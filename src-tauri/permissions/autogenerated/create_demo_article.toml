@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-create-demo-article"
+description = "Enables the create_demo_article command without any pre-configured scope."
+commands.allow = ["create_demo_article"]
+
+[[permission]]
+identifier = "deny-create-demo-article"
+description = "Denies the create_demo_article command without any pre-configured scope."
+commands.deny = ["create_demo_article"]

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.sql text eol=lf
+*.png binary
+*.ico binary
+*.icns binary
+# 需求原文中的 Markdown 双空格用于显式换行。
+docs/initialization-requirements.md whitespace=-blank-at-eol

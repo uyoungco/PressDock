@@ -1,0 +1,66 @@
+[
+  {
+    "id": "demo-1",
+    "source": {
+      "id": "source-1",
+      "title": "城市更新，让老街区焕发新活力",
+      "url": "https://example.com/news/urban-renewal",
+      "content": "清晨的老街区，第一家早餐店已经开门。沿街整修后的建筑保留了原有风貌，新增的公共空间吸引居民驻足。\n\n城市更新既要改善生活环境，也要延续街区记忆。社区正在收集居民意见，逐步完善公共设施。\n\n这是一篇用于演示工作流程的素材，不代表真实新闻报道。",
+      "importedAt": "2026-10-22T01:30:00Z"
+    },
+    "title": "城市更新，让老街区焕发新活力",
+    "content": "清晨的老街区，第一家早餐店已经开门。沿街整修后的建筑保留了原有风貌，新增的公共空间吸引居民驻足。\n\n城市更新既要改善生活环境，也要延续街区记忆。社区正在收集居民意见，逐步完善公共设施。\n\n这是一篇用于演示工作流程的素材，不代表真实新闻报道。",
+    "status": "draft",
+    "createdAt": "2026-10-22T01:30:00Z",
+    "updatedAt": "2026-10-22T02:10:00Z",
+    "isDemo": true
+  },
+  {
+    "id": "demo-2",
+    "source": {
+      "id": "source-2",
+      "title": "公共图书馆延长开放时间",
+      "url": "https://example.com/news/library",
+      "content": "公共阅读空间正在探索更灵活的服务方式。延长开放时间的方案将结合读者需求进一步完善。\n\n此内容为演示素材。",
+      "importedAt": "2026-10-22T00:40:00Z"
+    },
+    "title": "公共图书馆延长开放时间",
+    "content": "公共阅读空间正在探索更灵活的服务方式。延长开放时间的方案将结合读者需求进一步完善。\n\n此内容为演示素材。",
+    "status": "review",
+    "createdAt": "2026-10-22T00:40:00Z",
+    "updatedAt": "2026-10-22T01:50:00Z",
+    "isDemo": true
+  },
+  {
+    "id": "demo-3",
+    "source": {
+      "id": "source-3",
+      "title": "秋日田野里的丰收图景",
+      "url": "https://example.com/news/harvest",
+      "content": "秋日田野里，农户正在忙碌。农业服务人员走进田间，提供技术支持。\n\n此内容为演示素材。",
+      "importedAt": "2026-10-21T08:00:00Z"
+    },
+    "title": "秋日田野里的丰收图景",
+    "content": "秋日田野里，农户正在忙碌。农业服务人员走进田间，提供技术支持。\n\n此内容为演示素材。",
+    "status": "imported",
+    "createdAt": "2026-10-21T08:00:00Z",
+    "updatedAt": "2026-10-21T08:00:00Z",
+    "isDemo": true
+  },
+  {
+    "id": "demo-4",
+    "source": {
+      "id": "source-4",
+      "title": "青年创作者走进社区",
+      "url": "https://example.com/news/community",
+      "content": "青年创作者来到社区，通过展览和交流分享生活观察。\n\n此内容为演示素材。",
+      "importedAt": "2026-10-20T06:00:00Z"
+    },
+    "title": "青年创作者走进社区",
+    "content": "青年创作者来到社区，通过展览和交流分享生活观察。\n\n此内容为演示素材。",
+    "status": "published",
+    "createdAt": "2026-10-20T06:00:00Z",
+    "updatedAt": "2026-10-21T06:00:00Z",
+    "isDemo": true
+  }
+]
