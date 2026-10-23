@@ -22,9 +22,13 @@ import { currentArticleIdAtom, editorDirtyAtom } from "@/atoms/editor";
 import { editorService } from "@/features/editor/service";
 import { isDesktop } from "@/services/tauri/client";
 import type { Article } from "@/types/article";
+import { useAuth } from "@/hooks/use-auth";
+import { authService } from "@/features/auth/service";
+import { editorBuffers } from "@/features/editor/buffer";
 
 export default function Editor() {
   const { id = "" } = useParams();
+  const userId = useAuth().session?.user.userId ?? 0;
   const [article, setArticle] = useState<Article | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -33,7 +37,9 @@ export default function Editor() {
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useAtom(editorDirtyAtom);
   const setCurrent = useSetAtom(currentArticleIdAtom);
-  const blocker = useBlocker(dirty);
+  const blocker = useBlocker(
+    () => dirty && authService.getSnapshot().status === "authenticated",
+  );
   useBeforeUnload((event) => {
     if (dirty) {
       event.preventDefault();
@@ -50,9 +56,13 @@ export default function Editor() {
       .then((data) => {
         if (active) {
           setArticle(data);
-          setTitle(data.title);
-          setContent(data.content);
-          setDirty(false);
+          const buffer = editorBuffers.get(userId, id);
+          setTitle(buffer?.title ?? data.title);
+          setContent(buffer?.content ?? data.content);
+          setDirty(
+            !!buffer &&
+              (buffer.title !== data.title || buffer.content !== data.content),
+          );
         }
       })
       .catch((reason: unknown) => {
@@ -71,10 +81,11 @@ export default function Editor() {
       setDirty(false);
       setCurrent(null);
     };
-  }, [id, setCurrent, setDirty]);
+  }, [id, userId, setCurrent, setDirty]);
   const change = (nextTitle: string, nextContent: string) => {
     setTitle(nextTitle);
     setContent(nextContent);
+    editorBuffers.set(userId, id, { title: nextTitle, content: nextContent });
     setDirty(nextTitle !== article?.title || nextContent !== article.content);
   };
   async function save() {
@@ -84,6 +95,7 @@ export default function Editor() {
       setArticle(saved);
       setTitle(saved.title);
       setDirty(false);
+      editorBuffers.remove(userId, id);
       toast.success(
         isDesktop()
           ? "草稿已保存到本地 SQLite"
@@ -228,6 +240,7 @@ export default function Editor() {
               variant="destructive"
               onClick={() => {
                 setDirty(false);
+                editorBuffers.remove(userId, id);
                 if (blocker.state === "blocked") blocker.proceed();
               }}
             >

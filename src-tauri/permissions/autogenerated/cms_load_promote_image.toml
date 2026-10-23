@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-load-promote-image"
+description = "Enables the cms_load_promote_image command without any pre-configured scope."
+commands.allow = ["cms_load_promote_image"]
+
+[[permission]]
+identifier = "deny-cms-load-promote-image"
+description = "Denies the cms_load_promote_image command without any pre-configured scope."
+commands.deny = ["cms_load_promote_image"]

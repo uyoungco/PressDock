@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAtom } from "jotai";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Search, Sun, Moon, Monitor, Settings, PanelLeft } from "lucide-react";
@@ -12,12 +13,44 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { navigation } from "./navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { editorDirtyAtom } from "@/atoms/editor";
+import { useAuth } from "@/hooks/use-auth";
+import { authService } from "@/features/auth/service";
+import { toast } from "sonner";
+import { ServiceError } from "@/services/tauri/client";
 
 export function TopBar({ onMenu }: { onMenu: () => void }) {
   const [theme, setTheme] = useAtom(themeAtom);
   const [search, setSearch] = useAtom(globalSearchAtom);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const auth = useAuth();
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const [dirty, setDirty] = useAtom(editorDirtyAtom);
+  async function logout() {
+    setConfirmLogout(false);
+    setDirty(false);
+    try {
+      const result = await authService.logout();
+      if (!result.credentialsCleared)
+        toast.error("已退出当前会话，但安全凭据未能禁用。请检查应用数据目录。");
+      else if (!result.remoteSucceeded)
+        toast.warning("已退出本地会话，后台退出请求未成功。");
+    } catch (reason) {
+      if (reason instanceof ServiceError && reason.code === "SESSION_CHANGED")
+        return;
+      toast.error(
+        "已退出界面，但无法确认本地凭据清理结果，请重试退出或重启应用检查。",
+      );
+    }
+  }
   const current = navigation.find((item) =>
     pathname.startsWith(item.to.split("/demo")[0]),
   );
@@ -86,6 +119,36 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
       >
         <Settings className="size-4" />
       </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" aria-label="账号菜单">
+            {auth.session?.user.nickname}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onSelect={() => setConfirmLogout(true)}>
+            退出登录
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Dialog open={confirmLogout} onOpenChange={setConfirmLogout}>
+        <DialogContent>
+          <DialogTitle>退出登录？</DialogTitle>
+          <DialogDescription>
+            {dirty
+              ? "当前有未保存修改，退出后将丢失。取消退出可返回保存草稿。"
+              : "退出后需要重新登录才能进入工作区。"}
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmLogout(false)}>
+              取消
+            </Button>
+            <Button variant="destructive" onClick={() => void logout()}>
+              {dirty ? "放弃修改并退出" : "确认退出"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

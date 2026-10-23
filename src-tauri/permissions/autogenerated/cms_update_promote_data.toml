@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-update-promote-data"
+description = "Enables the cms_update_promote_data command without any pre-configured scope."
+commands.allow = ["cms_update_promote_data"]
+
+[[permission]]
+identifier = "deny-cms-update-promote-data"
+description = "Denies the cms_update_promote_data command without any pre-configured scope."
+commands.deny = ["cms_update_promote_data"]

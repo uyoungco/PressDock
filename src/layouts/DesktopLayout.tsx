@@ -15,7 +15,10 @@ import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { cn } from "@/lib/utils";
 
-export function DesktopLayout({ children }: PropsWithChildren) {
+export function DesktopLayout({
+  children,
+  contentScroll = "page",
+}: PropsWithChildren<{ contentScroll?: "page" | "contained" }>) {
   const [open, setOpen] = useAtom(sidebarOpenAtom);
   const { pathname } = useLocation();
   return (
@@ -42,11 +45,11 @@ export function DesktopLayout({ children }: PropsWithChildren) {
           </div>
         )}
         <nav aria-label="主导航" className="space-y-1 p-2 pt-3">
-          {navigation.map(({ to, label, icon: Icon }, index) => {
+          {navigation.map(({ to, label, icon: Icon }) => {
             const active = pathname.startsWith(to.split("/demo")[0]);
             return (
               <div key={to}>
-                {index === 6 && <Separator className="my-3" />}
+                {to === "/settings" && <Separator className="my-3" />}
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <NavLink
@@ -101,11 +104,16 @@ export function DesktopLayout({ children }: PropsWithChildren) {
           </div>
         )}
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <TopBar onMenu={() => setOpen(!open)} />
         <main
           id="main-content"
-          className="flex-1 overflow-auto bg-muted/20 p-7"
+          className={cn(
+            "min-h-0 min-w-0 flex-1 bg-muted/20",
+            contentScroll === "contained"
+              ? "flex flex-col overflow-hidden p-4"
+              : "overflow-auto p-7",
+          )}
         >
           {children}
         </main>

@@ -27,6 +27,9 @@ export class LocalArticleRepository implements CmsAdapter {
     });
   }
   async publishArticle(_id: string): Promise<void> {
-    throw new ServiceError("NOT_CONFIGURED", "CMS 尚未连接，未执行发布");
+    throw new ServiceError(
+      "NOT_CONFIGURED",
+      "CMS 发布接口尚未接入，未执行发布",
+    );
   }
 }

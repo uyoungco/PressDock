@@ -9,6 +9,19 @@
     "allow-list-articles",
     "allow-get-article",
     "allow-save-draft",
-    "allow-create-demo-article"
+    "allow-create-demo-article",
+    "allow-cms-login",
+    "allow-cms-restore-session",
+    "allow-cms-logout",
+    "allow-cms-list-promote-channels",
+    "allow-cms-list-promote-data",
+    "allow-cms-load-promote-image",
+    "allow-cms-get-promote-data",
+    "allow-cms-create-promote-data",
+    "allow-cms-update-promote-data",
+    "allow-cms-delete-promote-data",
+    "allow-cms-save-promote-order",
+    "allow-cms-upload-promote-image",
+    "allow-open-external-link"
   ]
 }

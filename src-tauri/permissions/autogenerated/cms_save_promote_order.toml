@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-save-promote-order"
+description = "Enables the cms_save_promote_order command without any pre-configured scope."
+commands.allow = ["cms_save_promote_order"]
+
+[[permission]]
+identifier = "deny-cms-save-promote-order"
+description = "Denies the cms_save_promote_order command without any pre-configured scope."
+commands.deny = ["cms_save_promote_order"]

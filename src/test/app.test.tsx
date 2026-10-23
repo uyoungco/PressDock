@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
@@ -8,6 +8,36 @@ import { routes } from "@/app/router";
 import { themeAtom } from "@/atoms/theme";
 import { sidebarOpenAtom } from "@/atoms/navigation";
 import { editorDirtyAtom, editorStatusAtom } from "@/atoms/editor";
+import { cmsIpc } from "@/services/tauri/cms";
+import { authService } from "@/features/auth/service";
+
+vi.mock("@/services/tauri/cms", () => ({
+  cmsIpc: { restore: vi.fn(), login: vi.fn(), logout: vi.fn() },
+}));
+vi.mock("@/services/tauri/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/tauri/client")>()),
+  isDesktop: vi.fn(() => true),
+}));
+vi.mock("@/services/cms", async () => ({
+  articleService: new (await import("@/services/cms/mock")).MockCmsAdapter(),
+}));
+vi.mock("@/services/tauri/system", () => ({
+  systemService: {
+    getAppInfo: vi.fn(async () => ({
+      name: "PressDock",
+      version: "0.1.0",
+      platform: "test",
+    })),
+    healthCheck: vi.fn(async () => ({ ready: true })),
+  },
+}));
+beforeEach(() => {
+  authService.useLoginForm();
+  vi.mocked(cmsIpc.restore).mockResolvedValue({
+    user: { userId: 6, nickname: "editor", roles: ["admin"], perms: ["admin"] },
+    persistent: true,
+  });
+});
 
 describe("工作区", () => {
   it("渲染工作台并能切换路由", async () => {
@@ -29,7 +59,9 @@ describe("工作区", () => {
     expect(
       await screen.findByRole("heading", { name: "系统设置" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("浏览器预览，Rust 服务不可用")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Rust 与 SQLite 已就绪"),
+    ).toBeInTheDocument();
     router.dispose();
   });
   it("未知路由回到工作台", async () => {

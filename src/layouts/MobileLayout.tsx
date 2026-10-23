@@ -10,11 +10,15 @@ import {
 import { navigation } from "@/components/layout/navigation";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
+import { cn } from "@/lib/utils";
 
-export function MobileLayout({ children }: PropsWithChildren) {
+export function MobileLayout({
+  children,
+  contentScroll = "page",
+}: PropsWithChildren<{ contentScroll?: "page" | "contained" }>) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh min-w-0 flex-col overflow-hidden">
       <TopBar onMenu={() => setOpen(true)} />
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-72 p-5">
@@ -40,7 +44,15 @@ export function MobileLayout({ children }: PropsWithChildren) {
           </nav>
         </SheetContent>
       </Sheet>
-      <main id="main-content" className="flex-1 overflow-auto bg-muted/20 p-4">
+      <main
+        id="main-content"
+        className={cn(
+          "min-h-0 min-w-0 flex-1 bg-muted/20",
+          contentScroll === "contained"
+            ? "flex flex-col overflow-hidden p-2"
+            : "overflow-auto p-4",
+        )}
+      >
         {children}
       </main>
       <StatusBar />

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-login"
+description = "Enables the cms_login command without any pre-configured scope."
+commands.allow = ["cms_login"]
+
+[[permission]]
+identifier = "deny-cms-login"
+description = "Denies the cms_login command without any pre-configured scope."
+commands.deny = ["cms_login"]

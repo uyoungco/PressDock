@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 .tools/
 *.tsbuildinfo
+*.exe
 coverage/
 .env
 .env.*

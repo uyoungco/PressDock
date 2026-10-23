@@ -17,7 +17,7 @@ cargo test --manifest-path src-tauri/Cargo.toml
 
 ```text
 npm ci                         安装锁定的前端依赖
-npm run dev                    Vite 浏览器演示，localhost:1420
+npm run dev                    Vite 登录页预览，localhost:1420
 npm run tauri dev              桌面开发
 npm run lint                   ESLint，警告也视为失败
 npm test                       Vitest 单次执行

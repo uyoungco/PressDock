@@ -22,9 +22,11 @@ import { themeAtom, type Theme } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
 import { APP_NAME, APP_VERSION } from "@/constants/app";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Settings() {
   const [theme, setTheme] = useAtom(themeAtom);
+  const auth = useAuth();
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [health, setHealth] = useState("正在检查…");
   useEffect(() => {
@@ -54,7 +56,11 @@ export default function Settings() {
   }, []);
   return (
     <>
-      <PageHeader title="系统设置" description="管理工作区外观与服务连接。" />
+      <PageHeader
+        title="系统设置"
+        description="管理工作区外观与服务连接。"
+        demo={false}
+      />
       <div className="grid gap-5 xl:grid-cols-2">
         <Card className="shadow-none">
           <CardHeader>
@@ -110,12 +116,29 @@ export default function Settings() {
             </p>
           </CardContent>
         </Card>
+        <Card className="shadow-none">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plug className="size-4" />
+              CMS 连接
+            </CardTitle>
+            <Badge variant="secondary">已登录 · 只读素材</Badge>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>新闻管理后台 · newsadmin.nccontrol.com.cn</p>
+            <p>
+              当前账号：{auth.session?.user.nickname} · 角色：
+              {auth.session?.user.roles.join("、")}
+            </p>
+            <p>
+              {auth.session?.persistent
+                ? "会话已安全保存，重启后验证恢复。"
+                : "会话仅本次运行有效，关闭后需要重新登录。"}
+            </p>
+            <p>渠道素材支持筛选和查看；发布接口尚未接入。</p>
+          </CardContent>
+        </Card>
         {[
-          {
-            title: "CMS 连接",
-            icon: Plug,
-            text: "未来连接新闻 CMS。采集、认证和发布适配器将在明确接口协议后接入。",
-          },
           {
             title: "AI 服务",
             icon: Sparkles,

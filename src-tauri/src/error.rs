@@ -22,6 +22,15 @@ pub struct CommandError {
     message: String,
 }
 
+impl From<crate::cms::CmsError> for CommandError {
+    fn from(error: crate::cms::CmsError) -> Self {
+        Self {
+            code: error.code,
+            message: error.message,
+        }
+    }
+}
+
 impl From<AppError> for CommandError {
     fn from(error: AppError) -> Self {
         let (code, message) = match &error {

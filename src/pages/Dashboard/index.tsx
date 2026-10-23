@@ -141,8 +141,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="text-sm">你的新闻编辑工作空间</CardTitle>
             <CardDescription className="leading-relaxed">
-              当前使用演示素材。连接采集工具与 CMS
-              后，即可逐步接入真实编辑流程。
+              当前本地稿件为演示素材。渠道素材已可查询，真实采集与发布尚未接入。
             </CardDescription>
           </CardHeader>
           <CardContent>

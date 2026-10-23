@@ -39,7 +39,7 @@ export default function Publish() {
       <div className="mb-5 flex items-start gap-3 rounded-lg border border-amber-500/25 bg-amber-500/5 p-4 text-sm">
         <Unplug className="mt-0.5 size-4 shrink-0 text-amber-600" />
         <div>
-          <p className="font-medium">CMS 尚未连接</p>
+          <p className="font-medium">发布接口尚未接入</p>
           <p className="mt-1 text-xs text-muted-foreground">
             当前列表为演示数据，所有操作均不会向外部 CMS 发布文章。
           </p>

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-logout"
+description = "Enables the cms_logout command without any pre-configured scope."
+commands.allow = ["cms_logout"]
+
+[[permission]]
+identifier = "deny-cms-logout"
+description = "Denies the cms_logout command without any pre-configured scope."
+commands.deny = ["cms_logout"]

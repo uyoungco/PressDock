@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-list-promote-data"
+description = "Enables the cms_list_promote_data command without any pre-configured scope."
+commands.allow = ["cms_list_promote_data"]
+
+[[permission]]
+identifier = "deny-cms-list-promote-data"
+description = "Denies the cms_list_promote_data command without any pre-configured scope."
+commands.deny = ["cms_list_promote_data"]

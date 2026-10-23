@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-delete-promote-data"
+description = "Enables the cms_delete_promote_data command without any pre-configured scope."
+commands.allow = ["cms_delete_promote_data"]
+
+[[permission]]
+identifier = "deny-cms-delete-promote-data"
+description = "Denies the cms_delete_promote_data command without any pre-configured scope."
+commands.deny = ["cms_delete_promote_data"]
