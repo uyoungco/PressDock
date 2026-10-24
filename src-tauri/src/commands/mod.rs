@@ -1,6 +1,10 @@
 mod articles;
 mod cms;
+mod image_presets;
+mod images;
 mod system;
 pub use articles::*;
 pub use cms::*;
+pub use image_presets::*;
+pub use images::*;
 pub use system::*;

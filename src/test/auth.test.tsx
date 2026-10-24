@@ -263,11 +263,13 @@ describe("登录和工作区认证", () => {
       "secret{Enter}",
     );
     await screen.findByRole("button", { name: "开始排序" });
-    expect(
-      [...document.querySelectorAll("tbody tr")].map((e) =>
-        e.getAttribute("data-material-id"),
-      ),
-    ).toEqual(["1", "2"]);
+    await waitFor(() =>
+      expect(
+        [...document.querySelectorAll("tbody tr")].map((e) =>
+          e.getAttribute("data-material-id"),
+        ),
+      ).toEqual(["1", "2"]),
+    );
     expect(cmsIpc.list).toHaveBeenCalledTimes(2);
     expect(cmsIpc.order).not.toHaveBeenCalled();
     router.dispose();

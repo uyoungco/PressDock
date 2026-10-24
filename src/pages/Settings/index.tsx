@@ -23,6 +23,13 @@ import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
 import { APP_NAME, APP_VERSION } from "@/constants/app";
 import { useAuth } from "@/hooks/use-auth";
+import { ImagePresetSettings } from "@/features/image-presets/ImagePresetSettings";
+
+const themeOptions: { value: Theme; label: string }[] = [
+  { value: "system", label: "跟随系统" },
+  { value: "light", label: "浅色" },
+  { value: "dark", label: "深色" },
+];
 
 export default function Settings() {
   const [theme, setTheme] = useAtom(themeAtom);
@@ -62,6 +69,7 @@ export default function Settings() {
         demo={false}
       />
       <div className="grid gap-5 xl:grid-cols-2">
+        <ImagePresetSettings />
         <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -76,9 +84,12 @@ export default function Settings() {
             <label htmlFor="theme-select" className="text-sm">
               界面主题
             </label>
-            <Select
+            <Select<Theme>
+              items={themeOptions}
               value={theme}
-              onValueChange={(value) => setTheme(value as Theme)}
+              onValueChange={(value) => {
+                if (value !== null) setTheme(value);
+              }}
             >
               <SelectTrigger
                 id="theme-select"

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-image-process"
+description = "Enables the image_process command without any pre-configured scope."
+commands.allow = ["image_process"]
+
+[[permission]]
+identifier = "deny-image-process"
+description = "Denies the image_process command without any pre-configured scope."
+commands.deny = ["image_process"]

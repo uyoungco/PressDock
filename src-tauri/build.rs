@@ -21,6 +21,12 @@ fn main() {
             "cms_save_promote_order",
             "cms_upload_promote_image",
             "open_external_link",
+            "image_inspect",
+            "image_process",
+            "image_cancel",
+            "image_export",
+            "list_channel_image_presets",
+            "save_channel_image_presets",
         ]),
     ))
     .expect("failed to build Tauri application metadata");

@@ -19,6 +19,11 @@ import { globalSearchAtom } from "@/atoms/app";
 import { STATUS_LABELS } from "@/constants/app";
 import { useArticles } from "@/hooks/use-articles";
 
+const statusOptions = [
+  { value: "all", label: "全部状态" },
+  ...Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label })),
+];
+
 export default function Articles() {
   const { articles, loading, error } = useArticles();
   const [search, setSearch] = useAtom(globalSearchAtom);
@@ -54,7 +59,13 @@ export default function Articles() {
               className="pl-9"
             />
           </div>
-          <Select value={status} onValueChange={setStatus}>
+          <Select
+            items={statusOptions}
+            value={status}
+            onValueChange={(value) => {
+              if (value !== null) setStatus(value);
+            }}
+          >
             <SelectTrigger aria-label="筛选文章状态" className="w-36">
               <SelectValue />
             </SelectTrigger>
@@ -72,7 +83,9 @@ export default function Articles() {
           </span>
         </div>
         <LoadState loading={loading} error={error} />
-        {!loading && !error && <ArticleTable articles={filtered} />}
+        {!loading && !error && (
+          <ArticleTable articles={filtered} preferenceKey="articles" />
+        )}
       </Card>
     </>
   );

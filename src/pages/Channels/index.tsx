@@ -4,11 +4,22 @@ import { Copy, RotateCcw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/common/SearchableSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MaterialImage } from "@/features/channels/MaterialImage";
 import { channelQueryMemory } from "@/features/channels/query-memory";
 import { MaterialTable } from "@/features/channels/MaterialTable";
+import { materialColumnPreferences } from "@/features/channels/table-model";
+import { useColumnPreferences } from "@/hooks/use-column-preferences";
+import { DataTableColumnSettings } from "@/components/ui/data-table-column-settings";
 import { useChannelActions } from "@/features/channels/use-channel-actions";
 import {
   Dialog,
@@ -30,8 +41,6 @@ import {
   type PromoteField,
 } from "@/types/cms";
 
-const selectClass =
-  "h-7 min-w-0 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 max-md:min-h-11";
 const show = (value: string | number | null) =>
   value === "" || value === null ? "—" : String(value);
 const queryKey = (query: PromoteQuery) => channelQueryParams(query).toString();
@@ -152,6 +161,10 @@ export default function Channels() {
 }
 
 function ChannelResults() {
+  const columnPreferences = useColumnPreferences(
+    "channels",
+    materialColumnPreferences,
+  );
   const [params, setParams] = useSearchParams();
   const applied = useMemo(() => readChannelQuery(params), [params]);
   const key = queryKey(applied);
@@ -305,56 +318,52 @@ function ChannelResults() {
           }}
         >
           <fieldset disabled={locked} className="contents">
-            <label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:min-w-36">
-              渠道
-              <select
+            <div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:min-w-36">
+              <label htmlFor="channel-filter">渠道</label>
+              <SearchableSelect
+                id="channel-filter"
                 aria-label="渠道"
-                className={selectClass}
+                className="h-7 w-full max-md:min-h-11"
                 value={draft.channel}
-                disabled={groupsLoading || !!groupsError}
-                onChange={(event) =>
+                options={[
+                  { value: "", label: "全部渠道" },
+                  ...groups.map((group) => ({
+                    value: group.channel,
+                    label: group.channel,
+                  })),
+                ]}
+                searchPlaceholder="搜索渠道…"
+                disabled={locked || groupsLoading || !!groupsError}
+                onValueChange={(value) =>
                   setDraft({
                     ...draft,
-                    channel: event.target.value,
+                    channel: value,
                     subchannel: "",
                   })
                 }
-              >
-                <option value="">全部渠道</option>
-                {draft.channel &&
-                  !groups.some((group) => group.channel === draft.channel) && (
-                    <option value={draft.channel}>{draft.channel}</option>
-                  )}
-                {groups.map((group) => (
-                  <option key={group.channel} value={group.channel}>
-                    {group.channel}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:min-w-48">
-              子渠道
-              <select
+              />
+            </div>
+            <div className="col-span-2 flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:w-[28rem] md:max-w-full">
+              <label htmlFor="subchannel-filter">子渠道</label>
+              <SearchableSelect
+                id="subchannel-filter"
                 aria-label="子渠道"
-                className={`${selectClass} max-w-80`}
+                className="h-auto min-h-7 w-full py-1 max-md:min-h-11"
+                wrapLabels
                 value={draft.subchannel}
-                disabled={!draft.channel || groupsLoading || !!groupsError}
-                onChange={(event) =>
-                  setDraft({ ...draft, subchannel: event.target.value })
+                options={[
+                  { value: "", label: "全部子渠道" },
+                  ...subchannels.map((value) => ({ value, label: value })),
+                ]}
+                searchPlaceholder="搜索子渠道…"
+                disabled={
+                  locked || !draft.channel || groupsLoading || !!groupsError
                 }
-              >
-                <option value="">全部子渠道</option>
-                {draft.subchannel &&
-                  !subchannels.includes(draft.subchannel) && (
-                    <option value={draft.subchannel}>{draft.subchannel}</option>
-                  )}
-                {subchannels.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
+                onValueChange={(value) =>
+                  setDraft({ ...draft, subchannel: value })
+                }
+              />
+            </div>
             <label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
               发布日期
               <Input
@@ -435,6 +444,12 @@ function ChannelResults() {
               </span>
             )
           )}
+          <div className="ml-auto">
+            <DataTableColumnSettings
+              controller={columnPreferences}
+              disabled={locked}
+            />
+          </div>
         </div>
         <div
           ref={listViewport}
@@ -480,9 +495,9 @@ function ChannelResults() {
               </Button>
             </div>
           ) : (
-            matchingResult &&
-            (matchingResult.data.length ? (
+            matchingResult && (
               <MaterialTable
+                preferences={columnPreferences}
                 rows={actions.sorted ?? matchingResult.data}
                 sorting={actions.sorting}
                 busy={actions.busy}
@@ -491,11 +506,7 @@ function ChannelResults() {
                 onEdit={(row) => void actions.beginEdit(row)}
                 onDelete={actions.requestDelete}
               />
-            ) : (
-              <p className="py-16 text-center text-sm text-muted-foreground">
-                暂无符合条件的素材
-              </p>
-            ))
+            )
           )}
         </div>
         <div
@@ -513,30 +524,41 @@ function ChannelResults() {
               ` · 服务端参考总数 ${matchingResult.total}`}
           </span>
           <div className="flex flex-wrap items-center justify-between gap-2 sm:ml-auto sm:gap-3">
-            <label className="flex items-center gap-2">
-              每页条数
-              <select
-                aria-label="每页条数"
+            <div className="flex items-center gap-2">
+              <label htmlFor="page-size-filter">每页条数</label>
+              <Select<PromoteQuery["pagesize"]>
                 disabled={locked}
-                className={selectClass}
+                items={pageSizes.map((value) => ({
+                  value,
+                  label: String(value),
+                }))}
                 value={applied.pagesize}
-                onChange={(event) =>
-                  submit({
-                    ...applied,
-                    current: 1,
-                    pagesize: Number(
-                      event.target.value,
-                    ) as PromoteQuery["pagesize"],
-                  })
-                }
+                onValueChange={(value) => {
+                  if (value !== null)
+                    submit({
+                      ...applied,
+                      current: 1,
+                      pagesize: value,
+                    });
+                }}
               >
-                {pageSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </label>
+                <SelectTrigger
+                  id="page-size-filter"
+                  aria-label="每页条数"
+                  size="sm"
+                  className="min-w-16 max-md:min-h-11"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {pageSizes.map((size) => (
+                    <SelectItem key={size} value={size}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"

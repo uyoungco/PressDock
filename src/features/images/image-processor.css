@@ -1,0 +1,31 @@
+.image-processor .ReactCrop {
+  flex-shrink: 0;
+  max-width: none;
+}
+.image-processor .ReactCrop__child-wrapper {
+  overflow: visible;
+}
+.image-processor .ReactCrop__crop-selection {
+  border: 1px solid white;
+}
+.image-processor .ReactCrop__drag-handle::after {
+  background: white;
+  border: 1px solid #171717;
+}
+.image-processor .ReactCrop__crop-selection:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 3px;
+}
+.image-transparency {
+  background-color: #fafafa;
+  background-image: conic-gradient(
+    #ddd 25%,
+    transparent 0 50%,
+    #ddd 0 75%,
+    transparent 0
+  );
+  background-size: 16px 16px;
+}
+.image-processor-viewport {
+  scrollbar-color: #737373 #171717;
+}

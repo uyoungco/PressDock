@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { channelService } from "./service";
+import { useMaterialImage } from "./use-material-image";
 import type { MaterialEdit } from "./edit-buffer";
 import type { PromoteInput } from "@/types/cms";
 
@@ -30,45 +29,7 @@ export function MaterialForm({
   onUploading: (value: boolean) => void;
   error: string | null;
 }) {
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const alive = useRef(true);
-  const locked = useRef(false);
-  useEffect(() => {
-    alive.current = true;
-    return () => {
-      alive.current = false;
-    };
-  }, []);
-  const latest = useRef(edit.input);
-  useEffect(() => {
-    latest.current = edit.input;
-  }, [edit.input]);
-  async function upload(
-    file: File | undefined,
-    field: "titlePic" | "titlePic2",
-  ) {
-    if (!file || locked.current || busy) return;
-    locked.current = true;
-    setUploading(true);
-    onUploading(true);
-    setUploadError(null);
-    try {
-      const result = await channelService.upload(file);
-      if (alive.current) onChange({ ...latest.current, [field]: result.url });
-    } catch (reason) {
-      if (alive.current)
-        setUploadError(
-          reason instanceof Error ? reason.message : "图片上传失败",
-        );
-    } finally {
-      locked.current = false;
-      if (alive.current) {
-        setUploading(false);
-        onUploading(false);
-      }
-    }
-  }
+  const image = useMaterialImage(edit.input, busy, onChange, onUploading);
   const fields: [keyof PromoteInput, string][] = [
     ["channel", "Channel"],
     ["subChannel", "SubChannel"],
@@ -84,11 +45,12 @@ export function MaterialForm({
     <Dialog
       open
       onOpenChange={(open) => {
-        if (!open && !busy) onClose();
+        if (!open && !busy && !image.working) onClose();
       }}
     >
       <DialogContent
         className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl"
+        showCloseButton={!busy && !image.working}
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogTitle>{edit.base ? "修改素材" : "新增素材"}</DialogTitle>
@@ -99,7 +61,7 @@ export function MaterialForm({
           id="material-form"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!uploading && !busy) onSave();
+            if (!image.working && !busy) onSave();
           }}
           noValidate
           className="space-y-4"
@@ -126,7 +88,18 @@ export function MaterialForm({
                   value={edit.input[field] ?? ""}
                   disabled={
                     busy ||
-                    (uploading && ["titlePic", "titlePic2"].includes(field))
+                    (image.working &&
+                      [
+                        "channel",
+                        "subChannel",
+                        "titlePic",
+                        "titlePic2",
+                      ].includes(field))
+                  }
+                  onPaste={
+                    field === "titlePic" || field === "titlePic2"
+                      ? (event) => image.paste(event, field)
+                      : undefined
                   }
                   onChange={(e) =>
                     onChange({ ...edit.input, [field]: e.target.value })
@@ -136,38 +109,42 @@ export function MaterialForm({
               {(field === "titlePic" || field === "titlePic2") && (
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   aria-label={`上传 ${label}`}
-                  disabled={busy || uploading}
+                  disabled={busy || image.working}
                   className="block max-w-full text-xs file:mr-3 file:rounded-md file:border file:bg-secondary file:px-3 file:py-2"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     e.target.value = "";
-                    void upload(file, field);
+                    image.start(file, field);
                   }}
                 />
               )}
             </div>
           ))}
-          {uploading && <p role="status">正在上传图片…</p>}
-          {(error || uploadError) && (
+          {(error || image.error) && (
             <p role="alert" className="text-sm text-destructive">
-              {error || uploadError}
+              {error || image.error}
             </p>
           )}
         </form>
         <DialogFooter>
-          <Button variant="outline" disabled={busy} onClick={onClose}>
+          <Button
+            variant="outline"
+            disabled={busy || image.working}
+            onClick={onClose}
+          >
             取消
           </Button>
           <Button
             type="submit"
             form="material-form"
-            disabled={busy || uploading}
+            disabled={busy || image.working}
           >
             {busy ? "正在保存…" : "保存素材"}
           </Button>
         </DialogFooter>
+        {image.dialog}
       </DialogContent>
     </Dialog>
   );

@@ -22,6 +22,12 @@
     "allow-cms-delete-promote-data",
     "allow-cms-save-promote-order",
     "allow-cms-upload-promote-image",
-    "allow-open-external-link"
+    "allow-open-external-link",
+    "allow-image-inspect",
+    "allow-image-process",
+    "allow-image-cancel",
+    "allow-image-export",
+    "allow-list-channel-image-presets",
+    "allow-save-channel-image-presets"
   ]
 }

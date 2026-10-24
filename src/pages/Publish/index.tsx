@@ -68,7 +68,9 @@ export default function Publish() {
             </CardHeader>
             <CardContent className="p-0">
               <LoadState loading={loading} error={error} />
-              {!loading && !error && <ArticleTable articles={pending} />}
+              {!loading && !error && (
+                <ArticleTable articles={pending} preferenceKey="publish" />
+              )}
             </CardContent>
           </Card>
         </TabsContent>

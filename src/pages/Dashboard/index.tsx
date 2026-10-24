@@ -101,6 +101,7 @@ export default function Dashboard() {
           <LoadState loading={loading} error={error} />
           {!loading && !error && (
             <ArticleTable
+              preferenceKey="dashboard"
               articles={[...articles]
                 .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
                 .slice(0, 5)}

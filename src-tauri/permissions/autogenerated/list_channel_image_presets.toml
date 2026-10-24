@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-list-channel-image-presets"
+description = "Enables the list_channel_image_presets command without any pre-configured scope."
+commands.allow = ["list_channel_image_presets"]
+
+[[permission]]
+identifier = "deny-list-channel-image-presets"
+description = "Denies the list_channel_image_presets command without any pre-configured scope."
+commands.deny = ["list_channel_image_presets"]

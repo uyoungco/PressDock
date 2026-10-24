@@ -3,6 +3,7 @@ pub mod cms;
 mod commands;
 mod database;
 mod error;
+mod imaging;
 mod system;
 use tauri::Manager;
 
@@ -10,6 +11,8 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .manage(std::sync::Arc::new(imaging::ImageJobs::default()))
         .setup(|app| {
             let directory = app.path().app_data_dir()?;
             let database = tauri::async_runtime::block_on(async {
@@ -39,7 +42,13 @@ pub fn run() {
             commands::cms_delete_promote_data,
             commands::cms_save_promote_order,
             commands::cms_upload_promote_image,
-            commands::open_external_link
+            commands::open_external_link,
+            commands::image_inspect,
+            commands::image_process,
+            commands::image_cancel,
+            commands::image_export,
+            commands::list_channel_image_presets,
+            commands::save_channel_image_presets
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

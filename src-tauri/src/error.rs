@@ -22,6 +22,15 @@ pub struct CommandError {
     message: String,
 }
 
+impl From<crate::imaging::ImageError> for CommandError {
+    fn from(error: crate::imaging::ImageError) -> Self {
+        Self {
+            code: error.code,
+            message: error.message,
+        }
+    }
+}
+
 impl From<crate::cms::CmsError> for CommandError {
     fn from(error: crate::cms::CmsError) -> Self {
         Self {

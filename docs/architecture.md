@@ -8,7 +8,7 @@ React 页面 / shadcn/ui
   → CmsAdapter / LocalArticleRepository
   → 类型化 Tauri IPC（services/tauri）
   → Rust commands（工作区命令检查会话）
-  → database / SQLx / SQLite，或 cms / reqwest / 固定新闻后台
+  → database / SQLx / SQLite，或 cms / reqwest / 固定新闻后台，或 imaging / 本地图片编码
 ```
 
 组件不直接调用 `invoke`，不执行 SQL。IPC 返回值由 Zod 校验；Rust 同时校验保存请求及导入 URL。错误以 `{ code, message }` 序列化，前端统一以 Sonner 显示。数据库内部错误只写入本地诊断输出，不将 SQL 和路径暴露给用户。
@@ -18,10 +18,12 @@ React 页面 / shadcn/ui
 - `app`：Provider、Hash 路由和异常页面。
 - `pages`：工作区与登录页面的视图及局部交互。
 - `features`：文章统计、导入、编辑、图片和发布模型及服务。
-- `components/ui`：由 shadcn CLI 安装的可访问基础组件；`common` 为业务通用展示，`layout` 为导航与工具栏。
+- `components/ui`：shadcn/ui 可访问基础组件，Select / Combobox 使用 Base UI，其余沿用 Radix；`common` 为业务通用展示，`layout` 为导航与工具栏。
 - `atoms`：主题、导航、搜索与编辑会话；派生 atom 展示编辑状态。
 - `services/cms`：可替换服务契约与 Mock；`storage`：本地持久化适配；`tauri`：唯一 IPC 出口。
-- Rust `commands`：薄入口；`database`：事务、迁移与查询；`system`：平台信息；`cms` / `ai`：服务配置契约。
+- Rust `commands`：薄入口；`database`：事务、迁移与查询；`system`：平台信息；`cms` / `ai`：服务配置契约；`imaging`：本地解码、取景、色彩管理和编码。
+
+业务下拉统一使用 Base UI Select；渠道、子渠道使用 `common/SearchableSelect`，由同系列 Combobox 实现弹层内搜索。搜索仅在内存中过滤已加载选项，中文按名称包含匹配、英文忽略大小写，不触发远程查询或改变选中值。选中后才通知业务层；关闭清空搜索，禁用时收起弹层。空字符串对应“全部”，配置中已移除的历史值仍可回显。调用方显式合并加载、错误、预设和页面操作锁定条件；普通短列表不显示搜索栏。新增选择控件时使用现有 Base UI 封装，不通过当前 Radix registry 配置覆盖这两个组件。
 
 ## 存储规则
 
@@ -58,6 +60,16 @@ SQLite 位于 `app.path().app_data_dir()/pressdock.db`。目录由 Tauri 按平�
 编辑缓冲只保存在进程内，本地稿件按用户 ID 和稿件 ID 区分，素材表单由 `channelEditBuffers` 按用户 ID 保存完整底稿与输入。会话失效后同账号登录可恢复，显式退出或换账号清空；排序在页面卸载时丢弃，重新登录后查询服务端顺序。SQLite 仍为现有共享本地工作区。
 
 ## 扩展边界
+
+图片处理采用 `ImageProcessor → features/images/service → services/tauri/images → commands/images → imaging`。组件只接收 File / Blob，不接收任意远程地址；尺寸、体积和格式分别锁定传入的预设，业务层再次检查预设与返回结果。百分比裁剪映射到经 EXIF 校正的原图像素，不使用 DOM 尺寸或 devicePixelRatio 导出。
+
+子渠道图片预设采用 `features/image-presets → services/tauri/image-presets → commands/image_presets → database/image_presets → SQLx`，本机 SQLite 按渠道、子渠道、图片字段唯一保存，不按账号隔离。素材表单通过局部焦点粘贴事件或文件选择启动处理弹框，每次读取最新规则，确认后经业务服务验证结果并调用现有 CMS 上传；成功仅回填地址。图片工作流与保存素材共用操作锁，会话变化和关闭后丢弃旧结果。
+
+Rust 通过内容签名识别格式并复核 MIME，限制 20 MiB 输入、2400 万像素及解码器分配；动画明确拒绝。Little CMS 将嵌入的 RGB / 灰度 ICC 转为 sRGB 后去除原始方向和元数据，保持 Alpha。尺寸调整采用预乘 Alpha 的 Lanczos3；只有取景和显式输出宽高可改变尺寸，压缩搜索始终复用同一份处理后像素。`image` 编码 JPG、`libwebp` 编码 WebP、`png + oxipng` 无损优化，必要时 `exoquant` 减色并检查色差。细节见 [图片处理说明](image-processing.md)。
+
+图片 CPU 工作放到 `spawn_blocking`，编码并发上限为 1，最多登记 8 个任务。任务 ID 对应取消标记；取消、卸载、参数变化及认证版本变化会中止或丢弃旧结果，RAII 清理任务。前端为预览 Blob 创建 URL，并在替换或卸载时撤销。输入与结果不进入数据库或 localStorage。另存为只由 Rust 调用 dialog 插件，未开放通用文件系统和前端 dialog 权限；保存前复核真实字节格式、扩展名和会话，使用 `create_new` 禁止覆盖已有文件，写入失败或写入期间取消时清理新建的半成品。
+
+`scripts/image-qa.mjs` 仅作为显式启动的本机隔离验收工具，通过 Rust 单元测试执行真实检查和编码。该测试入口受 `cfg(test)` 限制，不存在于桌面产物，也不提供登录绕过、CMS 请求或导出命令。
 
 `CmsAdapter` 是本地稿件业务服务契约，发布始终返回未配置错误。CMS 发布接入仍需确认接口，不得在页面中编造请求地址。采集工具没有确认协议前，导入只创建演示素材，绝不抓取或假装导入真实内容。
 

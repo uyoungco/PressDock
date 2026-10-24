@@ -9,6 +9,7 @@ import { deferred, material, materialPage } from "./cms-fixtures";
 import type { PromotePage } from "@/types/cms";
 import { channelQueryMemory } from "@/features/channels/query-memory";
 import { promoteImages } from "@/features/channels/images";
+import { chooseOption } from "./select-helpers";
 
 vi.mock("@/features/channels/images", () => ({
   promoteImages: { acquire: vi.fn() },
@@ -46,14 +47,44 @@ function setup(path = "/channels") {
   return router;
 }
 describe("渠道素材筛选、分页和详情", () => {
+  it("两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值", async () => {
+    const router = setup("/channels?channel=历史渠道&subchannel=历史子渠道");
+    await screen.findByText("渠道新闻 1");
+    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+      "历史渠道",
+    );
+    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+      "历史子渠道",
+    );
+    await userEvent.click(screen.getByLabelText("渠道", { exact: true }));
+    await userEvent.type(
+      await screen.findByPlaceholderText("搜索渠道…"),
+      "koo",
+    );
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(channelService.list).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByRole("option", { name: "KOOK" }));
+    await userEvent.click(screen.getByLabelText("子渠道", { exact: true }));
+    await userEvent.type(
+      await screen.findByPlaceholderText("搜索子渠道…"),
+      "轮播",
+    );
+    await userEvent.click(screen.getByRole("option", { name: "轮播图" }));
+    expect(channelService.list).toHaveBeenCalledTimes(1);
+    expect(channelService.groups).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByRole("button", { name: "搜索" }));
+    await waitFor(() =>
+      expect(channelService.list).toHaveBeenLastCalledWith(
+        expect.objectContaining({ channel: "KOOK", subchannel: "轮播图" }),
+      ),
+    );
+    router.dispose();
+  });
   it("初始并行取数，选择条件不查询，搜索才提交并回到第一页", async () => {
     const router = setup("/channels?current=2&pagesize=10");
     await screen.findByText("渠道新闻 1");
-    await userEvent.selectOptions(
-      screen.getByLabelText("渠道", { exact: true }),
-      "KOOK",
-    );
-    await userEvent.selectOptions(
+    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
+    await chooseOption(
       screen.getByLabelText("子渠道", { exact: true }),
       "轮播图",
     );
@@ -72,11 +103,10 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(
       new URLSearchParams(router.state.location.search).get("publishdate"),
     ).toBe("2026-10-23");
-    await userEvent.selectOptions(
-      screen.getByLabelText("渠道", { exact: true }),
-      "2345",
+    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "2345");
+    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+      "全部子渠道",
     );
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveValue("");
     expect(channelService.groups).toHaveBeenCalledTimes(1);
     router.dispose();
   });
@@ -96,14 +126,18 @@ describe("渠道素材筛选、分页和详情", () => {
       }),
     );
     expect(screen.getByLabelText("发布日期")).toHaveValue("");
-    expect(screen.getByLabelText("渠道", { exact: true })).toHaveValue("");
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveValue("");
+    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+      "全部渠道",
+    );
+    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+      "全部子渠道",
+    );
     router.dispose();
   });
   it("每页条数变化回到第一页，保留已提交条件", async () => {
     const router = setup("/channels?channel=KOOK&current=2&pagesize=30");
     await screen.findByText("渠道新闻 1");
-    await userEvent.selectOptions(screen.getByLabelText("每页条数"), "50");
+    await chooseOption(screen.getByLabelText("每页条数"), "50");
     await waitFor(() =>
       expect(channelService.list).toHaveBeenLastCalledWith({
         channel: "KOOK",
@@ -150,11 +184,7 @@ describe("渠道素材筛选、分页和详情", () => {
         data: [{ ...material(2), title: "最新结果" }],
       });
     const router = setup();
-    await screen.findByRole("option", { name: "KOOK" });
-    await userEvent.selectOptions(
-      screen.getByLabelText("渠道", { exact: true }),
-      "KOOK",
-    );
+    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     expect(await screen.findByText("最新结果")).toBeInTheDocument();
     await act(async () =>
@@ -180,7 +210,9 @@ describe("渠道素材筛选、分页和详情", () => {
     await userEvent.click(screen.getByRole("button", { name: "重试素材列表" }));
     expect(await screen.findByText("渠道新闻 1")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "重试渠道选项" }));
-    await screen.findByRole("option", { name: "KOOK" });
+    await waitFor(() =>
+      expect(screen.getByLabelText("渠道", { exact: true })).toBeEnabled(),
+    );
     expect(channelService.list).toHaveBeenCalledTimes(2);
     router.dispose();
   });
@@ -256,10 +288,7 @@ describe("渠道素材筛选、分页和详情", () => {
       "/channels?channel=KOOK&subchannel=轮播图&publishdate=2026-10-23&current=3&pagesize=20",
     );
     await screen.findByText("渠道新闻 1");
-    await userEvent.selectOptions(
-      screen.getByLabelText("渠道", { exact: true }),
-      "2345",
-    );
+    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "2345");
     await act(() => router.navigate("/elsewhere"));
     vi.mocked(channelService.list).mockClear();
     await act(() => router.navigate("/channels"));
@@ -272,8 +301,10 @@ describe("渠道素材筛选、分页和详情", () => {
       current: 3,
       pagesize: 20,
     });
-    expect(screen.getByLabelText("渠道", { exact: true })).toHaveValue("KOOK");
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveValue(
+    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+      "KOOK",
+    );
+    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
       "轮播图",
     );
     expect(screen.getByLabelText("发布日期")).toHaveValue("2026-10-23");
@@ -312,7 +343,7 @@ describe("渠道素材筛选、分页和详情", () => {
     await act(() => router.navigate("/elsewhere"));
     await act(() => router.navigate("/channels"));
     await screen.findByText("渠道新闻 1");
-    expect(screen.getByLabelText("每页条数")).toHaveValue("20");
+    expect(screen.getByLabelText("每页条数")).toHaveTextContent("20");
     expect(channelService.list).toHaveBeenLastCalledWith(
       channelQueryMemory.read(),
     );
@@ -325,17 +356,16 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(
       new URLSearchParams(router.state.location.search).get("current"),
     ).toBe("1");
-    await userEvent.selectOptions(
-      screen.getByLabelText("渠道", { exact: true }),
-      "KOOK",
-    );
+    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     await waitFor(() =>
       expect(channelQueryMemory.read()?.channel).toBe("KOOK"),
     );
     await act(() => router.navigate(-1));
     await waitFor(() =>
-      expect(screen.getByLabelText("渠道", { exact: true })).toHaveValue(""),
+      expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+        "全部渠道",
+      ),
     );
     expect(channelQueryMemory.read()?.channel).toBe("");
     router.dispose();

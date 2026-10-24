@@ -1,152 +1,110 @@
-import { useEffect, useState } from "react";
-import { ImagePlus, Image as ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  IMAGE_RATIOS,
-  MAX_IMAGE_SIZE,
-  type ImageRatio,
-} from "@/features/images/model";
+import { ImageProcessor, type ImageProcessorResult } from "@/features/images";
+import { MAX_IMAGE_SIZE } from "@/features/images/model";
+import { imageService } from "@/features/images/service";
 
 export default function Images() {
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [ratio, setRatio] = useState<ImageRatio>("original");
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+  const [saving, setSaving] = useState(false);
+  const save = useRef<AbortController | null>(null);
+  useEffect(() => () => save.current?.abort(), []);
+  async function exportImage(result: ImageProcessorResult) {
+    if (save.current) return;
+    const controller = new AbortController();
+    save.current = controller;
+    setSaving(true);
+    try {
+      const exported = await imageService.export(result, controller.signal);
+      if (exported.saved && !controller.signal.aborted)
+        toast.success(`图片已保存：${exported.fileName}`);
+    } catch (reason) {
+      if (!controller.signal.aborted)
+        toast.error(reason instanceof Error ? reason.message : "图片保存失败");
+    } finally {
+      if (!controller.signal.aborted) setSaving(false);
+      save.current = null;
+    }
+  }
   return (
     <>
       <PageHeader
+        demo={false}
         title="图片处理"
-        description="预览新闻配图，规划适合栏目的图片比例。"
+        description="裁剪取景、控制文件体积，转换为 JPG、PNG 或 WebP。"
       />
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="text-base">图片工作区</CardTitle>
-            <CardDescription>
-              仅本地预览，当前不会上传、裁剪或生成处理结果。
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <label
-              htmlFor="image-file"
-              className="mb-3 flex items-center gap-2 text-sm font-medium"
-            >
-              <ImagePlus className="size-4" />
-              选择本地图片
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
+        <div className="flex items-center gap-3">
+          <ImagePlus className="size-5 text-muted-foreground" />
+          <div>
+            <label htmlFor="image-file" className="block text-sm font-medium">
+              {file ? "更换图片" : "选择本地图片"}
             </label>
-            <Input
-              id="image-file"
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              onChange={(e) => {
-                const next = e.target.files?.[0];
-                if (!next) return;
-                if (
-                  ![
-                    "image/png",
-                    "image/jpeg",
-                    "image/webp",
-                    "image/gif",
-                  ].includes(next.type) ||
-                  next.size > MAX_IMAGE_SIZE
-                ) {
-                  toast.error(
-                    "请选择 20 MB 以内的 PNG、JPEG、WebP 或 GIF 图片",
-                  );
-                  e.target.value = "";
-                  return;
-                }
-                setFile(next);
-              }}
-            />
-            <div className="mt-5 flex min-h-80 items-center justify-center overflow-hidden rounded-lg border border-dashed bg-muted/30">
-              {preview ? (
-                <div
-                  className="w-full overflow-hidden"
-                  style={{ aspectRatio: ratio === "original" ? "auto" : ratio }}
-                >
-                  <img
-                    src={preview}
-                    alt={file?.name ?? "本地图片预览"}
-                    className="max-h-[60vh] w-full object-contain"
-                    onError={() => {
-                      setPreview(null);
-                      setFile(null);
-                      toast.error("图片无法解码，请选择有效的图片文件");
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <ImageIcon className="mx-auto mb-3 size-9 stroke-1" />
-                  <p className="text-sm">选择图片开始预览</p>
-                  <p className="mt-1 text-xs">
-                    PNG / JPEG / WebP / GIF · 最大 20 MB
-                  </p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="h-fit shadow-none">
-          <CardHeader>
-            <CardTitle className="text-sm">输出规划</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">
-                目标比例
-              </label>
-              <Select
-                value={ratio}
-                onValueChange={(value) => setRatio(value as ImageRatio)}
-              >
-                <SelectTrigger aria-label="目标图片比例" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {IMAGE_RATIOS.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {file && (
-              <div className="break-all text-xs leading-relaxed text-muted-foreground">
-                {file.name}
-                <br />
-                {(file.size / 1024).toFixed(1)} KB
-              </div>
-            )}
-            <p className="border-t pt-4 text-xs leading-relaxed text-muted-foreground">
-              比例选择用于预览画布。裁剪坐标、尺寸调整和结果导出将在后续接入。
+            <p className="mt-1 text-xs text-muted-foreground">
+              静态 JPG / PNG / WebP · 最大 20 MiB · 处理结果另存为
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <Input
+          id="image-file"
+          aria-label="选择本地图片"
+          className="max-w-xs"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          disabled={saving}
+          onChange={(e) => {
+            const next = e.target.files?.[0];
+            e.target.value = "";
+            if (!next) return;
+            if (!next.size || next.size > MAX_IMAGE_SIZE) {
+              toast.error("请选择不超过 20 MiB 的静态 JPG、PNG 或 WebP 图片");
+              return;
+            }
+            setFile(next);
+          }}
+        />
       </div>
+      {file ? (
+        <div className="relative">
+          <div inert={saving}>
+            <ImageProcessor
+              image={file}
+              onConfirm={(result) => void exportImage(result)}
+              onCancel={() => setFile(null)}
+            />
+          </div>
+          {saving && (
+            <div
+              role="status"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/85 backdrop-blur-sm"
+            >
+              <LoaderCircle className="size-6 animate-spin" />
+              <p className="text-sm">请选择保存位置，完成图片另存为…</p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  save.current?.abort();
+                  setSaving(false);
+                }}
+              >
+                取消导出
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex min-h-96 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-8 text-center">
+          <ImagePlus className="mb-4 size-12 stroke-1 text-muted-foreground" />
+          <h2 className="text-base font-medium">选择一张图片开始处理</h2>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            在左侧拖动裁剪框，在右侧设置输出尺寸、文件体积和格式。确认结果后选择本地保存位置。
+          </p>
+        </div>
+      )}
     </>
   );
 }
