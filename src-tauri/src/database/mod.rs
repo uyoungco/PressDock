@@ -1,3 +1,4 @@
+pub mod ai;
 pub mod image_presets;
 pub mod models;
 mod repository;

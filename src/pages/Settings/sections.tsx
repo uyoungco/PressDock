@@ -132,11 +132,12 @@ export function ServiceConnections({
             <Sparkles className="size-4" />
             AI 服务
           </CardTitle>
-          <Badge variant="outline">尚未配置</Badge>
+          <Badge variant="outline">可配置</Badge>
         </CardHeader>
         <CardContent>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            预留标题建议与段落整理能力。密钥将由原生安全凭据服务管理。
+            在“AI
+            模型”配置连接，在“提示词模板”设置标题优化规则。密钥由系统安全凭据库管理。
           </p>
         </CardContent>
       </Card>

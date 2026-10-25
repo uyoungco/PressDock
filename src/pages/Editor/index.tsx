@@ -25,6 +25,7 @@ import type { Article } from "@/types/article";
 import { useAuth } from "@/hooks/use-auth";
 import { authService } from "@/features/auth/service";
 import { editorBuffers } from "@/features/editor/buffer";
+import { TitleOptimizer } from "@/features/ai/TitleOptimizer";
 
 export default function Editor() {
   const { id = "" } = useParams();
@@ -148,13 +149,21 @@ export default function Editor() {
                 >
                   文章标题
                 </label>
-                <Input
-                  id="draft-title"
-                  value={title}
-                  onChange={(e) => change(e.target.value, content)}
-                  maxLength={200}
-                  disabled={saving}
-                />
+                <div className="flex items-start gap-2">
+                  <Input
+                    id="draft-title"
+                    value={title}
+                    onChange={(e) => change(e.target.value, content)}
+                    disabled={saving}
+                  />
+                  <TitleOptimizer
+                    title={title}
+                    content={content}
+                    disabled={saving}
+                    titleInputId="draft-title"
+                    onAdopt={(next) => change(next, content)}
+                  />
+                </div>
               </div>
               <Tabs defaultValue="edit">
                 <TabsList>

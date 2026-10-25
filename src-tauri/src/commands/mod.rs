@@ -1,8 +1,10 @@
+mod ai;
 mod articles;
 mod cms;
 mod image_presets;
 mod images;
 mod system;
+pub use ai::*;
 pub use articles::*;
 pub use cms::*;
 pub use image_presets::*;

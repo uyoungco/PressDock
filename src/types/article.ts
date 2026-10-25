@@ -18,7 +18,11 @@ export const sourceArticleSchema = z.object({
 export const articleSchema = z.object({
   id: z.string().min(1),
   source: sourceArticleSchema,
-  title: z.string().trim().min(1, "请输入文章标题").max(200, "标题最多 200 字"),
+  title: z
+    .string()
+    .trim()
+    .min(1, "请输入文章标题")
+    .refine((value) => [...value].length <= 200, "标题最多 200 字"),
   content: z.string().max(1_000_000, "正文过长"),
   status: articleStatusSchema,
   createdAt: z.iso.datetime(),

@@ -20,10 +20,20 @@ pub fn run() {
                 database::Database::open(&directory.join("pressdock.db")).await
             })?;
             app.manage(database);
+            app.manage(ai::AiService::new()?);
             app.manage(cms::CmsService::new(&directory)?);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            commands::ai_load_settings,
+            commands::ai_save_provider,
+            commands::ai_save_model,
+            commands::ai_save_template,
+            commands::ai_delete_config,
+            commands::ai_list_models,
+            commands::ai_test_model,
+            commands::ai_suggest_titles,
+            commands::ai_cancel,
             commands::get_app_info,
             commands::health_check,
             commands::list_articles,

@@ -40,6 +40,11 @@ vi.mock("@/services/tauri/image-presets", () => ({
     save: vi.fn(),
   },
 }));
+vi.mock("@/features/ai/service", () => ({
+  aiService: {
+    load: vi.fn(async () => ({ providers: [], models: [], templates: [] })),
+  },
+}));
 vi.mock("@/services/tauri/client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services/tauri/client")>()),
   isDesktop: vi.fn(() => true),
@@ -127,7 +132,7 @@ describe("工作区", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("当前账号：editor · 角色：admin")).toBeVisible();
     expect(screen.getByText("会话已安全保存，重启后验证恢复。")).toBeVisible();
-    expect(screen.getByText("尚未配置")).toBeVisible();
+    expect(screen.getByText("可配置")).toBeVisible();
     await userEvent.click(screen.getByRole("tab", { name: "关于应用" }));
     expect(
       screen.getByRole("tabpanel", { name: "关于应用" }),
@@ -145,7 +150,7 @@ describe("工作区", () => {
       </AppProviders>,
     );
     const general = await screen.findByRole("tab", { name: "常规设置" });
-    expect(screen.getAllByRole("tab")).toHaveLength(4);
+    expect(screen.getAllByRole("tab")).toHaveLength(6);
     expect(general).toHaveAttribute("aria-selected", "true");
     expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
     expect(screen.getByLabelText("预设渠道")).not.toBeVisible();
@@ -155,7 +160,13 @@ describe("工作区", () => {
     await user.tab();
     expect(screen.getByLabelText("界面主题")).toHaveFocus();
     general.focus();
-    for (const name of ["图片预设", "服务连接", "关于应用"]) {
+    for (const name of [
+      "图片预设",
+      "服务连接",
+      "AI 模型",
+      "提示词模板",
+      "关于应用",
+    ]) {
       await user.keyboard("{ArrowRight}");
       expect(screen.getByRole("tab", { name })).toHaveFocus();
       expect(screen.getByRole("tab", { name })).toHaveAttribute(

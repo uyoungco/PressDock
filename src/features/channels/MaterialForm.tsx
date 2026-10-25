@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMaterialImage } from "./use-material-image";
 import type { MaterialEdit } from "./edit-buffer";
 import type { PromoteInput } from "@/types/cms";
+import { TitleOptimizer } from "@/features/ai/TitleOptimizer";
 
 export function MaterialForm({
   edit,
@@ -85,29 +86,40 @@ export function MaterialForm({
                   }
                 />
               ) : (
-                <Input
-                  id={`material-${field}`}
-                  type={field === "publishDate" ? "date" : "text"}
-                  value={edit.input[field] ?? ""}
-                  disabled={
-                    busy ||
-                    (image.working &&
-                      [
-                        "channel",
-                        "subChannel",
-                        "titlePic",
-                        "titlePic2",
-                      ].includes(field))
-                  }
-                  onPaste={
-                    field === "titlePic" || field === "titlePic2"
-                      ? (event) => image.paste(event, field)
-                      : undefined
-                  }
-                  onChange={(e) =>
-                    onChange({ ...edit.input, [field]: e.target.value })
-                  }
-                />
+                <div className="flex items-start gap-2">
+                  <Input
+                    id={`material-${field}`}
+                    type={field === "publishDate" ? "date" : "text"}
+                    value={edit.input[field] ?? ""}
+                    disabled={
+                      busy ||
+                      (image.working &&
+                        [
+                          "channel",
+                          "subChannel",
+                          "titlePic",
+                          "titlePic2",
+                        ].includes(field))
+                    }
+                    onPaste={
+                      field === "titlePic" || field === "titlePic2"
+                        ? (event) => image.paste(event, field)
+                        : undefined
+                    }
+                    onChange={(e) =>
+                      onChange({ ...edit.input, [field]: e.target.value })
+                    }
+                  />
+                  {field === "title" && (
+                    <TitleOptimizer
+                      title={edit.input.title}
+                      content={edit.input.smallText ?? ""}
+                      disabled={busy || image.working}
+                      titleInputId="material-title"
+                      onAdopt={(title) => onChange({ ...edit.input, title })}
+                    />
+                  )}
+                </div>
               )}
               {(field === "titlePic" || field === "titlePic2") && (
                 <input

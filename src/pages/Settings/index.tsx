@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAtom } from "jotai";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -8,6 +9,8 @@ import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ImagePresetSettings } from "@/features/image-presets/ImagePresetSettings";
+import { ModelSettings } from "@/features/ai/ModelSettings";
+import { TemplateSettings } from "@/features/ai/TemplateSettings";
 import {
   GeneralSettings,
   ServiceConnections,
@@ -15,7 +18,12 @@ import {
 } from "./sections";
 
 export default function Settings() {
-  const [tab, setTab] = useState("general");
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState(() =>
+    ["ai-models", "ai-templates"].includes(params.get("tab") ?? "")
+      ? params.get("tab")!
+      : "general",
+  );
   const [theme, setTheme] = useAtom(themeAtom);
   const auth = useAuth();
   const [info, setInfo] = useState<AppInfo | null>(null);
@@ -49,7 +57,7 @@ export default function Settings() {
     <>
       <PageHeader
         title="系统设置"
-        description="管理工作区外观、图片预设与服务连接。"
+        description="管理工作区外观、图片预设、AI 模型与提示词模板。"
         demo={false}
       />
       <Tabs value={tab} onValueChange={setTab} className="min-w-0 gap-5">
@@ -63,6 +71,12 @@ export default function Settings() {
             </TabsTrigger>
             <TabsTrigger value="services" className="px-4">
               服务连接
+            </TabsTrigger>
+            <TabsTrigger value="ai-models" className="px-4">
+              AI 模型
+            </TabsTrigger>
+            <TabsTrigger value="ai-templates" className="px-4">
+              提示词模板
             </TabsTrigger>
             <TabsTrigger value="about" className="px-4">
               关于应用
@@ -89,6 +103,22 @@ export default function Settings() {
         </TabsContent>
         <TabsContent value="about" className="min-w-0">
           <AboutApplication info={info} />
+        </TabsContent>
+        <TabsContent
+          value="ai-models"
+          forceMount
+          hidden={tab !== "ai-models"}
+          className="min-w-0"
+        >
+          <ModelSettings active={tab === "ai-models"} />
+        </TabsContent>
+        <TabsContent
+          value="ai-templates"
+          forceMount
+          hidden={tab !== "ai-templates"}
+          className="min-w-0"
+        >
+          <TemplateSettings active={tab === "ai-templates"} />
         </TabsContent>
       </Tabs>
     </>

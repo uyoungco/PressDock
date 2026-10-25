@@ -2,6 +2,15 @@ fn main() {
     println!("cargo:rerun-if-changed=migrations");
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
         tauri_build::AppManifest::new().commands(&[
+            "ai_load_settings",
+            "ai_save_provider",
+            "ai_save_model",
+            "ai_save_template",
+            "ai_delete_config",
+            "ai_list_models",
+            "ai_test_model",
+            "ai_suggest_titles",
+            "ai_cancel",
             "get_app_info",
             "health_check",
             "list_articles",
