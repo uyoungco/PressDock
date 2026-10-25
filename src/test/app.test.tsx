@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { Provider, createStore } from "jotai";
@@ -9,7 +16,14 @@ import { themeAtom } from "@/atoms/theme";
 import { sidebarOpenAtom } from "@/atoms/navigation";
 import { editorDirtyAtom, editorStatusAtom } from "@/atoms/editor";
 import { cmsIpc } from "@/services/tauri/cms";
+import { imagePresetsIpc } from "@/services/tauri/image-presets";
+import { systemService } from "@/services/tauri/system";
 import { authService } from "@/features/auth/service";
+import {
+  emptyPresets,
+  type ChannelImagePresets,
+} from "@/features/image-presets/model";
+import { deferred } from "./cms-fixtures";
 import { chooseOption } from "./select-helpers";
 
 vi.mock("@/services/tauri/cms", () => ({
@@ -21,7 +35,10 @@ vi.mock("@/services/tauri/cms", () => ({
   },
 }));
 vi.mock("@/services/tauri/image-presets", () => ({
-  imagePresetsIpc: { list: vi.fn(async () => []) },
+  imagePresetsIpc: {
+    list: vi.fn(async () => []),
+    save: vi.fn(),
+  },
 }));
 vi.mock("@/services/tauri/client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services/tauri/client")>()),
@@ -41,7 +58,13 @@ vi.mock("@/services/tauri/system", () => ({
   },
 }));
 beforeEach(() => {
+  vi.clearAllMocks();
   authService.useLoginForm();
+  vi.mocked(cmsIpc.channels).mockResolvedValue([]);
+  vi.mocked(imagePresetsIpc.list).mockResolvedValue([]);
+  vi.mocked(imagePresetsIpc.save).mockImplementation(
+    async (request) => request,
+  );
   vi.mocked(cmsIpc.restore).mockResolvedValue({
     user: { userId: 6, nickname: "editor", roles: ["admin"], perms: ["admin"] },
     persistent: true,
@@ -98,9 +121,166 @@ describe("工作区", () => {
     expect(
       await screen.findByRole("heading", { name: "系统设置" }),
     ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("tab", { name: "服务连接" }));
     expect(
       await screen.findByText("Rust 与 SQLite 已就绪"),
     ).toBeInTheDocument();
+    expect(screen.getByText("当前账号：editor · 角色：admin")).toBeVisible();
+    expect(screen.getByText("会话已安全保存，重启后验证恢复。")).toBeVisible();
+    expect(screen.getByText("尚未配置")).toBeVisible();
+    await userEvent.click(screen.getByRole("tab", { name: "关于应用" }));
+    expect(
+      screen.getByRole("tabpanel", { name: "关于应用" }),
+    ).toHaveTextContent("PressDock v0.1.0");
+    router.dispose();
+  });
+  it("设置默认展示常规模块，支持键盘导航且隐藏预设不参与焦点导航", async () => {
+    const user = userEvent.setup();
+    const router = createMemoryRouter(routes, {
+      initialEntries: ["/settings"],
+    });
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    );
+    const general = await screen.findByRole("tab", { name: "常规设置" });
+    expect(screen.getAllByRole("tab")).toHaveLength(4);
+    expect(general).toHaveAttribute("aria-selected", "true");
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+    expect(screen.getByLabelText("预设渠道")).not.toBeVisible();
+    await user.click(general);
+    await user.tab();
+    expect(screen.getByRole("tabpanel", { name: "常规设置" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByLabelText("界面主题")).toHaveFocus();
+    general.focus();
+    for (const name of ["图片预设", "服务连接", "关于应用"]) {
+      await user.keyboard("{ArrowRight}");
+      expect(screen.getByRole("tab", { name })).toHaveFocus();
+      expect(screen.getByRole("tab", { name })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+      expect(screen.getByRole("tabpanel", { name })).toBeVisible();
+      expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+    }
+    await user.keyboard("{Home}");
+    expect(general).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(screen.getByRole("tab", { name: "关于应用" })).toHaveFocus();
+    expect(systemService.getAppInfo).toHaveBeenCalledTimes(1);
+    expect(systemService.healthCheck).toHaveBeenCalledTimes(1);
+    expect(imagePresetsIpc.list).toHaveBeenCalledTimes(1);
+    expect(imagePresetsIpc.save).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("link", { name: "文章管理" }));
+    await screen.findByRole("heading", { name: "文章管理" });
+    await user.click(screen.getByRole("link", { name: "系统设置" }));
+    expect(
+      await screen.findByRole("tab", { name: "常规设置", selected: true }),
+    ).toBeVisible();
+    router.dispose();
+  });
+  it("切换设置标签保留预设草稿和复制来源，隐藏期间保存失败可重试并完成", async () => {
+    const user = userEvent.setup();
+    vi.mocked(cmsIpc.channels).mockResolvedValue([
+      { channel: "A", subchannels: ["轮播图"] },
+      { channel: "B", subchannels: ["轮播图"] },
+    ]);
+    vi.mocked(imagePresetsIpc.list).mockResolvedValue([
+      { ...emptyPresets("A", "轮播图"), titlePic: { format: "png" } },
+    ]);
+    const router = createMemoryRouter(routes, {
+      initialEntries: ["/settings"],
+    });
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    );
+    await user.click(await screen.findByRole("tab", { name: "图片预设" }));
+    await chooseOption(screen.getByLabelText("预设渠道"), "B");
+    await chooseOption(screen.getByLabelText("预设子渠道"), "轮播图");
+    await chooseOption(screen.getByLabelText("复制来源"), "A / 轮播图");
+    fireEvent.change(screen.getByLabelText("TitlePic 体积上限（KiB）"), {
+      target: { value: "100" },
+    });
+    await user.click(screen.getByRole("tab", { name: "服务连接" }));
+    expect(screen.getByLabelText("预设渠道")).not.toBeVisible();
+    await user.click(screen.getByRole("tab", { name: "图片预设" }));
+    expect(screen.getByLabelText("预设渠道")).toHaveTextContent("B");
+    expect(screen.getByLabelText("预设子渠道")).toHaveTextContent("轮播图");
+    expect(screen.getByLabelText("复制来源")).toHaveTextContent("A / 轮播图");
+    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+    expect(imagePresetsIpc.save).not.toHaveBeenCalled();
+
+    const saving = deferred<ChannelImagePresets>();
+    vi.mocked(imagePresetsIpc.save).mockReturnValueOnce(saving.promise);
+    await user.click(screen.getByRole("button", { name: "保存图片预设" }));
+    await user.click(screen.getByRole("tab", { name: "关于应用" }));
+    await user.click(screen.getByRole("tab", { name: "图片预设" }));
+    expect(
+      screen.getByRole("button", { name: "正在保存预设…" }),
+    ).toBeDisabled();
+    expect(screen.getByLabelText("预设渠道")).toBeDisabled();
+    expect(screen.getByLabelText("复制来源")).toBeDisabled();
+    expect(imagePresetsIpc.save).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("tab", { name: "常规设置" }));
+    await act(async () => saving.reject(new Error("磁盘写入失败")));
+    await user.click(screen.getByRole("tab", { name: "图片预设" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("磁盘写入失败");
+    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+
+    const retry = deferred<ChannelImagePresets>();
+    vi.mocked(imagePresetsIpc.save).mockReturnValueOnce(retry.promise);
+    await user.click(screen.getByRole("button", { name: "保存图片预设" }));
+    const saved = vi.mocked(imagePresetsIpc.save).mock.calls[1][0];
+    expect(saved).toEqual({
+      ...emptyPresets("B", "轮播图"),
+      titlePic: { maxBytes: 102400 },
+    });
+    await user.click(screen.getByRole("tab", { name: "常规设置" }));
+    await act(async () => retry.resolve(saved));
+    await user.click(screen.getByRole("tab", { name: "图片预设" }));
+    expect(screen.getByRole("button", { name: "保存图片预设" })).toBeEnabled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+    expect(imagePresetsIpc.save).toHaveBeenCalledTimes(2);
+    expect(imagePresetsIpc.list).toHaveBeenCalledTimes(1);
+    expect(systemService.healthCheck).toHaveBeenCalledTimes(1);
+    router.dispose();
+  });
+  it("服务检查失败切换标签后仍显示错误，关于应用使用前端版本", async () => {
+    vi.mocked(systemService.healthCheck).mockRejectedValueOnce(
+      new Error("数据库不可用"),
+    );
+    const router = createMemoryRouter(routes, {
+      initialEntries: ["/settings"],
+    });
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    );
+    await userEvent.click(await screen.findByRole("tab", { name: "服务连接" }));
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole("tabpanel", { name: "服务连接" })).getByRole(
+          "status",
+        ),
+      ).toHaveTextContent("数据库不可用"),
+    );
+    await userEvent.click(screen.getByRole("tab", { name: "关于应用" }));
+    expect(
+      screen.getByRole("tabpanel", { name: "关于应用" }),
+    ).toHaveTextContent("v0.1.0 · 前端版本");
+    await userEvent.click(screen.getByRole("tab", { name: "服务连接" }));
+    expect(
+      within(screen.getByRole("tabpanel", { name: "服务连接" })).getByRole(
+        "status",
+      ),
+    ).toHaveTextContent("数据库不可用");
+    expect(systemService.healthCheck).toHaveBeenCalledTimes(1);
     router.dispose();
   });
   it("未知路由回到工作台", async () => {
