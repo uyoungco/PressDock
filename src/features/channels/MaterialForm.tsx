@@ -4,6 +4,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,14 +50,16 @@ export function MaterialForm({
       }}
     >
       <DialogContent
-        className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl"
+        className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-2xl"
         showCloseButton={!busy && !image.working}
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogTitle>{edit.base ? "修改素材" : "新增素材"}</DialogTitle>
-        <DialogDescription>
-          带 * 的字段必填。上传图片只回填地址，保存后才关联素材。
-        </DialogDescription>
+        <DialogHeader className="shrink-0 pr-8">
+          <DialogTitle>{edit.base ? "修改素材" : "新增素材"}</DialogTitle>
+          <DialogDescription>
+            带 * 的字段必填。上传图片只回填地址，保存后才关联素材。
+          </DialogDescription>
+        </DialogHeader>
         <form
           id="material-form"
           onSubmit={(e) => {
@@ -64,7 +67,7 @@ export function MaterialForm({
             if (!image.working && !busy) onSave();
           }}
           noValidate
-          className="space-y-4"
+          className="-mx-1 min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1"
         >
           {fields.map(([field, label]) => (
             <div key={field} className="space-y-2">
@@ -128,7 +131,7 @@ export function MaterialForm({
             </p>
           )}
         </form>
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           <Button
             variant="outline"
             disabled={busy || image.working}
