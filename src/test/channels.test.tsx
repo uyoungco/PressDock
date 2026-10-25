@@ -50,13 +50,13 @@ describe("渠道素材筛选、分页和详情", () => {
   it("两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值", async () => {
     const router = setup("/channels?channel=历史渠道&subchannel=历史子渠道");
     await screen.findByText("渠道新闻 1");
-    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: "渠道" })).toHaveTextContent(
       "历史渠道",
     );
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: "子渠道" })).toHaveTextContent(
       "历史子渠道",
     );
-    await userEvent.click(screen.getByLabelText("渠道", { exact: true }));
+    await userEvent.click(screen.getByRole("combobox", { name: "渠道" }));
     await userEvent.type(
       await screen.findByPlaceholderText("搜索渠道…"),
       "koo",
@@ -64,7 +64,7 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(screen.getAllByRole("option")).toHaveLength(1);
     expect(channelService.list).toHaveBeenCalledTimes(1);
     await userEvent.click(screen.getByRole("option", { name: "KOOK" }));
-    await userEvent.click(screen.getByLabelText("子渠道", { exact: true }));
+    await userEvent.click(screen.getByRole("combobox", { name: "子渠道" }));
     await userEvent.type(
       await screen.findByPlaceholderText("搜索子渠道…"),
       "轮播",
@@ -83,12 +83,15 @@ describe("渠道素材筛选、分页和详情", () => {
   it("初始并行取数，选择条件不查询，搜索才提交并回到第一页", async () => {
     const router = setup("/channels?current=2&pagesize=10");
     await screen.findByText("渠道新闻 1");
-    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
+    await chooseOption(screen.getByRole("combobox", { name: "渠道" }), "KOOK");
     await chooseOption(
-      screen.getByLabelText("子渠道", { exact: true }),
+      screen.getByRole("combobox", { name: "子渠道" }),
       "轮播图",
     );
-    await userEvent.type(screen.getByLabelText("发布日期"), "2026-10-23");
+    await userEvent.type(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+      "2026-10-23",
+    );
     expect(channelService.list).toHaveBeenCalledTimes(1);
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     await waitFor(() =>
@@ -103,8 +106,8 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(
       new URLSearchParams(router.state.location.search).get("publishdate"),
     ).toBe("2026-10-23");
-    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "2345");
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+    await chooseOption(screen.getByRole("combobox", { name: "渠道" }), "2345");
+    expect(screen.getByRole("combobox", { name: "子渠道" })).toHaveTextContent(
       "全部子渠道",
     );
     expect(channelService.groups).toHaveBeenCalledTimes(1);
@@ -125,11 +128,13 @@ describe("渠道素材筛选、分页和详情", () => {
         pagesize: 10,
       }),
     );
-    expect(screen.getByLabelText("发布日期")).toHaveValue("");
-    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+    expect(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+    ).toHaveValue("");
+    expect(screen.getByRole("combobox", { name: "渠道" })).toHaveTextContent(
       "全部渠道",
     );
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: "子渠道" })).toHaveTextContent(
       "全部子渠道",
     );
     router.dispose();
@@ -184,7 +189,7 @@ describe("渠道素材筛选、分页和详情", () => {
         data: [{ ...material(2), title: "最新结果" }],
       });
     const router = setup();
-    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
+    await chooseOption(screen.getByRole("combobox", { name: "渠道" }), "KOOK");
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     expect(await screen.findByText("最新结果")).toBeInTheDocument();
     await act(async () =>
@@ -211,7 +216,7 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(await screen.findByText("渠道新闻 1")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "重试渠道选项" }));
     await waitFor(() =>
-      expect(screen.getByLabelText("渠道", { exact: true })).toBeEnabled(),
+      expect(screen.getByRole("combobox", { name: "渠道" })).toBeEnabled(),
     );
     expect(channelService.list).toHaveBeenCalledTimes(2);
     router.dispose();
@@ -288,7 +293,7 @@ describe("渠道素材筛选、分页和详情", () => {
       "/channels?channel=KOOK&subchannel=轮播图&publishdate=2026-10-23&current=3&pagesize=20",
     );
     await screen.findByText("渠道新闻 1");
-    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "2345");
+    await chooseOption(screen.getByRole("combobox", { name: "渠道" }), "2345");
     await act(() => router.navigate("/elsewhere"));
     vi.mocked(channelService.list).mockClear();
     await act(() => router.navigate("/channels"));
@@ -301,13 +306,15 @@ describe("渠道素材筛选、分页和详情", () => {
       current: 3,
       pagesize: 20,
     });
-    expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: "渠道" })).toHaveTextContent(
       "KOOK",
     );
-    expect(screen.getByLabelText("子渠道", { exact: true })).toHaveTextContent(
+    expect(screen.getByRole("combobox", { name: "子渠道" })).toHaveTextContent(
       "轮播图",
     );
-    expect(screen.getByLabelText("发布日期")).toHaveValue("2026-10-23");
+    expect(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+    ).toHaveValue("2026-10-23");
     router.dispose();
   });
 
@@ -356,14 +363,14 @@ describe("渠道素材筛选、分页和详情", () => {
     expect(
       new URLSearchParams(router.state.location.search).get("current"),
     ).toBe("1");
-    await chooseOption(screen.getByLabelText("渠道", { exact: true }), "KOOK");
+    await chooseOption(screen.getByRole("combobox", { name: "渠道" }), "KOOK");
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     await waitFor(() =>
       expect(channelQueryMemory.read()?.channel).toBe("KOOK"),
     );
     await act(() => router.navigate(-1));
     await waitFor(() =>
-      expect(screen.getByLabelText("渠道", { exact: true })).toHaveTextContent(
+      expect(screen.getByRole("combobox", { name: "渠道" })).toHaveTextContent(
         "全部渠道",
       ),
     );

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ImageIcon } from "lucide-react";
+import { CopyIcon, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { Button } from "@/components/ui/button";
@@ -79,6 +79,7 @@ export function ImagePresetSettings() {
   const [configs, setConfigs] = useState<ChannelImagePresets[]>([]);
   const [channel, setChannel] = useState("");
   const [subChannel, setSubChannel] = useState("");
+  const [copySourceKey, setCopySourceKey] = useState("");
   const [drafts, setDrafts] = useState<Record<string, DraftPair>>({});
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -108,6 +109,7 @@ export function ImagePresetSettings() {
       else setGroupsError("渠道列表加载失败，可重试；仍可编辑已保存的预设。");
       if (presets.status === "fulfilled") {
         setConfigs(presets.value);
+        setCopySourceKey("");
         setReady(true);
       } else {
         setReady(false);
@@ -143,6 +145,28 @@ export function ImagePresetSettings() {
     ]),
   ].filter(Boolean);
   const disabled = loading || saving || !ready;
+  const copySources = configs.filter(
+    (entry) =>
+      (entry.channel !== channel || entry.subChannel !== subChannel) &&
+      (hasPreset(entry.titlePic) || hasPreset(entry.titlePic2)),
+  );
+  const copySource = copySources.find(
+    (entry) =>
+      JSON.stringify([entry.channel, entry.subChannel]) === copySourceKey,
+  );
+  const copyDisabled = disabled || !channel || !subChannel;
+  function copyPresets() {
+    if (copyDisabled || savingGate.current || !copySource) return;
+    setDrafts((previous) => ({
+      ...previous,
+      [key]: {
+        titlePic: toDraft(copySource.titlePic),
+        titlePic2: toDraft(copySource.titlePic2),
+      },
+    }));
+    setError(null);
+    toast.success("预设已填入，请保存");
+  }
   function change(field: MaterialImageField, next: Draft) {
     setDrafts((previous) => ({
       ...previous,
@@ -190,7 +214,7 @@ export function ImagePresetSettings() {
     }
   }
   return (
-    <Card className="shadow-none xl:col-span-2">
+    <Card className="min-w-0 shadow-none xl:col-span-2">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <ImageIcon className="size-4" />
@@ -202,8 +226,8 @@ export function ImagePresetSettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
+        <div className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)]">
+          <div className="grid min-w-0 gap-2">
             <label htmlFor="preset-channel">预设渠道</label>
             <SearchableSelect
               id="preset-channel"
@@ -213,13 +237,16 @@ export function ImagePresetSettings() {
               onValueChange={(value) => {
                 setChannel(value);
                 setSubChannel("");
+                setCopySourceKey("");
                 setError(null);
               }}
               disabled={disabled}
               searchPlaceholder="搜索预设渠道…"
+              className="h-auto min-h-8 w-full py-1.5"
+              wrapLabels
             />
           </div>
-          <div className="space-y-2">
+          <div className="grid min-w-0 gap-2">
             <label htmlFor="preset-subchannel">预设子渠道</label>
             <SearchableSelect
               id="preset-subchannel"
@@ -228,12 +255,56 @@ export function ImagePresetSettings() {
               value={subChannel}
               onValueChange={(value) => {
                 setSubChannel(value);
+                setCopySourceKey("");
                 setError(null);
               }}
               disabled={disabled || !channel}
               searchPlaceholder="搜索预设子渠道…"
+              className="h-auto min-h-8 w-full py-1.5"
+              wrapLabels
             />
           </div>
+        </div>
+        <div className="space-y-2">
+          <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="grid min-w-0 gap-2">
+              <label htmlFor="preset-copy-source">复制来源</label>
+              <SearchableSelect
+                id="preset-copy-source"
+                aria-label="复制来源"
+                aria-describedby="preset-copy-hint"
+                options={copySources.map((entry) => ({
+                  value: JSON.stringify([entry.channel, entry.subChannel]),
+                  label: `${entry.channel} / ${entry.subChannel}`,
+                }))}
+                value={copySource ? copySourceKey : ""}
+                onValueChange={setCopySourceKey}
+                disabled={copyDisabled || copySources.length === 0}
+                placeholder={
+                  !channel || !subChannel
+                    ? "请先选择目标子渠道"
+                    : copySources.length === 0
+                      ? "暂无其他已保存预设"
+                      : "请选择已保存的预设"
+                }
+                searchPlaceholder="搜索来源渠道或子渠道…"
+                className="h-auto min-h-8 w-full py-1.5"
+                wrapLabels
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={copyDisabled || !copySource}
+              onClick={copyPresets}
+            >
+              <CopyIcon className="size-4" />
+              复制预设
+            </Button>
+          </div>
+          <p id="preset-copy-hint" className="text-xs text-muted-foreground">
+            复制将替换当前表单，保存后生效
+          </p>
         </div>
         {loading && <p role="status">正在读取图片预设…</p>}
         {groupsError && (

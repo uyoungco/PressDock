@@ -116,19 +116,19 @@ describe("渠道素材写操作", () => {
     const requestCount = vi.mocked(channelService.list).mock.calls.length;
     await userEvent.click(screen.getByRole("button", { name: "列配置" }));
     expect(
-      screen.getByRole("menuitemcheckbox", { name: "Title" }),
+      screen.getByRole("menuitemcheckbox", { name: "标题" }),
     ).toHaveAttribute("aria-disabled", "true");
     expect(
       screen.getByRole("menuitemcheckbox", { name: "操作" }),
     ).toHaveAttribute("aria-disabled", "true");
     await userEvent.click(
-      screen.getByRole("menuitemcheckbox", { name: "Writer" }),
+      screen.getByRole("menuitemcheckbox", { name: "作者" }),
     );
     await userEvent.keyboard("{Escape}");
     expect(
-      screen.queryByRole("columnheader", { name: "Writer" }),
+      screen.queryByRole("columnheader", { name: "作者" }),
     ).not.toBeInTheDocument();
-    const resize = screen.getByRole("separator", { name: "调整 Title 列宽" });
+    const resize = screen.getByRole("separator", { name: "调整 标题 列宽" });
     resize.focus();
     await userEvent.keyboard("{ArrowRight}");
     expect(resize).toHaveAttribute("aria-valuenow", "330");
@@ -148,7 +148,7 @@ describe("渠道素材写操作", () => {
     expect(channelService.order).not.toHaveBeenCalled();
     router.dispose();
   });
-  it("列顺序对齐网页，ArticleId 和外链通过服务打开", async () => {
+  it("列顺序对齐网页，文章编号和外链通过服务打开", async () => {
     const router = await setup();
     const headers = within(screen.getByRole("table"))
       .getAllByRole("columnheader")
@@ -180,12 +180,17 @@ describe("渠道素材写操作", () => {
   });
   it("未提交条件禁止排序，当前页不足两条禁止排序", async () => {
     const router = await setup();
-    await userEvent.clear(screen.getByLabelText("发布日期"));
+    await userEvent.clear(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+    );
     expect(screen.getByRole("button", { name: "开始排序" })).toBeDisabled();
     vi.mocked(channelService.list).mockImplementation(async (q) =>
       materialPage(1, q.current, q.pagesize),
     );
-    await userEvent.type(screen.getByLabelText("发布日期"), "2026-10-22");
+    await userEvent.type(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+      "2026-10-22",
+    );
     await userEvent.click(screen.getByRole("button", { name: "搜索" }));
     expect(
       await screen.findByText("当前页至少需要两条素材"),
@@ -195,7 +200,7 @@ describe("渠道素材写操作", () => {
   it("原生拖放只提交当前页，排序失败保留并可重试，期间锁定操作", async () => {
     const router = await setup();
     await userEvent.click(screen.getByRole("button", { name: "开始排序" }));
-    expect(screen.getByLabelText("渠道", { exact: true })).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "渠道" })).toBeDisabled();
     expect(screen.getByLabelText("每页条数")).toBeDisabled();
     expect(screen.getByRole("button", { name: "新增" })).toBeDisabled();
     const transfer = {
@@ -226,7 +231,7 @@ describe("渠道素材写操作", () => {
     expect(channelService.order).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: "列配置" })).toBeDisabled();
     expect(
-      screen.getByRole("separator", { name: "调整 Title 列宽" }),
+      screen.getByRole("separator", { name: "调整 标题 列宽" }),
     ).toHaveAttribute("aria-disabled", "true");
     expect(channelService.order).toHaveBeenCalledWith(
       {

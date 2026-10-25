@@ -139,7 +139,7 @@ function MaterialCell({
           <Button
             size="icon"
             variant="ghost"
-            aria-label={`复制 ${field} ${row.id}`}
+            aria-label={`复制 ${field === "url" ? "文章链接" : "落地链接"} ${row.id}`}
             onClick={() => void copy(row[field]!)}
           >
             <Copy className="size-3" />
