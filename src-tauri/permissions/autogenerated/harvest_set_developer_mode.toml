@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-harvest-set-developer-mode"
+description = "Enables the harvest_set_developer_mode command without any pre-configured scope."
+commands.allow = ["harvest_set_developer_mode"]
+
+[[permission]]
+identifier = "deny-harvest-set-developer-mode"
+description = "Denies the harvest_set_developer_mode command without any pre-configured scope."
+commands.deny = ["harvest_set_developer_mode"]

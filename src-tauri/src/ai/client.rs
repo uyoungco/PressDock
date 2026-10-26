@@ -2,7 +2,10 @@ use super::{
     credentials::{AiVault, NativeAiVault},
     *,
 };
-use crate::database::Database;
+use crate::{
+    database::Database,
+    error::{Diagnostic, redact, response_context},
+};
 use reqwest::{Client, Method, StatusCode};
 use serde_json::{Value, json};
 use std::{
@@ -12,6 +15,14 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio::sync::watch;
+
+// 采集任务的 JSON 输出参数与现有标题生成分开，避免改动标题优化行为。
+#[derive(Clone, Copy)]
+pub(crate) enum GenerationTask<'a> {
+    General,
+    Metadata(&'a (dyn Fn(&Value) + Sync)),
+    Layout(&'a (dyn Fn(&Value) + Sync)),
+}
 
 struct Job {
     cancel: watch::Sender<bool>,
@@ -41,11 +52,17 @@ fn cancelled() -> AiError {
     AiError::new("AI_CANCELLED", "AI 请求已取消")
 }
 fn network(error: reqwest::Error) -> AiError {
-    if error.is_timeout() {
+    let result = if error.is_timeout() {
         AiError::new("AI_TIMEOUT", "AI 请求超时，请手动重试")
     } else {
         AiError::new("AI_NETWORK", "无法连接 AI 服务，请检查 API 地址和网络")
-    }
+    };
+    // reqwest 的 URL 可能含凭据；保留网络原因链，但不携带请求地址或认证头。
+    result.diagnosed(Diagnostic::error(
+        "ai.request",
+        &error.without_url(),
+        json!({}),
+    ))
 }
 
 impl AiService {
@@ -196,6 +213,18 @@ impl AiService {
         } else {
             None
         };
+        // 采集设置/未完成任务也持有模型；删除凭据前检查，防止数据库拒绝后密钥却已丢失。
+        if matches!(kind, "provider" | "model")
+            && db
+                .harvest_model_in_use(kind, id)
+                .await
+                .map_err(|_| AiError::new("AI_STORAGE", "无法检查采集模型引用"))?
+        {
+            return Err(AiError::new(
+                "AI_IN_USE",
+                "配置正被采集设置或未完成任务引用，请先解除引用",
+            ));
+        }
         // 先检查数据库引用；被引用的提供商不会删除凭据。
         if kind == "provider" {
             let settings = db.ai_settings().await?;
@@ -259,12 +288,35 @@ impl AiService {
         if let Some(body) = body {
             request = request.json(&body);
         }
-        let mut response = request.send().await.map_err(network)?;
+        let mut response = request.send().await.map_err(|error| {
+            let mut error = network(error);
+            if let Some(diagnostic) = &mut error.diagnostic {
+                diagnostic.operation = format!("ai.{path}.send");
+            }
+            error
+        })?;
         let status = response.status();
         let mut bytes = Vec::new();
-        while let Some(chunk) = response.chunk().await.map_err(network)? {
+        loop {
+            let chunk = response.chunk().await.map_err(|error| {
+                let mut error = network(error);
+                if let Some(diagnostic) = &mut error.diagnostic {
+                    diagnostic.operation = format!("ai.{path}.read");
+                    diagnostic.context = response_context(status.as_u16(), &bytes, secret, true);
+                }
+                error
+            })?;
+            let Some(chunk) = chunk else { break };
             if bytes.len() + chunk.len() > 2 * 1024 * 1024 {
-                return Err(AiError::new("AI_RESPONSE", "AI 响应超过 2 MiB"));
+                let received = bytes.len() + chunk.len();
+                bytes.extend_from_slice(&chunk[..2 * 1024 * 1024 - bytes.len()]);
+                return Err(AiError::new("AI_RESPONSE", "AI 响应超过 2 MiB").diagnosed(
+                    Diagnostic {
+                        operation: format!("ai.{path}.read"),
+                        causes: vec![format!("已收到至少 {received} 字节，响应读取上限为 2 MiB")],
+                        context: response_context(status.as_u16(), &bytes, secret, true),
+                    },
+                ));
             }
             bytes.extend_from_slice(&chunk);
         }
@@ -274,7 +326,7 @@ impl AiService {
                     .and_then(Value::as_str)
                     .map(str::to_owned)
             });
-            return Err(match status {
+            let error = match status {
                 StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => {
                     AiError::new("AI_AUTH", "AI 密钥无效或无模型权限，请检查配置")
                 }
@@ -302,10 +354,20 @@ impl AiService {
                         status.as_u16()
                     ),
                 ),
-            });
+            };
+            return Err(error.diagnosed(Diagnostic {
+                operation: format!("ai.{path}.response"),
+                causes: vec![format!("HTTP {status}")],
+                context: response_context(status.as_u16(), &bytes, secret, false),
+            }));
         }
-        serde_json::from_slice(&bytes)
-            .map_err(|_| AiError::new("AI_RESPONSE", "AI 服务返回了无效 JSON"))
+        serde_json::from_slice(&bytes).map_err(|error| {
+            AiError::new("AI_RESPONSE", "AI 服务返回了无效 JSON").diagnosed(Diagnostic::error(
+                &format!("ai.{path}.parse"),
+                &error,
+                response_context(status.as_u16(), &bytes, secret, false),
+            ))
+        })
     }
 
     pub async fn list_models(
@@ -340,6 +402,18 @@ impl AiService {
         system: &str,
         user: &str,
     ) -> Result<String, AiError> {
+        self.generate_for_task(db, model, system, user, GenerationTask::General)
+            .await
+    }
+
+    pub(crate) async fn generate_for_task(
+        &self,
+        db: &Database,
+        model: &AiModelConfig,
+        system: &str,
+        user: &str,
+        task: GenerationTask<'_>,
+    ) -> Result<String, AiError> {
         let (provider, secret) = self.provider(db, &model.provider_id).await?;
         let (path, mut body) = match provider.protocol {
             Protocol::ChatCompletions => (
@@ -368,9 +442,60 @@ impl AiService {
                 body["reasoning_effort"] = json!(effort);
             }
         }
+        if !matches!(task, GenerationTask::General) {
+            if provider.protocol == Protocol::ChatCompletions {
+                body["response_format"] = json!({"type":"json_object"});
+            } else {
+                body["text"] = json!({"format":{"type":"json_object"}});
+            }
+            let deepseek = url::Url::parse(&provider.base_url)
+                .ok()
+                .is_some_and(|url| url.host_str() == Some("api.deepseek.com"));
+            if model.max_output_tokens.is_none() {
+                body[if provider.protocol == Protocol::Responses {
+                    "max_output_tokens"
+                } else {
+                    &provider.compatibility.max_tokens_field
+                }] = json!(match task {
+                    GenerationTask::Metadata(_) => 512,
+                    GenerationTask::Layout(_) if deepseek => 16384,
+                    _ => 8192,
+                });
+            }
+            if matches!(task, GenerationTask::Layout(_))
+                && deepseek
+                && provider.protocol == Protocol::ChatCompletions
+            {
+                body["thinking"] = json!({"type":"enabled"});
+                if model.reasoning_effort.is_none() {
+                    body["reasoning_effort"] = json!("low");
+                }
+            }
+        }
         let value = self
             .request(&provider, secret.as_deref(), Method::POST, path, Some(body))
             .await?;
+        // 在完成状态/截断校验之前交给采集日志观察器，保留失败时已收到的业务响应。
+        // 不交出 provider、密钥或请求头，普通标题调用不注册观察器。
+        match task {
+            GenerationTask::General => {}
+            GenerationTask::Metadata(observe) | GenerationTask::Layout(observe) => {
+                observe(&redact(
+                    value.clone(),
+                    &secret.as_deref().into_iter().collect::<Vec<_>>(),
+                ))
+            }
+        }
+        let output_error = |code, message| {
+            AiError::new(code, message).diagnosed(Diagnostic {
+                operation: format!("ai.{path}.output"),
+                causes: vec![],
+                context: redact(
+                    value.clone(),
+                    &secret.as_deref().into_iter().collect::<Vec<_>>(),
+                ),
+            })
+        };
         let output = match provider.protocol {
             Protocol::ChatCompletions => {
                 if value
@@ -378,7 +503,7 @@ impl AiService {
                     .and_then(Value::as_str)
                     == Some("length")
                 {
-                    return Err(AiError::new(
+                    return Err(output_error(
                         "AI_OUTPUT_LIMIT",
                         "输出达到 token 上限，请增加模型输出上限后重试",
                     ));
@@ -395,7 +520,7 @@ impl AiService {
                     .and_then(Value::as_str)
                     .is_some_and(|s| s != "completed")
                 {
-                    return Err(AiError::new(
+                    return Err(output_error(
                         "AI_RESPONSE",
                         "模型未完成输出，请检查输出上限后重试",
                     ));
@@ -415,7 +540,7 @@ impl AiService {
             }
         };
         if output.trim().is_empty() {
-            return Err(AiError::new(
+            return Err(output_error(
                 "AI_RESPONSE",
                 "模型未返回可用文本，可能拒绝了本次请求",
             ));

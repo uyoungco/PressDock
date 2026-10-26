@@ -2,6 +2,13 @@ fn main() {
     println!("cargo:rerun-if-changed=migrations");
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
         tauri_build::AppManifest::new().commands(&[
+            "harvest_set_developer_mode",
+            "harvest_open_devtools",
+            "harvest_load_settings",
+            "harvest_save_settings",
+            "harvest_list_jobs",
+            "harvest_enqueue",
+            "harvest_job_action",
             "ai_load_settings",
             "ai_save_provider",
             "ai_save_model",

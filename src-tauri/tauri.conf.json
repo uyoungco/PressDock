@@ -13,6 +13,7 @@
     "windows": [
       {
         "label": "main",
+        "create": false,
         "dragDropEnabled": false,
         "title": "PressDock — News Editorial Workspace",
         "width": 1280,

@@ -9,6 +9,7 @@ pub use models::*;
 pub struct AiError {
     pub code: &'static str,
     pub message: String,
+    pub(crate) diagnostic: Option<crate::error::Diagnostic>,
 }
 
 impl AiError {
@@ -16,7 +17,13 @@ impl AiError {
         Self {
             code,
             message: message.into(),
+            diagnostic: None,
         }
+    }
+    // 详细原因跨服务传递，只有开发者任务的事件出口会读取它。
+    pub(crate) fn diagnosed(mut self, diagnostic: crate::error::Diagnostic) -> Self {
+        self.diagnostic = Some(diagnostic);
+        self
     }
     pub fn invalid(message: impl Into<String>) -> Self {
         Self::new("AI_VALIDATION", message)
@@ -31,10 +38,14 @@ impl std::fmt::Debug for AiError {
 }
 
 impl From<sqlx::Error> for AiError {
-    fn from(_: sqlx::Error) -> Self {
-        Self::new("AI_STORAGE", "AI 配置存储失败，请重试")
+    fn from(error: sqlx::Error) -> Self {
+        Self::new("AI_STORAGE", "AI 配置存储失败，请重试").diagnosed(
+            crate::error::Diagnostic::error("ai.storage", &error, serde_json::json!({})),
+        )
     }
 }
 
 #[cfg(test)]
 mod tests;
+
+pub(crate) use client::GenerationTask;

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-harvest-save-settings"
+description = "Enables the harvest_save_settings command without any pre-configured scope."
+commands.allow = ["harvest_save_settings"]
+
+[[permission]]
+identifier = "deny-harvest-save-settings"
+description = "Denies the harvest_save_settings command without any pre-configured scope."
+commands.deny = ["harvest_save_settings"]

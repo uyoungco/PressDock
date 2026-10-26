@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-harvest-open-devtools"
+description = "Enables the harvest_open_devtools command without any pre-configured scope."
+commands.allow = ["harvest_open_devtools"]
+
+[[permission]]
+identifier = "deny-harvest-open-devtools"
+description = "Denies the harvest_open_devtools command without any pre-configured scope."
+commands.deny = ["harvest_open_devtools"]

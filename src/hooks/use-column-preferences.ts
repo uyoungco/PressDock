@@ -4,7 +4,7 @@ import { atomWithStorage } from "jotai/utils";
 import { functionalUpdate, type Updater } from "@tanstack/react-table";
 
 export type TablePreferenceKey =
-  "channels" | "dashboard" | "articles" | "publish";
+  "channels" | "dashboard" | "articles" | "publish" | "import";
 export interface PreferenceColumn {
   id: string;
   label: string;

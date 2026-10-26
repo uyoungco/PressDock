@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-harvest-list-jobs"
+description = "Enables the harvest_list_jobs command without any pre-configured scope."
+commands.allow = ["harvest_list_jobs"]
+
+[[permission]]
+identifier = "deny-harvest-list-jobs"
+description = "Denies the harvest_list_jobs command without any pre-configured scope."
+commands.deny = ["harvest_list_jobs"]

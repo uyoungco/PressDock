@@ -71,7 +71,21 @@ Rust 通过内容签名识别格式并复核 MIME，限制 20 MiB 输入、2400 
 
 `scripts/image-qa.mjs` 仅作为显式启动的本机隔离验收工具，通过 Rust 单元测试执行真实检查和编码。该测试入口受 `cfg(test)` 限制，不存在于桌面产物，也不提供登录绕过、CMS 请求或导出命令。
 
-`CmsAdapter` 是本地稿件业务服务契约，发布始终返回未配置错误。CMS 发布接入仍需确认接口，不得在页面中编造请求地址。采集工具没有确认协议前，导入只创建演示素材，绝不抓取或假装导入真实内容。
+`CmsAdapter` 继续承担旧本地稿件读写，其发布方法仍返回未配置错误。真实采集走独立的 `features/import → services/tauri/harvest → commands/harvest → harvest`，返回持久任务而非伪装成已完成的文章。后台 worker 复用 CMS 会话，经 FormatContent 和 Article 创建接口自动提交；文章创建与正式发布分别表述。
+
+### 采集任务
+
+`0004_harvest.sql` 新增单行设置与 `harvest_jobs`。入队请求 ID 保证幂等；迁移 `0005_harvest_developer.sql` 将唯一约束扩展为账号/规范化 URL/任务模式分别去重；配置快照在入队时固定，五项开关、所选模型和 developerMode 分离于清理保留天数；旧 JSON 缺少 developerMode 时按 false 读取。来源 URL、时间戳及入队本地日期固定保存，列表按当前账号和日期读取轻量字段，不回传正文/payload。前端先订阅刷新通知再读取数据库，离页只释放订阅，不停止 worker。
+
+一个 Rust worker 原子领取当前账号的排队任务，处理期间复核 CMS 会话版本。原生采集窗口独立 label，业务 capability 只允许 main；通过 eval_with_callback 获取 DOM，不给远程页面开放 invoke。导航前标记旧文档，避免异步 navigate 读取上一页；只允许百度来源/登录导航，最终文章来源重新匹配适配器。标题就绪即更新，分页检查点保存在任务，采全后原文只插入一次到 source_articles；不自动创建 drafts。
+
+采集处理复用原 HTML 清理、元数据逐字段校验、布局编号引用与原本地分页规则。正文整理和分页拆成四种组合；只分页保留段落 HTML，不触发 AI 清理。分类清单来自后台；AI 请求复用提供商/凭据客户端并使用 JSON 输出约定，关闭的元数据字段不生成。付费请求不自动网络重试，完整布局结构错误最多纠正一次。
+
+最终待提交数据先入库，再标记 submitting 发出创建文章请求。明确成功后记为 succeeded；网络/异常响应或提交期间取消/退出记为 submissionUnknown，保留核对记录，不自动重发。启动先将旧运行状态恢复为 interrupted/unknown，再执行保留期清理，仅清理明确终态及不再被稿件引用的采集原文。模型删除前同时检查采集设置与未完成任务引用，防止删除凭据后才被外键拒绝。
+
+开发者模式不改变 FormatContent、分类或 AI 链，最终分支返回独立 DebugCompleted 结果，不调用 Article，也不写 submitting。数据库提交意图更新额外限定任务模式为正常；调试终态加入历史清理和模型引用释放规则，关闭设置不重新提交已有调试结果。迁移以事务重建带扩展 CHECK 的任务表，完整保留旧列和记录，再重建索引。
+
+调试数据由 Rust `harvest-debug` 类型化事件仅发到 main，携带 userId/jobId/attempt/timestamp/step/kind/data。Context 按任务模式惰性构建业务日志，正常任务不序列化完整 HTML；事件失败不影响采集。工作区统一订阅并按当前会话账号过滤，卸载释放监听。开发者开关通过 harvest_set_developer_mode 原子更新 options 中的 JSON boolean，与入队共用配置操作锁；前端以保存返回值更新勾选状态，不提交其他未保存表单。F12 经业务服务和类型化 IPC 调用 harvest_open_devtools；Rust 核对 main 窗口、有效 CMS 会话和已保存设置后调用原生 DevTools。桌面 release 启用 tauri/devtools，采集窗口显式禁用 DevTools，不增加远程业务权限。
 
 ### AI 配置与标题优化
 

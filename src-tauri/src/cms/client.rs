@@ -9,12 +9,15 @@ use serde_json::{Value, json};
 use std::{collections::HashSet, path::Path, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 
+#[path = "articles.rs"]
+mod articles;
 #[path = "write.rs"]
 mod writes;
 
 pub struct CmsError {
     pub code: &'static str,
     pub message: String,
+    pub(crate) diagnostic: Option<crate::error::Diagnostic>,
 }
 
 impl std::fmt::Debug for CmsError {
@@ -30,7 +33,13 @@ impl CmsError {
         Self {
             code,
             message: message.into(),
+            diagnostic: None,
         }
+    }
+    // 详细原因跨服务传递，只有开发者任务的事件出口会读取它。
+    pub(crate) fn diagnosed(mut self, diagnostic: crate::error::Diagnostic) -> Self {
+        self.diagnostic = Some(diagnostic);
+        self
     }
     fn expired() -> Self {
         Self::new("AUTH_EXPIRED", "登录已失效，请重新登录")

@@ -13,6 +13,7 @@ import { DesktopLayout } from "@/layouts/DesktopLayout";
 import { MobileLayout } from "@/layouts/MobileLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RequireSession, SessionBoundary } from "@/features/auth/components";
+import { useDeveloperTools } from "@/features/import/use-developer-tools";
 const Login = lazy(() => import("@/pages/Login"));
 const Channels = lazy(() => import("@/pages/Channels"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -24,6 +25,7 @@ const Publish = lazy(() => import("@/pages/Publish"));
 const Settings = lazy(() => import("@/pages/Settings"));
 
 function Workspace() {
+  useDeveloperTools();
   const mobile = useIsMobile();
   const { pathname } = useLocation();
   const Layout = mobile ? MobileLayout : DesktopLayout;

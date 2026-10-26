@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-harvest-enqueue"
+description = "Enables the harvest_enqueue command without any pre-configured scope."
+commands.allow = ["harvest_enqueue"]
+
+[[permission]]
+identifier = "deny-harvest-enqueue"
+description = "Denies the harvest_enqueue command without any pre-configured scope."
+commands.deny = ["harvest_enqueue"]

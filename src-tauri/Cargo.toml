@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["devtools"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite-bundled", "migrate", "macros"] }
@@ -38,6 +38,8 @@ exoquant = "0.2"
 webp = { version = "0.3", default-features = false }
 lcms2 = { version = "6.2", features = ["static"] }
 tauri-plugin-dialog = "2"
+scraper = { version = "0.27", default-features = false }
+regex = "1"
 
 [dev-dependencies]
 tempfile = "3"

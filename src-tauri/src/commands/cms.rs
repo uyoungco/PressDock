@@ -13,8 +13,13 @@ use tauri_plugin_opener::OpenerExt;
 pub async fn cms_login(
     request: LoginRequest,
     cms: State<'_, CmsService>,
+    harvest: State<'_, crate::harvest::HarvestService>,
 ) -> Result<AuthSession, CommandError> {
-    Ok(cms.login(request).await?)
+    // 认证切换立即停止旧任务；新会话仅唤醒所属账号的持久队列。
+    harvest.stop();
+    let session = cms.login(request).await?;
+    harvest.wake.notify_one();
+    Ok(session)
 }
 #[tauri::command]
 pub async fn cms_restore_session(
@@ -23,7 +28,11 @@ pub async fn cms_restore_session(
     Ok(cms.restore_session().await?)
 }
 #[tauri::command]
-pub async fn cms_logout(cms: State<'_, CmsService>) -> Result<LogoutResult, CommandError> {
+pub async fn cms_logout(
+    cms: State<'_, CmsService>,
+    harvest: State<'_, crate::harvest::HarvestService>,
+) -> Result<LogoutResult, CommandError> {
+    harvest.stop();
     Ok(cms.logout().await)
 }
 #[tauri::command]

@@ -8,6 +8,7 @@ import { themeAtom } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
 import { useAuth } from "@/hooks/use-auth";
+import { HarvestSettings } from "@/features/import/HarvestSettings";
 import { ImagePresetSettings } from "@/features/image-presets/ImagePresetSettings";
 import { ModelSettings } from "@/features/ai/ModelSettings";
 import { TemplateSettings } from "@/features/ai/TemplateSettings";
@@ -20,7 +21,7 @@ import {
 export default function Settings() {
   const [params] = useSearchParams();
   const [tab, setTab] = useState(() =>
-    ["ai-models", "ai-templates"].includes(params.get("tab") ?? "")
+    ["ai-models", "ai-templates", "harvest"].includes(params.get("tab") ?? "")
       ? params.get("tab")!
       : "general",
   );
@@ -57,7 +58,7 @@ export default function Settings() {
     <>
       <PageHeader
         title="系统设置"
-        description="管理工作区外观、图片预设、AI 模型与提示词模板。"
+        description="管理采集与 AI 处理、工作区外观、图片预设和 AI 模型。"
         demo={false}
       />
       <Tabs value={tab} onValueChange={setTab} className="min-w-0 gap-5">
@@ -65,6 +66,9 @@ export default function Settings() {
           <TabsList aria-label="设置模块" className="h-10! min-w-max">
             <TabsTrigger value="general" className="px-4">
               常规设置
+            </TabsTrigger>
+            <TabsTrigger value="harvest" className="px-4">
+              采集与 AI 处理
             </TabsTrigger>
             <TabsTrigger value="image-presets" className="px-4">
               图片预设
@@ -85,6 +89,14 @@ export default function Settings() {
         </div>
         <TabsContent value="general" className="min-w-0">
           <GeneralSettings theme={theme} onThemeChange={setTheme} />
+        </TabsContent>
+        <TabsContent
+          value="harvest"
+          forceMount
+          hidden={tab !== "harvest"}
+          className="min-w-0"
+        >
+          <HarvestSettings active={tab === "harvest"} />
         </TabsContent>
         <TabsContent
           value="image-presets"
