@@ -372,6 +372,208 @@ async fn both_protocols_discovery_options_and_gateway_compatibility() {
 }
 
 #[tokio::test]
+async fn metadata_token_budget_respects_both_protocols_and_explicit_limits() {
+    for (protocol, tokens_field) in [
+        (Protocol::ChatCompletions, "max_completion_tokens"),
+        (Protocol::ChatCompletions, "max_tokens"),
+        (Protocol::Responses, "max_output_tokens"),
+    ] {
+        let server = MockServer::start().await;
+        let dir = tempfile::tempdir().unwrap();
+        let db = Database::open(&dir.path().join("ai.db")).await.unwrap();
+        let ai = AiService::with_vault(Arc::new(TestVault::default())).unwrap();
+        let mut config = provider("gateway", &server.uri(), protocol);
+        if tokens_field == "max_tokens" {
+            config.compatibility.max_tokens_field = "max_tokens".into();
+        }
+        ai.save_provider(&db, config).await.unwrap();
+        let text = r#"{"smallText":"本地测试摘要","tags":["测试","摘要","标签"]}"#;
+        let (endpoint, response) = match protocol {
+            Protocol::ChatCompletions => (
+                "/chat/completions",
+                json!({"choices":[{"finish_reason":"stop","message":{"content":text}}]}),
+            ),
+            Protocol::Responses => (
+                "/responses",
+                json!({"status":"completed","output":[{"type":"reasoning","summary":[]},{"type":"message","content":[{"type":"output_text","text":text}]}]}),
+            ),
+        };
+        Mock::given(method("POST"))
+            .and(path(endpoint))
+            .respond_with(ResponseTemplate::new(200).set_body_json(response))
+            .expect(3)
+            .mount(&server)
+            .await;
+        for limit in [None, Some(2048)] {
+            let mut configured = model("metadata", "gateway");
+            configured.max_output_tokens = limit;
+            configured.reasoning_effort = Some("high".into());
+            let observed = Mutex::new(Vec::new());
+            let observe = |response: &serde_json::Value| {
+                observed.lock().unwrap().push(response.clone());
+            };
+            assert_eq!(
+                ai.generate_for_task(
+                    &db,
+                    &configured,
+                    "只返回 JSON 对象",
+                    "本地测试文章",
+                    GenerationTask::Metadata(&observe),
+                )
+                .await
+                .unwrap(),
+                text
+            );
+            assert_eq!(observed.lock().unwrap().len(), 1);
+        }
+        ai.generate_text(&db, &model("general", "gateway"), "测试", "本地文本")
+            .await
+            .unwrap();
+        let requests = server.received_requests().await.unwrap();
+        assert_eq!(requests.len(), 3);
+        for (request, limit) in requests.iter().zip([Some(8192), Some(2048), None]) {
+            let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap();
+            for field in ["max_output_tokens", "max_completion_tokens", "max_tokens"] {
+                if field == tokens_field
+                    && let Some(limit) = limit
+                {
+                    assert_eq!(body[field], limit);
+                } else {
+                    assert!(body.get(field).is_none(), "不应发送 {field}：{body}");
+                }
+            }
+            if limit.is_some() {
+                let (format, effort) = match protocol {
+                    Protocol::ChatCompletions => {
+                        (&body["response_format"]["type"], &body["reasoning_effort"])
+                    }
+                    Protocol::Responses => (
+                        &body["text"]["format"]["type"],
+                        &body["reasoning"]["effort"],
+                    ),
+                };
+                assert_eq!(format, "json_object");
+                assert_eq!(effort, "high");
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn unfinished_responses_reject_partial_text_and_preserve_redacted_diagnostics() {
+    let partial = json!([{"type":"message","content":[{"type":"output_text","text":"{\"smallText\":\"部分结果\"}"}]}]);
+    for (mut response, code, message) in [
+        (
+            json!({"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"output":[{"type":"reasoning","summary":[]}]}),
+            "AI_OUTPUT_LIMIT",
+            "输出达到 token 上限",
+        ),
+        (
+            json!({"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"output":partial}),
+            "AI_OUTPUT_LIMIT",
+            "输出达到 token 上限",
+        ),
+        (
+            json!({"status":"incomplete","incomplete_details":{"reason":"content_filter"},"output":partial}),
+            "AI_RESPONSE",
+            "内容过滤",
+        ),
+        (
+            json!({"status":"failed","error":{"code":"server_error","message":"回显 fake-ai-test-secret"},"output":partial}),
+            "AI_RESPONSE",
+            "服务生成失败",
+        ),
+        (
+            json!({"status":"cancelled","output":partial}),
+            "AI_RESPONSE",
+            "已取消本次生成",
+        ),
+        (
+            json!({"status":"queued","output":partial}),
+            "AI_RESPONSE",
+            "仍在生成",
+        ),
+        (
+            json!({"status":"in_progress","output":partial}),
+            "AI_RESPONSE",
+            "仍在生成",
+        ),
+        (
+            json!({"status":"incomplete","incomplete_details":{"reason":"unknown_reason"},"output":partial}),
+            "AI_RESPONSE",
+            "模型未完成输出",
+        ),
+        (
+            json!({"status":"incomplete","output":partial}),
+            "AI_RESPONSE",
+            "模型未完成输出",
+        ),
+        (
+            json!({"status":"unknown_status","output":partial}),
+            "AI_RESPONSE",
+            "模型未完成输出",
+        ),
+        (
+            json!({"status":"completed","output":[{"type":"reasoning","summary":[]}]}),
+            "AI_RESPONSE",
+            "未返回可用文本",
+        ),
+    ] {
+        let server = MockServer::start().await;
+        let dir = tempfile::tempdir().unwrap();
+        let db = Database::open(&dir.path().join("ai.db")).await.unwrap();
+        let ai = AiService::with_vault(Arc::new(TestVault::default())).unwrap();
+        ai.save_provider(&db, provider("gateway", &server.uri(), Protocol::Responses))
+            .await
+            .unwrap();
+        response["api_key"] = json!("fake-ai-test-secret");
+        response["usage"] =
+            json!({"output_tokens":512,"output_tokens_details":{"reasoning_tokens":512}});
+        Mock::given(method("POST"))
+            .and(path("/responses"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(response.clone()))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let observed = Mutex::new(Vec::new());
+        let observe = |response: &serde_json::Value| {
+            observed.lock().unwrap().push(response.clone());
+        };
+        let error = ai
+            .generate_for_task(
+                &db,
+                &model("metadata", "gateway"),
+                "只返回 JSON 对象",
+                "本地测试文章",
+                GenerationTask::Metadata(&observe),
+            )
+            .await
+            .unwrap_err();
+        assert_eq!(error.code, code);
+        assert!(error.message.contains(message), "{}", error.message);
+        assert!(!error.message.contains("fake-ai-test-secret"));
+        if code != "AI_OUTPUT_LIMIT" {
+            assert!(!error.message.contains("输出上限"));
+        }
+        assert_eq!(server.received_requests().await.unwrap().len(), 1);
+        let observed = observed.lock().unwrap();
+        assert_eq!(observed.len(), 1);
+        let diagnostic = error.diagnostic.unwrap();
+        assert_eq!(diagnostic.operation, "ai.responses.output");
+        assert_eq!(diagnostic.context, observed[0]);
+        assert_eq!(diagnostic.context["status"], response["status"]);
+        assert_eq!(diagnostic.context["output"], response["output"]);
+        assert_eq!(diagnostic.context["usage"], response["usage"]);
+        assert_eq!(diagnostic.context["api_key"], "[REDACTED]");
+        assert!(
+            !serde_json::to_string(&diagnostic)
+                .unwrap()
+                .contains("fake-ai-test-secret")
+        );
+    }
+}
+
+#[tokio::test]
 async fn http_errors_are_redacted_independent_and_never_retried() {
     for (status, body, code) in [
         (

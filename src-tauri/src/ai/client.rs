@@ -457,7 +457,8 @@ impl AiService {
                 } else {
                     &provider.compatibility.max_tokens_field
                 }] = json!(match task {
-                    GenerationTask::Metadata(_) => 512,
+                    // 输出额度也包含推理 token，元数据 JSON 较短也需要预留推理空间。
+                    GenerationTask::Metadata(_) => 8192,
                     GenerationTask::Layout(_) if deepseek => 16384,
                     _ => 8192,
                 });
@@ -515,15 +516,33 @@ impl AiService {
                     .to_owned()
             }
             Protocol::Responses => {
-                if value
-                    .get("status")
-                    .and_then(Value::as_str)
-                    .is_some_and(|s| s != "completed")
+                if let Some(status) = value.get("status").and_then(Value::as_str)
+                    && status != "completed"
                 {
-                    return Err(output_error(
-                        "AI_RESPONSE",
-                        "模型未完成输出，请检查输出上限后重试",
-                    ));
+                    let (code, message) = match (
+                        status,
+                        value
+                            .pointer("/incomplete_details/reason")
+                            .and_then(Value::as_str),
+                    ) {
+                        ("incomplete", Some("max_output_tokens")) => (
+                            "AI_OUTPUT_LIMIT",
+                            "输出达到 token 上限，请增加模型输出上限后重试",
+                        ),
+                        ("incomplete", Some("content_filter")) => {
+                            ("AI_RESPONSE", "AI 输出被内容过滤，未返回完整结果")
+                        }
+                        ("failed", _) => {
+                            ("AI_RESPONSE", "AI 服务生成失败，请检查服务商状态后手动重试")
+                        }
+                        ("cancelled", _) => ("AI_RESPONSE", "AI 服务已取消本次生成，请手动重试"),
+                        ("queued" | "in_progress", _) => (
+                            "AI_RESPONSE",
+                            "AI 服务仍在生成，尚未返回完整结果，请稍后手动重试",
+                        ),
+                        _ => ("AI_RESPONSE", "模型未完成输出，请手动重试"),
+                    };
+                    return Err(output_error(code, message));
                 }
                 value
                     .get("output")
