@@ -54,15 +54,11 @@ describe("Dice UI Data Table 列配置", () => {
       const view = setup(key);
       expect(table().getAllByRole("row")).toHaveLength(articles.length + 1);
       expect(table().getAllByText("演示")).toHaveLength(articles.length);
-      expect(
-        table().getByRole("link", { name: `编辑：${articles[0].title}` }),
-      ).toHaveAttribute("href", `/editor/${articles[0].id}`);
+      expect(table().getByText(articles[0].title)).toBeInTheDocument();
+      expect(table().queryByRole("link")).not.toBeInTheDocument();
       await userEvent.click(screen.getByRole("button", { name: "列配置" }));
       expect(
         screen.getByRole("menuitemcheckbox", { name: "文章标题" }),
-      ).toHaveAttribute("aria-disabled", "true");
-      expect(
-        screen.getByRole("menuitemcheckbox", { name: "操作" }),
       ).toHaveAttribute("aria-disabled", "true");
       await userEvent.click(
         screen.getByRole("menuitemcheckbox", { name: "来源" }),
@@ -179,8 +175,8 @@ describe("Dice UI Data Table 列配置", () => {
       table().getByRole("columnheader", { name: "文章标题" }),
     ).toBeInTheDocument();
     expect(
-      table().getByRole("columnheader", { name: "操作" }),
-    ).toBeInTheDocument();
+      table().queryByRole("columnheader", { name: "操作" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("separator", { name: "调整 文章标题 列宽" }),
     ).toHaveAttribute("aria-valuenow", "960");

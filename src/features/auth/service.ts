@@ -5,7 +5,7 @@ import {
   onAuthenticationExpired,
   ServiceError,
 } from "@/services/tauri/client";
-import { editorBuffers } from "@/features/editor/buffer";
+import { articleMemory } from "@/features/cms-articles/state";
 import { channelQueryMemory } from "@/features/channels/query-memory";
 import { channelEditBuffers } from "@/features/channels/edit-buffer";
 import {
@@ -42,7 +42,7 @@ function begin() {
 }
 function accept(session: AuthSession | null) {
   if (session) {
-    editorBuffers.retainUser(session.user.userId);
+    articleMemory.retainUser(session.user.userId);
     channelQueryMemory.retainUser(session.user.userId);
     channelEditBuffers.retainUser(session.user.userId);
   }
@@ -120,7 +120,7 @@ export const authService = {
   },
   async logout() {
     begin();
-    editorBuffers.clear();
+    articleMemory.clear();
     channelQueryMemory.clear();
     channelEditBuffers.clear();
     accept(null);
@@ -157,7 +157,7 @@ export function safeReturnPath(value: string | null): string {
       !/^\/(dashboard|articles|import|images|publish|settings|channels)$/.test(
         path,
       ) &&
-      !/^\/editor\/[^/\\]+$/.test(path)
+      !/^\/articles\/(quality|review-[123])$/.test(path)
     )
       return "/dashboard";
     return `${url.pathname}${url.search}${url.hash}`;

@@ -1,16 +1,10 @@
 import type { PropsWithChildren } from "react";
 import { useAtom } from "jotai";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Newspaper, HardDrive, ChevronRight } from "lucide-react";
 import { sidebarOpenAtom } from "@/atoms/navigation";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { navigation } from "@/components/layout/navigation";
+import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { cn } from "@/lib/utils";
@@ -20,7 +14,6 @@ export function DesktopLayout({
   contentScroll = "page",
 }: PropsWithChildren<{ contentScroll?: "page" | "contained" }>) {
   const [open, setOpen] = useAtom(sidebarOpenAtom);
-  const { pathname } = useLocation();
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
       <aside
@@ -44,42 +37,11 @@ export function DesktopLayout({
             编辑工作空间
           </div>
         )}
-        <nav aria-label="主导航" className="space-y-1 p-2 pt-3">
-          {navigation.map(({ to, label, icon: Icon }) => {
-            const active = pathname.startsWith(to.split("/demo")[0]);
-            return (
-              <div key={to}>
-                {to === "/settings" && <Separator className="my-3" />}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <NavLink
-                      to={to}
-                      aria-label={label}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex h-10 items-center gap-3 rounded-md px-3 text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                        active &&
-                          "bg-sidebar-accent font-medium text-foreground",
-                      )}
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      {open && (
-                        <>
-                          <span>{label}</span>
-                          {active && (
-                            <ChevronRight className="ml-auto size-3.5 text-muted-foreground" />
-                          )}
-                        </>
-                      )}
-                    </NavLink>
-                  </TooltipTrigger>
-                  {!open && (
-                    <TooltipContent side="right">{label}</TooltipContent>
-                  )}
-                </Tooltip>
-              </div>
-            );
-          })}
+        <nav
+          aria-label="主导航"
+          className="min-h-0 space-y-1 overflow-y-auto p-2 pt-3"
+        >
+          <NavigationItems expanded={open} onExpand={() => setOpen(true)} />
         </nav>
         {open && (
           <div className="m-3 mt-auto rounded-lg border bg-background p-3">

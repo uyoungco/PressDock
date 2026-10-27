@@ -41,7 +41,6 @@ impl Database {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use models::SaveDraftRequest;
 
     #[tokio::test]
     async fn draft_survives_reopen_and_original_is_immutable()
@@ -50,16 +49,27 @@ mod tests {
         let path = directory.path().join("pressdock.db");
         let db = Database::open(&path).await?;
         assert!(db.health().await?);
-        let original = db.get_article("demo-1").await?;
-        db.save_draft(SaveDraftRequest {
-            id: original.id.clone(),
-            title: "独立编辑标题".into(),
-            content: "独立编辑正文".into(),
-        })
-        .await?;
+        let original = db
+            .list_articles()
+            .await?
+            .into_iter()
+            .find(|article| article.id == "demo-1")
+            .unwrap();
+        // 模拟旧版本留下的草稿，迁移后只读历史仍须保留既有编辑数据。
+        sqlx::query("UPDATE drafts SET title=?,content=? WHERE id=?")
+            .bind("独立编辑标题")
+            .bind("独立编辑正文")
+            .bind(&original.id)
+            .execute(&db.pool)
+            .await?;
         db.pool.close().await;
         let reopened = Database::open(&path).await?;
-        let saved = reopened.get_article("demo-1").await?;
+        let saved = reopened
+            .list_articles()
+            .await?
+            .into_iter()
+            .find(|article| article.id == "demo-1")
+            .unwrap();
         assert_eq!(saved.title, "独立编辑标题");
         assert_eq!(saved.content, "独立编辑正文");
         assert_eq!(saved.source.title, original.source.title);
@@ -73,19 +83,6 @@ mod tests {
     async fn invalid_requests_do_not_write_data() -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         let db = Database::open(&directory.path().join("test.db")).await?;
-        assert!(
-            db.save_draft(SaveDraftRequest {
-                id: "demo-1".into(),
-                title: "  ".into(),
-                content: "x".into()
-            })
-            .await
-            .is_err()
-        );
-        assert!(matches!(
-            db.get_article("missing").await,
-            Err(AppError::NotFound)
-        ));
         assert!(db.create_demo_article("file:///etc/passwd").await.is_err());
         assert!(db.create_demo_article("javascript:alert(1)").await.is_err());
         let demo = db.create_demo_article("https://example.com/test").await?;

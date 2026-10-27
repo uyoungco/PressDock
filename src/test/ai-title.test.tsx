@@ -5,7 +5,6 @@ import {
   render,
   screen,
   waitFor,
-  within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
@@ -13,10 +12,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { TitleOptimizer } from "@/features/ai/TitleOptimizer";
 import { MaterialForm } from "@/features/channels/MaterialForm";
 import { blankInput } from "@/features/channels/edit-buffer";
-import Editor from "@/pages/Editor";
-import { editorService } from "@/features/editor/service";
 import { aiService } from "@/features/ai/service";
-import { editorBuffers } from "@/features/editor/buffer";
 import { Provider } from "jotai";
 import type { PromoteInput } from "@/types/cms";
 import { aiResult, aiSettings } from "./ai-fixtures";
@@ -25,9 +21,6 @@ import { chooseOption } from "./select-helpers";
 
 vi.mock("@/features/ai/service", () => ({
   aiService: { load: vi.fn(), suggest: vi.fn() },
-}));
-vi.mock("@/features/editor/service", () => ({
-  editorService: { load: vi.fn(), save: vi.fn() },
 }));
 vi.mock("@/features/channels/use-material-image", () => ({
   useMaterialImage: () => ({
@@ -44,7 +37,6 @@ vi.mock("@/features/auth/service", () => ({
 }));
 beforeEach(() => {
   vi.clearAllMocks();
-  editorBuffers.clear();
   vi.mocked(aiService.load).mockResolvedValue(aiSettings());
   vi.mocked(aiService.suggest).mockResolvedValue(aiResult());
 });
@@ -227,51 +219,4 @@ it("渠道素材使用当前 Title 和 SmallText，采用不保存素材", async
     "演示候选标题一",
   );
   expect(save).not.toHaveBeenCalled();
-});
-it("内容编辑使用未保存标题和正文，采用仅更新编辑缓冲", async () => {
-  vi.mocked(editorService.load).mockResolvedValue({
-    id: "draft",
-    title: "已保存标题",
-    content: "已保存正文",
-    source: {
-      id: "source",
-      title: "原始标题",
-      url: "https://example.com",
-      content: "原始正文",
-      importedAt: "2026-10-25",
-    },
-    status: "draft",
-    createdAt: "2026-10-25",
-    updatedAt: "2026-10-25",
-    isDemo: true,
-  });
-  const router = createMemoryRouter(
-    [{ path: "/editor/:id", element: <Editor /> }],
-    { initialEntries: ["/editor/draft"] },
-  );
-  render(
-    <Provider>
-      <RouterProvider router={router} />
-    </Provider>,
-  );
-  fireEvent.change(await screen.findByLabelText("文章标题"), {
-    target: { value: "未保存标题" },
-  });
-  fireEvent.change(screen.getByLabelText("文章正文"), {
-    target: { value: "未保存正文" },
-  });
-  await userEvent.click(screen.getByRole("button", { name: "AI 优化" }));
-  await screen.findByText("演示候选标题一");
-  expect(aiService.suggest).toHaveBeenCalledWith(
-    expect.objectContaining({ title: "未保存标题", content: "未保存正文" }),
-    expect.any(AbortSignal),
-  );
-  await userEvent.click(screen.getByRole("button", { name: "采用候选 1" }));
-  expect(screen.getByLabelText("文章标题")).toHaveValue("演示候选标题一");
-  expect(editorService.save).not.toHaveBeenCalled();
-  expect(editorBuffers.get(session.user.userId, "draft")).toEqual({
-    title: "演示候选标题一",
-    content: "未保存正文",
-  });
-  expect(within(document.body).getByText("有未保存修改")).toBeInTheDocument();
 });

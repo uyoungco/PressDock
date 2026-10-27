@@ -1,6 +1,6 @@
 use super::{
     Database,
-    models::{Article, SaveDraftRequest, SourceArticle},
+    models::{Article, SourceArticle},
 };
 use crate::error::AppError;
 use chrono::{SecondsFormat, Utc};
@@ -34,34 +34,6 @@ impl Database {
             .into_iter()
             .map(from_row)
             .collect::<Result<Vec<_>, _>>()?)
-    }
-    pub async fn get_article(&self, id: &str) -> Result<Article, AppError> {
-        if id.is_empty() || id.len() > 100 {
-            return Err(AppError::Validation("无效的文章 ID".into()));
-        }
-        let row = sqlx::query("SELECT d.id,d.title,d.content,d.status,d.created_at,d.updated_at,s.id AS source_id,s.title AS source_title,s.url,s.content AS source_content,s.imported_at,s.is_demo FROM drafts d JOIN source_articles s ON d.source_id=s.id WHERE d.id = ?")
-            .bind(id)
-            .fetch_optional(&self.pool)
-            .await?
-            .ok_or(AppError::NotFound)?;
-        Ok(from_row(row)?)
-    }
-    pub async fn save_draft(&self, request: SaveDraftRequest) -> Result<Article, AppError> {
-        request.validate()?;
-        let now = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true);
-        let result = sqlx::query(
-            "UPDATE drafts SET title=?,content=?,status='draft',updated_at=? WHERE id=?",
-        )
-        .bind(request.title.trim())
-        .bind(&request.content)
-        .bind(now)
-        .bind(&request.id)
-        .execute(&self.pool)
-        .await?;
-        if result.rows_affected() == 0 {
-            return Err(AppError::NotFound);
-        }
-        self.get_article(&request.id).await
     }
     async fn insert_article(&self, article: &Article) -> Result<(), AppError> {
         let mut tx = self.pool.begin().await?;

@@ -4,7 +4,12 @@ import { atomWithStorage } from "jotai/utils";
 import { functionalUpdate, type Updater } from "@tanstack/react-table";
 
 export type TablePreferenceKey =
-  "channels" | "dashboard" | "articles" | "publish" | "import";
+  | "channels"
+  | "dashboard"
+  | "articles"
+  | "publish"
+  | "import"
+  | `cms-articles-${import("@/types/cms-article").ArticleView}`;
 export interface PreferenceColumn {
   id: string;
   label: string;

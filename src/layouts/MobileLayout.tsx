@@ -1,5 +1,4 @@
 import { useState, type PropsWithChildren } from "react";
-import { NavLink } from "react-router-dom";
 import { Newspaper } from "lucide-react";
 import {
   Sheet,
@@ -7,7 +6,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { navigation } from "@/components/layout/navigation";
+import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { cn } from "@/lib/utils";
@@ -27,20 +26,11 @@ export function MobileLayout({
             PressDock
           </SheetTitle>
           <SheetDescription>新闻编辑工作空间</SheetDescription>
-          <nav aria-label="主导航" className="mt-5 space-y-1">
-            {navigation.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `flex min-h-12 items-center gap-3 rounded-md px-3 text-sm ${isActive ? "bg-muted font-medium" : "text-muted-foreground"}`
-                }
-              >
-                <Icon className="size-4" />
-                {label}
-              </NavLink>
-            ))}
+          <nav
+            aria-label="主导航"
+            className="mt-5 min-h-0 flex-1 space-y-1 overflow-y-auto"
+          >
+            <NavigationItems onNavigate={() => setOpen(false)} />
           </nav>
         </SheetContent>
       </Sheet>

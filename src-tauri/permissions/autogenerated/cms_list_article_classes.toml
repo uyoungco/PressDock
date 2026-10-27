@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-list-article-classes"
+description = "Enables the cms_list_article_classes command without any pre-configured scope."
+commands.allow = ["cms_list_article_classes"]
+
+[[permission]]
+identifier = "deny-cms-list-article-classes"
+description = "Denies the cms_list_article_classes command without any pre-configured scope."
+commands.deny = ["cms_list_article_classes"]

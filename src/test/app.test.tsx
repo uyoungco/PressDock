@@ -26,6 +26,17 @@ import {
 import { deferred } from "./cms-fixtures";
 import { chooseOption } from "./select-helpers";
 
+vi.mock("@/services/tauri/articles", () => ({
+  articleIpc: {
+    classes: vi.fn(async () => [{ id: 1, name: "演示分类" }]),
+    list: vi.fn(async (query) => ({
+      data: [],
+      total: 0,
+      current: query.current,
+      pageSize: query.pagesize,
+    })),
+  },
+}));
 vi.mock("@/services/tauri/cms", () => ({
   cmsIpc: {
     restore: vi.fn(),
@@ -77,7 +88,7 @@ beforeEach(() => {
 });
 
 describe("工作区", () => {
-  it("文章状态下拉显示中文并筛选列表，主题选择继续持久化", async () => {
+  it("文章分类导航与每页条数可选择，主题选择继续持久化", async () => {
     const router = createMemoryRouter(routes, {
       initialEntries: ["/articles"],
     });
@@ -86,15 +97,11 @@ describe("工作区", () => {
         <RouterProvider router={router} />
       </AppProviders>,
     );
-    await screen.findByRole("heading", { name: "文章管理" }, { timeout: 5000 });
-    expect(
-      await screen.findByText("城市更新，让老街区焕发新活力"),
-    ).toBeInTheDocument();
-    await chooseOption(screen.getByLabelText("筛选文章状态"), "草稿");
-    expect(screen.getByLabelText("筛选文章状态")).toHaveTextContent("草稿");
-    expect(screen.getByText("共 1 篇")).toBeInTheDocument();
-    await chooseOption(screen.getByLabelText("筛选文章状态"), "全部状态");
-    expect(screen.getByText("共 4 篇")).toBeInTheDocument();
+    // 内容卡片不再重复显示栏目标题，等待筛选区域确认文章页已就绪。
+    await screen.findByRole("form", { name: "文章筛选" }, { timeout: 5000 });
+    await screen.findByText("暂无符合条件的文章");
+    await chooseOption(screen.getByLabelText("每页条数"), "500");
+    expect(router.state.location.search).toContain("pagesize=500");
     await userEvent.click(screen.getByRole("link", { name: "系统设置" }));
     await chooseOption(
       await screen.findByLabelText("界面主题", {}, { timeout: 5000 }),
@@ -150,7 +157,7 @@ describe("工作区", () => {
       </AppProviders>,
     );
     const general = await screen.findByRole("tab", { name: "常规设置" });
-    expect(screen.getAllByRole("tab")).toHaveLength(6);
+    expect(screen.getAllByRole("tab")).toHaveLength(7);
     expect(general).toHaveAttribute("aria-selected", "true");
     expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
     expect(screen.getByLabelText("预设渠道")).not.toBeVisible();
@@ -161,6 +168,7 @@ describe("工作区", () => {
     expect(screen.getByLabelText("界面主题")).toHaveFocus();
     general.focus();
     for (const name of [
+      "采集与 AI 处理",
       "图片预设",
       "服务连接",
       "AI 模型",
@@ -184,8 +192,9 @@ describe("工作区", () => {
     expect(systemService.healthCheck).toHaveBeenCalledTimes(1);
     expect(imagePresetsIpc.list).toHaveBeenCalledTimes(1);
     expect(imagePresetsIpc.save).not.toHaveBeenCalled();
-    await user.click(screen.getByRole("link", { name: "文章管理" }));
-    await screen.findByRole("heading", { name: "文章管理" });
+    await user.click(screen.getByRole("button", { name: "文章管理" }));
+    await user.click(screen.getByRole("link", { name: "优质文章" }));
+    await screen.findByRole("form", { name: "文章筛选" });
     await user.click(screen.getByRole("link", { name: "系统设置" }));
     expect(
       await screen.findByRole("tab", { name: "常规设置", selected: true }),

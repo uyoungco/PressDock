@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-add-article-to-promote"
+description = "Enables the cms_add_article_to_promote command without any pre-configured scope."
+commands.allow = ["cms_add_article_to_promote"]
+
+[[permission]]
+identifier = "deny-cms-add-article-to-promote"
+description = "Denies the cms_add_article_to_promote command without any pre-configured scope."
+commands.deny = ["cms_add_article_to_promote"]

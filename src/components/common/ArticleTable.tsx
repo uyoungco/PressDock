@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
-import { ArrowUpRight, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { DataTableColumnSettings } from "@/components/ui/data-table-column-settings";
 import { useDataTable } from "@/hooks/use-data-table";
@@ -35,24 +33,11 @@ const columnPreferences: PreferenceColumn[] = [
   { id: "createdAt", label: "创建时间", size: 176, minSize: 128, maxSize: 480 },
   { id: "updatedAt", label: "更新时间", size: 176, minSize: 128, maxSize: 480 },
   { id: "status", label: "状态", size: 144, minSize: 112, maxSize: 320 },
-  {
-    id: "actions",
-    label: "操作",
-    size: 120,
-    minSize: 112,
-    maxSize: 320,
-    enableHiding: false,
-  },
 ];
 const cells: Record<string, DataTableColumnDef<Article>["cell"]> = {
   title: ({ row: { original: article } }) => (
     <div className="break-words">
-      <Link
-        to={`/editor/${article.id}`}
-        className="font-medium hover:underline"
-      >
-        {article.title}
-      </Link>
+      <span className="font-medium">{article.title}</span>
       {article.isDemo && (
         <span className="ml-2 text-xs text-muted-foreground">演示</span>
       )}
@@ -80,14 +65,6 @@ const cells: Record<string, DataTableColumnDef<Article>["cell"]> = {
     <Badge variant={article.status === "failed" ? "destructive" : "secondary"}>
       {STATUS_LABELS[article.status]}
     </Badge>
-  ),
-  actions: ({ row: { original: article } }) => (
-    <Button variant="ghost" size="sm" asChild>
-      <Link to={`/editor/${article.id}`} aria-label={`编辑：${article.title}`}>
-        编辑
-        <ArrowUpRight className="size-3.5" />
-      </Link>
-    </Button>
   ),
 };
 const columns: DataTableColumnDef<Article>[] = columnPreferences.map(

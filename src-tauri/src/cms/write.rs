@@ -18,7 +18,7 @@ pub(crate) fn external_url(value: &str) -> Result<url::Url, CmsError> {
     Ok(url)
 }
 
-fn validate_input(input: &PromoteInput) -> Result<(), CmsError> {
+pub(super) fn validate_input(input: &PromoteInput) -> Result<(), CmsError> {
     if input.channel.trim().is_empty()
         || input.title.trim().is_empty()
         || input.title_pic.trim().is_empty()
@@ -33,7 +33,7 @@ fn validate_input(input: &PromoteInput) -> Result<(), CmsError> {
     Ok(())
 }
 
-fn pascal(value: Value) -> Value {
+pub(super) fn pascal(value: Value) -> Value {
     Value::Object(
         value
             .as_object()
@@ -55,7 +55,7 @@ impl CmsService {
     pub fn external_link(value: &str) -> Result<String, CmsError> {
         Ok(external_url(value)?.into())
     }
-    async fn finish_request(
+    pub(super) async fn finish_request(
         &self,
         request: RequestBuilder,
         generation: u64,

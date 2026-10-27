@@ -1,9 +1,6 @@
 use crate::{
     cms::CmsService,
-    database::{
-        Database,
-        models::{Article, SaveDraftRequest},
-    },
+    database::{Database, models::Article},
     error::CommandError,
 };
 use tauri::State;
@@ -17,28 +14,6 @@ pub async fn list_articles(
     let articles = database.list_articles().await?;
     cms.ensure_generation(generation).await?;
     Ok(articles)
-}
-#[tauri::command]
-pub async fn get_article(
-    id: String,
-    database: State<'_, Database>,
-    cms: State<'_, CmsService>,
-) -> Result<Article, CommandError> {
-    let generation = cms.authorize().await?;
-    let article = database.get_article(&id).await?;
-    cms.ensure_generation(generation).await?;
-    Ok(article)
-}
-#[tauri::command]
-pub async fn save_draft(
-    request: SaveDraftRequest,
-    database: State<'_, Database>,
-    cms: State<'_, CmsService>,
-) -> Result<Article, CommandError> {
-    let generation = cms.authorize().await?;
-    let article = database.save_draft(request).await?;
-    cms.ensure_generation(generation).await?;
-    Ok(article)
 }
 #[tauri::command]
 pub async fn create_demo_article(

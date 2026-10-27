@@ -31,12 +31,6 @@ export const articleSchema = z.object({
 });
 export type Article = z.infer<typeof articleSchema>;
 export type SourceArticle = z.infer<typeof sourceArticleSchema>;
-export const draftInputSchema = articleSchema.pick({
-  id: true,
-  title: true,
-  content: true,
-});
-export type SaveDraftRequest = z.infer<typeof draftInputSchema>;
 export const importUrlSchema = z.url({
   protocol: /^https?$/,
   error: "请输入有效的 HTTP 或 HTTPS 链接",

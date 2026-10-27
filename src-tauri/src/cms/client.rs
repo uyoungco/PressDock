@@ -9,6 +9,8 @@ use serde_json::{Value, json};
 use std::{collections::HashSet, path::Path, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 
+#[path = "article_management.rs"]
+mod article_management;
 #[path = "articles.rs"]
 mod articles;
 #[path = "write.rs"]

@@ -19,7 +19,6 @@ const Channels = lazy(() => import("@/pages/Channels"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Articles = lazy(() => import("@/pages/Articles"));
 const ImportPage = lazy(() => import("@/pages/Import"));
-const Editor = lazy(() => import("@/pages/Editor"));
 const Images = lazy(() => import("@/pages/Images"));
 const Publish = lazy(() => import("@/pages/Publish"));
 const Settings = lazy(() => import("@/pages/Settings"));
@@ -30,7 +29,13 @@ function Workspace() {
   const { pathname } = useLocation();
   const Layout = mobile ? MobileLayout : DesktopLayout;
   return (
-    <Layout contentScroll={pathname === "/channels" ? "contained" : "page"}>
+    <Layout
+      contentScroll={
+        pathname === "/channels" || pathname.startsWith("/articles")
+          ? "contained"
+          : "page"
+      }
+    >
       <Suspense
         fallback={
           <Skeleton aria-label="正在加载页面" className="h-64 w-full" />
@@ -81,9 +86,17 @@ export const routes = [
         children: [
           { index: true, element: <Navigate to="/dashboard" replace /> },
           { path: "/dashboard", element: <Dashboard /> },
-          { path: "/articles", element: <Articles /> },
+          {
+            path: "/articles",
+            element: <Navigate to="/articles/quality" replace />,
+          },
+          ...(["quality", "review-1", "review-2", "review-3"] as const).map(
+            (view) => ({
+              path: `/articles/${view}`,
+              element: <Articles view={view} />,
+            }),
+          ),
           { path: "/import", element: <ImportPage /> },
-          { path: "/editor/:id", element: <Editor /> },
           { path: "/images", element: <Images /> },
           { path: "/publish", element: <Publish /> },
           { path: "/settings", element: <Settings /> },

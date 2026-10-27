@@ -51,9 +51,9 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
       );
     }
   }
-  const current = navigation.find((item) =>
-    pathname.startsWith(item.to.split("/demo")[0]),
-  );
+  const current = navigation
+    .flatMap((item) => item.children ?? [item])
+    .find((item) => pathname.startsWith(item.to));
   const choices: { value: Theme; label: string; icon: typeof Sun }[] = [
     { value: "light", label: "浅色", icon: Sun },
     { value: "dark", label: "深色", icon: Moon },
@@ -77,7 +77,13 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
         className="relative ml-auto min-w-0 flex-1 sm:w-60 sm:flex-none"
         onSubmit={(e) => {
           e.preventDefault();
-          navigate("/articles");
+          // 顶部搜索提交到当前文章类别；其他页面默认查询优质文章。
+          const target = /^\/articles\/(quality|review-[123])$/.test(pathname)
+            ? pathname
+            : "/articles/quality";
+          navigate(
+            `${target}?${new URLSearchParams({ title: search, current: "1", pagesize: "50" })}`,
+          );
         }}
       >
         <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
@@ -136,7 +142,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
           <DialogTitle>退出登录？</DialogTitle>
           <DialogDescription>
             {dirty
-              ? "当前有未保存修改，退出后将丢失。取消退出可返回保存草稿。"
+              ? "当前有未保存修改，退出后将丢失。取消退出可返回保存修改。"
               : "退出后需要重新登录才能进入工作区。"}
           </DialogDescription>
           <DialogFooter>

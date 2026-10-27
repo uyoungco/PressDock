@@ -127,7 +127,7 @@ export default function Dashboard() {
             <Button variant="outline" asChild>
               <Link to="/articles">
                 <FilePenLine className="size-4" />
-                整理草稿
+                查看文章
               </Link>
             </Button>
             <Button variant="outline" asChild>

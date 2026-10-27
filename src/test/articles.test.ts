@@ -1,26 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { MockCmsAdapter } from "@/services/cms/mock";
-import { draftInputSchema, importUrlSchema } from "@/types/article";
+import { importUrlSchema } from "@/types/article";
 import { summarizeArticles } from "@/features/articles/model";
 
 describe("文章模型与业务边界", () => {
-  it("编辑草稿不覆盖原始素材，包含原文中的数字和段落", async () => {
-    const adapter = new MockCmsAdapter();
-    const original = await adapter.getArticle("demo-1");
-    const saved = await adapter.saveDraft({
-      id: original.id,
-      title: "新的编辑标题",
-      content: "编辑内容 123\n\n第二段",
-    });
-    expect(saved.source).toEqual(original.source);
-    expect(saved.content).toBe("编辑内容 123\n\n第二段");
-    expect((await adapter.getArticle(original.id)).title).toBe("新的编辑标题");
-  });
-  it("拒绝空标题与非 HTTP 来源", () => {
-    expect(
-      draftInputSchema.safeParse({ id: "1", title: "  ", content: "内容" })
-        .success,
-    ).toBe(false);
+  it("拒绝非 HTTP 来源", () => {
     expect(importUrlSchema.safeParse("javascript:alert(1)").success).toBe(
       false,
     );

@@ -37,10 +37,13 @@ function ComboboxTrigger({
 
 function ComboboxContent({
   className,
+  container,
   ...props
-}: ComboboxPrimitive.Popup.Props) {
+}: ComboboxPrimitive.Popup.Props & {
+  container?: ComboboxPrimitive.Portal.Props["container"];
+}) {
   return (
-    <ComboboxPrimitive.Portal>
+    <ComboboxPrimitive.Portal container={container}>
       <ComboboxPrimitive.Positioner
         side="bottom"
         sideOffset={4}

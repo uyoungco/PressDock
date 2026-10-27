@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-get-article"
+description = "Enables the cms_get_article command without any pre-configured scope."
+commands.allow = ["cms_get_article"]
+
+[[permission]]
+identifier = "deny-cms-get-article"
+description = "Denies the cms_get_article command without any pre-configured scope."
+commands.deny = ["cms_get_article"]

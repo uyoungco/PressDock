@@ -1,12 +1,6 @@
 import { z } from "zod";
 import demoData from "@/features/articles/demo-articles.json";
-import {
-  articleSchema,
-  draftInputSchema,
-  importUrlSchema,
-  type Article,
-  type SaveDraftRequest,
-} from "@/types/article";
+import { articleSchema, importUrlSchema, type Article } from "@/types/article";
 import { ServiceError } from "@/services/tauri/client";
 import type { CmsAdapter } from "./adapter";
 
@@ -14,26 +8,6 @@ export class MockCmsAdapter implements CmsAdapter {
   private articles = z.array(articleSchema).parse(structuredClone(demoData));
   async getArticles() {
     return structuredClone(this.articles);
-  }
-  async getArticle(id: string) {
-    const article = this.articles.find((a) => a.id === id);
-    if (!article) throw new ServiceError("NOT_FOUND", "文章不存在");
-    return structuredClone(article);
-  }
-  async saveDraft(input: SaveDraftRequest) {
-    const request = draftInputSchema.parse(input);
-    const article = await this.getArticle(request.id);
-    const updated: Article = {
-      ...article,
-      title: request.title,
-      content: request.content,
-      status: "draft",
-      updatedAt: new Date().toISOString(),
-    };
-    this.articles = this.articles.map((a) =>
-      a.id === request.id ? updated : a,
-    );
-    return structuredClone(updated);
   }
   async importArticle(input: string) {
     const url = importUrlSchema.parse(input);

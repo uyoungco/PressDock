@@ -122,3 +122,39 @@ pub async fn open_external_link(
     cms.ensure_generation(generation).await?;
     Ok(())
 }
+
+// 后台文章命令始终通过 CmsService 使用原生会话，令牌不返回前端。
+#[tauri::command]
+pub async fn cms_list_articles(
+    query: crate::cms::ArticleQuery,
+    cms: State<'_, CmsService>,
+) -> Result<crate::cms::CmsArticlePage, CommandError> {
+    Ok(cms.list_cms_articles(query).await?)
+}
+#[tauri::command]
+pub async fn cms_list_article_classes(
+    cms: State<'_, CmsService>,
+) -> Result<Vec<crate::cms::ArticleClass>, CommandError> {
+    Ok(cms.list_article_classes().await?)
+}
+#[tauri::command]
+pub async fn cms_get_article(
+    id: i64,
+    cms: State<'_, CmsService>,
+) -> Result<crate::cms::CmsArticleDetail, CommandError> {
+    Ok(cms.get_cms_article(id).await?)
+}
+#[tauri::command]
+pub async fn cms_update_article(
+    request: crate::cms::ArticleUpdate,
+    cms: State<'_, CmsService>,
+) -> Result<MutationResult, CommandError> {
+    Ok(cms.update_cms_article(request).await?)
+}
+#[tauri::command]
+pub async fn cms_add_article_to_promote(
+    request: crate::cms::ArticlePromoteInput,
+    cms: State<'_, CmsService>,
+) -> Result<MutationResult, CommandError> {
+    Ok(cms.add_article_to_promote(request).await?)
+}

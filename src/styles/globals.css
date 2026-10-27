@@ -186,3 +186,17 @@
     min-width: 44px;
   }
 }
+
+/* 富文本内核跟随应用主题，工具栏弹层沿用编辑器默认层级。 */
+.cms-rich-editor {
+  --w-e-textarea-bg-color: var(--background);
+  --w-e-textarea-color: var(--foreground);
+  --w-e-textarea-border-color: var(--border);
+  --w-e-toolbar-bg-color: var(--background);
+  --w-e-toolbar-color: var(--foreground);
+  --w-e-toolbar-active-color: var(--primary);
+  --w-e-toolbar-active-bg-color: var(--accent);
+  --w-e-toolbar-border-color: var(--border);
+  --w-e-modal-button-bg-color: var(--secondary);
+  --w-e-modal-button-border-color: var(--border);
+}

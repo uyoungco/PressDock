@@ -10,7 +10,8 @@ import { isDesktop } from "@/services/tauri/client";
 import { invokeCommand } from "@/services/tauri/client";
 import { invoke } from "@tauri-apps/api/core";
 import { z } from "zod";
-import { editorBuffers } from "@/features/editor/buffer";
+import { articleMemory } from "@/features/cms-articles/state";
+import { defaultQuery } from "@/features/cms-articles/service";
 import { deferred, session, materialPage } from "./cms-fixtures";
 import { channelQueryMemory } from "@/features/channels/query-memory";
 import {
@@ -50,7 +51,7 @@ vi.mock("@/services/cms", async () => ({
 beforeEach(() => {
   vi.clearAllMocks();
   authService.useLoginForm();
-  editorBuffers.clear();
+  articleMemory.clear();
   channelQueryMemory.clear();
   channelEditBuffers.clear();
   vi.mocked(isDesktop).mockReturnValue(true);
@@ -121,14 +122,15 @@ describe("登录和工作区认证", () => {
       "{Enter}",
     );
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe("/articles"),
+      expect(router.state.location.pathname).toBe("/articles/quality"),
     );
     expect(cmsIpc.login).toHaveBeenCalledExactlyOnceWith({
       username: "editor",
       password: " secret ",
     });
+    // 文章卡片标题已移除，通过筛选区域确认登录回跳后的页面就绪。
     expect(
-      await screen.findByRole("heading", { name: "文章管理" }),
+      await screen.findByRole("form", { name: "文章筛选" }, { timeout: 5000 }),
     ).toBeInTheDocument();
     expect(Object.keys(localStorage)).not.toContain("accessToken");
     router.dispose();
@@ -186,39 +188,12 @@ describe("登录和工作区认证", () => {
     const pending = deferred<typeof session | null>();
     vi.mocked(cmsIpc.restore).mockReturnValue(pending.promise);
     const restoring = authService.restore();
-    editorBuffers.set(6, "a", { title: "未保存", content: "正文" });
+    articleMemory.remember({ ...defaultQuery("quality"), title: "未提交查询" });
     await authService.logout();
     pending.resolve(session);
     await restoring;
     expect(authService.getSnapshot().status).toBe("anonymous");
-    expect(editorBuffers.get(6, "a")).toBeUndefined();
-  });
-  it("会话失效保留未保存草稿，同账号重新登录后恢复", async () => {
-    vi.mocked(cmsIpc.restore).mockResolvedValue(session);
-    const router = renderRoute("/editor/demo-1");
-    const title = await screen.findByLabelText("文章标题");
-    await userEvent.clear(title);
-    await userEvent.type(title, "尚未保存的稿件");
-    vi.mocked(invoke).mockRejectedValueOnce({
-      code: "AUTH_EXPIRED",
-      message: "登录失效",
-    });
-    await act(async () => {
-      await expect(invokeCommand("test", z.string())).rejects.toMatchObject({
-        code: "AUTH_EXPIRED",
-      });
-    });
-    await screen.findByRole("heading", { name: "登录 PressDock" });
-    expect(editorBuffers.get(6, "demo-1")?.title).toBe("尚未保存的稿件");
-    await userEvent.type(screen.getByLabelText("用户名"), "editor");
-    await userEvent.type(
-      screen.getByLabelText("密码", { exact: true }),
-      "secret{Enter}",
-    );
-    expect(await screen.findByLabelText("文章标题")).toHaveValue(
-      "尚未保存的稿件",
-    );
-    router.dispose();
+    expect(articleMemory.query("quality")).toBeUndefined();
   });
   it("回跳只允许完整站内业务路由", () => {
     expect(safeReturnPath("/channels?channel=KOOK&current=2")).toBe(

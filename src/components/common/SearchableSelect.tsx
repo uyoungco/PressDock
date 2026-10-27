@@ -29,6 +29,7 @@ export interface SearchableSelectProps {
   emptyText?: string;
   className?: string;
   contentClassName?: string;
+  portalContainer?: HTMLElement | null;
   wrapLabels?: boolean;
 }
 
@@ -47,6 +48,7 @@ export function SearchableSelect({
   emptyText = "未找到匹配项",
   className,
   contentClassName,
+  portalContainer,
   wrapLabels = false,
 }: SearchableSelectProps) {
   const generatedId = useId();
@@ -107,7 +109,8 @@ export function SearchableSelect({
       >
         <ComboboxValue placeholder={placeholder} />
       </ComboboxTrigger>
-      <ComboboxContent className={contentClassName}>
+      {/* 嵌入 Radix 弹层时将选项挂入其内容，保持焦点约束与可访问性。 */}
+      <ComboboxContent className={contentClassName} container={portalContainer}>
         <ComboboxInput
           aria-label={searchPlaceholder}
           placeholder={searchPlaceholder}
