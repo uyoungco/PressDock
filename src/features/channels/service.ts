@@ -7,6 +7,7 @@ import {
   type PromoteRecord,
 } from "@/types/cms";
 import { prepareImageUpload } from "./upload";
+import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 export const channelService = {
   groups: () => cmsIpc.channels(),
   list: (query: PromoteQuery) => cmsIpc.list(promoteQuerySchema.parse(query)),
@@ -19,7 +20,21 @@ export const channelService = {
   },
   remove: (id: number) => cmsIpc.remove(id),
   order: (query: PromoteQuery, ids: number[]) => cmsIpc.order(query, ids),
-  upload: async (file: File) => cmsIpc.upload(await prepareImageUpload(file)),
+  upload: async (file: File) => {
+    let invalidated = false;
+    const unsubscribe = onClientInvalidated(() => {
+      invalidated = true;
+    });
+    try {
+      const input = await prepareImageUpload(file);
+      // 解码和读取也属于当前会话，避免换号后把旧文件提交给新账号。
+      if (invalidated)
+        throw new ServiceError("SESSION_CHANGED", "登录状态已变化，请重试");
+      return await cmsIpc.upload(input);
+    } finally {
+      unsubscribe();
+    }
+  },
   openLink: (url: string) => cmsIpc.openLink(url),
 };
 export function readChannelQuery(params: URLSearchParams): PromoteQuery {

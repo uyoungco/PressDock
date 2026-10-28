@@ -289,6 +289,8 @@ export function EditorSheet({
             <p className="text-sm font-medium">正文</p>
             <Suspense fallback={<Skeleton className="h-80" />}>
               <RichTextEditor
+                // 不同文章持有独立编辑器，避免复用旧文档及上传结果。
+                key={input.id}
                 initialHtml={input.newsText}
                 disabled={locked}
                 onUploading={onUploading}

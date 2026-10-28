@@ -187,16 +187,128 @@
   }
 }
 
-/* 富文本内核跟随应用主题，工具栏弹层沿用编辑器默认层级。 */
-.cms-rich-editor {
-  --w-e-textarea-bg-color: var(--background);
-  --w-e-textarea-color: var(--foreground);
-  --w-e-textarea-border-color: var(--border);
-  --w-e-toolbar-bg-color: var(--background);
-  --w-e-toolbar-color: var(--foreground);
-  --w-e-toolbar-active-color: var(--primary);
-  --w-e-toolbar-active-bg-color: var(--accent);
-  --w-e-toolbar-border-color: var(--border);
-  --w-e-modal-button-bg-color: var(--secondary);
-  --w-e-modal-button-border-color: var(--border);
+/* Tiptap 无默认排版；样式限定在正文内，编辑区和保护模式预览共用主题。 */
+.cms-rich-editor .cms-editor-body {
+  position: relative;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  min-height: 20rem;
+  padding: 0.75rem;
+  color: var(--foreground);
+  background: var(--background);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+/* 禁用 Tiptap 的全局注入后，在编辑器范围内保留其光标辅助节点样式。 */
+.cms-rich-editor .cms-editor-body img.ProseMirror-separator {
+  display: inline !important;
+  border: 0 !important;
+  margin: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.cms-rich-editor .cms-editor-body .ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+.cms-rich-editor .cms-editor-body.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+.cms-rich-editor .cms-editor-body .ProseMirror-gapcursor::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid currentColor;
+}
+.cms-rich-editor .cms-editor-body.ProseMirror-hideselection * {
+  caret-color: transparent;
+}
+.cms-rich-editor .cms-editor-body.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+.cms-rich-editor .cms-editor-body p {
+  margin-block: 0.65em;
+}
+.cms-rich-editor .cms-editor-body > :first-child {
+  margin-top: 0;
+}
+.cms-rich-editor .cms-editor-body :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1em 0.5em;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.cms-rich-editor .cms-editor-body h1 {
+  font-size: 1.875em;
+}
+.cms-rich-editor .cms-editor-body h2 {
+  font-size: 1.5em;
+}
+.cms-rich-editor .cms-editor-body h3 {
+  font-size: 1.25em;
+}
+.cms-rich-editor .cms-editor-body h4 {
+  font-size: 1.125em;
+}
+.cms-rich-editor .cms-editor-body :is(h5, h6) {
+  font-size: 1em;
+}
+.cms-rich-editor .cms-editor-body :is(ul, ol) {
+  margin-block: 0.65em;
+  padding-left: 1.75em;
+}
+.cms-rich-editor .cms-editor-body ul {
+  list-style: disc;
+}
+.cms-rich-editor .cms-editor-body ol {
+  list-style: decimal;
+}
+.cms-rich-editor .cms-editor-body li > p {
+  margin-block: 0.25em;
+}
+.cms-rich-editor .cms-editor-body blockquote {
+  margin-block: 0.75em;
+  padding-left: 1em;
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+}
+.cms-rich-editor .cms-editor-body :is(pre, code) {
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  font-family: monospace;
+}
+.cms-rich-editor .cms-editor-body pre {
+  padding: 0.75em;
+}
+.cms-rich-editor .cms-editor-body a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cms-rich-editor .cms-editor-body img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+.cms-rich-editor .cms-editor-body .img-caption {
+  font-size: 0.875em;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+.cms-rich-editor .cms-editor-body .ProseMirror-selectednode {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.cms-rich-editor .cms-editor-body .is-editor-empty:first-child::before {
+  float: left;
+  height: 0;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  content: attr(data-placeholder);
+}
+.cms-rich-editor .cms-editor-body :is(table, th, td) {
+  border: 1px solid var(--border);
+  padding: 0.5em;
 }
