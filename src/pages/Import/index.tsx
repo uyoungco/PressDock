@@ -4,6 +4,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentProps,
   type FormEvent,
 } from "react";
 import { Download, Link2, LoaderCircle, RefreshCw } from "lucide-react";
@@ -61,7 +62,31 @@ const columnPreferences: PreferenceColumn[] = [
     maxSize: 640,
     enableHiding: false,
   },
+  {
+    id: "actions",
+    label: "操作",
+    size: 280,
+    minSize: 180,
+    maxSize: 640,
+    enableHiding: false,
+  },
 ];
+const pinnedEnd = ["actions"];
+const statusVariants: Record<
+  HarvestJob["status"],
+  ComponentProps<typeof Badge>["variant"]
+> = {
+  queued: "warning",
+  running: "warning",
+  waitingUser: "warning",
+  waitingLogin: "warning",
+  succeeded: "success",
+  debugCompleted: "secondary",
+  failed: "destructive",
+  cancelled: "secondary",
+  interrupted: "secondary",
+  submissionUnknown: "destructive",
+};
 const getRowId = (job: HarvestJob) => job.id;
 const message = (reason: unknown) =>
   reason instanceof Error ? reason.message : "采集操作失败，请重试";
@@ -191,8 +216,8 @@ export default function ImportPage() {
         cell: ({ row: { original: job } }) => (
           <a
             href={job.url}
-            className="block text-left font-medium break-words hover:underline"
-            title={job.title ?? job.url}
+            className="block truncate text-left font-medium hover:underline"
+            title={job.title || job.url}
             onClick={(event) => {
               event.preventDefault();
               void importService
@@ -210,13 +235,7 @@ export default function ImportPage() {
         meta: { label: "状态" },
         cell: ({ row: { original: job } }) => (
           <div className="flex flex-col items-start gap-2">
-            <Badge
-              variant={
-                job.status === "failed" || job.status === "submissionUnknown"
-                  ? "destructive"
-                  : "secondary"
-              }
-            >
+            <Badge variant={statusVariants[job.status]}>
               {harvestStatus(job)}
             </Badge>
             {job.error && (
@@ -232,98 +251,111 @@ export default function ImportPage() {
                 {warning}
               </p>
             ))}
-            <div className="flex flex-wrap gap-1">
-              {job.status === "waitingUser" && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    disabled={busyId === job.id}
-                    onClick={() => void act(job, "show")}
-                  >
-                    打开来源窗口
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    disabled={busyId === job.id}
-                    onClick={() => void act(job, "resume")}
-                  >
-                    验证完成，继续
-                  </Button>
-                </>
-              )}
-              {["queued", "running", "waitingUser"].includes(job.status) && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  disabled={busyId === job.id}
-                  onClick={() => void act(job, "cancel")}
-                >
-                  取消
-                </Button>
-              )}
-              {["failed", "interrupted", "cancelled", "waitingLogin"].includes(
-                job.status,
-              ) && (
+          </div>
+        ),
+      },
+      {
+        ...columnPreferences[2],
+        header: "操作",
+        meta: { label: "操作" },
+        cell: ({ row: { original: job } }) => (
+          <div className="flex flex-wrap gap-1">
+            {job.status === "waitingUser" && (
+              <>
                 <Button
                   variant="outline"
                   size="xs"
                   disabled={busyId === job.id}
-                  onClick={() => void act(job, "retry")}
+                  onClick={() => void act(job, "show")}
                 >
-                  重试
+                  打开来源窗口
                 </Button>
-              )}
-              {/* 仅终态显示删除；后端仍原子校验状态，避免与重试并发删除任务。 */}
-              {[
-                "succeeded",
-                "debugCompleted",
-                "failed",
-                "cancelled",
-                "interrupted",
-              ].includes(job.status) && (
                 <Button
                   variant="outline"
                   size="xs"
                   disabled={busyId === job.id}
-                  onClick={() => setConfirm({ job, action: "delete" })}
+                  onClick={() => void act(job, "resume")}
                 >
-                  删除
+                  验证完成，继续
                 </Button>
-              )}
-              {job.status === "submissionUnknown" && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    disabled={busyId === job.id}
-                    onClick={() =>
-                      setConfirm({ job, action: "confirmSubmitted" })
-                    }
-                  >
-                    已核对：CMS 已添加
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    disabled={busyId === job.id}
-                    onClick={() =>
-                      setConfirm({ job, action: "confirmNotSubmitted" })
-                    }
-                  >
-                    已核对：CMS 未添加
-                  </Button>
-                </>
-              )}
-            </div>
+              </>
+            )}
+            {["queued", "running", "waitingUser"].includes(job.status) && (
+              <Button
+                variant="ghost"
+                size="xs"
+                disabled={busyId === job.id}
+                onClick={() => void act(job, "cancel")}
+              >
+                取消
+              </Button>
+            )}
+            {["failed", "interrupted", "cancelled", "waitingLogin"].includes(
+              job.status,
+            ) && (
+              <Button
+                variant="outline"
+                size="xs"
+                disabled={busyId === job.id}
+                onClick={() => void act(job, "retry")}
+              >
+                重试
+              </Button>
+            )}
+            {/* 仅终态显示删除；后端仍原子校验状态，避免与重试并发删除任务。 */}
+            {[
+              "succeeded",
+              "debugCompleted",
+              "failed",
+              "cancelled",
+              "interrupted",
+            ].includes(job.status) && (
+              <Button
+                variant="outline"
+                size="xs"
+                disabled={busyId === job.id}
+                onClick={() => setConfirm({ job, action: "delete" })}
+              >
+                删除
+              </Button>
+            )}
+            {job.status === "submissionUnknown" && (
+              <>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={busyId === job.id}
+                  onClick={() =>
+                    setConfirm({ job, action: "confirmSubmitted" })
+                  }
+                >
+                  已核对：CMS 已添加
+                </Button>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={busyId === job.id}
+                  onClick={() =>
+                    setConfirm({ job, action: "confirmNotSubmitted" })
+                  }
+                >
+                  已核对：CMS 未添加
+                </Button>
+              </>
+            )}
           </div>
         ),
       },
     ],
     [act, busyId],
   );
-  const table = useDataTable({ data: jobs, columns, preferences, getRowId });
+  const table = useDataTable({
+    data: jobs,
+    columns,
+    preferences,
+    getRowId,
+    pinnedEnd,
+  });
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitLock.current) return;
