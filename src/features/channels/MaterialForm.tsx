@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "cn";
 import {
   Dialog,
   DialogContent,
@@ -103,9 +104,10 @@ export function MaterialForm({
                 {["channel", "title", "titlePic"].includes(field) ? "* " : ""}
                 {label}
               </label>
-              {/* 文章转素材从真实配置选择；普通素材仍沿用原有输入和请求协议。 */}
+              {/* 文章转素材从真实配置选择；子渠道铺满表单行，避免长名称被过早截断。 */}
               {channels && (field === "channel" || field === "subChannel") ? (
                 <SearchableSelect
+                  className={cn(field === "subChannel" && "w-full")}
                   portalContainer={portalContainer}
                   id={`material-${field}`}
                   value={edit.input[field] ?? ""}
