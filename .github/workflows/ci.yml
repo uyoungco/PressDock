@@ -1,7 +1,5 @@
 name: Validate PressDock
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -9,6 +7,8 @@ permissions:
 
 jobs:
   build:
+    # 暂停所有 Actions 构建；恢复时移除此条件并按需恢复自动触发。
+    if: ${{ false }}
     strategy:
       fail-fast: false
       matrix:

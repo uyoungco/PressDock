@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Save, LoaderCircle } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import {
   Card,
@@ -10,6 +9,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
 import {
   Select,
   SelectTrigger,
@@ -22,11 +32,17 @@ import { LoadState } from "@/components/common/LoadState";
 import { aiService } from "@/features/ai/service";
 import { aiErrorMessage } from "@/features/ai/use-settings";
 import type { AiModelConfig } from "@/features/ai/contracts";
-import {
-  harvestSettingsSchema,
-  type HarvestSettings as Settings,
-} from "./contracts";
 import { importService } from "./service";
+import { ServiceError } from "@/services/tauri/client";
+
+const autosave = importService.settingsAutosave;
+function flushOnLeave() {
+  void autosave.flush().catch((reason: unknown) => {
+    if (reason instanceof ServiceError && reason.code === "SESSION_CHANGED")
+      return;
+    toast.error(`采集设置尚未保存：${aiErrorMessage(reason)}`);
+  });
+}
 
 const switches = [
   ["autoClassify", "AI 判断分类", "根据原文生成分类，校验后覆盖默认分类。"],
@@ -49,84 +65,66 @@ const switches = [
 ] as const;
 
 export function HarvestSettings({ active }: { active: boolean }) {
-  const [form, setForm] = useState<Settings | null>(null);
-  const [days, setDays] = useState("");
+  const {
+    form,
+    days,
+    retentionError,
+    status,
+    error: saveError,
+    modeSaving,
+  } = useSyncExternalStore(autosave.subscribe, autosave.getSnapshot);
   const [models, setModels] = useState<AiModelConfig[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [modeSaving, setModeSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const loaded = useRef(false);
   const lock = useRef(false);
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   useEffect(() => {
     if (!active) return;
     let valid = true;
     setLoading(true);
-    // 标签切换只刷新模型列表，保留尚未保存的五项设置和保留天数。
-    Promise.all([
-      loaded.current ? Promise.resolve(null) : importService.settings(),
-      aiService.load(),
-    ])
+    setError(null);
+    Promise.allSettled([importService.settings(), aiService.load()])
       .then(([settings, ai]) => {
         if (!valid) return;
-        if (settings) {
-          setForm(settings);
-          setDays(settings.retentionDays?.toString() ?? "");
-          loaded.current = true;
-        }
-        setModels(ai.models);
-        setError(null);
-      })
-      .catch((reason: unknown) => {
-        if (valid) setError(aiErrorMessage(reason));
+        if (ai.status === "fulfilled") setModels(ai.value.models);
+        const failed =
+          ai.status === "rejected"
+            ? ai
+            : settings.status === "rejected" && !autosave.getSnapshot().error
+              ? settings
+              : null;
+        setError(failed ? aiErrorMessage(failed.reason) : null);
       })
       .finally(() => {
         if (valid) setLoading(false);
       });
     return () => {
       valid = false;
+      flushOnLeave();
     };
   }, [active]);
   async function setDeveloperMode(enabled: boolean) {
     if (!form || lock.current) return;
     lock.current = true;
-    setModeSaving(true);
     setError(null);
     try {
-      // 勾选状态以落库结果为准；单独保存模式，不提交其他未保存的 AI/保留期修改。
       const saved = await importService.setDeveloperMode(enabled);
-      setForm((current) => current && { ...current, developerMode: saved });
+      if (!mounted.current) return;
       toast.success(
         saved
           ? "开发者模式已开启，可按 F12 打开 DevTools"
           : "开发者模式已关闭，仅影响之后新入队的任务",
       );
     } catch (reason) {
-      setError(aiErrorMessage(reason));
+      if (mounted.current) setError(aiErrorMessage(reason));
     } finally {
       lock.current = false;
-      setModeSaving(false);
-    }
-  }
-  async function save(event: FormEvent) {
-    event.preventDefault();
-    if (!form || lock.current) return;
-    lock.current = true;
-    setSaving(true);
-    setError(null);
-    try {
-      const request = harvestSettingsSchema.parse({
-        ...form,
-        retentionDays: days.trim() === "" ? null : Number(days),
-      });
-      await importService.saveSettings(request);
-      setForm(request);
-      toast.success("采集设置已保存，新的采集任务将使用这些设置");
-    } catch (reason) {
-      setError(aiErrorMessage(reason));
-    } finally {
-      lock.current = false;
-      setSaving(false);
     }
   }
   return (
@@ -141,65 +139,69 @@ export function HarvestSettings({ active }: { active: boolean }) {
       <CardContent className="flex flex-col gap-5">
         <LoadState loading={loading && !form} error={error} />
         {form && (
-          <form onSubmit={save} className="flex flex-col gap-6">
-            <label className="flex items-start gap-3">
+          <FieldGroup>
+            <Field
+              orientation="horizontal"
+              data-disabled={modeSaving || loading}
+            >
               <input
+                id="harvest-developer-mode"
                 type="checkbox"
                 role="switch"
                 className="mt-1 size-4 accent-primary"
                 checked={form.developerMode}
-                disabled={saving || modeSaving || loading}
+                disabled={modeSaving || loading}
                 onChange={(event) =>
                   void setDeveloperMode(event.target.checked)
                 }
               />
-              <span className="flex flex-col gap-1">
-                <span className="text-sm font-medium">开发者模式</span>
+              <FieldContent>
+                <FieldLabel htmlFor="harvest-developer-mode">
+                  开发者模式
+                </FieldLabel>
                 {modeSaving && (
                   <span role="status" className="text-xs text-muted-foreground">
                     正在保存开发者模式…
                   </span>
                 )}
-                <span className="text-xs text-muted-foreground">
+                <FieldDescription>
                   开关即时保存，开启后按 F12 打开
                   DevTools，逐步打印业务数据。仍调用 CMS 格式化，但不创建 CMS
                   文章。
-                </span>
-                <span className="text-xs font-medium text-muted-foreground">
+                </FieldDescription>
+                <FieldDescription>
                   仅影响开启后新入队的任务；已有正常任务仍会提交
                   CMS。关闭后不会补交调试任务。
-                </span>
-              </span>
-            </label>
-            <fieldset
-              className="flex flex-col gap-4"
-              disabled={saving || modeSaving}
-            >
-              <legend className="mb-4 text-sm font-medium">AI 处理规则</legend>
-              {switches.map(([key, label, hint]) => (
-                <label key={key} className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    className="mt-1 size-4 accent-primary"
-                    checked={form[key]}
-                    onChange={(event) =>
-                      setForm({ ...form, [key]: event.target.checked })
-                    }
-                  />
-                  <span className="flex flex-col gap-1">
-                    <span className="text-sm font-medium">{label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {hint}
-                    </span>
-                  </span>
-                </label>
-              ))}
-            </fieldset>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="harvest-model" className="text-sm font-medium">
-                AI 处理模型
-              </label>
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+            <FieldSet>
+              <FieldLegend variant="label">AI 处理规则</FieldLegend>
+              <FieldGroup className="gap-4">
+                {switches.map(([key, label, hint]) => (
+                  <Field key={key} orientation="horizontal">
+                    <input
+                      id={`harvest-${key}`}
+                      type="checkbox"
+                      role="switch"
+                      className="mt-1 size-4 accent-primary"
+                      checked={form[key]}
+                      onChange={(event) =>
+                        autosave.update({ [key]: event.target.checked })
+                      }
+                    />
+                    <FieldContent>
+                      <FieldLabel htmlFor={`harvest-${key}`}>
+                        {label}
+                      </FieldLabel>
+                      <FieldDescription>{hint}</FieldDescription>
+                    </FieldContent>
+                  </Field>
+                ))}
+              </FieldGroup>
+            </FieldSet>
+            <Field>
+              <FieldLabel htmlFor="harvest-model">AI 处理模型</FieldLabel>
               <Select<string>
                 value={form.modelConfigId ?? ""}
                 items={[
@@ -209,10 +211,10 @@ export function HarvestSettings({ active }: { active: boolean }) {
                     label: model.displayName,
                   })),
                 ]}
-                disabled={saving || modeSaving || loading}
+                disabled={loading}
                 onValueChange={(value) => {
                   if (value !== null)
-                    setForm({ ...form, modelConfigId: value || null });
+                    autosave.update({ modelConfigId: value || null });
                 }}
               >
                 <SelectTrigger id="harvest-model" className="w-full">
@@ -231,50 +233,69 @@ export function HarvestSettings({ active }: { active: boolean }) {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
+              <FieldDescription>
                 复用“AI 模型”中的提供商和密钥。所有 AI 项关闭时不发送 AI 请求。
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="harvest-retention"
-                className="text-sm font-medium"
-              >
+              </FieldDescription>
+            </Field>
+            <Field data-invalid={Boolean(retentionError)}>
+              <FieldLabel htmlFor="harvest-retention">
                 历史保留时间（天）
-              </label>
+              </FieldLabel>
               <Input
                 id="harvest-retention"
-                type="number"
-                min={1}
-                max={36500}
-                step={1}
+                inputMode="numeric"
                 value={days}
-                onChange={(event) => setDays(event.target.value)}
+                onChange={(event) => autosave.updateDays(event.target.value)}
                 placeholder="留空表示永久保留"
-                disabled={saving || modeSaving}
+                aria-invalid={Boolean(retentionError)}
+                aria-describedby={
+                  retentionError
+                    ? "harvest-retention-error harvest-retention-hint"
+                    : "harvest-retention-hint"
+                }
                 className="max-w-sm"
               />
-              <p className="text-xs text-muted-foreground">
+              {retentionError && (
+                <FieldError id="harvest-retention-error">
+                  {retentionError}
+                </FieldError>
+              )}
+              <FieldDescription id="harvest-retention-hint">
                 包含启动当天，留空永久保留。保存后在下次启动时清理过期终态记录；未完成和提交结果待确认的任务保留。不删除
                 CMS 文章。
-              </p>
-            </div>
-            <Button
-              type="submit"
-              disabled={saving || modeSaving || loading}
-              className="self-start"
-            >
-              {saving ? (
-                <LoaderCircle
-                  data-icon="inline-start"
-                  className="animate-spin"
-                />
-              ) : (
-                <Save data-icon="inline-start" />
-              )}
-              {saving ? "正在保存…" : "保存采集设置"}
-            </Button>
-          </form>
+              </FieldDescription>
+            </Field>
+            <p role="status" className="text-xs text-muted-foreground">
+              {status === "saving"
+                ? "正在保存…"
+                : status === "pending"
+                  ? "待保存"
+                  : status === "saved"
+                    ? "已保存"
+                    : status === "error"
+                      ? "保存失败"
+                      : "修改后自动保存"}
+              {" · 停止修改 500 毫秒后自动保存，新任务使用已保存的设置。"}
+            </p>
+            {saveError && (
+              <Alert variant="destructive">
+                <AlertTitle>采集设置保存失败</AlertTitle>
+                <AlertDescription>
+                  <p>{saveError}。修改已保留，请重试。</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      void autosave.retry().catch(() => undefined);
+                    }}
+                  >
+                    重试
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
+          </FieldGroup>
         )}
       </CardContent>
     </Card>
