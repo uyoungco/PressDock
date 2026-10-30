@@ -4,6 +4,8 @@ import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import { Placeholder } from "@tiptap/extensions";
 import { DOMParser as SchemaParser, DOMSerializer } from "@tiptap/pm/model";
+import { Plugin } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import DOMPurify from "dompurify";
 
 export const pageBreak = "[!--empirenews.page--]";
@@ -78,6 +80,46 @@ export const editorExtensions = [
   }).configure({ inline: true, allowBase64: false }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
   Placeholder.configure({ placeholder: "请输入正文…" }),
+  Extension.create({
+    name: "cmsPaginationDisplay",
+    addProseMirrorPlugins() {
+      const decorate = (doc: import("@tiptap/pm/model").Node) => {
+        const decorations: Decoration[] = [];
+        let page = 1;
+        doc.descendants((node, position) => {
+          if (node.type.name !== "paragraph" || node.textContent !== pageBreak)
+            return;
+          // 仅装饰实时视图，分页提示和交互属性不会进入 getHTML 或 CMS 正文。
+          decorations.push(
+            Decoration.node(position, position + node.nodeSize, {
+              class: "cms-page-break",
+              contenteditable: "false",
+              role: "separator",
+              "aria-label": `第 ${page} 页与第 ${page + 1} 页之间的分页点`,
+              "data-page-label": `第 ${page} 页 / 第 ${page + 1} 页`,
+            }),
+          );
+          page++;
+          return false;
+        });
+        return DecorationSet.create(doc, decorations);
+      };
+      return [
+        new Plugin<DecorationSet>({
+          state: {
+            init: (_, state) => decorate(state.doc),
+            apply: (transaction, value) =>
+              transaction.docChanged ? decorate(transaction.doc) : value,
+          },
+          props: {
+            decorations(state) {
+              return this.getState(state);
+            },
+          },
+        }),
+      ];
+    },
+  }),
   Extension.create({
     name: "cmsCaption",
     addGlobalAttributes() {

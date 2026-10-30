@@ -1,18 +1,23 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { selectionToInsertionEnd } from "@tiptap/core";
 import {
   EditorContent,
   useEditor,
   useEditorState,
   type Editor,
 } from "@tiptap/react";
-import { DOMParser as SchemaParser, Fragment, Slice } from "@tiptap/pm/model";
+import { DOMParser as SchemaParser, Slice } from "@tiptap/pm/model";
 import { closeHistory } from "@tiptap/pm/history";
-import { TextSelection, type SelectionBookmark } from "@tiptap/pm/state";
+import {
+  TextSelection,
+  type SelectionBookmark,
+  type Transaction,
+} from "@tiptap/pm/state";
+import type { Node as EditorNode } from "@tiptap/pm/model";
 import {
   AlignCenterIcon,
   AlignLeftIcon,
   BoldIcon,
+  BookOpenIcon,
   ChevronDownIcon,
   CodeXmlIcon,
   EraserIcon,
@@ -57,6 +62,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { articleService } from "./service";
+import { PaginationAssistant } from "./PaginationAssistant";
+import { insertionBoundary, readPagination } from "./editor-pagination";
 import {
   cleanHtml,
   editorExtensions,
@@ -128,6 +135,8 @@ export default function RichTextEditor({
     bookmark: SelectionBookmark;
   } | null>(null);
   const [sourceError, setSourceError] = useState("");
+  const [paginationOpen, setPaginationOpen] = useState(false);
+  const paginationLocation = useRef<number | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const toolbar = useRef<HTMLDivElement>(null);
   const fileSelection = useRef<SelectionBookmark | null>(null);
@@ -238,6 +247,8 @@ export default function RichTextEditor({
       setLink(null);
       setSource(null);
       setSourceError("");
+      setPaginationOpen(false);
+      paginationLocation.current = null;
       latest.current.onUploading(false);
     });
     return () => {
@@ -536,6 +547,10 @@ export default function RichTextEditor({
         : "0",
       undo: editor?.can().undo() ?? false,
       redo: editor?.can().redo() ?? false,
+      doc: editor?.state.doc,
+      paginationBoundary: editor
+        ? insertionBoundary(editor.state.doc, editor.state.selection.to)
+        : null,
     }),
   });
   const locked =
@@ -609,37 +624,76 @@ export default function RichTextEditor({
       );
     }
   }
+  function commitPagination(transaction: Transaction) {
+    // 每次分页操作独立成组，撤销不连带相邻输入；仍走原 onUpdate 和原文恢复机制。
+    // 弹框内调整时保持焦点和背景滚动位置，关闭后再回到正文。
+    editor!.view.dispatch(
+      closeHistory(paginationOpen ? transaction : transaction.scrollIntoView()),
+    );
+    editor!.view.dispatch(
+      closeHistory(editor!.state.tr).setMeta("addToHistory", false),
+    );
+    if (!paginationOpen) editor!.view.focus();
+  }
   function insertPageBreak() {
     if (!canEdit()) return;
     const target = editor!;
-    const paragraph = target.schema.nodes.paragraph;
-    const marker = paragraph.create(null, target.schema.text(pageBreak));
-    // 直接在选区末尾的零宽范围插入，避免邻近选区落到分隔线等节点上并替换原内容。
-    const end = target.state.selection.to;
-    const transaction = closeHistory(target.state.tr).replaceRange(
-      end,
-      end,
-      new Slice(Fragment.from(marker), 0, 0),
+    const position = insertionBoundary(
+      target.state.doc,
+      target.state.selection.to,
     );
-    // 块拟合可能把插入点移到段落外，使用实际插入终点定位后续输入位置。
-    selectionToInsertionEnd(transaction, 0, 1);
-    const { $from } = transaction.selection;
-    if (
-      $from.parent.type === paragraph &&
-      $from.parent.textContent === pageBreak
-    ) {
-      // 文末或紧邻其他分页时补普通空段落，让后续输入不会改写分页标记。
-      const position = $from.parentOffset ? $from.after() : $from.before();
-      transaction.insert(position, paragraph.create());
-      transaction.setSelection(
-        TextSelection.create(transaction.doc, position + 1),
-      );
-    }
-    target.view.dispatch(transaction.scrollIntoView());
-    target.view.dispatch(
-      closeHistory(target.state.tr).setMeta("addToHistory", false),
+    if (position === null) return;
+    const marker = target.schema.nodes.paragraph.create(
+      null,
+      target.schema.text(pageBreak),
     );
-    target.view.focus();
+    // 改为顶层内容块之后插入，不再拆分光标所在段落，也不会替换选中文字。
+    const transaction = target.state.tr.insert(position, marker);
+    transaction.setSelection(
+      TextSelection.near(
+        transaction.doc.resolve(position + marker.nodeSize),
+        1,
+      ),
+    );
+    commitPagination(transaction);
+  }
+  function removePageBreak(index: number) {
+    if (!canEdit()) return;
+    const item = readPagination(editor!.state.doc).breaks[index];
+    if (item.nested) return;
+    commitPagination(
+      editor!.state.tr.delete(item.position, item.position + item.size),
+    );
+  }
+  function applyPagination(base: EditorNode, candidate: EditorNode) {
+    if (!canEdit() || editor!.state.doc !== base || base.eq(candidate)) return;
+    const transaction = editor!.state.tr.replaceWith(
+      0,
+      base.content.size,
+      candidate.content,
+    );
+    transaction.setSelection(TextSelection.atStart(transaction.doc));
+    commitPagination(transaction);
+  }
+  function locatePage(position: number) {
+    if (!canEdit()) return;
+    // 定位只改变选区，不进入历史，也不回写 newsText。
+    editor!.view.dispatch(
+      editor!.state.tr
+        .setSelection(
+          TextSelection.near(editor!.state.doc.resolve(position), 1),
+        )
+        .scrollIntoView(),
+    );
+    editor!.view.focus();
+  }
+  function finishPaginationClose() {
+    const position = paginationLocation.current;
+    paginationLocation.current = null;
+    if (!canEdit()) return;
+    // 等弹框焦点锁释放后再定位，防止正文焦点被弹框抢回或外层抽屉误关闭。
+    if (position !== null) locatePage(position);
+    else editor!.view.focus();
   }
   function openLink() {
     if (!canEdit()) return;
@@ -869,7 +923,28 @@ export default function RichTextEditor({
           fileSelection.current = editor!.state.selection.getBookmark();
           fileInput.current!.click();
         })}
-        {action("插入分页符", <SeparatorHorizontalIcon />, insertPageBreak)}
+        {action(
+          "插入分页符",
+          <SeparatorHorizontalIcon />,
+          insertPageBreak,
+          state?.paginationBoundary == null,
+        )}
+        <Button
+          type="button"
+          variant={paginationOpen ? "secondary" : "ghost"}
+          size="sm"
+          disabled={locked}
+          aria-expanded={paginationOpen}
+          aria-haspopup="dialog"
+          aria-controls="cms-pagination-assistant"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => {
+            if (canEdit()) setPaginationOpen(true);
+          }}
+        >
+          <BookOpenIcon data-icon="inline-start" />
+          分页助手
+        </Button>
         {action(
           "撤销",
           <UndoIcon />,
@@ -934,6 +1009,23 @@ export default function RichTextEditor({
         </div>
       ) : (
         <EditorContent editor={editor} />
+      )}
+      {/* 每次打开持有独立初稿；关闭卸载时只清除未应用的临时状态。 */}
+      {paginationOpen && state?.doc && !compatibility && (
+        <PaginationAssistant
+          doc={state.doc}
+          locked={locked}
+          canInsert={state.paginationBoundary !== null}
+          onInsert={insertPageBreak}
+          onRemove={removePageBreak}
+          onApply={applyPagination}
+          onLocate={(position) => {
+            paginationLocation.current = position;
+            setPaginationOpen(false);
+          }}
+          onClose={() => setPaginationOpen(false)}
+          onAfterClose={finishPaginationClose}
+        />
       )}
       <Dialog
         open={!!source}
