@@ -7,7 +7,7 @@ import { harvestIpc } from "@/services/tauri/harvest";
 import { aiService } from "@/features/ai/service";
 import { invalidateClientRequests } from "@/services/tauri/client";
 import type { HarvestSettings as Settings } from "@/features/import/contracts";
-import { aiSettings } from "./ai-fixtures";
+import { aiSettings, paginationSettings } from "./ai-fixtures";
 import { deferred } from "./cms-fixtures";
 import { toast } from "sonner";
 
@@ -33,8 +33,7 @@ beforeEach(() => {
     autoClassify: false,
     autoTags: true,
     autoSummary: true,
-    autoOrganize: false,
-    autoPaginate: false,
+    aiAutoPaginate: false,
     modelConfigId: null,
     retentionDays: null,
   };
@@ -92,6 +91,30 @@ it("首次加载不保存，移除按钮；连续修改在最后一次修改 500
   );
   expect(screen.getByRole("status")).toHaveTextContent("已保存");
   expect(toast.success).not.toHaveBeenCalled();
+});
+
+it("替换旧规则，AI 自动分页默认关闭且独立于元数据模型；显示共用配置及入口", async () => {
+  const settings = paginationSettings();
+  vi.mocked(aiService.load).mockResolvedValue(settings);
+  const configure = vi.fn();
+  render(<HarvestSettings active onConfigurePagination={configure} />);
+  await tick(0);
+  expect(screen.queryByLabelText("AI 正文整理")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("自动内容分页")).not.toBeInTheDocument();
+  expect(screen.getByLabelText("AI 自动分页")).not.toBeChecked();
+  expect(screen.getByLabelText("元数据处理模型")).toBeInTheDocument();
+  expect(screen.getByText(/每页最少 100、目标 240、最多 400 字/)).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "配置默认分页模板" }));
+  expect(configure).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByLabelText("AI 自动分页"));
+  await tick();
+  expect(persisted.aiAutoPaginate).toBe(true);
+  expect(persisted.modelConfigId).toBeNull();
+  expect(persisted).not.toHaveProperty("autoOrganize");
+  expect(persisted).not.toHaveProperty("autoPaginate");
+  invalidateClientRequests();
+  await importService.settings();
+  expect(autosave.getSnapshot().form?.aiAutoPaginate).toBe(true);
 });
 
 it("改回已保存值取消待保存；保留天数校验暂停整批保存，修正后恢复", async () => {
@@ -214,10 +237,10 @@ it("保存失败后离开再返回仍保留表单，重试成功清除错误", a
 
 it("模型选择与规则使用同一个防抖批次，读取设置提前补存", async () => {
   await importService.settings();
-  autosave.update({ modelConfigId: "model-1", autoOrganize: true });
+  autosave.update({ modelConfigId: "model-1", aiAutoPaginate: true });
   await importService.settings();
   expect(harvestIpc.saveSettings).toHaveBeenCalledExactlyOnceWith(
-    expect.objectContaining({ modelConfigId: "model-1", autoOrganize: true }),
+    expect.objectContaining({ modelConfigId: "model-1", aiAutoPaginate: true }),
   );
 });
 

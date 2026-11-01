@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { Download, Link2, LoaderCircle, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { LoadState } from "@/components/common/LoadState";
@@ -34,7 +35,16 @@ import {
   useColumnPreferences,
   type PreferenceColumn,
 } from "@/hooks/use-column-preferences";
-import { useAuth } from "@/hooks/use-auth";
+import { useAtom, useAtomValue } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
+import {
+  businessKeys,
+  harvestDateAtom,
+  harvestNotificationErrorAtom,
+  harvestNotificationsReadyAtom,
+  invalidateBusinessQueries,
+} from "@/lib/query-runtime";
 import type { DataTableColumnDef } from "@/lib/data-table";
 import { importService } from "@/features/import/service";
 import {
@@ -92,20 +102,30 @@ const message = (reason: unknown) =>
   reason instanceof Error ? reason.message : "采集操作失败，请重试";
 
 export default function ImportPage() {
-  const userId = useAuth().session?.user.userId;
+  const userId = useQueryUser();
+  const client = useQueryClient();
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
-  const [date, setDate] = useState(localCollectionDate);
-  const [jobs, setJobs] = useState<HarvestJob[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [rememberedDate, rememberDate] = useAtom(harvestDateAtom);
+  const today = localCollectionDate();
+  const date =
+    !rememberedDate || rememberedDate.date === rememberedDate.today
+      ? today
+      : rememberedDate.date;
+  const setDate = (value: string) =>
+    rememberDate({ date: value, today: localCollectionDate() });
+  const notificationsReady = useAtomValue(harvestNotificationsReadyAtom);
+  const list = useBusinessQuery(
+    businessKeys.harvestDate(userId, date),
+    () => importService.list(date),
+    userId === 0 || notificationsReady,
+  );
+  const jobs = list.data?.jobs ?? [];
+  const loading = list.isPending;
+  const error = list.error?.message ?? null;
   const [inputError, setInputError] = useState<string | null>(null);
-  const [notificationError, setNotificationError] = useState<string | null>(
-    null,
-  );
-  const [maintenanceWarning, setMaintenanceWarning] = useState<string | null>(
-    null,
-  );
+  const notificationError = useAtomValue(harvestNotificationErrorAtom);
+  const maintenanceWarning = list.data?.maintenanceWarning;
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<{
     job: HarvestJob;
@@ -115,98 +135,50 @@ export default function ImportPage() {
   const request = useRef<{ id: string; url: string } | null>(null);
   const submitLock = useRef(false);
   const actionLock = useRef(false);
-  const refresh = useRef<() => void>(() => {});
+  const refresh = () => {
+    void list.refetch();
+  };
   const preferences = useColumnPreferences("import", columnPreferences);
 
   useEffect(() => {
-    let active = true;
-    let running = false;
-    let requested = false;
-    let unlisten: (() => void) | undefined;
-    setJobs([]);
-    setNotificationError(null);
-    setLoading(true);
-    setError(null);
-    // 先订阅再读快照；刷新串行合并，避免旧查询覆盖较新的持久状态。
-    async function reload() {
-      requested = true;
-      if (running) return;
-      running = true;
-      try {
-        while (requested && active) {
-          requested = false;
-          const next = await importService.list(date);
-          if (active) {
-            setJobs(next.jobs);
-            setMaintenanceWarning(next.maintenanceWarning);
-            setError(null);
-          }
-        }
-      } catch (reason) {
-        if (active) setError(message(reason));
-      } finally {
-        running = false;
-        if (active) setLoading(false);
-      }
-    }
-    refresh.current = () => {
-      void reload();
-    };
-    importService
-      .subscribe(() => {
-        void reload();
-      })
-      .then((stop) => {
-        if (!active) {
-          stop();
-          return;
-        }
-        unlisten = stop;
-        void reload();
-      })
-      .catch((reason) => {
-        if (active) {
-          setNotificationError(
-            `实时状态通知不可用，请手动刷新：${message(reason)}`,
-          );
-          void reload();
-        }
-      });
-    return () => {
-      active = false;
-      unlisten?.();
-    };
-  }, [date, userId]);
-  useEffect(() => {
-    let today = localCollectionDate();
     const timer = window.setInterval(() => {
       const next = localCollectionDate();
-      if (next !== today) {
-        const previous = today;
-        today = next;
-        setDate((current) => (current === previous ? next : current));
-      }
+      rememberDate((current) => {
+        if (!current) return { date: next, today: next };
+        if (current.today === next) return current;
+        return {
+          date: current.date === current.today ? next : current.date,
+          today: next,
+        };
+      });
     }, 30_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [rememberDate]);
 
-  const act = useCallback(async (job: HarvestJob, action: HarvestAction) => {
-    if (actionLock.current) return false;
-    actionLock.current = true;
-    setBusyId(job.id);
-    try {
-      await importService.action(job.id, action);
-      refresh.current();
-      if (action === "delete") toast.success("采集记录已删除");
-      return true;
-    } catch (reason) {
-      toast.error(message(reason));
-      return false;
-    } finally {
-      actionLock.current = false;
-      setBusyId(null);
-    }
-  }, []);
+  const act = useCallback(
+    async (job: HarvestJob, action: HarvestAction) => {
+      if (actionLock.current) return false;
+      actionLock.current = true;
+      setBusyId(job.id);
+      try {
+        await importService.action(job.id, action);
+        void invalidateBusinessQueries(
+          client,
+          businessKeys.harvest(userId),
+          businessKeys.articles(userId),
+        );
+        if (action === "delete") toast.success("采集记录已删除");
+        return true;
+      } catch (reason) {
+        toast.error(message(reason));
+        return false;
+      } finally {
+        actionLock.current = false;
+        setBusyId(null);
+      }
+    },
+    [client, userId],
+  );
   const columns = useMemo<DataTableColumnDef<HarvestJob>[]>(
     () => [
       {
@@ -378,14 +350,11 @@ export default function ImportPage() {
       request.current = null;
       setUrl("");
       setDate(job.collectionDate);
-      setJobs((previous) => [
-        job,
-        ...previous.filter(
-          (item) =>
-            item.id !== job.id && item.collectionDate === job.collectionDate,
-        ),
-      ]);
-      refresh.current();
+      void invalidateBusinessQueries(
+        client,
+        businessKeys.harvest(userId),
+        businessKeys.articles(userId),
+      );
       toast.success(
         job.status === "queued"
           ? job.developerMode
@@ -489,14 +458,16 @@ export default function ImportPage() {
                 variant="outline"
                 size="icon"
                 aria-label="刷新采集记录"
-                onClick={() => refresh.current()}
+                onClick={refresh}
+                disabled={list.isFetching}
+                aria-busy={list.isFetching}
               >
-                <RefreshCw />
+                <RefreshCw className={cn(list.isFetching && "animate-spin")} />
               </Button>
             </div>
           </CardHeader>
           <CardContent className="flex min-w-0 flex-col gap-3">
-            <LoadState loading={loading} error={error} />
+            <LoadState loading={loading} error={error} retry={refresh} />
             {notificationError && (
               <p role="alert" className="text-sm text-muted-foreground">
                 {notificationError}

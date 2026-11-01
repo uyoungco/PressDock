@@ -245,12 +245,13 @@
 }
 /* 分页标识由 Decoration 提供，隐藏机器标记但不改变 schema 和保存的 HTML。 */
 .cms-rich-editor .cms-editor-body .cms-page-break {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
   margin-block: 1rem;
   border-block: 1px dashed var(--border);
   padding-block: 0.5rem;
+  padding-inline: 0.5rem;
   color: var(--muted-foreground);
   background: var(--muted);
   font-size: 0;
@@ -258,7 +259,21 @@
 }
 .cms-rich-editor .cms-editor-body .cms-page-break::before {
   content: attr(data-page-label);
+  grid-column: 2;
+  grid-row: 1;
   font-size: 0.75rem;
+}
+.cms-rich-editor .cms-editor-body .cms-page-break-source {
+  display: none;
+}
+.cms-rich-editor .cms-editor-body .cms-page-break-delete {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  max-width: 100%;
+  height: auto;
+  min-height: 1.5rem;
+  white-space: normal;
 }
 .cms-rich-editor .cms-page-preview {
   min-height: 10rem;

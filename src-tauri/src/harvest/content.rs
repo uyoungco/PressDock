@@ -285,7 +285,3 @@ pub(super) async fn metadata(
     }
     Ok(())
 }
-
-pub(super) fn json_input(title: &str, blocks: Vec<Value>) -> String {
-    json!({"title":title,"blocks":blocks}).to_string()
-}

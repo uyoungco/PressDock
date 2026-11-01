@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeAtom } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
@@ -19,7 +20,7 @@ import {
 } from "./sections";
 
 export default function Settings() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [tab, setTab] = useState(() =>
     ["ai-models", "ai-templates", "harvest"].includes(params.get("tab") ?? "")
       ? params.get("tab")!
@@ -62,7 +63,10 @@ export default function Settings() {
         demo={false}
       />
       <Tabs value={tab} onValueChange={setTab} className="min-w-0 gap-5">
-        <div className="min-w-0 overflow-x-auto pb-1">
+        <ScrollArea
+          orientation="horizontal"
+          viewportProps={{ className: "pb-1" }}
+        >
           <TabsList aria-label="设置模块" className="h-10! min-w-max">
             <TabsTrigger value="general" className="px-4">
               常规设置
@@ -86,7 +90,7 @@ export default function Settings() {
               关于应用
             </TabsTrigger>
           </TabsList>
-        </div>
+        </ScrollArea>
         <TabsContent value="general" className="min-w-0">
           <GeneralSettings theme={theme} onThemeChange={setTheme} />
         </TabsContent>
@@ -96,7 +100,13 @@ export default function Settings() {
           hidden={tab !== "harvest"}
           className="min-w-0"
         >
-          <HarvestSettings active={tab === "harvest"} />
+          <HarvestSettings
+            active={tab === "harvest"}
+            onConfigurePagination={() => {
+              setParams({ tab: "ai-templates", purpose: "pagination" });
+              setTab("ai-templates");
+            }}
+          />
         </TabsContent>
         <TabsContent
           value="image-presets"
@@ -130,7 +140,15 @@ export default function Settings() {
           hidden={tab !== "ai-templates"}
           className="min-w-0"
         >
-          <TemplateSettings active={tab === "ai-templates"} />
+          <TemplateSettings
+            key={
+              params.get("purpose") === "pagination" ? "pagination" : "title"
+            }
+            active={tab === "ai-templates"}
+            initialPurpose={
+              params.get("purpose") === "pagination" ? "pagination" : "title"
+            }
+          />
         </TabsContent>
       </Tabs>
     </>

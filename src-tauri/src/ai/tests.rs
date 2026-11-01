@@ -14,6 +14,9 @@ use wiremock::{
     matchers::{body_partial_json, header, method, path},
 };
 
+#[path = "ipc_tests.rs"]
+mod ipc_tests;
+
 #[derive(Default)]
 struct TestVault {
     values: Mutex<HashMap<String, String>>,
@@ -76,6 +79,355 @@ fn request() -> TitleSuggestionRequest {
     }
 }
 
+fn pagination_request() -> PaginationRequest {
+    PaginationRequest {
+        job_id: uuid::Uuid::new_v4().to_string(),
+        template_id: "builtin-news-pagination".into(),
+        model_config_id: "gateway".into(),
+        title: "【演示数据】分页测试".into(),
+        blocks: serde_json::from_value(json!([
+            {"id":"B1","type":"text","text":"【演示数据】问题？","chars":10,"paragraph":0},
+            {"id":"B2","type":"text","text":"演示答案 {{blocks}}。","chars":18,"paragraph":1},
+            {"id":"B3","type":"image","chars":0,"paragraph":2}
+        ]))
+        .unwrap(),
+    }
+}
+
+#[test]
+fn deepseek_pagination_defaults_disable_thinking_for_both_protocols() {
+    for protocol in [Protocol::ChatCompletions, Protocol::Responses] {
+        for max_tokens_field in ["max_tokens", "max_completion_tokens"] {
+            let mut provider = AiProviderConfig {
+                id: "deepseek".into(),
+                display_name: "DeepSeek".into(),
+                base_url: "https://api.deepseek.com/v1".into(),
+                protocol,
+                has_api_key: true,
+                compatibility: Compatibility::default(),
+            };
+            provider.compatibility.max_tokens_field = max_tokens_field.into();
+            let mut m = model("deepseek", "deepseek");
+            let build = |m: &AiModelConfig| {
+                super::client::generation_request(
+                    &provider,
+                    m,
+                    "系统 JSON 指令",
+                    "演示正文",
+                    GenerationTask::Pagination,
+                )
+            };
+            let (endpoint, body) = build(&m);
+            let output_field = if protocol == Protocol::Responses {
+                "max_output_tokens"
+            } else {
+                max_tokens_field
+            };
+            assert_eq!(body[output_field], 4096);
+            assert_eq!(body["stream"], false);
+            assert_eq!(body["store"], false);
+            if protocol == Protocol::Responses {
+                assert_eq!(endpoint, "responses");
+                assert_eq!(body["reasoning"], json!({"effort":"none"}));
+                assert_eq!(body["text"]["format"]["type"], "json_object");
+                assert!(body.get("thinking").is_none());
+            } else {
+                assert_eq!(endpoint, "chat/completions");
+                assert_eq!(body["thinking"], json!({"type":"disabled"}));
+                assert_eq!(body["response_format"]["type"], "json_object");
+                assert!(body.get("reasoning_effort").is_none());
+            }
+            for effort in ["low", "medium", "high"] {
+                m.reasoning_effort = Some(effort.into());
+                m.max_output_tokens = Some(2222);
+                let (_, body) = build(&m);
+                assert_eq!(body[output_field], 2222);
+                if protocol == Protocol::Responses {
+                    assert_eq!(body["reasoning"], json!({"effort":effort}));
+                    assert!(body.get("thinking").is_none());
+                } else {
+                    assert_eq!(body["thinking"], json!({"type":"enabled"}));
+                    assert_eq!(body["reasoning_effort"], effort);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn pagination_thinking_defaults_do_not_change_other_providers_or_tasks() {
+    for protocol in [Protocol::ChatCompletions, Protocol::Responses] {
+        let mut provider = AiProviderConfig {
+            id: "gateway".into(),
+            display_name: "测试网关".into(),
+            base_url: "https://gateway.example/v1".into(),
+            protocol,
+            has_api_key: false,
+            compatibility: Compatibility::default(),
+        };
+        let m = model("model", "gateway");
+        let ignore = |_: &serde_json::Value| {};
+        for host in [
+            "https://gateway.example/v1",
+            "https://api.deepseek.com.evil.example",
+        ] {
+            provider.base_url = host.into();
+            let (_, body) = super::client::generation_request(
+                &provider,
+                &m,
+                "JSON",
+                "演示",
+                GenerationTask::Pagination,
+            );
+            assert!(body.get("reasoning").is_none());
+            assert!(body.get("reasoning_effort").is_none());
+            assert!(body.get("thinking").is_none());
+        }
+        provider.base_url = "https://api.deepseek.com".into();
+        for task in [GenerationTask::General, GenerationTask::Metadata(&ignore)] {
+            let (_, body) = super::client::generation_request(&provider, &m, "JSON", "演示", task);
+            assert!(body.get("reasoning").is_none());
+            assert!(body.get("thinking").is_none());
+            assert!(body.get("reasoning_effort").is_none());
+            let output_field = if protocol == Protocol::Responses {
+                "max_output_tokens"
+            } else {
+                "max_completion_tokens"
+            };
+            if matches!(task, GenerationTask::General) {
+                assert!(body.get(output_field).is_none());
+                assert!(body.get("response_format").is_none());
+                assert!(body.get("text").is_none());
+            } else {
+                assert_eq!(body[output_field], 8192);
+            }
+        }
+    }
+}
+
+#[test]
+fn pagination_contract_rejects_bad_references_and_variables() {
+    let r = pagination_request();
+    for output in [
+        r#"{"bind_after":["B99"],"prefer_after":[]}"#,
+        r#"{"bind_after":["B2","B1"],"prefer_after":[]}"#,
+        r#"{"bind_after":["B1","B1"],"prefer_after":[]}"#,
+        r#"{"bind_after":["B1"],"prefer_after":["B1"]}"#,
+        r#"{"bind_after":[],"prefer_after":[],"body":"不可改写"}"#,
+        r#"{"bind_after":[]}"#,
+    ] {
+        assert!(super::pagination::parse(output, &r.blocks).is_err());
+    }
+    assert!(
+        super::pagination::parse(r#"{"bind_after":["B1"],"prefer_after":["B3"]}"#, &r.blocks)
+            .is_ok()
+    );
+    assert!(super::pagination::validate_variables("{{title}} {{blocks}}").is_ok());
+    assert!(super::pagination::validate_variables("{{content}}").is_err());
+    assert!(super::pagination::validate_variables("{{blocks").is_err());
+}
+
+#[tokio::test]
+async fn pagination_migration_preserves_title_settings_and_separates_defaults() {
+    let pool = sqlx::SqlitePool::connect("sqlite::memory:").await.unwrap();
+    sqlx::raw_sql(include_str!("../../migrations/0003_ai_settings.sql"))
+        .execute(&pool)
+        .await
+        .unwrap();
+    sqlx::query("UPDATE ai_prompt_templates SET name='自定义标题',system_prompt='保留指令',candidate_count=3,max_length=42").execute(&pool).await.unwrap();
+    sqlx::raw_sql(include_str!("../../migrations/0006_ai_pagination.sql"))
+        .execute(&pool)
+        .await
+        .unwrap();
+    let db = Database { pool };
+    let settings = db.ai_settings().await.unwrap();
+    let title = settings
+        .templates
+        .iter()
+        .find(|t| t.purpose == TemplatePurpose::Title)
+        .unwrap();
+    assert_eq!(title.name, "自定义标题");
+    assert_eq!(title.system_prompt, "保留指令");
+    assert_eq!(
+        (title.candidate_count, title.max_length, title.is_default),
+        (3, 42, true)
+    );
+    let pagination = settings
+        .templates
+        .iter()
+        .find(|t| t.purpose == TemplatePurpose::Pagination)
+        .unwrap();
+    assert!(pagination.is_default);
+    pagination.validate().unwrap();
+    let mut copy = pagination.clone();
+    copy.id = "pagination-copy".into();
+    db.ai_save_template(&copy).await.unwrap();
+    let settings = db.ai_settings().await.unwrap();
+    assert_eq!(
+        settings.templates.iter().filter(|t| t.is_default).count(),
+        2
+    );
+    assert!(
+        settings
+            .templates
+            .iter()
+            .any(|t| t.id == title.id && t.is_default)
+    );
+    copy.purpose = TemplatePurpose::Title;
+    assert!(db.ai_save_template(&copy).await.is_err());
+}
+
+#[tokio::test]
+async fn pagination_uses_saved_provider_protocol_limits_and_rejects_partial_output() {
+    for (protocol, field) in [
+        (Protocol::ChatCompletions, "max_tokens"),
+        (Protocol::Responses, "max_output_tokens"),
+    ] {
+        let server = MockServer::start().await;
+        let dir = tempfile::tempdir().unwrap();
+        let db = Database::open(&dir.path().join("ai.db")).await.unwrap();
+        let ai = AiService::with_vault(Arc::new(TestVault::default())).unwrap();
+        let mut p = provider("gateway", &format!("{}/prefix", server.uri()), protocol);
+        p.compatibility.max_tokens_field = "max_tokens".into();
+        p.compatibility.system_role = "developer".into();
+        ai.save_provider(&db, p).await.unwrap();
+        db.ai_save_model(&model("gateway", "gateway"))
+            .await
+            .unwrap();
+        let output = r#"{"bind_after":["B1"],"prefer_after":[]}"#;
+        let endpoint = if protocol == Protocol::ChatCompletions {
+            "/prefix/chat/completions"
+        } else {
+            "/prefix/responses"
+        };
+        let payload = if protocol == Protocol::ChatCompletions {
+            json!({"choices":[{"finish_reason":"stop","message":{"content":output}}]})
+        } else {
+            json!({"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":output}]}]})
+        };
+        Mock::given(method("POST"))
+            .and(path(endpoint))
+            .and(header("authorization", "Bearer fake-ai-test-secret"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(payload.clone()))
+            .expect(2)
+            .mount(&server)
+            .await;
+        let result = ai
+            .suggest_pagination(&db, pagination_request())
+            .await
+            .unwrap();
+        assert_eq!(result.semantic.bind_after, vec!["B1"]);
+        let mut m = model("gateway", "gateway");
+        m.max_output_tokens = Some(2222);
+        m.reasoning_effort = Some("low".into());
+        db.ai_save_model(&m).await.unwrap();
+        ai.suggest_pagination(&db, pagination_request())
+            .await
+            .unwrap();
+        let received = server.received_requests().await.unwrap();
+        let first: serde_json::Value = serde_json::from_slice(&received[0].body).unwrap();
+        let second: serde_json::Value = serde_json::from_slice(&received[1].body).unwrap();
+        assert_eq!(first[field], 4096);
+        assert_eq!(second[field], 2222);
+        if protocol == Protocol::ChatCompletions {
+            assert_eq!(first["messages"][0]["role"], "developer");
+            assert_eq!(first["response_format"]["type"], "json_object");
+            assert_eq!(second["reasoning_effort"], "low");
+        } else {
+            assert_eq!(first["text"]["format"]["type"], "json_object");
+            assert_eq!(second["reasoning"]["effort"], "low");
+        }
+        assert!(
+            serde_json::to_string(&first)
+                .unwrap()
+                .contains("演示答案 {{blocks}}")
+        );
+        server.reset().await;
+        let mut partial = payload.clone();
+        if protocol == Protocol::ChatCompletions {
+            partial["choices"][0]["finish_reason"] = json!("length");
+        } else {
+            partial["status"] = json!("incomplete");
+            partial["incomplete_details"] = json!({"reason":"max_output_tokens"});
+        }
+        Mock::given(method("POST"))
+            .and(path(endpoint))
+            .respond_with(ResponseTemplate::new(200).set_body_json(partial))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let error = ai
+            .suggest_pagination(&db, pagination_request())
+            .await
+            .err()
+            .expect("截断响应必须报错");
+        assert_eq!(error.code, "AI_OUTPUT_LIMIT");
+        assert!(error.message.contains("包含推理消耗"));
+        assert!(error.message.contains("手动重试"));
+        assert_eq!(server.received_requests().await.unwrap().len(), 1);
+        server.reset().await;
+        let mut wrong = pagination_request();
+        wrong.template_id = "builtin-news-title".into();
+        assert!(ai.suggest_pagination(&db, wrong).await.is_err());
+        assert!(server.received_requests().await.unwrap().is_empty());
+    }
+}
+
+// 显式手动调用才访问真实服务；普通测试不会请求 AI。密钥由进程环境提供，仅进入内存凭据替身。
+#[tokio::test]
+#[ignore = "需要显式提供真实 AI 测试配置"]
+async fn pagination_live_smoke() {
+    let key = std::env::var("PRESSDOCK_LIVE_AI_KEY").expect("缺少真实 AI 测试密钥");
+    let base = std::env::var("PRESSDOCK_LIVE_AI_BASE").expect("缺少真实 AI 测试地址");
+    let model_id = std::env::var("PRESSDOCK_LIVE_AI_MODEL").expect("缺少真实 AI 测试模型");
+    let dir = tempfile::tempdir().unwrap();
+    let db = Database::open(&dir.path().join("live-pagination.db"))
+        .await
+        .unwrap();
+    let ai = AiService::with_vault(Arc::new(TestVault::default())).unwrap();
+    let mut config = provider("gateway", &base, Protocol::ChatCompletions);
+    config.api_key = Some(key);
+    config.compatibility.max_tokens_field = "max_tokens".into();
+    config.compatibility.send_store = false;
+    ai.save_provider(&db, config).await.unwrap();
+    let mut configured_model = model("gateway", "gateway");
+    configured_model.model_id = model_id;
+    db.ai_save_model(&configured_model).await.unwrap();
+    let mut template = db
+        .ai_settings()
+        .await
+        .unwrap()
+        .templates
+        .into_iter()
+        .find(|t| t.purpose == TemplatePurpose::Pagination)
+        .unwrap();
+    template.model_config_id = Some("gateway".into());
+    db.ai_save_template(&template).await.unwrap();
+    let fixtures: Vec<serde_json::Value> = serde_json::from_str(include_str!(
+        "../../../docs/ai-pagination/demo-fixtures.json"
+    ))
+    .unwrap();
+    let mut reports = Vec::new();
+    for fixture in fixtures.into_iter().filter(|f| {
+        f["split"] == "semantic" || f["id"] == "demo-short" || f["id"] == "demo-caption-tail"
+    }) {
+        let started = std::time::Instant::now();
+        let r = PaginationRequest {
+            job_id: uuid::Uuid::new_v4().to_string(),
+            template_id: template.id.clone(),
+            model_config_id: "gateway".into(),
+            title: fixture["title"].as_str().unwrap().into(),
+            blocks: serde_json::from_value(fixture["blocks"].clone()).unwrap(),
+        };
+        let result = ai.suggest_pagination(&db, r).await.unwrap();
+        reports.push(json!({"id":fixture["id"],"semantic":result.semantic,"elapsedMs":started.elapsed().as_millis()}));
+    }
+    println!("真实分页调用通过：{} 个演示用例", reports.len());
+    if let Ok(path) = std::env::var("PRESSDOCK_LIVE_PAGINATION_OUTPUT") {
+        std::fs::write(path, serde_json::to_string_pretty(&reports).unwrap()).unwrap();
+    }
+}
+
 #[tokio::test]
 async fn settings_persist_default_is_unique_and_references_are_protected() {
     let dir = tempfile::tempdir().unwrap();
@@ -116,7 +468,11 @@ async fn settings_persist_default_is_unique_and_references_are_protected() {
     db.ai_save_template(&copy).await.unwrap();
     let settings = db.ai_settings().await.unwrap();
     assert_eq!(
-        settings.templates.iter().filter(|t| t.is_default).count(),
+        settings
+            .templates
+            .iter()
+            .filter(|t| t.is_default && t.purpose == TemplatePurpose::Title)
+            .count(),
         1
     );
     assert!(
@@ -153,11 +509,11 @@ async fn settings_persist_default_is_unique_and_references_are_protected() {
     let mut invalid = copy.clone();
     invalid.user_prompt = "{{unknown}}".into();
     assert!(db.ai_save_template(&invalid).await.is_err());
-    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 2);
+    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 3);
     db.pool.close().await;
     let db = Database::open(&path).await.unwrap();
     assert_eq!(db.ai_settings().await.unwrap().providers.len(), 2);
-    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 2);
+    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 3);
     template.model_config_id = None;
     template.is_default = false;
     db.ai_save_template(&template).await.unwrap();
@@ -171,6 +527,7 @@ async fn settings_persist_default_is_unique_and_references_are_protected() {
             .unwrap()
             .templates
             .iter()
+            .filter(|t| t.purpose == TemplatePurpose::Title)
             .all(|t| !t.is_default)
     );
 }

@@ -6,7 +6,9 @@ import {
   Clock3,
   CheckCheck,
   Files,
+  RefreshCw,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +24,7 @@ import { useArticles } from "@/hooks/use-articles";
 import { summarizeArticles } from "@/features/articles/model";
 
 export default function Dashboard() {
-  const { articles, loading, error } = useArticles();
+  const { articles, loading, error, refreshing, refresh } = useArticles();
   const stats = summarizeArticles(articles);
   const cards = [
     {
@@ -90,16 +92,32 @@ export default function Dashboard() {
               演示素材 · 按最近更新时间排序
             </CardDescription>
           </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/articles">
-              全部文章
-              <ArrowRight className="size-3.5" />
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={refreshing}
+              onClick={refresh}
+              aria-label="刷新工作台列表"
+              aria-busy={refreshing}
+            >
+              <RefreshCw
+                data-icon="inline-start"
+                className={cn(refreshing && "animate-spin")}
+              />
+              刷新
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/articles">
+                全部文章
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
-          <LoadState loading={loading} error={error} />
-          {!loading && !error && (
+          <LoadState loading={loading} error={error} retry={refresh} />
+          {!loading && (
             <ArticleTable
               preferenceKey="dashboard"
               articles={[...articles]

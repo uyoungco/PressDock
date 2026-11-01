@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useBeforeUnload, useBlocker } from "react-router-dom";
 import { useSetAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
+import { businessKeys, invalidateBusinessQueries } from "@/lib/query-runtime";
 import { toast } from "sonner";
 import { editorDirtyAtom } from "@/atoms/editor";
 import { authService } from "@/features/auth/service";
@@ -34,22 +37,27 @@ export function useArticleActions(
   classes: ArticleClass[],
   classesError: string | null,
   retryClasses: () => void,
-  refresh: () => void,
 ) {
+  const user = useQueryUser();
+  const client = useQueryClient();
   const [edit, setEdit] = useState(() => articleMemory.edit(view));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [discard, setDiscard] = useState(false);
-  const [groups, setGroups] = useState<ChannelGroup[]>([]);
-  const [groupsLoading, setGroupsLoading] = useState(false);
-  const [groupsError, setGroupsError] = useState<string | null>(null);
-  const [groupsRetry, setGroupsRetry] = useState(0);
   const alive = useRef(true),
     gate = useRef(false);
   const setDirty = useSetAtom(editorDirtyAtom);
   const dirty = articleEditIsDirty(edit) || busy || uploading;
   const promoting = edit?.kind === "promote";
+  const groupQuery = useBusinessQuery(
+    businessKeys.groups(user),
+    channelService.groups,
+    promoting,
+  );
+  const groups: ChannelGroup[] = groupQuery.data ?? [];
+  const groupsLoading = groupQuery.isPending;
+  const groupsError = groupQuery.error?.message ?? null;
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -60,26 +68,6 @@ export function useArticleActions(
   useEffect(() => {
     setDirty(dirty);
   }, [dirty, setDirty]);
-  useEffect(() => {
-    if (!promoting) return;
-    let active = true;
-    setGroupsLoading(true);
-    setGroupsError(null);
-    channelService
-      .groups()
-      .then((value) => {
-        if (active) setGroups(value);
-      })
-      .catch((reason: unknown) => {
-        if (active) setGroupsError(message(reason));
-      })
-      .finally(() => {
-        if (active) setGroupsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [promoting, groupsRetry]);
   const blocker = useBlocker(
     () => dirty && authService.getSnapshot().status === "authenticated",
   );
@@ -181,12 +169,17 @@ export function useArticleActions(
           article: edit.article,
           input: edit.input,
         });
+      void invalidateBusinessQueries(
+        client,
+        edit.kind === "edit"
+          ? businessKeys.articles(user)
+          : businessKeys.channels(user),
+      );
       if (alive.current) {
         close();
         toast.success(
           edit.kind === "edit" ? "文章修改已保存" : "已添加到渠道素材",
         );
-        refresh();
       }
     } catch (reason) {
       if (alive.current) setError(message(reason));
@@ -231,7 +224,9 @@ export function useArticleActions(
               groups,
               loading: groupsLoading,
               error: groupsError,
-              retry: () => setGroupsRetry((value) => value + 1),
+              retry: () => {
+                void groupQuery.refetch();
+              },
             }}
           />
         )}

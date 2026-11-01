@@ -1,10 +1,14 @@
 mod client;
 mod credentials;
 pub mod models;
+mod pagination;
+pub(crate) mod pagination_plan;
 mod titles;
 
 pub use client::AiService;
 pub use models::*;
+pub(crate) use pagination::PaginationSnapshot;
+pub use pagination::{PaginationBlock, PaginationBlockType, PaginationRequest, PaginationResult};
 
 pub struct AiError {
     pub code: &'static str,

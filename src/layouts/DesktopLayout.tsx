@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { Newspaper, HardDrive, ChevronRight } from "lucide-react";
 import { sidebarOpenAtom } from "@/atoms/navigation";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
@@ -22,7 +23,7 @@ export function DesktopLayout({
           open ? "w-58" : "w-16",
         )}
       >
-        <div className="flex h-14 items-center gap-2.5 border-b px-4">
+        <div className="flex h-14 shrink-0 items-center gap-2.5 border-b px-4">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background">
             <Newspaper className="size-4" />
           </span>
@@ -33,18 +34,17 @@ export function DesktopLayout({
           )}
         </div>
         {open && (
-          <div className="px-5 pt-6 pb-2 text-[10px] font-medium tracking-[0.16em] text-muted-foreground">
+          <div className="shrink-0 px-5 pt-6 pb-2 text-[10px] font-medium tracking-[0.16em] text-muted-foreground">
             编辑工作空间
           </div>
         )}
-        <nav
-          aria-label="主导航"
-          className="min-h-0 space-y-1 overflow-y-auto p-2 pt-3"
-        >
-          <NavigationItems expanded={open} onExpand={() => setOpen(true)} />
-        </nav>
+        <ScrollArea className="flex-1">
+          <nav aria-label="主导航" className="flex flex-col gap-1 p-2 pt-3">
+            <NavigationItems expanded={open} onExpand={() => setOpen(true)} />
+          </nav>
+        </ScrollArea>
         {open && (
-          <div className="m-3 mt-auto rounded-lg border bg-background p-3">
+          <div className="m-3 mt-auto shrink-0 rounded-lg border bg-background p-3">
             <div className="mb-1 flex items-center gap-2 text-xs font-medium">
               <HardDrive className="size-3.5" />
               本地优先
@@ -71,13 +71,17 @@ export function DesktopLayout({
         <main
           id="main-content"
           className={cn(
-            "min-h-0 min-w-0 flex-1 bg-muted/20",
-            contentScroll === "contained"
-              ? "flex flex-col overflow-hidden p-4"
-              : "overflow-auto p-7",
+            "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-muted/20",
+            contentScroll === "contained" && "p-4",
           )}
         >
-          {children}
+          {contentScroll === "contained" ? (
+            children
+          ) : (
+            <ScrollArea className="flex-1">
+              <div className="p-7">{children}</div>
+            </ScrollArea>
+          )}
         </main>
         <StatusBar />
       </div>

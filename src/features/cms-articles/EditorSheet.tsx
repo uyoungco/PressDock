@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Sheet,
@@ -110,203 +111,209 @@ export function EditorSheet({
             保存修改到 CMS。正文保留原有图片和分页标记。
           </SheetDescription>
         </SheetHeader>
-        <form
-          id="cms-article-edit"
-          className="min-h-0 flex-1 overflow-y-auto p-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (!locked) onSave();
-          }}
-        >
-          <fieldset disabled={locked}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="cms-title">标题 *</FieldLabel>
-                <Input
-                  id="cms-title"
-                  value={input.title}
-                  onChange={(event) =>
-                    onChange({ ...input, title: event.target.value })
-                  }
-                />
-              </Field>
-              <FieldGroup className="grid gap-4 sm:grid-cols-3">
-                {(["titlePic", "titlePic2", "titlePic3"] as const).map(
-                  (field, index) => (
-                    <Field key={field}>
-                      <FieldLabel htmlFor={`cms-${field}`}>
-                        {index ? `TitlePic${index + 1}` : "TitlePic *"}
-                      </FieldLabel>
-                      <MaterialImage
-                        compact
-                        url={articleImageUrl(input[field])}
-                        label={`文章图片 ${index + 1}`}
-                      />
-                      <Input
-                        id={`cms-${field}`}
-                        value={input[field]}
-                        onChange={(event) =>
-                          onChange({ ...input, [field]: event.target.value })
-                        }
-                        onPaste={(event) => {
-                          const file = [...event.clipboardData.items]
-                            .find(
-                              (item) =>
-                                item.kind === "file" &&
-                                item.type.startsWith("image/"),
-                            )
-                            ?.getAsFile();
-                          if (file) {
-                            event.preventDefault();
-                            void upload(file, field);
+        <ScrollArea className="flex-1">
+          <form
+            id="cms-article-edit"
+            className="p-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!locked) onSave();
+            }}
+          >
+            <fieldset disabled={locked}>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="cms-title">标题 *</FieldLabel>
+                  <Input
+                    id="cms-title"
+                    value={input.title}
+                    onChange={(event) =>
+                      onChange({ ...input, title: event.target.value })
+                    }
+                  />
+                </Field>
+                <FieldGroup className="grid gap-4 sm:grid-cols-3">
+                  {(["titlePic", "titlePic2", "titlePic3"] as const).map(
+                    (field, index) => (
+                      <Field key={field}>
+                        <FieldLabel htmlFor={`cms-${field}`}>
+                          {index ? `TitlePic${index + 1}` : "TitlePic *"}
+                        </FieldLabel>
+                        <MaterialImage
+                          compact
+                          url={articleImageUrl(input[field])}
+                          label={`文章图片 ${index + 1}`}
+                        />
+                        <Input
+                          id={`cms-${field}`}
+                          value={input[field]}
+                          onChange={(event) =>
+                            onChange({ ...input, [field]: event.target.value })
                           }
-                        }}
-                      />
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        aria-label={`上传文章图片 ${index + 1}`}
-                        onChange={(event) => {
-                          const file = event.target.files?.[0];
-                          event.target.value = "";
-                          if (file) void upload(file, field);
-                        }}
-                      />
-                    </Field>
-                  ),
-                )}
+                          onPaste={(event) => {
+                            const file = [...event.clipboardData.items]
+                              .find(
+                                (item) =>
+                                  item.kind === "file" &&
+                                  item.type.startsWith("image/"),
+                              )
+                              ?.getAsFile();
+                            if (file) {
+                              event.preventDefault();
+                              void upload(file, field);
+                            }
+                          }}
+                        />
+                        <Input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          aria-label={`上传文章图片 ${index + 1}`}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            event.target.value = "";
+                            if (file) void upload(file, field);
+                          }}
+                        />
+                      </Field>
+                    ),
+                  )}
+                </FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="cms-class">分类 *</FieldLabel>
+                  <SearchableSelect
+                    portalContainer={portalContainer}
+                    id="cms-class"
+                    value={String(input.classId)}
+                    options={classes.map((item) => ({
+                      value: String(item.id),
+                      label: item.name,
+                    }))}
+                    disabled={locked || !classes.length || !!classesError}
+                    onValueChange={(value) =>
+                      onChange({
+                        ...input,
+                        classId: Number(value),
+                        className: classes.find(
+                          (item) => item.id === Number(value),
+                        )!.name,
+                      })
+                    }
+                  />
+                  {classesError && (
+                    <p role="alert">
+                      {classesError}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={retryClasses}
+                      >
+                        重试分类
+                      </Button>
+                    </p>
+                  )}
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="cms-tag">标签</FieldLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {input.tags.map((value, index) => (
+                      <Badge key={`${value}-${index}`} variant="secondary">
+                        {value}
+                        <button
+                          type="button"
+                          aria-label={`移除标签 ${value}`}
+                          disabled={locked}
+                          onClick={() =>
+                            onChange({
+                              ...input,
+                              tags: input.tags.filter((_, i) => i !== index),
+                            })
+                          }
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      id="cms-tag"
+                      value={tag}
+                      placeholder="输入标签后按回车"
+                      onChange={(event) => setTag(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter" &&
+                          !event.nativeEvent.isComposing
+                        ) {
+                          event.preventDefault();
+                          addTag();
+                        }
+                      }}
+                    />
+                    <Button type="button" variant="outline" onClick={addTag}>
+                      添加标签
+                    </Button>
+                  </div>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="cms-summary">摘要</FieldLabel>
+                  <Textarea
+                    id="cms-summary"
+                    value={input.smallText}
+                    onChange={(event) =>
+                      onChange({ ...input, smallText: event.target.value })
+                    }
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="cms-writer">作者</FieldLabel>
+                  <Input
+                    id="cms-writer"
+                    value={input.writer}
+                    onChange={(event) =>
+                      onChange({ ...input, writer: event.target.value })
+                    }
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="cms-source">来源 URL</FieldLabel>
+                  <Input
+                    id="cms-source"
+                    value={input.sourceUrl}
+                    onChange={(event) =>
+                      onChange({ ...input, sourceUrl: event.target.value })
+                    }
+                  />
+                </Field>
               </FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="cms-class">分类 *</FieldLabel>
-                <SearchableSelect
-                  portalContainer={portalContainer}
-                  id="cms-class"
-                  value={String(input.classId)}
-                  options={classes.map((item) => ({
-                    value: String(item.id),
-                    label: item.name,
-                  }))}
-                  disabled={locked || !classes.length || !!classesError}
-                  onValueChange={(value) =>
-                    onChange({
-                      ...input,
-                      classId: Number(value),
-                      className: classes.find(
-                        (item) => item.id === Number(value),
-                      )!.name,
+            </fieldset>
+            <div className="mt-6 flex flex-col gap-2">
+              <p className="text-sm font-medium">正文</p>
+              <Suspense fallback={<Skeleton className="h-80" />}>
+                <RichTextEditor
+                  title={input.title}
+                  // 不同文章持有独立编辑器，避免复用旧文档及上传结果。
+                  key={input.id}
+                  initialHtml={input.newsText}
+                  disabled={locked}
+                  onUploading={onUploading}
+                  onError={onError}
+                  onChange={(newsText) =>
+                    latest.current.onChange({
+                      ...latest.current.input,
+                      newsText,
                     })
                   }
                 />
-                {classesError && (
-                  <p role="alert">
-                    {classesError}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={retryClasses}
-                    >
-                      重试分类
-                    </Button>
-                  </p>
-                )}
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="cms-tag">标签</FieldLabel>
-                <div className="flex flex-wrap gap-2">
-                  {input.tags.map((value, index) => (
-                    <Badge key={`${value}-${index}`} variant="secondary">
-                      {value}
-                      <button
-                        type="button"
-                        aria-label={`移除标签 ${value}`}
-                        disabled={locked}
-                        onClick={() =>
-                          onChange({
-                            ...input,
-                            tags: input.tags.filter((_, i) => i !== index),
-                          })
-                        }
-                      >
-                        ×
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    id="cms-tag"
-                    value={tag}
-                    placeholder="输入标签后按回车"
-                    onChange={(event) => setTag(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === "Enter" &&
-                        !event.nativeEvent.isComposing
-                      ) {
-                        event.preventDefault();
-                        addTag();
-                      }
-                    }}
-                  />
-                  <Button type="button" variant="outline" onClick={addTag}>
-                    添加标签
-                  </Button>
-                </div>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="cms-summary">摘要</FieldLabel>
-                <Textarea
-                  id="cms-summary"
-                  value={input.smallText}
-                  onChange={(event) =>
-                    onChange({ ...input, smallText: event.target.value })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="cms-writer">作者</FieldLabel>
-                <Input
-                  id="cms-writer"
-                  value={input.writer}
-                  onChange={(event) =>
-                    onChange({ ...input, writer: event.target.value })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="cms-source">来源 URL</FieldLabel>
-                <Input
-                  id="cms-source"
-                  value={input.sourceUrl}
-                  onChange={(event) =>
-                    onChange({ ...input, sourceUrl: event.target.value })
-                  }
-                />
-              </Field>
-            </FieldGroup>
-          </fieldset>
-          <div className="mt-6 flex flex-col gap-2">
-            <p className="text-sm font-medium">正文</p>
-            <Suspense fallback={<Skeleton className="h-80" />}>
-              <RichTextEditor
-                // 不同文章持有独立编辑器，避免复用旧文档及上传结果。
-                key={input.id}
-                initialHtml={input.newsText}
-                disabled={locked}
-                onUploading={onUploading}
-                onError={onError}
-                onChange={(newsText) =>
-                  latest.current.onChange({ ...latest.current.input, newsText })
-                }
-              />
-            </Suspense>
-          </div>
-          {error && (
-            <p role="alert" className="mt-4 text-destructive">
-              {error}
-            </p>
-          )}
-        </form>
+              </Suspense>
+            </div>
+            {error && (
+              <p role="alert" className="mt-4 text-destructive">
+                {error}
+              </p>
+            )}
+          </form>
+        </ScrollArea>
         <SheetFooter className="shrink-0 flex-row justify-end border-t">
           <Button variant="outline" disabled={locked} onClick={onClose}>
             取消

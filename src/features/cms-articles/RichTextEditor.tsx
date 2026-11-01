@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   EditorContent,
@@ -64,6 +65,7 @@ import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { articleService } from "./service";
 import { PaginationAssistant } from "./PaginationAssistant";
 import { insertionBoundary, readPagination } from "./editor-pagination";
+import { deletePageBreakAt } from "./editor-page-break";
 import {
   cleanHtml,
   editorExtensions,
@@ -90,12 +92,14 @@ function ToolHint({ label, children }: { label: string; children: ReactNode }) {
 
 export default function RichTextEditor({
   initialHtml,
+  title,
   disabled,
   onChange,
   onUploading,
   onError,
 }: {
   initialHtml: string;
+  title: string;
   disabled: boolean;
   onChange: (html: string) => void;
   onUploading: (value: boolean) => void;
@@ -660,10 +664,8 @@ export default function RichTextEditor({
   function removePageBreak(index: number) {
     if (!canEdit()) return;
     const item = readPagination(editor!.state.doc).breaks[index];
-    if (item.nested) return;
-    commitPagination(
-      editor!.state.tr.delete(item.position, item.position + item.size),
-    );
+    if (!item) return;
+    deletePageBreakAt(editor!.view, item.position, !paginationOpen);
   }
   function applyPagination(base: EditorNode, candidate: EditorNode) {
     if (!canEdit() || editor!.state.doc !== base || base.eq(candidate)) return;
@@ -677,6 +679,8 @@ export default function RichTextEditor({
   }
   function locatePage(position: number) {
     if (!canEdit()) return;
+    // 先恢复正文焦点，让 ProseMirror 能从正文选区找到实际滚动视口。
+    editor!.view.focus();
     // 定位只改变选区，不进入历史，也不回写 newsText。
     editor!.view.dispatch(
       editor!.state.tr
@@ -685,7 +689,6 @@ export default function RichTextEditor({
         )
         .scrollIntoView(),
     );
-    editor!.view.focus();
   }
   function finishPaginationClose() {
     const position = paginationLocation.current;
@@ -768,13 +771,13 @@ export default function RichTextEditor({
     );
   }
   return (
-    // 外层不创建额外滚动容器；sticky 的负偏移补偿表单 p-4，吸顶后紧贴抽屉标题。
+    // 正文与元数据共用抽屉滚动视口，工具栏吸顶后紧贴抽屉标题。
     <div className="cms-rich-editor min-w-0 rounded-md border">
       <div
         ref={toolbar}
         role="toolbar"
         aria-label="正文工具栏"
-        className="sticky -top-4 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
+        className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
       >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1013,6 +1016,7 @@ export default function RichTextEditor({
       {/* 每次打开持有独立初稿；关闭卸载时只清除未应用的临时状态。 */}
       {paginationOpen && state?.doc && !compatibility && (
         <PaginationAssistant
+          title={title}
           doc={state.doc}
           locked={locked}
           canInsert={state.paginationBoundary !== null}
@@ -1048,7 +1052,10 @@ export default function RichTextEditor({
                 : "编辑当前正文的 HTML，应用后返回富文本编辑。仍需保存修改才写入 CMS。"}
             </DialogDescription>
           </DialogHeader>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <ScrollArea
+            className="flex-1"
+            viewportProps={{ className: "px-1 py-1" }}
+          >
             <Field data-invalid={!!sourceError} data-disabled={sourceLocked}>
               <FieldLabel htmlFor="cms-body-source">正文 HTML</FieldLabel>
               <Textarea
@@ -1082,7 +1089,7 @@ export default function RichTextEditor({
                 </p>
               )}
             </Field>
-          </div>
+          </ScrollArea>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={closeSource}>
               取消

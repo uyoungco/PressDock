@@ -9,6 +9,7 @@ import {
 import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 export function MobileLayout({
@@ -26,24 +27,27 @@ export function MobileLayout({
             PressDock
           </SheetTitle>
           <SheetDescription>新闻编辑工作空间</SheetDescription>
-          <nav
-            aria-label="主导航"
-            className="mt-5 min-h-0 flex-1 space-y-1 overflow-y-auto"
-          >
-            <NavigationItems onNavigate={() => setOpen(false)} />
-          </nav>
+          <ScrollArea className="mt-5 flex-1">
+            <nav aria-label="主导航" className="flex flex-col gap-1">
+              <NavigationItems onNavigate={() => setOpen(false)} />
+            </nav>
+          </ScrollArea>
         </SheetContent>
       </Sheet>
       <main
         id="main-content"
         className={cn(
-          "min-h-0 min-w-0 flex-1 bg-muted/20",
-          contentScroll === "contained"
-            ? "flex flex-col overflow-hidden p-2"
-            : "overflow-auto p-4",
+          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-muted/20",
+          contentScroll === "contained" && "p-2",
         )}
       >
-        {children}
+        {contentScroll === "contained" ? (
+          children
+        ) : (
+          <ScrollArea className="flex-1">
+            <div className="p-4">{children}</div>
+          </ScrollArea>
+        )}
       </main>
       <StatusBar />
     </div>

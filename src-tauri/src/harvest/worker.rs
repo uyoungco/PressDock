@@ -1,9 +1,5 @@
 use super::*;
-use crate::{
-    ai::{AiService, GenerationTask},
-    cms::CmsService,
-    database::Database,
-};
+use crate::{ai::AiService, cms::CmsService, database::Database};
 use serde_json::{Value, json};
 use std::{
     sync::{Arc, Mutex},
@@ -234,7 +230,7 @@ async fn process(
 ) -> Result<Outcome, HarvestError> {
     let db = app.state::<Database>();
     let cms = app.state::<CmsService>();
-    let options = &stored.options;
+    let options = &stored.options.processing;
     context.trace(
         app,
         "start",
@@ -248,13 +244,7 @@ async fn process(
             "output",
             || json!({"raw":stored.raw,"formatted":stored.formatted,"prepared":prepared}),
         );
-        for step in [
-            "collecting",
-            "formatting",
-            "metadata",
-            "organizing",
-            "paginating",
-        ] {
+        for step in ["collecting", "formatting", "metadata", "paginating"] {
             context.trace(
                 app,
                 step,
@@ -321,10 +311,7 @@ async fn process(
                 .await?;
             formatted
         };
-        let needs_ai = options.auto_classify
-            || options.auto_summary
-            || options.auto_tags
-            || options.auto_organize;
+        let needs_ai = options.auto_classify || options.auto_summary || options.auto_tags;
         let model = if needs_ai {
             let settings = db.ai_settings().await?;
             settings
@@ -336,7 +323,7 @@ async fn process(
         };
         if needs_ai && model.is_none() {
             context
-                .warning(app, "未配置 AI 处理模型，AI 步骤已跳过，保留后台结果")
+                .warning(app, "未配置元数据处理模型，元数据步骤已跳过，保留后台结果")
                 .await?;
         }
         if let Some(model) = &model
@@ -367,171 +354,58 @@ async fn process(
         } else {
             context.trace(app, "metadata", "skip", || json!({"reason":if model.is_none() && needs_ai {"未配置模型"} else {"元数据开关均关闭"},"article":article}));
         }
-        if options.auto_organize {
-            if let Some(model) = &model {
-                context.trace(
-                    app,
-                    "layout.prepare",
-                    "input",
-                    || json!({"html":article.news_text}),
-                );
-                match layout::prepare(&article.news_text) {
-                    Ok(document) => {
-                        let ai = app.state::<AiService>();
-                        let mut input = content::json_input(&raw.title, document.input());
-                        let mut output = None;
-                        for attempt in 0..2 {
-                            context
-                                .progress(app, Status::Running, Stage::Organizing)
-                                .await?;
-                            context.trace(app, "layout.request", "input", || json!({"model":model.model_id,"pass":attempt+1,"system":layout::PROMPT,"user":input}));
-                            let observe = |response: &Value| {
-                                context.trace(
-                                    app,
-                                    "layout.response",
-                                    "output",
-                                    || json!({"pass":attempt+1,"response":response}),
-                                );
-                            };
-                            let result = content::generate(
-                                &ai,
-                                &db,
-                                model,
-                                layout::PROMPT,
-                                &input,
-                                GenerationTask::Layout(&observe),
-                            )
-                            .await;
-                            match result {
-                                Ok(text) => {
-                                    if options.auto_paginate {
-                                        context
-                                            .progress(app, Status::Running, Stage::Paginating)
-                                            .await?;
-                                        context.trace(app, "paginating", "input", || json!({"layout":text,"target":240,"singlePageMax":280,"tailMin":100}));
-                                    }
-                                    match layout::render(&document, &text, options.auto_paginate) {
-                                        Ok(html) => {
-                                            context.trace(
-                                                app,
-                                                "layout.validation",
-                                                "output",
-                                                || json!({"valid":true,"html":html}),
-                                            );
-                                            if options.auto_paginate {
-                                                context.trace(app, "paginating", "output", || json!({"pages":html.split("[!--empirenews.page--]").collect::<Vec<_>>(),"html":html}));
-                                            }
-                                            output = Some(html);
-                                            break;
-                                        }
-                                        Err(error) => {
-                                            context.error(
-                                                app,
-                                                "layout.validation",
-                                                &error,
-                                                || json!({"pass":attempt+1,"response":text}),
-                                            );
-                                            if attempt == 0 {
-                                                input = format!(
-                                                    "{}\n上次完整响应未通过校验：{}。请重新生成完整JSON。修正优先保留全文，drop_blocks必须为空数组，不得省略正文或图片。\n上次响应：{}",
-                                                    content::json_input(
-                                                        &raw.title,
-                                                        document.input()
-                                                    ),
-                                                    error.message,
-                                                    text
-                                                );
-                                            } else {
-                                                context
-                                                    .warning(
-                                                        app,
-                                                        &format!(
-                                                            "正文整理已回退：{}",
-                                                            error.message
-                                                        ),
-                                                    )
-                                                    .await?;
-                                            }
-                                        }
-                                    }
-                                }
-                                Err(error) => {
-                                    context.error(
-                                        app,
-                                        "layout.fallback",
-                                        &error,
-                                        || json!({"pass":attempt+1,"article":article}),
-                                    );
-                                    context
-                                        .warning(app, &format!("正文整理已回退：{}", error.message))
-                                        .await?;
-                                    break;
-                                }
-                            }
-                        }
-                        if let Some(html) = output {
-                            article.news_text = html;
-                        } else {
-                            context.trace(app, "organizing", "skip", || json!({"reason":"正文整理失败，回退后台原排版","html":article.news_text}));
-                            if options.auto_paginate {
-                                context.trace(app, "paginating", "skip", || json!({"reason":"正文整理失败，按原规则整体回退","html":article.news_text}));
-                            }
-                        }
-                    }
-                    Err(error) => {
-                        context.error(app, "layout.prepare", &error, || json!({"article":article}));
-                        context.warning(app, &error.message).await?;
-                        if options.auto_paginate {
-                            context.trace(app, "paginating", "skip", || json!({"reason":"正文结构不支持整理，按原规则整体回退","html":article.news_text}));
-                        }
-                    }
+        if options.ai_auto_paginate {
+            context
+                .progress(app, Status::Running, Stage::Paginating)
+                .await?;
+            context.trace(app, "paginating", "input", || json!({"html":article.news_text,"configuration":stored.options.pagination_snapshot}));
+            let ai = app.state::<AiService>();
+            match pagination::paginate(
+                &ai,
+                &db,
+                stored.options.pagination_snapshot.as_ref(),
+                &article.title,
+                &article.news_text,
+            )
+            .await
+            {
+                Ok(html) => {
+                    cms.ensure_generation(context.generation).await?;
+                    context.trace(app, "paginating", "output", || json!({"html":html}));
+                    article.news_text = html;
                 }
-            } else {
-                context.trace(
-                    app,
-                    "organizing",
-                    "skip",
-                    || json!({"reason":"未配置模型","html":article.news_text}),
-                );
-                if options.auto_paginate {
-                    context.trace(app, "paginating", "skip", || json!({"reason":"正文整理不可执行，按既有规则整体回退","html":article.news_text}));
+                Err(error) => {
+                    if matches!(
+                        error.code,
+                        "AUTH_EXPIRED"
+                            | "SESSION_CHANGED"
+                            | "HARVEST_STORAGE"
+                            | "AI_STORAGE"
+                            | "HARVEST_CANCELLED"
+                            | "AI_CANCELLED"
+                    ) {
+                        return Err(error);
+                    }
+                    context.error(
+                        app,
+                        "paginating.fallback",
+                        &error,
+                        || json!({"article":article}),
+                    );
+                    context
+                        .warning(
+                            app,
+                            &format!("AI 自动分页已回退，保留原排版：{}", error.message),
+                        )
+                        .await?;
                 }
             }
         } else {
             context.trace(
                 app,
-                "organizing",
-                "skip",
-                || json!({"reason":"AI 正文整理开关关闭"}),
-            );
-            if options.auto_paginate {
-                context
-                    .progress(app, Status::Running, Stage::Paginating)
-                    .await?;
-                context.trace(app, "paginating", "input", || json!({"html":article.news_text,"target":240,"singlePageMax":280,"tailMin":100}));
-                match layout::paginate_existing(&article.news_text) {
-                    Ok(html) => {
-                        context.trace(app, "paginating", "output", || json!({"pages":html.split("[!--empirenews.page--]").collect::<Vec<_>>(),"html":html}));
-                        article.news_text = html;
-                    }
-                    Err(error) => {
-                        context.error(
-                            app,
-                            "paginating.fallback",
-                            &error,
-                            || json!({"article":article}),
-                        );
-                        context.warning(app, &error.message).await?;
-                    }
-                }
-            }
-        }
-        if !options.auto_paginate {
-            context.trace(
-                app,
                 "paginating",
                 "skip",
-                || json!({"reason":"自动内容分页开关关闭"}),
+                || json!({"reason":"AI 自动分页开关关闭"}),
             );
         }
         db.harvest_save_result(&context.id, &article, true).await?;
@@ -607,7 +481,7 @@ pub fn start(app: AppHandle) {
                 id: job.job.id.clone(),
                 user_id: user,
                 generation,
-                developer_mode: job.options.developer_mode,
+                developer_mode: job.options.processing.developer_mode,
                 attempt: job.job.attempts,
                 cancelled,
                 resume: Notify::new(),

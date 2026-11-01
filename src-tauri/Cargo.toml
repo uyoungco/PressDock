@@ -42,6 +42,7 @@ scraper = { version = "0.27", default-features = false }
 regex = "1"
 
 [dev-dependencies]
+tauri = { version = "2", features = ["test"] }
 tempfile = "3"
 wiremock = "0.6"
 

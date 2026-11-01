@@ -59,6 +59,15 @@ async fn login_routes(server: &MockServer) {
         .mount(server).await;
 }
 
+// IPC 验收使用内存凭据和本地演示接口，不接触真实登录状态或系统凭据。
+pub(crate) async fn ipc_service() -> (CmsService, MockServer) {
+    let server = MockServer::start().await;
+    login_routes(&server).await;
+    let service = CmsService::with_vault(server.uri(), Arc::new(TestVault::default())).unwrap();
+    service.login(credentials()).await.unwrap();
+    (service, server)
+}
+
 fn write_input() -> PromoteInput {
     PromoteInput {
         channel: "2345".into(),

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useBeforeUnload, useBlocker } from "react-router-dom";
 import { useSetAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { businessKeys, invalidateBusinessQueries } from "@/lib/query-runtime";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { authService } from "@/features/auth/service";
@@ -36,6 +38,7 @@ export function useChannelActions(
   refresh: (deleted: boolean) => void,
 ) {
   const user = useAuth().session?.user.userId ?? 0;
+  const client = useQueryClient();
   const [edit, setEdit] = useState<MaterialEdit | null>(() =>
     channelEditBuffers.get(user),
   );
@@ -121,10 +124,11 @@ export function useChannelActions(
       if (edit.base)
         await channelService.update({ ...edit.base, ...parsed.data });
       else await channelService.create(parsed.data);
+      refresh(false);
+      void invalidateBusinessQueries(client, businessKeys.channels(user));
       if (alive.current) {
         close();
         toast.success("素材已保存");
-        refresh(false);
       }
     } catch (e) {
       if (alive.current) setEditError(message(e));
@@ -140,10 +144,11 @@ export function useChannelActions(
     setDeleteError(null);
     try {
       await channelService.remove(deleteTarget.id);
+      refresh(true);
+      void invalidateBusinessQueries(client, businessKeys.channels(user));
       if (alive.current) {
         setDeleteTarget(null);
         toast.success("素材已删除");
-        refresh(true);
       }
     } catch (e) {
       if (alive.current) setDeleteError(message(e));
@@ -174,11 +179,12 @@ export function useChannelActions(
         query,
         sorted.map((r) => r.id),
       );
+      refresh(false);
+      void invalidateBusinessQueries(client, businessKeys.channels(user));
       if (alive.current) {
         setSorted(null);
         setSortChanged(false);
         toast.success("排序已保存");
-        refresh(false);
       }
     } catch (e) {
       if (alive.current) toast.error(message(e));

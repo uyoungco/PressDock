@@ -3,7 +3,13 @@ import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import {
   suggestionRequestSchema,
   type TitleSuggestionRequest,
+  paginationRequestSchema,
+  type PaginationRequest,
 } from "./contracts";
+import {
+  validateSemanticPagination,
+  validatePaginationBoundaries,
+} from "./pagination";
 
 const active = new Map<string, AbortController>();
 onClientInvalidated(() => {
@@ -39,6 +45,23 @@ async function operation<T>(
   }
 }
 export const aiService = {
+  paginate: (input: Omit<PaginationRequest, "jobId">, signal?: AbortSignal) =>
+    operation(async (id) => {
+      const request = paginationRequestSchema.parse({ ...input, jobId: id });
+      const result = await aiIpc.paginate(request);
+      if (
+        result.jobId !== id ||
+        result.templateId !== input.templateId ||
+        result.modelConfigId !== input.modelConfigId
+      )
+        throw new Error("AI 分页结果与本次请求不符");
+      validateSemanticPagination(
+        { bind_after: result.bind_after, prefer_after: result.prefer_after },
+        input.blocks,
+      );
+      validatePaginationBoundaries(result.breakAfter, input.blocks);
+      return result;
+    }, signal),
   load: aiIpc.load,
   saveProvider: aiIpc.saveProvider,
   saveModel: aiIpc.saveModel,

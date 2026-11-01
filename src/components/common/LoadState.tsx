@@ -1,10 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 export function LoadState({
   loading,
   error,
+  retry,
 }: {
   loading: boolean;
   error: string | null;
+  retry?: () => void;
 }) {
   if (error)
     return (
@@ -12,7 +15,12 @@ export function LoadState({
         role="alert"
         className="rounded-lg border border-destructive/30 p-5 text-sm text-destructive"
       >
-        {error}。请检查本地服务后重新打开页面。
+        {error}
+        {retry && (
+          <Button variant="outline" size="sm" className="ml-3" onClick={retry}>
+            重试
+          </Button>
+        )}
       </div>
     );
   if (loading)

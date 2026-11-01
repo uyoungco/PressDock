@@ -10,9 +10,17 @@ pub struct Options {
     pub auto_classify: bool,
     pub auto_tags: bool,
     pub auto_summary: bool,
-    pub auto_organize: bool,
-    pub auto_paginate: bool,
+    #[serde(default)]
+    pub ai_auto_paginate: bool,
     pub model_config_id: Option<String>,
+}
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct JobOptions {
+    #[serde(flatten)]
+    pub processing: Options,
+    #[serde(default)]
+    pub pagination_snapshot: Option<crate::ai::PaginationSnapshot>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -167,7 +175,7 @@ impl FormattedArticle {
 pub(crate) struct StoredJob {
     pub job: Job,
     pub user_id: i64,
-    pub options: Options,
+    pub options: JobOptions,
     pub raw: Option<RawArticle>,
     pub formatted: Option<FormattedArticle>,
     pub prepared: Option<FormattedArticle>,
