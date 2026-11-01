@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-30T17:53:33.625785300+00:00",
+  "elapsedMs": 624,
+  "finishReason": null,
+  "fixture": "demo-explanation",
+  "incompleteReason": null,
+  "inputTokens": 989,
+  "maxOutputTokens": 4096,
+  "model": "deepseek-flash",
+  "outputChars": 43,
+  "outputTokens": 20,
+  "protocol": "responses",
+  "reasoningEffort": "none",
+  "reasoningTokens": 0,
+  "status": "completed",
+  "thinking": null,
+  "validSemantic": true
+}

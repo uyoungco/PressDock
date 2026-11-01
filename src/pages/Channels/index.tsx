@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
-import { Copy, RotateCcw, Search } from "lucide-react";
+import { Copy, RefreshCw, RotateCcw, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +14,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MaterialImage } from "@/features/channels/MaterialImage";
-import { channelQueryMemory } from "@/features/channels/query-memory";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
+import {
+  businessKeys,
+  channelFilterAtom,
+  invalidateBusinessQueries,
+} from "@/lib/query-runtime";
 import { MaterialTable } from "@/features/channels/MaterialTable";
 import { materialColumnPreferences } from "@/features/channels/table-model";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
@@ -34,7 +43,6 @@ import {
 } from "@/features/channels/service";
 import {
   pageSizes,
-  type ChannelGroup,
   type PromotePage,
   type PromoteQuery,
   type PromoteRecord,
@@ -91,13 +99,16 @@ function MaterialDetail({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-3xl">
         <DialogTitle>素材详情</DialogTitle>
         <DialogDescription>
           查看渠道素材的标题、摘要和关联信息。
         </DialogDescription>
         {row && (
-          <>
+          <ScrollArea
+            className="-mx-1 flex-1"
+            viewportProps={{ className: "px-1 py-1" }}
+          >
             <div className="grid gap-3 sm:grid-cols-2">
               <MaterialImage
                 key={`first-${row.id}`}
@@ -136,7 +147,7 @@ function MaterialDetail({
                 </div>
               ))}
             </dl>
-          </>
+          </ScrollArea>
         )}
       </DialogContent>
     </Dialog>
@@ -145,7 +156,7 @@ function MaterialDetail({
 
 export default function Channels() {
   const [params] = useSearchParams();
-  const remembered = channelQueryMemory.read();
+  const remembered = useAtomValue(channelFilterAtom);
   if (!params.size) {
     return (
       <Navigate
@@ -169,131 +180,105 @@ function ChannelResults() {
   const applied = useMemo(() => readChannelQuery(params), [params]);
   const key = queryKey(applied);
   const [draft, setDraft] = useState(applied);
-  const [groups, setGroups] = useState<ChannelGroup[]>([]);
-  const [groupsLoading, setGroupsLoading] = useState(true);
-  const [groupsError, setGroupsError] = useState<string | null>(null);
-  const [groupsRetry, setGroupsRetry] = useState(0);
-  const [result, setResult] = useState<{
+  const user = useQueryUser();
+  const client = useQueryClient();
+  const remember = useSetAtom(channelFilterAtom);
+  const groupQuery = useBusinessQuery(
+    businessKeys.groups(user),
+    channelService.groups,
+  );
+  const groups = groupQuery.data ?? [];
+  const groupsLoading = groupQuery.isPending;
+  const groupsError = groupQuery.error?.message ?? null;
+  const list = useBusinessQuery(businessKeys.channelPage(user, applied), () =>
+    channelService.list(applied),
+  );
+  const matchingResult = list.data ?? null;
+  const loading = list.isPending;
+  const error = list.error?.message ?? null;
+  const previousResult = useRef<{
     query: PromoteQuery;
     page: PromotePage;
   } | null>(null);
-  const previousResult = useRef<typeof result>(null);
-  const rollback = useRef<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [retry, setRetry] = useState(0);
-  const [end, setEnd] = useState(false);
   const [selected, setSelected] = useState<PromoteRecord | null>(null);
   const listViewport = useRef<HTMLDivElement>(null);
-  const resetScroll = useRef(true);
-  const lastSuccessfulQuery = useRef<string | null>(null);
   const mutationRefresh = useRef<{ key: string; deleted: boolean } | null>(
     null,
   );
+  const refresh = () => {
+    void invalidateBusinessQueries(client, businessKeys.channels(user));
+  };
   const actions = useChannelActions(applied, (deleted) => {
     mutationRefresh.current = { key, deleted };
-    setRetry((v) => v + 1);
   });
   const locked = actions.sorting || actions.busy;
+  const nextState = client.getQueryState<PromotePage>(
+    businessKeys.channelPage(user, {
+      ...applied,
+      current: applied.current + 1,
+    }),
+  );
+  const end =
+    !!matchingResult &&
+    (matchingResult.data.length < applied.pagesize ||
+      (!!nextState?.data &&
+        !nextState.isInvalidated &&
+        nextState.dataUpdatedAt >= list.dataUpdatedAt &&
+        !nextState.data.data.length));
 
   useEffect(() => {
-    channelQueryMemory.remember(applied);
+    remember(applied);
     setDraft(applied);
-  }, [applied]);
+    setSelected(null);
+    if (listViewport.current) listViewport.current.scrollTop = 0;
+  }, [applied, remember]);
   useEffect(() => {
-    let active = true;
-    setGroupsLoading(true);
-    setGroupsError(null);
-    channelService
-      .groups()
-      .then((value) => {
-        if (active) setGroups(value);
-      })
-      .catch((reason: unknown) => {
-        if (active)
-          setGroupsError(
-            reason instanceof Error ? reason.message : "读取渠道配置失败",
-          );
-      })
-      .finally(() => {
-        if (active) setGroupsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [groupsRetry]);
-  useEffect(() => {
-    if (rollback.current === key) {
-      rollback.current = null;
-      setLoading(false);
+    if (!list.data || list.isFetching || list.isError) return;
+    const page = list.data;
+    const mutation =
+      mutationRefresh.current?.key === key ? mutationRefresh.current : null;
+    mutationRefresh.current = null;
+    if (mutation?.deleted && !page.data.length && applied.current > 1) {
+      setParams(
+        channelQueryParams({ ...applied, current: applied.current - 1 }),
+        { replace: true },
+      );
       return;
     }
-    let active = true;
-    setLoading(true);
-    setError(null);
-    setSelected(null);
-    channelService
-      .list(applied)
-      .then((page) => {
-        if (!active) return;
-        const mutation =
-          mutationRefresh.current?.key === key ? mutationRefresh.current : null;
-        mutationRefresh.current = null;
-        if (mutation?.deleted && !page.data.length && applied.current > 1) {
-          setParams(
-            channelQueryParams({ ...applied, current: applied.current - 1 }),
-            { replace: true },
-          );
-          return;
-        }
-        const previous = previousResult.current;
-        if (
-          !page.data.length &&
-          previous &&
-          sameFilters(applied, previous.query) &&
-          applied.current === previous.query.current + 1
-        ) {
-          setEnd(true);
-          rollback.current = queryKey(previous.query);
-          setParams(channelQueryParams(previous.query), { replace: true });
-          toast.info("已到末页");
-          return;
-        }
-        const value = { query: applied, page };
-        if (resetScroll.current || lastSuccessfulQuery.current !== key) {
-          if (listViewport.current) listViewport.current.scrollTop = 0;
-          resetScroll.current = false;
-        }
-        lastSuccessfulQuery.current = key;
-        previousResult.current = value;
-        setResult(value);
-        setEnd(page.data.length < applied.pagesize);
-      })
-      .catch((reason: unknown) => {
-        if (active) {
-          if (mutationRefresh.current?.key === key) {
-            toast.warning("操作已完成，但列表刷新失败，请重试列表");
-            mutationRefresh.current = null;
-          }
-          setError(reason instanceof Error ? reason.message : "读取素材失败");
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [applied, key, retry, setParams]);
+    const previous = previousResult.current;
+    if (
+      !page.data.length &&
+      previous &&
+      sameFilters(applied, previous.query) &&
+      applied.current === previous.query.current + 1
+    ) {
+      setParams(channelQueryParams(previous.query), { replace: true });
+      toast.info("已到末页");
+      return;
+    }
+    previousResult.current = { query: applied, page };
+  }, [
+    applied,
+    key,
+    list.data,
+    list.dataUpdatedAt,
+    list.isFetching,
+    list.isError,
+    setParams,
+  ]);
+  useEffect(() => {
+    if (list.error && mutationRefresh.current?.key === key) {
+      mutationRefresh.current = null;
+      toast.warning("操作已完成，但列表刷新失败，请重试列表");
+    }
+  }, [list.error, key]);
 
   const subchannels =
     groups.find((group) => group.channel === draft.channel)?.subchannels ?? [];
-  const matchingResult =
-    result && queryKey(result.query) === key ? result.page : null;
   function submit(query: PromoteQuery) {
     if (locked) return;
-    resetScroll.current = true;
-    if (queryKey(query) === key) setRetry((value) => value + 1);
+    if (listViewport.current) listViewport.current.scrollTop = 0;
+    if (queryKey(query) === key) refresh();
     else setParams(channelQueryParams(query));
   }
   const sortReason =
@@ -301,7 +286,7 @@ function ChannelResults() {
       ? "请填写渠道、子渠道和日期并搜索后排序"
       : queryKey(draft) !== key
         ? "筛选条件尚未搜索，请先搜索"
-        : loading || error || !matchingResult
+        : list.isFetching || error || !matchingResult
           ? "请等待当前页成功加载"
           : matchingResult.data.length < 2
             ? "当前页至少需要两条素材"
@@ -404,6 +389,20 @@ function ChannelResults() {
           </fieldset>
         </form>
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:gap-3 md:px-4">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={locked || list.isFetching}
+            onClick={refresh}
+            aria-label="刷新渠道素材"
+            aria-busy={list.isFetching}
+          >
+            <RefreshCw
+              data-icon="inline-start"
+              className={cn(list.isFetching && "animate-spin")}
+            />
+            刷新
+          </Button>
           <Button size="sm" disabled={locked} onClick={actions.create}>
             新增
           </Button>
@@ -451,12 +450,16 @@ function ChannelResults() {
             />
           </div>
         </div>
-        <div
-          ref={listViewport}
-          role="region"
-          aria-label="渠道素材内容"
-          tabIndex={0}
-          className="min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain [scrollbar-gutter:stable] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+        <ScrollArea
+          viewportRef={listViewport}
+          orientation="both"
+          className="flex-1"
+          viewportProps={{
+            role: "region",
+            "aria-label": "渠道素材内容",
+            tabIndex: 0,
+            className: "overscroll-contain",
+          }}
         >
           {groupsLoading && (
             <p
@@ -475,7 +478,7 @@ function ChannelResults() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setGroupsRetry((v) => v + 1)}
+                onClick={() => void groupQuery.refetch()}
               >
                 重试渠道选项
               </Button>
@@ -487,28 +490,28 @@ function ChannelResults() {
               <Skeleton className="h-12" />
               <Skeleton className="h-12" />
             </div>
-          ) : error ? (
+          ) : null}
+          {error && (
             <div role="alert" className="space-y-3 p-6 text-sm">
               <p className="text-destructive">{error}</p>
-              <Button variant="outline" onClick={() => setRetry((v) => v + 1)}>
+              <Button variant="outline" onClick={refresh}>
                 重试素材列表
               </Button>
             </div>
-          ) : (
-            matchingResult && (
-              <MaterialTable
-                preferences={columnPreferences}
-                rows={actions.sorted ?? matchingResult.data}
-                sorting={actions.sorting}
-                busy={actions.busy}
-                onMove={actions.move}
-                onDetail={setSelected}
-                onEdit={(row) => void actions.beginEdit(row)}
-                onDelete={actions.requestDelete}
-              />
-            )
           )}
-        </div>
+          {matchingResult && (
+            <MaterialTable
+              preferences={columnPreferences}
+              rows={actions.sorted ?? matchingResult.data}
+              sorting={actions.sorting}
+              busy={actions.busy}
+              onMove={actions.move}
+              onDetail={setSelected}
+              onEdit={(row) => void actions.beginEdit(row)}
+              onDelete={actions.requestDelete}
+            />
+          )}
+        </ScrollArea>
         <div
           aria-label="素材分页"
           className="flex shrink-0 flex-col gap-2 border-t px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:px-4"

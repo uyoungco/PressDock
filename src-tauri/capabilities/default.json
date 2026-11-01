@@ -21,6 +21,7 @@
     "allow-ai-list-models",
     "allow-ai-test-model",
     "allow-ai-suggest-titles",
+    "allow-ai-suggest-pagination",
     "allow-ai-cancel",
     "allow-get-app-info",
     "allow-health-check",

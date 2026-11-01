@@ -39,6 +39,8 @@ export const aiSettings = (): AiSettings => ({
     {
       id: "template-1",
       name: "新闻标题优化",
+      purpose: "title",
+      paginationOptions: null,
       systemPrompt: "保留事实",
       userPrompt:
         "{{title}}\n{{content}}\n{{count}}\n{{max_length}}\n{{requirements}}",
@@ -50,6 +52,8 @@ export const aiSettings = (): AiSettings => ({
     {
       id: "template-2",
       name: "简洁标题",
+      purpose: "title",
+      paginationOptions: null,
       systemPrompt: "简洁",
       userPrompt: "{{title}}",
       modelConfigId: "model-2",
@@ -69,3 +73,20 @@ export const aiResult = (
   requestedCount: 5,
   ...overrides,
 });
+
+export const paginationSettings = (): AiSettings => {
+  const settings = aiSettings();
+  settings.templates.push({
+    id: "pagination-1",
+    purpose: "pagination",
+    name: "演示分页模板",
+    systemPrompt: "仅判断语义",
+    userPrompt: "{{title}}\n{{blocks}}",
+    modelConfigId: "model-1",
+    candidateCount: 5,
+    maxLength: 30,
+    paginationOptions: { minChars: 100, targetChars: 240, maxChars: 400 },
+    isDefault: true,
+  });
+  return settings;
+};

@@ -20,8 +20,80 @@ use tokio::sync::watch;
 #[derive(Clone, Copy)]
 pub(crate) enum GenerationTask<'a> {
     General,
+    Pagination,
     Metadata(&'a (dyn Fn(&Value) + Sync)),
-    Layout(&'a (dyn Fn(&Value) + Sync)),
+}
+
+// 请求构造与网络调用分离，便于覆盖官方服务商和两种协议的任务参数。
+pub(super) fn generation_request(
+    provider: &AiProviderConfig,
+    model: &AiModelConfig,
+    system: &str,
+    user: &str,
+    task: GenerationTask<'_>,
+) -> (&'static str, Value) {
+    let (path, mut body) = match provider.protocol {
+        Protocol::ChatCompletions => (
+            "chat/completions",
+            json!({"model":model.model_id,"messages":[{"role":provider.compatibility.system_role,"content":system},{"role":"user","content":user}],"stream":false}),
+        ),
+        Protocol::Responses => (
+            "responses",
+            json!({"model":model.model_id,"instructions":system,"input":user,"stream":false}),
+        ),
+    };
+    if provider.compatibility.send_store {
+        body["store"] = json!(false);
+    }
+    if let Some(tokens) = model.max_output_tokens {
+        body[if provider.protocol == Protocol::Responses {
+            "max_output_tokens"
+        } else {
+            &provider.compatibility.max_tokens_field
+        }] = json!(tokens);
+    }
+    if let Some(effort) = &model.reasoning_effort {
+        if provider.protocol == Protocol::Responses {
+            body["reasoning"] = json!({"effort":effort});
+        } else {
+            body["reasoning_effort"] = json!(effort);
+        }
+    }
+    if !matches!(task, GenerationTask::General) {
+        if provider.protocol == Protocol::ChatCompletions {
+            body["response_format"] = json!({"type":"json_object"});
+        } else {
+            body["text"] = json!({"format":{"type":"json_object"}});
+        }
+        let deepseek = url::Url::parse(&provider.base_url)
+            .ok()
+            .is_some_and(|url| url.host_str() == Some("api.deepseek.com"));
+        if model.max_output_tokens.is_none() {
+            body[if provider.protocol == Protocol::Responses {
+                "max_output_tokens"
+            } else {
+                &provider.compatibility.max_tokens_field
+            }] = json!(match task {
+                // 输出额度也包含推理 token，元数据 JSON 较短也需要预留推理空间。
+                GenerationTask::Metadata(_) => 8192,
+                GenerationTask::Pagination => 4096,
+                _ => 8192,
+            });
+        }
+        if matches!(task, GenerationTask::Pagination) && deepseek {
+            // 分页只返回语义编号；默认使用调研验证过的非推理模式，显式推理设置仍优先。
+            match provider.protocol {
+                Protocol::ChatCompletions => {
+                    body["thinking"] = json!({"type": if model.reasoning_effort.is_some() { "enabled" } else { "disabled" }});
+                }
+                Protocol::Responses if model.reasoning_effort.is_none() => {
+                    body["reasoning"] = json!({"effort":"none"});
+                }
+                Protocol::Responses => {}
+            }
+        }
+    }
+    (path, body)
 }
 
 struct Job {
@@ -415,77 +487,18 @@ impl AiService {
         task: GenerationTask<'_>,
     ) -> Result<String, AiError> {
         let (provider, secret) = self.provider(db, &model.provider_id).await?;
-        let (path, mut body) = match provider.protocol {
-            Protocol::ChatCompletions => (
-                "chat/completions",
-                json!({"model":model.model_id,"messages":[{"role":provider.compatibility.system_role,"content":system},{"role":"user","content":user}],"stream":false}),
-            ),
-            Protocol::Responses => (
-                "responses",
-                json!({"model":model.model_id,"instructions":system,"input":user,"stream":false}),
-            ),
-        };
-        if provider.compatibility.send_store {
-            body["store"] = json!(false);
-        }
-        if let Some(tokens) = model.max_output_tokens {
-            body[if provider.protocol == Protocol::Responses {
-                "max_output_tokens"
-            } else {
-                &provider.compatibility.max_tokens_field
-            }] = json!(tokens);
-        }
-        if let Some(effort) = &model.reasoning_effort {
-            if provider.protocol == Protocol::Responses {
-                body["reasoning"] = json!({"effort":effort});
-            } else {
-                body["reasoning_effort"] = json!(effort);
-            }
-        }
-        if !matches!(task, GenerationTask::General) {
-            if provider.protocol == Protocol::ChatCompletions {
-                body["response_format"] = json!({"type":"json_object"});
-            } else {
-                body["text"] = json!({"format":{"type":"json_object"}});
-            }
-            let deepseek = url::Url::parse(&provider.base_url)
-                .ok()
-                .is_some_and(|url| url.host_str() == Some("api.deepseek.com"));
-            if model.max_output_tokens.is_none() {
-                body[if provider.protocol == Protocol::Responses {
-                    "max_output_tokens"
-                } else {
-                    &provider.compatibility.max_tokens_field
-                }] = json!(match task {
-                    // 输出额度也包含推理 token，元数据 JSON 较短也需要预留推理空间。
-                    GenerationTask::Metadata(_) => 8192,
-                    GenerationTask::Layout(_) if deepseek => 16384,
-                    _ => 8192,
-                });
-            }
-            if matches!(task, GenerationTask::Layout(_))
-                && deepseek
-                && provider.protocol == Protocol::ChatCompletions
-            {
-                body["thinking"] = json!({"type":"enabled"});
-                if model.reasoning_effort.is_none() {
-                    body["reasoning_effort"] = json!("low");
-                }
-            }
-        }
+        let (path, body) = generation_request(&provider, model, system, user, task);
         let value = self
             .request(&provider, secret.as_deref(), Method::POST, path, Some(body))
             .await?;
         // 在完成状态/截断校验之前交给采集日志观察器，保留失败时已收到的业务响应。
         // 不交出 provider、密钥或请求头，普通标题调用不注册观察器。
         match task {
-            GenerationTask::General => {}
-            GenerationTask::Metadata(observe) | GenerationTask::Layout(observe) => {
-                observe(&redact(
-                    value.clone(),
-                    &secret.as_deref().into_iter().collect::<Vec<_>>(),
-                ))
-            }
+            GenerationTask::General | GenerationTask::Pagination => {}
+            GenerationTask::Metadata(observe) => observe(&redact(
+                value.clone(),
+                &secret.as_deref().into_iter().collect::<Vec<_>>(),
+            )),
         }
         let output_error = |code, message| {
             AiError::new(code, message).diagnosed(Diagnostic {
@@ -499,14 +512,19 @@ impl AiService {
         };
         let output = match provider.protocol {
             Protocol::ChatCompletions => {
-                if value
+                let finish_reason = value
                     .pointer("/choices/0/finish_reason")
-                    .and_then(Value::as_str)
-                    == Some("length")
-                {
+                    .and_then(Value::as_str);
+                if finish_reason == Some("length") {
                     return Err(output_error(
                         "AI_OUTPUT_LIMIT",
-                        "输出达到 token 上限，请增加模型输出上限后重试",
+                        "输出达到 token 上限（包含推理消耗），请检查模型的推理强度和输出上限后手动重试",
+                    ));
+                }
+                if matches!(task, GenerationTask::Pagination) && finish_reason != Some("stop") {
+                    return Err(output_error(
+                        "AI_OUTPUT_INCOMPLETE",
+                        "AI 分页响应未完整结束，请检查输出上限或重新生成",
                     ));
                 }
                 value
@@ -516,6 +534,14 @@ impl AiService {
                     .to_owned()
             }
             Protocol::Responses => {
+                if matches!(task, GenerationTask::Pagination)
+                    && value.get("status").and_then(Value::as_str).is_none()
+                {
+                    return Err(output_error(
+                        "AI_OUTPUT_INCOMPLETE",
+                        "AI 分页响应缺少完成状态，请检查服务商兼容设置",
+                    ));
+                }
                 if let Some(status) = value.get("status").and_then(Value::as_str)
                     && status != "completed"
                 {
@@ -527,7 +553,7 @@ impl AiService {
                     ) {
                         ("incomplete", Some("max_output_tokens")) => (
                             "AI_OUTPUT_LIMIT",
-                            "输出达到 token 上限，请增加模型输出上限后重试",
+                            "输出达到 token 上限（包含推理消耗），请检查模型的推理强度和输出上限后手动重试",
                         ),
                         ("incomplete", Some("content_filter")) => {
                             ("AI_RESPONSE", "AI 输出被内容过滤，未返回完整结果")
@@ -567,3 +593,7 @@ impl AiService {
         Ok(output)
     }
 }
+
+#[cfg(test)]
+#[path = "pagination_live_test.rs"]
+mod pagination_live_test;

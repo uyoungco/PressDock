@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { AlertCircle, Unplug, Send } from "lucide-react";
+import { useAtom } from "jotai";
+import { publishTabAtom } from "@/lib/query-runtime";
+import { AlertCircle, Unplug, Send, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ArticleTable } from "@/components/common/ArticleTable";
@@ -19,8 +22,9 @@ import { demoPublishJobs } from "@/features/publishing/model";
 import { articleService } from "@/services/cms";
 
 export default function Publish() {
-  const { articles, loading, error } = useArticles();
+  const { articles, loading, error, refreshing, refresh } = useArticles();
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useAtom(publishTabAtom);
   const pending = articles.filter((a) => a.status === "review");
   async function publish() {
     if (!pending[0]) return;
@@ -35,7 +39,26 @@ export default function Publish() {
   }
   return (
     <>
-      <PageHeader title="发布管理" description="查看待发布稿件与任务状态。" />
+      <PageHeader
+        title="发布管理"
+        description="查看待发布稿件与任务状态。"
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={refreshing}
+            onClick={refresh}
+            aria-label="刷新发布列表"
+            aria-busy={refreshing}
+          >
+            <RefreshCw
+              data-icon="inline-start"
+              className={cn(refreshing && "animate-spin")}
+            />
+            刷新
+          </Button>
+        }
+      />
       <div className="mb-5 flex items-start gap-3 rounded-lg border border-amber-500/25 bg-amber-500/5 p-4 text-sm">
         <Unplug className="mt-0.5 size-4 shrink-0 text-amber-600" />
         <div>
@@ -45,7 +68,7 @@ export default function Publish() {
           </p>
         </div>
       </div>
-      <Tabs defaultValue="pending">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="pending">
             待发布稿件 ({pending.length})
@@ -67,8 +90,8 @@ export default function Publish() {
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <LoadState loading={loading} error={error} />
-              {!loading && !error && (
+              <LoadState loading={loading} error={error} retry={refresh} />
+              {!loading && (
                 <ArticleTable articles={pending} preferenceKey="publish" />
               )}
             </CardContent>

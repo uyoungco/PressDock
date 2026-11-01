@@ -5,6 +5,8 @@ mod images;
 mod models;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(crate) use tests::ipc_service;
 
 pub use client::{CmsError, CmsService};
 pub use models::*;

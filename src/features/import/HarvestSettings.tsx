@@ -31,7 +31,7 @@ import {
 import { LoadState } from "@/components/common/LoadState";
 import { aiService } from "@/features/ai/service";
 import { aiErrorMessage } from "@/features/ai/use-settings";
-import type { AiModelConfig } from "@/features/ai/contracts";
+import { emptySettings, type AiSettings } from "@/features/ai/contracts";
 import { importService } from "./service";
 import { ServiceError } from "@/services/tauri/client";
 
@@ -53,18 +53,19 @@ const switches = [
     "生成不超过 130 字符的简介；关闭时保留后台简介。",
   ],
   [
-    "autoOrganize",
-    "AI 正文整理",
-    "按原文片段整理段落和图注，沿用首尾推广、署名清理规则。",
-  ],
-  [
-    "autoPaginate",
-    "自动内容分页",
-    "按语义组或原段落本地分页；单独开启时无需调用 AI。",
+    "aiAutoPaginate",
+    "AI 自动分页",
+    "复用分页助手的默认模板、绑定模型和页长规则；失败保留原排版并继续导入。",
   ],
 ] as const;
 
-export function HarvestSettings({ active }: { active: boolean }) {
+export function HarvestSettings({
+  active,
+  onConfigurePagination,
+}: {
+  active: boolean;
+  onConfigurePagination?: () => void;
+}) {
   const {
     form,
     days,
@@ -73,7 +74,15 @@ export function HarvestSettings({ active }: { active: boolean }) {
     error: saveError,
     modeSaving,
   } = useSyncExternalStore(autosave.subscribe, autosave.getSnapshot);
-  const [models, setModels] = useState<AiModelConfig[]>([]);
+  const [aiSettings, setAiSettings] = useState<AiSettings>(emptySettings);
+  const models = aiSettings.models;
+  const paginationTemplate = aiSettings.templates.find(
+    (t) => t.purpose === "pagination" && t.isDefault,
+  );
+  const paginationModel = models.find(
+    (m) => m.id === paginationTemplate?.modelConfigId,
+  );
+  const paginationOptions = paginationTemplate?.paginationOptions;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lock = useRef(false);
@@ -92,7 +101,7 @@ export function HarvestSettings({ active }: { active: boolean }) {
     Promise.allSettled([importService.settings(), aiService.load()])
       .then(([settings, ai]) => {
         if (!valid) return;
-        if (ai.status === "fulfilled") setModels(ai.value.models);
+        if (ai.status === "fulfilled") setAiSettings(ai.value);
         const failed =
           ai.status === "rejected"
             ? ai
@@ -200,12 +209,31 @@ export function HarvestSettings({ active }: { active: boolean }) {
                 ))}
               </FieldGroup>
             </FieldSet>
+            <FieldSet>
+              <FieldLegend variant="label">共用分页助手配置</FieldLegend>
+              <FieldContent>
+                <FieldDescription>
+                  {paginationTemplate && paginationModel && paginationOptions
+                    ? `${paginationTemplate.name} · ${paginationModel.displayName} · 每页最少 ${paginationOptions.minChars}、目标 ${paginationOptions.targetChars}、最多 ${paginationOptions.maxChars} 字。`
+                    : "默认文章分页模板、绑定模型或页长尚未配置完整；开启后仍可导入，分页步骤会提示回退。"}
+                </FieldDescription>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={onConfigurePagination}
+                  disabled={!onConfigurePagination}
+                >
+                  配置默认分页模板
+                </Button>
+              </FieldContent>
+            </FieldSet>
             <Field>
-              <FieldLabel htmlFor="harvest-model">AI 处理模型</FieldLabel>
+              <FieldLabel htmlFor="harvest-model">元数据处理模型</FieldLabel>
               <Select<string>
                 value={form.modelConfigId ?? ""}
                 items={[
-                  { value: "", label: "未配置（AI 步骤回退到后台结果）" },
+                  { value: "", label: "未配置（元数据保留后台结果）" },
                   ...models.map((model) => ({
                     value: model.id,
                     label: model.displayName,
@@ -223,7 +251,7 @@ export function HarvestSettings({ active }: { active: boolean }) {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="">
-                      未配置（AI 步骤回退到后台结果）
+                      未配置（元数据保留后台结果）
                     </SelectItem>
                     {models.map((model) => (
                       <SelectItem key={model.id} value={model.id}>
@@ -234,7 +262,9 @@ export function HarvestSettings({ active }: { active: boolean }) {
                 </SelectContent>
               </Select>
               <FieldDescription>
-                复用“AI 模型”中的提供商和密钥。所有 AI 项关闭时不发送 AI 请求。
+                用于分类、标签和摘要；AI
+                自动分页使用默认分页模板绑定的模型。所有 AI 项关闭时不发送 AI
+                请求。
               </FieldDescription>
             </Field>
             <Field data-invalid={Boolean(retentionError)}>

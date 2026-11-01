@@ -47,6 +47,29 @@ function setup(path = "/channels") {
   return router;
 }
 describe("渠道素材筛选、分页和详情", () => {
+  it("分页和提交新筛选后重置实际列表视口的纵向位置", async () => {
+    vi.mocked(channelService.list).mockImplementation(async (q) =>
+      materialPage(10, q.current, q.pagesize, 100),
+    );
+    const router = setup("/channels?pagesize=10");
+    await screen.findByText("渠道新闻 10");
+    const viewport = screen.getByRole("region", { name: "渠道素材内容" });
+    viewport.scrollTop = 300;
+    await userEvent.click(screen.getByRole("button", { name: "下一页" }));
+    await waitFor(() => expect(channelQueryMemory.read()?.current).toBe(2));
+    expect(viewport.scrollTop).toBe(0);
+    viewport.scrollTop = 200;
+    await userEvent.type(
+      screen.getByLabelText("发布日期", { selector: "input" }),
+      "2026-10-23",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "搜索" }));
+    await waitFor(() =>
+      expect(channelQueryMemory.read()?.publishdate).toBe("2026-10-23"),
+    );
+    expect(viewport.scrollTop).toBe(0);
+    router.dispose();
+  });
   it("两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值", async () => {
     const router = setup("/channels?channel=历史渠道&subchannel=历史子渠道");
     await screen.findByText("渠道新闻 1");
@@ -298,8 +321,9 @@ describe("渠道素材筛选、分页和详情", () => {
     vi.mocked(channelService.list).mockClear();
     await act(() => router.navigate("/channels"));
     await screen.findByText("渠道新闻 1");
-    expect(channelService.list).toHaveBeenCalledTimes(1);
-    expect(channelService.list).toHaveBeenLastCalledWith({
+    expect(channelService.list).not.toHaveBeenCalled();
+    expect(channelService.groups).toHaveBeenCalledTimes(1);
+    expect(channelQueryMemory.read()).toEqual({
       channel: "KOOK",
       subchannel: "轮播图",
       publishdate: "2026-10-23",

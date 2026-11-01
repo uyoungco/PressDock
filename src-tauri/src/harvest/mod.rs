@@ -1,7 +1,9 @@
 mod content;
-mod layout;
 mod models;
+mod pagination;
 mod store;
+#[cfg(test)]
+mod tests;
 mod webview;
 pub(crate) mod worker;
 pub use models::*;

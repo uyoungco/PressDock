@@ -53,6 +53,29 @@ export async function invokeCommand<T>(
       throw new ServiceError(parsed.data.code, parsed.data.message);
     }
     if (error instanceof ServiceError) throw error;
+    // Tauri 权限和命令分发错误使用字符串；只识别已知错误形态，不回显原始错误文本。
+    if (typeof error === "string") {
+      if (
+        /not allowed by ACL|not allowed on .*(?:window|webview|URL)|not allowed\. Permissions associated with this command|command not allowed/iu.test(
+          error,
+        )
+      ) {
+        throw new ServiceError(
+          "IPC_PERMISSION_DENIED",
+          "当前应用未开放此操作的调用权限，请更新应用后重试",
+        );
+      }
+      if (
+        /\bcommand\b[^\r\n]*(?:not found|does not exist|unknown)|unknown command/iu.test(
+          error,
+        )
+      ) {
+        throw new ServiceError(
+          "IPC_COMMAND_UNAVAILABLE",
+          "当前应用版本不支持此操作，请更新应用后重试",
+        );
+      }
+    }
     throw new ServiceError(
       "IPC_ERROR",
       error instanceof Error ? error.message : "本地服务调用失败，请重试",

@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -24,7 +25,11 @@ import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
 import { MaterialImage } from "@/features/channels/MaterialImage";
 import { ArticleTable } from "@/features/cms-articles/ArticleTable";
-import { articleMemory } from "@/features/cms-articles/state";
+import { useAtomValue, useSetAtom } from "jotai";
+import { RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
+import { articleFiltersAtom, businessKeys } from "@/lib/query-runtime";
 import {
   articleColumns,
   articleQueryParams,
@@ -36,21 +41,20 @@ import { useArticleActions } from "@/features/cms-articles/use-article-actions";
 import {
   articlePageSizes,
   cmsArticleQuerySchema,
-  type ArticleClass,
   type ArticleView,
-  type CmsArticlePage,
   type CmsArticleQuery,
 } from "@/types/cms-article";
 
 export default function Articles({ view }: { view: ArticleView }) {
   const [params] = useSearchParams();
+  const remembered = useAtomValue(articleFiltersAtom)[view];
   if (!params.size)
     return (
       <Navigate
         replace
         to={{
           pathname: `/articles/${view}`,
-          search: `?${articleQueryParams(articleMemory.query(view) ?? defaultQuery(view))}`,
+          search: `?${articleQueryParams(remembered ?? defaultQuery(view))}`,
         }}
       />
     );
@@ -61,78 +65,39 @@ function ArticleResults({ view }: { view: ArticleView }) {
   const [params, setParams] = useSearchParams();
   const applied = useMemo(() => readArticleQuery(view, params), [view, params]);
   const [draft, setDraft] = useState(applied);
-  const [classes, setClasses] = useState<ArticleClass[]>([]);
-  const [classesError, setClassesError] = useState<string | null>(null);
-  const [classRetry, setClassRetry] = useState(0);
-  const [result, setResult] = useState<{
-    key: string;
-    page: CmsArticlePage;
-  } | null>(null);
-  const [loading, setLoading] = useState(true),
-    [error, setError] = useState<string | null>(null);
+  const user = useQueryUser();
+  const remember = useSetAtom(articleFiltersAtom);
+  const classQuery = useBusinessQuery(
+    businessKeys.classes(user),
+    articleService.classes,
+  );
+  const classes = classQuery.data ?? [];
+  const classesError = classQuery.error?.message ?? null;
+  const list = useBusinessQuery(businessKeys.articlePage(user, applied), () =>
+    articleService.list(applied),
+  );
+  const page = list.data ?? null;
+  const loading = list.isPending;
+  const error = list.error?.message ?? null;
   const [filterError, setFilterError] = useState<string | null>(null);
-  const [retry, setRetry] = useState(0),
-    [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const preferences = useColumnPreferences(
     `cms-articles-${view}`,
     articleColumns,
   );
-  const refresh = () => setRetry((value) => value + 1);
-  const actions = useArticleActions(
-    view,
-    classes,
-    classesError,
-    () => setClassRetry((value) => value + 1),
-    refresh,
-  );
+  const refresh = () => {
+    void list.refetch();
+  };
+  const actions = useArticleActions(view, classes, classesError, () => {
+    void classQuery.refetch();
+  });
   const key = articleQueryParams(applied).toString();
-  const page = result?.key === key ? result.page : null;
   useEffect(() => {
     setDraft(applied);
-    articleMemory.remember(applied);
-  }, [applied]);
-  useEffect(() => {
-    let active = true;
-    setClassesError(null);
-    articleService
-      .classes()
-      .then((value) => {
-        if (active) setClasses(value);
-      })
-      .catch((reason: unknown) => {
-        if (active)
-          setClassesError(
-            reason instanceof Error ? reason.message : "读取分类失败",
-          );
-      });
-    return () => {
-      active = false;
-    };
-  }, [classRetry]);
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError(null);
-    articleService
-      .list(applied)
-      .then((page) => {
-        if (active) {
-          setResult({ key, page });
-          if (viewport.current) viewport.current.scrollTop = 0;
-        }
-      })
-      .catch((reason: unknown) => {
-        if (active)
-          setError(reason instanceof Error ? reason.message : "读取文章失败");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [applied, key, retry]);
+    remember((previous) => ({ ...previous, [view]: applied }));
+    if (viewport.current) viewport.current.scrollTop = 0;
+  }, [applied, remember, view]);
   function submit(query: CmsArticleQuery) {
     const parsed = cmsArticleQuerySchema.safeParse(query);
     if (!parsed.success) {
@@ -307,7 +272,7 @@ function ArticleResults({ view }: { view: ArticleView }) {
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => setClassRetry((v) => v + 1)}
+                onClick={() => void classQuery.refetch()}
               >
                 重试分类
               </Button>
@@ -316,6 +281,20 @@ function ArticleResults({ view }: { view: ArticleView }) {
         </form>
         {/* 与渠道素材页一致，列配置紧邻表格，并保留在列表滚动区域外。 */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:gap-3 md:px-4">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={actions.busy || list.isFetching}
+            onClick={refresh}
+            aria-label="刷新文章列表"
+            aria-busy={list.isFetching}
+          >
+            <RefreshCw
+              data-icon="inline-start"
+              className={cn(list.isFetching && "animate-spin")}
+            />
+            刷新
+          </Button>
           <div className="ml-auto">
             <DataTableColumnSettings
               controller={preferences}
@@ -323,12 +302,16 @@ function ArticleResults({ view }: { view: ArticleView }) {
             />
           </div>
         </div>
-        <div
-          ref={viewport}
-          role="region"
-          aria-label="文章列表内容"
-          tabIndex={0}
-          className="min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain [scrollbar-gutter:stable]"
+        <ScrollArea
+          viewportRef={viewport}
+          orientation="both"
+          className="flex-1"
+          viewportProps={{
+            role: "region",
+            "aria-label": "文章列表内容",
+            tabIndex: 0,
+            className: "overscroll-contain",
+          }}
         >
           {loading ? (
             <div className="space-y-3 p-4" aria-label="正在加载文章">
@@ -336,27 +319,27 @@ function ArticleResults({ view }: { view: ArticleView }) {
               <Skeleton className="h-12" />
               <Skeleton className="h-12" />
             </div>
-          ) : error ? (
+          ) : null}
+          {error && (
             <div role="alert" className="space-y-3 p-6">
               <p className="text-destructive">{error}</p>
               <Button variant="outline" onClick={refresh}>
                 重试文章列表
               </Button>
             </div>
-          ) : (
-            page && (
-              <ArticleTable
-                rows={page.data}
-                preferences={preferences}
-                view={view}
-                busy={actions.busy}
-                onEdit={(row) => void actions.beginEdit(row)}
-                onPromote={actions.beginPromote}
-                onPreview={setPreview}
-              />
-            )
           )}
-        </div>
+          {page && (
+            <ArticleTable
+              rows={page.data}
+              preferences={preferences}
+              view={view}
+              busy={actions.busy}
+              onEdit={(row) => void actions.beginEdit(row)}
+              onPromote={actions.beginPromote}
+              onPreview={setPreview}
+            />
+          )}
+        </ScrollArea>
         <div
           aria-label="文章分页"
           className="flex shrink-0 flex-wrap items-center gap-3 border-t px-4 py-2 text-xs text-muted-foreground"

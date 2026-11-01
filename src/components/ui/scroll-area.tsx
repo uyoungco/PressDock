@@ -4,24 +4,55 @@ import * as React from "react";
 import { cn } from "cn";
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui";
 
+type ScrollAreaProps = React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
+  orientation?: "vertical" | "horizontal" | "both";
+  viewportRef?: React.Ref<HTMLDivElement>;
+  viewportProps?: Omit<
+    React.ComponentProps<typeof ScrollAreaPrimitive.Viewport>,
+    "children" | "ref" | "asChild" | "disableImplicitContentElement"
+  >;
+};
+
 function ScrollArea({
   className,
   children,
+  orientation = "vertical",
+  viewportRef,
+  viewportProps,
   ...props
-}: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+}: ScrollAreaProps) {
+  const { className: viewportClassName, ...restViewportProps } =
+    viewportProps ?? {};
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      className={cn("relative", className)}
+      className={cn(
+        "relative grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden",
+        className,
+      )}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
+        {...restViewportProps}
+        ref={viewportRef}
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
+        className={cn(
+          "size-full min-h-0 min-w-0 rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:ring-inset focus-visible:outline-1 focus-visible:-outline-offset-1",
+          viewportClassName,
+        )}
+        disableImplicitContentElement
       >
-        {children}
+        {/* 块布局允许普通内容换行，宽表格仍由视口承接溢出。 */}
+        <ScrollAreaPrimitive.Content
+          data-slot="scroll-area-content"
+          className="min-h-full"
+          style={{ display: "flow-root" }}
+        >
+          {children}
+        </ScrollAreaPrimitive.Content>
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
+      {orientation !== "horizontal" && <ScrollBar />}
+      {orientation !== "vertical" && <ScrollBar orientation="horizontal" />}
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   );

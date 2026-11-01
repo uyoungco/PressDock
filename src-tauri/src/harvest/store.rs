@@ -136,6 +136,21 @@ impl Database {
         }
         let normalized = source_url(&request.url)?.to_string();
         let options = self.harvest_settings().await?.options;
+        let pagination_snapshot = if options.ai_auto_paginate {
+            // 快照只包含模板内容和绑定 ID；不读取或保存密钥。配置存储错误不能当作配置缺失。
+            self.ai_settings()
+                .await?
+                .templates
+                .iter()
+                .find(|t| t.purpose == crate::ai::TemplatePurpose::Pagination && t.is_default)
+                .and_then(|t| crate::ai::PaginationSnapshot::from_template(t).ok())
+        } else {
+            None
+        };
+        let job_options = JobOptions {
+            processing: options.clone(),
+            pagination_snapshot,
+        };
         let local = Local::now();
         let time = now();
         let mut tx = self.pool.begin().await?;
@@ -154,7 +169,7 @@ impl Database {
         }
         sqlx::query("INSERT INTO harvest_jobs(id,user_id,url,normalized_url,collection_date,timezone,status,options,created_at,updated_at) VALUES(?,?,?,?,?,?,'queued',?,?,?) ON CONFLICT DO NOTHING")
             .bind(&request.id).bind(user).bind(request.url.trim()).bind(&normalized).bind(local.format("%Y-%m-%d").to_string()).bind(local.format("%:z").to_string())
-            .bind(serde_json::to_string(&options)?).bind(&time).bind(&time).execute(&mut *tx).await?;
+            .bind(serde_json::to_string(&job_options)?).bind(&time).bind(&time).execute(&mut *tx).await?;
         let row = sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode FROM harvest_jobs WHERE user_id=? AND normalized_url=? AND COALESCE(json_extract(options,'$.developerMode'),0)=?")
             .bind(user)
             .bind(normalized)
@@ -365,9 +380,9 @@ impl Database {
         id: &str,
     ) -> Result<bool, HarvestError> {
         let sql = if kind == "provider" {
-            "SELECT EXISTS(SELECT 1 FROM ai_models m WHERE m.provider_id=? AND (EXISTS(SELECT 1 FROM harvest_settings WHERE model_config_id=m.id) OR EXISTS(SELECT 1 FROM harvest_jobs WHERE json_extract(options,'$.modelConfigId')=m.id AND status NOT IN ('succeeded','debugCompleted','failed','cancelled'))))"
+            "SELECT EXISTS(SELECT 1 FROM ai_models m WHERE m.provider_id=? AND (EXISTS(SELECT 1 FROM harvest_settings WHERE model_config_id=m.id) OR EXISTS(SELECT 1 FROM harvest_jobs WHERE (json_extract(options,'$.modelConfigId')=m.id OR json_extract(options,'$.paginationSnapshot.modelConfigId')=m.id) AND status NOT IN ('succeeded','debugCompleted','failed','cancelled'))))"
         } else {
-            "SELECT EXISTS(SELECT 1 FROM harvest_settings WHERE model_config_id=?) OR EXISTS(SELECT 1 FROM harvest_jobs WHERE json_extract(options,'$.modelConfigId')=? AND status NOT IN ('succeeded','debugCompleted','failed','cancelled'))"
+            "SELECT EXISTS(SELECT 1 FROM harvest_settings WHERE model_config_id=?) OR EXISTS(SELECT 1 FROM harvest_jobs WHERE (json_extract(options,'$.modelConfigId')=? OR json_extract(options,'$.paginationSnapshot.modelConfigId')=?) AND status NOT IN ('succeeded','debugCompleted','failed','cancelled'))"
         };
         if kind == "provider" {
             Ok(sqlx::query_scalar(sql)
@@ -376,6 +391,7 @@ impl Database {
                 .await?)
         } else {
             Ok(sqlx::query_scalar(sql)
+                .bind(id)
                 .bind(id)
                 .bind(id)
                 .fetch_one(&self.pool)

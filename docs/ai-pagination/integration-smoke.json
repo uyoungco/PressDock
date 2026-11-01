@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-30",
+  "model": "deepseek-flash",
+  "configuration": "隔离数据库保存的提供商、模型和内置分页模板；内存凭据，仅演示数据",
+  "results": [
+    {
+      "elapsedMs": 612,
+      "id": "demo-short",
+      "semantic": {
+        "bind_after": [],
+        "prefer_after": ["B1"]
+      },
+      "output": {
+        "break_after": []
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B2",
+          "characters": 89,
+          "images": 0,
+          "bodyBlocks": 2
+        }
+      ]
+    },
+    {
+      "elapsedMs": 546,
+      "id": "demo-caption-tail",
+      "semantic": {
+        "bind_after": [],
+        "prefer_after": ["B1", "B4"]
+      },
+      "output": {
+        "break_after": []
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B5",
+          "characters": 264,
+          "images": 1,
+          "bodyBlocks": 2
+        }
+      ]
+    },
+    {
+      "elapsedMs": 607,
+      "id": "demo-question-answer",
+      "semantic": {
+        "bind_after": ["B2"],
+        "prefer_after": ["B3"]
+      },
+      "output": {
+        "break_after": ["B3"]
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B3",
+          "characters": 213,
+          "images": 0,
+          "bodyBlocks": 3
+        },
+        {
+          "from": "B4",
+          "to": "B4",
+          "characters": 141,
+          "images": 0,
+          "bodyBlocks": 1
+        }
+      ]
+    },
+    {
+      "elapsedMs": 608,
+      "id": "demo-action-result",
+      "semantic": {
+        "bind_after": ["B2"],
+        "prefer_after": ["B3"]
+      },
+      "output": {
+        "break_after": ["B3"]
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B3",
+          "characters": 227,
+          "images": 0,
+          "bodyBlocks": 3
+        },
+        {
+          "from": "B4",
+          "to": "B4",
+          "characters": 138,
+          "images": 0,
+          "bodyBlocks": 1
+        }
+      ]
+    },
+    {
+      "elapsedMs": 681,
+      "id": "demo-explanation",
+      "semantic": {
+        "bind_after": ["B2"],
+        "prefer_after": ["B3"]
+      },
+      "output": {
+        "break_after": ["B1"]
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B1",
+          "characters": 156,
+          "images": 0,
+          "bodyBlocks": 1
+        },
+        {
+          "from": "B2",
+          "to": "B4",
+          "characters": 231,
+          "images": 0,
+          "bodyBlocks": 3
+        }
+      ]
+    },
+    {
+      "elapsedMs": 711,
+      "id": "demo-speaker-quote",
+      "semantic": {
+        "bind_after": ["B2"],
+        "prefer_after": []
+      },
+      "output": {
+        "break_after": ["B1"]
+      },
+      "valid": true,
+      "issues": [],
+      "pages": [
+        {
+          "from": "B1",
+          "to": "B1",
+          "characters": 144,
+          "images": 0,
+          "bodyBlocks": 1
+        },
+        {
+          "from": "B2",
+          "to": "B4",
+          "characters": 210,
+          "images": 0,
+          "bodyBlocks": 3
+        }
+      ]
+    }
+  ]
+}

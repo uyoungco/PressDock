@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -181,7 +182,7 @@ export function useMaterialImage(
         }}
       >
         <DialogContent
-          className="max-h-[95dvh] overflow-y-auto sm:max-w-6xl"
+          className="flex max-h-[95dvh] flex-col sm:max-w-6xl"
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -196,51 +197,56 @@ export function useMaterialImage(
             {work?.subChannel || "未选择子渠道"} ·
             确认结果后上传，保存素材后才关联。已配置的参数锁定。
           </DialogDescription>
-          {work && (
-            <>
-              {work.loading ? (
-                <div className="space-y-4 py-8 text-center">
-                  <p role="status">正在读取子渠道图片预设…</p>
-                  <Button variant="outline" onClick={close}>
-                    取消图片处理
-                  </Button>
-                </div>
-              ) : work.preset ? (
-                <div className="relative">
-                  <div inert={work.uploading}>
-                    <ImageProcessor
-                      image={work.file}
-                      preset={work.preset}
-                      onConfirm={(result) => void confirm(result)}
-                      onCancel={close}
-                    />
+          <ScrollArea
+            className="-mx-1 flex-1"
+            viewportProps={{ className: "px-1 py-1" }}
+          >
+            {work && (
+              <>
+                {work.loading ? (
+                  <div className="space-y-4 py-8 text-center">
+                    <p role="status">正在读取子渠道图片预设…</p>
+                    <Button variant="outline" onClick={close}>
+                      取消图片处理
+                    </Button>
                   </div>
-                  {work.uploading && (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/90">
-                      <p role="status">正在上传处理后的图片…</p>
-                      <Button variant="outline" onClick={close}>
-                        取消回填
-                      </Button>
+                ) : work.preset ? (
+                  <div className="relative">
+                    <div inert={work.uploading}>
+                      <ImageProcessor
+                        image={work.file}
+                        preset={work.preset}
+                        onConfirm={(result) => void confirm(result)}
+                        onCancel={close}
+                      />
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Button onClick={() => void loadPreset(work)}>
-                    重试读取预设
-                  </Button>
-                  <Button variant="outline" onClick={close}>
-                    取消图片处理
-                  </Button>
-                </div>
-              )}
-              {work.error && (
-                <p role="alert" className="text-sm text-destructive">
-                  {work.error}
-                </p>
-              )}
-            </>
-          )}
+                    {work.uploading && (
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/90">
+                        <p role="status">正在上传处理后的图片…</p>
+                        <Button variant="outline" onClick={close}>
+                          取消回填
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button onClick={() => void loadPreset(work)}>
+                      重试读取预设
+                    </Button>
+                    <Button variant="outline" onClick={close}>
+                      取消图片处理
+                    </Button>
+                  </div>
+                )}
+                {work.error && (
+                  <p role="alert" className="text-sm text-destructive">
+                    {work.error}
+                  </p>
+                )}
+              </>
+            )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     ),

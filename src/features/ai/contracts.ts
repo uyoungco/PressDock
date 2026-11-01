@@ -89,11 +89,13 @@ export const templateVariables = [
   "max_length",
   "requirements",
 ] as const;
-export function validateVariables(value: string): boolean {
+export const paginationVariables = ["title", "blocks"] as const;
+export function validateVariables(value: string, purpose = "title"): boolean {
+  const variables: readonly string[] =
+    purpose === "pagination" ? paginationVariables : templateVariables;
   const pattern = /\{\{([\s\S]*?)\}\}/g;
   for (const match of value.matchAll(pattern)) {
-    if (!(templateVariables as readonly string[]).includes(match[1].trim()))
-      return false;
+    if (!variables.includes(match[1].trim())) return false;
   }
   return !value.replace(pattern, "").includes("{{");
 }
@@ -101,18 +103,51 @@ export const countSchema = z.number().int().min(1).max(10);
 export const lengthSchema = z.number().int().min(1).max(200);
 const prompt = z
   .string()
-  .refine((v) => [...v].length <= 20_000, "提示词最多 20000 字符")
-  .refine(validateVariables, "存在未知或未闭合的模板变量");
-export const templateSchema = z.object({
-  id: text(100),
-  name: text(100),
-  systemPrompt: prompt,
-  userPrompt: prompt.refine((v) => !!v.trim(), "请输入用户提示词"),
-  modelConfigId: text(100).nullable(),
-  candidateCount: countSchema,
-  maxLength: lengthSchema,
-  isDefault: z.boolean(),
-});
+  .refine((v) => [...v].length <= 20_000, "提示词最多 20000 字符");
+export const paginationOptionsSchema = z
+  .object({
+    minChars: z.number().int().min(1).max(10_000),
+    targetChars: z.number().int().min(1).max(10_000),
+    maxChars: z.number().int().min(1).max(10_000),
+  })
+  .refine(
+    (v) => v.minChars <= v.targetChars && v.targetChars <= v.maxChars,
+    "页长须满足：最少字数 ≤ 目标字数 ≤ 最多字数",
+  );
+export const defaultPaginationOptions = {
+  minChars: 100,
+  targetChars: 240,
+  maxChars: 400,
+};
+export const templateSchema = z
+  .object({
+    purpose: z.enum(["title", "pagination"]).default("title"),
+    paginationOptions: paginationOptionsSchema.nullable().default(null),
+    id: text(100),
+    name: text(100),
+    systemPrompt: prompt,
+    userPrompt: prompt.refine((v) => !!v.trim(), "请输入用户提示词"),
+    modelConfigId: text(100).nullable(),
+    candidateCount: countSchema,
+    maxLength: lengthSchema,
+    isDefault: z.boolean(),
+  })
+  .superRefine((v, ctx) => {
+    for (const key of ["systemPrompt", "userPrompt"] as const) {
+      if (!validateVariables(v[key], v.purpose))
+        ctx.addIssue({
+          code: "custom",
+          path: [key],
+          message: "存在未知或未闭合的模板变量",
+        });
+    }
+    if (v.purpose === "pagination" && !v.paginationOptions)
+      ctx.addIssue({
+        code: "custom",
+        path: ["paginationOptions"],
+        message: "请配置分页页长",
+      });
+  });
 export const settingsSchema = z.object({
   providers: providerSchema.array(),
   models: modelSchema.array(),
@@ -154,6 +189,44 @@ export type PromptTemplate = z.infer<typeof templateSchema>;
 export type AiSettings = z.infer<typeof settingsSchema>;
 export type TitleSuggestionRequest = z.infer<typeof suggestionRequestSchema>;
 export type TitleSuggestionResult = z.infer<typeof suggestionResultSchema>;
+export const paginationBlockSchema = z.object({
+  id: z.string().regex(/^B[1-9]\d*$/),
+  type: z.enum(["text", "image", "caption", "heading", "source"]),
+  paragraph: z.number().int().nonnegative(),
+  text: z.string().optional(),
+  chars: z.number().int().nonnegative(),
+  caption_of: z.string().optional(),
+  keep_with_next: z.boolean().optional(),
+});
+export const paginationRequestSchema = z
+  .object({
+    jobId: z.uuid(),
+    templateId: text(100),
+    modelConfigId: text(100),
+    title: z.string().refine((v) => [...v].length <= 20_000, "标题过长"),
+    blocks: paginationBlockSchema.array().min(1).max(10_000),
+  })
+  .refine(
+    (r) =>
+      new TextEncoder().encode(JSON.stringify(r.blocks)).length <= 4_000_000,
+    "分页内容最多 4 MB",
+  );
+export const semanticPaginationSchema = z.strictObject({
+  bind_after: z.string().array(),
+  prefer_after: z.string().array(),
+});
+export const paginationResultSchema = z.object({
+  jobId: z.uuid(),
+  templateId: text(100),
+  modelConfigId: text(100),
+  ...semanticPaginationSchema.shape,
+  breakAfter: z.string().array(),
+  paginationOptions: paginationOptionsSchema,
+});
+export type PaginationBlock = z.infer<typeof paginationBlockSchema>;
+export type PaginationOptions = z.infer<typeof paginationOptionsSchema>;
+export type SemanticPagination = z.infer<typeof semanticPaginationSchema>;
+export type PaginationRequest = z.infer<typeof paginationRequestSchema>;
 export const emptySettings: AiSettings = {
   providers: [],
   models: [],

@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoaderCircle, Sparkles } from "lucide-react";
@@ -168,6 +169,10 @@ function TitleDialog({
       .load()
       .then((data) => {
         if (!valid) return;
+        data = {
+          ...data,
+          templates: data.templates.filter((t) => t.purpose === "title"),
+        };
         setSettings(data);
         setLoading(false);
         const template = data.templates.find((t) => t.isDefault);
@@ -232,208 +237,214 @@ function TitleDialog({
             生成候选，采用后仍需手动保存。
           </DialogDescription>
         </DialogHeader>
-        <div className="-mx-1 min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1">
-          <div className="space-y-1 rounded-lg bg-muted/50 p-3">
-            <p className="text-xs text-muted-foreground">当前标题</p>
-            <p className="text-sm break-words">
-              {source.title || "（未填写标题）"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              参考正文/摘要：{[...source.content].length} 字符，发送至所选 AI
-              服务。候选标题需人工核对。
-            </p>
-          </div>
-          {loading ? (
-            <p role="status" className="flex items-center gap-2 text-sm">
-              <LoaderCircle className="size-4 animate-spin" />
-              正在读取配置…
-            </p>
-          ) : (
-            <>
-              {!configured && (
-                <div className="space-y-2 rounded-lg border p-3">
-                  <p className="text-sm">
-                    请先配置 AI 模型，并为提示词模板绑定模型。
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      close();
-                      navigate("/settings?tab=ai-models");
-                    }}
-                  >
-                    前往 AI 模型设置
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      close();
-                      navigate("/settings?tab=ai-templates");
-                    }}
-                  >
-                    前往提示词模板
-                  </Button>
-                </div>
-              )}
-              {configured && (
-                <>
-                  <AiChoice
-                    id="ai-title-template"
-                    label="提示词模板"
-                    disabled={busy}
-                    value={options.templateId}
-                    options={[
-                      { value: "", label: "请选择模板（未配置默认模板）" },
-                      ...settings.templates.map((t) => ({
-                        value: t.id,
-                        label: t.name + (t.isDefault ? "（默认）" : ""),
-                      })),
-                    ]}
-                    onChange={(id) => {
-                      const template = settings.templates.find(
-                        (t) => t.id === id,
-                      );
-                      if (template)
-                        change(fromTemplate(template, options.requirements));
-                    }}
-                  />
-                  <AiChoice
-                    id="ai-title-model"
-                    label="本次使用模型"
-                    disabled={busy || !selectedTemplate?.modelConfigId}
-                    value={options.modelConfigId}
-                    options={[
-                      { value: "", label: "请选择模型" },
-                      ...settings.models.map((m) => ({
-                        value: m.id,
-                        label: `${settings.providers.find((p) => p.id === m.providerId)?.displayName ?? m.providerId} / ${m.displayName}`,
-                      })),
-                    ]}
-                    onChange={(id) => change({ ...options, modelConfigId: id })}
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <AiField id="ai-title-count" label="候选数量">
-                      <Input
-                        id="ai-title-count"
-                        type="number"
-                        min={1}
-                        max={10}
-                        disabled={busy}
-                        value={options.candidateCount || ""}
-                        onChange={(e) =>
-                          change({
-                            ...options,
-                            candidateCount: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </AiField>
-                    <AiField id="ai-title-length" label="最大字数">
-                      <Input
-                        id="ai-title-length"
-                        type="number"
-                        min={1}
-                        max={200}
-                        disabled={busy}
-                        value={options.maxLength || ""}
-                        onChange={(e) =>
-                          change({
-                            ...options,
-                            maxLength: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </AiField>
+        <ScrollArea className="-mx-1 flex-1">
+          <div className="flex flex-col gap-4 px-1 py-1">
+            <div className="space-y-1 rounded-lg bg-muted/50 p-3">
+              <p className="text-xs text-muted-foreground">当前标题</p>
+              <p className="text-sm break-words">
+                {source.title || "（未填写标题）"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                参考正文/摘要：{[...source.content].length} 字符，发送至所选 AI
+                服务。候选标题需人工核对。
+              </p>
+            </div>
+            {loading ? (
+              <p role="status" className="flex items-center gap-2 text-sm">
+                <LoaderCircle className="size-4 animate-spin" />
+                正在读取配置…
+              </p>
+            ) : (
+              <>
+                {!configured && (
+                  <div className="space-y-2 rounded-lg border p-3">
+                    <p className="text-sm">
+                      请先配置 AI 模型，并为提示词模板绑定模型。
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        close();
+                        navigate("/settings?tab=ai-models");
+                      }}
+                    >
+                      前往 AI 模型设置
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        close();
+                        navigate("/settings?tab=ai-templates");
+                      }}
+                    >
+                      前往提示词模板
+                    </Button>
                   </div>
-                  <AiField
-                    id="ai-title-requirements"
-                    label="补充要求（仅本次）"
-                  >
-                    <Textarea
-                      id="ai-title-requirements"
+                )}
+                {configured && (
+                  <>
+                    <AiChoice
+                      id="ai-title-template"
+                      label="提示词模板"
                       disabled={busy}
-                      value={options.requirements}
-                      placeholder="例如：突出数据，不要夸张"
-                      onChange={(e) =>
-                        change({ ...options, requirements: e.target.value })
+                      value={options.templateId}
+                      options={[
+                        { value: "", label: "请选择模板（未配置默认模板）" },
+                        ...settings.templates.map((t) => ({
+                          value: t.id,
+                          label: t.name + (t.isDefault ? "（默认）" : ""),
+                        })),
+                      ]}
+                      onChange={(id) => {
+                        const template = settings.templates.find(
+                          (t) => t.id === id,
+                        );
+                        if (template)
+                          change(fromTemplate(template, options.requirements));
+                      }}
+                    />
+                    <AiChoice
+                      id="ai-title-model"
+                      label="本次使用模型"
+                      disabled={busy || !selectedTemplate?.modelConfigId}
+                      value={options.modelConfigId}
+                      options={[
+                        { value: "", label: "请选择模型" },
+                        ...settings.models.map((m) => ({
+                          value: m.id,
+                          label: `${settings.providers.find((p) => p.id === m.providerId)?.displayName ?? m.providerId} / ${m.displayName}`,
+                        })),
+                      ]}
+                      onChange={(id) =>
+                        change({ ...options, modelConfigId: id })
                       }
                     />
-                  </AiField>
-                  {selectedTemplate && !selectedTemplate.modelConfigId && (
-                    <div className="space-y-2 rounded-lg border p-3">
-                      <p className="text-sm text-muted-foreground">
-                        当前模板尚未绑定模型，请先完成模板配置。
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          close();
-                          navigate("/settings?tab=ai-templates");
-                        }}
-                      >
-                        前往提示词模板
-                      </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <AiField id="ai-title-count" label="候选数量">
+                        <Input
+                          id="ai-title-count"
+                          type="number"
+                          min={1}
+                          max={10}
+                          disabled={busy}
+                          value={options.candidateCount || ""}
+                          onChange={(e) =>
+                            change({
+                              ...options,
+                              candidateCount: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </AiField>
+                      <AiField id="ai-title-length" label="最大字数">
+                        <Input
+                          id="ai-title-length"
+                          type="number"
+                          min={1}
+                          max={200}
+                          disabled={busy}
+                          value={options.maxLength || ""}
+                          onChange={(e) =>
+                            change({
+                              ...options,
+                              maxLength: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </AiField>
                     </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {sourceChanged && (
-            <p role="alert" className="text-sm text-destructive">
-              编辑内容已变化，请关闭弹窗后重新生成。
-            </p>
-          )}
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
-          {busy && (
-            <p role="status" className="flex items-center gap-2 text-sm">
-              <LoaderCircle className="size-4 animate-spin" />
-              正在生成候选标题…
-            </p>
-          )}
-          {result && (
-            <div className="space-y-3" aria-label="候选标题列表">
-              <p role="status" className="text-sm text-muted-foreground">
-                获得 {result.candidates.length} / {result.requestedCount}{" "}
-                个有效候选
-                {result.candidates.length < result.requestedCount &&
-                  "（已去除重复、空白或超长结果）"}
+                    <AiField
+                      id="ai-title-requirements"
+                      label="补充要求（仅本次）"
+                    >
+                      <Textarea
+                        id="ai-title-requirements"
+                        disabled={busy}
+                        value={options.requirements}
+                        placeholder="例如：突出数据，不要夸张"
+                        onChange={(e) =>
+                          change({ ...options, requirements: e.target.value })
+                        }
+                      />
+                    </AiField>
+                    {selectedTemplate && !selectedTemplate.modelConfigId && (
+                      <div className="space-y-2 rounded-lg border p-3">
+                        <p className="text-sm text-muted-foreground">
+                          当前模板尚未绑定模型，请先完成模板配置。
+                        </p>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            close();
+                            navigate("/settings?tab=ai-templates");
+                          }}
+                        >
+                          前往提示词模板
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+            {sourceChanged && (
+              <p role="alert" className="text-sm text-destructive">
+                编辑内容已变化，请关闭弹窗后重新生成。
               </p>
-              {result.candidates.map((candidate, index) => (
-                <div
-                  key={candidate}
-                  className="flex items-start gap-3 rounded-lg border p-3"
-                >
-                  <span className="pt-1 text-xs text-muted-foreground">
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm leading-6 break-words">{candidate}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {[...candidate].length} 字符
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    disabled={sourceChanged}
-                    onClick={() => {
-                      if (!sourceValid.current) return;
-                      onAdopt(candidate);
-                      close();
-                    }}
+            )}
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            {busy && (
+              <p role="status" className="flex items-center gap-2 text-sm">
+                <LoaderCircle className="size-4 animate-spin" />
+                正在生成候选标题…
+              </p>
+            )}
+            {result && (
+              <div className="space-y-3" aria-label="候选标题列表">
+                <p role="status" className="text-sm text-muted-foreground">
+                  获得 {result.candidates.length} / {result.requestedCount}{" "}
+                  个有效候选
+                  {result.candidates.length < result.requestedCount &&
+                    "（已去除重复、空白或超长结果）"}
+                </p>
+                {result.candidates.map((candidate, index) => (
+                  <div
+                    key={candidate}
+                    className="flex items-start gap-3 rounded-lg border p-3"
                   >
-                    采用<span className="sr-only">候选 {index + 1}</span>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    <span className="pt-1 text-xs text-muted-foreground">
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm leading-6 break-words">
+                        {candidate}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {[...candidate].length} 字符
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={sourceChanged}
+                      onClick={() => {
+                        if (!sourceValid.current) return;
+                        onAdopt(candidate);
+                        close();
+                      }}
+                    >
+                      采用<span className="sr-only">候选 {index + 1}</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
         <DialogFooter className="shrink-0">
           <Button variant="outline" onClick={close}>
             {busy ? "取消生成并关闭" : "关闭"}

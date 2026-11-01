@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactCrop, { type PercentCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -361,7 +362,7 @@ function ProcessorEditor({
         </span>
       </div>
       <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="flex min-w-0 flex-col border-b lg:border-r lg:border-b-0">
+        <div className="flex min-h-0 min-w-0 flex-col border-b lg:border-r lg:border-b-0">
           <div className="flex items-center justify-between gap-2 border-b px-3 py-2">
             <div className="flex gap-1" aria-label="图片预览模式">
               <Button
@@ -390,61 +391,71 @@ function ProcessorEditor({
               {Math.round(scale * 100)}%
             </span>
           </div>
-          <div
-            ref={viewport}
-            className="image-processor-viewport relative h-[min(58vh,620px)] min-h-80 flex-1 overflow-auto bg-neutral-950"
-            aria-label="图片裁剪工作区"
-          >
-            <div className="grid min-h-full min-w-full w-max place-items-center p-6">
-              {resultView && resultUrl ? (
-                <img
-                  src={resultUrl}
-                  alt="实际编码后的图片"
-                  className="image-transparency block max-w-none"
-                  style={{
-                    width: shown.width * scale,
-                    height: shown.height * scale,
-                  }}
-                  draggable={false}
-                />
-              ) : originalUrl ? (
-                <ReactCrop
-                  crop={cropping ? crop : undefined}
-                  aspect={aspect}
-                  disabled={busy || !cropping}
-                  keepSelection
-                  ruleOfThirds
-                  onChange={(_, percent) => {
-                    invalidate();
-                    setCrop(percent);
-                  }}
-                  ariaLabels={{
-                    cropArea: "裁剪选区",
-                    nwDragHandle: "左上裁剪手柄",
-                    nDragHandle: "上方裁剪手柄",
-                    neDragHandle: "右上裁剪手柄",
-                    eDragHandle: "右侧裁剪手柄",
-                    seDragHandle: "右下裁剪手柄",
-                    sDragHandle: "下方裁剪手柄",
-                    swDragHandle: "左下裁剪手柄",
-                    wDragHandle: "左侧裁剪手柄",
-                  }}
-                >
+          {/* 独立尺寸容器避免放大后的图片反过来撑高 flex 工作区。 */}
+          <div className="relative h-[min(58vh,620px)] min-h-80 flex-1">
+            <ScrollArea
+              viewportRef={viewport}
+              orientation="both"
+              className="inset-0 bg-neutral-950"
+              style={{ position: "absolute" }}
+              viewportProps={{
+                role: "region",
+                "aria-label": "图片裁剪工作区",
+                tabIndex: 0,
+                className: "[&>[data-slot=scroll-area-content]]:grid!",
+              }}
+            >
+              <div className="grid min-h-full min-w-full w-max place-items-center p-6">
+                {resultView && resultUrl ? (
                   <img
-                    src={originalUrl}
-                    alt="待裁剪的原图"
+                    src={resultUrl}
+                    alt="实际编码后的图片"
                     className="image-transparency block max-w-none"
                     style={{
-                      width: info.width * scale,
-                      height: info.height * scale,
+                      width: shown.width * scale,
+                      height: shown.height * scale,
                     }}
                     draggable={false}
                   />
-                </ReactCrop>
-              ) : (
-                <LoaderCircle className="size-6 animate-spin text-white" />
-              )}
-            </div>
+                ) : originalUrl ? (
+                  <ReactCrop
+                    crop={cropping ? crop : undefined}
+                    aspect={aspect}
+                    disabled={busy || !cropping}
+                    keepSelection
+                    ruleOfThirds
+                    onChange={(_, percent) => {
+                      invalidate();
+                      setCrop(percent);
+                    }}
+                    ariaLabels={{
+                      cropArea: "裁剪选区",
+                      nwDragHandle: "左上裁剪手柄",
+                      nDragHandle: "上方裁剪手柄",
+                      neDragHandle: "右上裁剪手柄",
+                      eDragHandle: "右侧裁剪手柄",
+                      seDragHandle: "右下裁剪手柄",
+                      sDragHandle: "下方裁剪手柄",
+                      swDragHandle: "左下裁剪手柄",
+                      wDragHandle: "左侧裁剪手柄",
+                    }}
+                  >
+                    <img
+                      src={originalUrl}
+                      alt="待裁剪的原图"
+                      className="image-transparency block max-w-none"
+                      style={{
+                        width: info.width * scale,
+                        height: info.height * scale,
+                      }}
+                      draggable={false}
+                    />
+                  </ReactCrop>
+                ) : (
+                  <LoaderCircle className="size-6 animate-spin text-white" />
+                )}
+              </div>
+            </ScrollArea>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 border-t px-3 py-2">
             <div className="flex gap-1">

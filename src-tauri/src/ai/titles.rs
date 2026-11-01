@@ -16,7 +16,7 @@ pub(super) fn validate_variables(prompt: &str) -> Result<(), AiError> {
 }
 
 // 单次解析，不再次解释素材正文里的 {{...}}，防止变量级联替换。
-fn render(
+pub(super) fn render(
     prompt: &str,
     mut variable: impl FnMut(&str) -> Result<String, AiError>,
 ) -> Result<String, AiError> {
@@ -89,7 +89,7 @@ impl AiService {
         let template = settings
             .templates
             .into_iter()
-            .find(|t| t.id == r.template_id)
+            .find(|t| t.id == r.template_id && t.purpose == TemplatePurpose::Title)
             .ok_or_else(|| AiError::invalid("提示词模板不存在"))?;
         template.validate()?;
         let bound_model = template

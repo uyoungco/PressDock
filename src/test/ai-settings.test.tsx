@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { ModelSettings } from "@/features/ai/ModelSettings";
 import { TemplateSettings } from "@/features/ai/TemplateSettings";
 import { aiService } from "@/features/ai/service";
-import { aiSettings } from "./ai-fixtures";
+import { aiSettings, paginationSettings } from "./ai-fixtures";
 import { chooseOption } from "./select-helpers";
 import { deferred } from "./cms-fixtures";
 import Settings from "@/pages/Settings";
@@ -175,4 +175,30 @@ it("未知模板变量阻止保存，失败保留输入", async () => {
   expect(await screen.findByRole("alert")).toHaveTextContent("未知");
   expect(aiService.saveTemplate).not.toHaveBeenCalled();
   expect(screen.getByLabelText("用户提示词")).toHaveValue("{{unknown}}");
+});
+
+it("分页模板独立显示、编辑页长和变量，保存时保留用途", async () => {
+  vi.mocked(aiService.load).mockResolvedValue(paginationSettings());
+  render(<TemplateSettings active initialPurpose="pagination" />);
+  await userEvent.click(
+    await screen.findByRole("button", { name: /演示分页模板/ }),
+  );
+  expect(screen.queryByLabelText("标题最大字数")).not.toBeInTheDocument();
+  expect(screen.getByLabelText("目标字数")).toHaveValue(240);
+  change("目标字数", "260");
+  change("用户提示词", "{{blocks}}");
+  await userEvent.click(screen.getByRole("button", { name: "保存模板" }));
+  await waitFor(() =>
+    expect(aiService.saveTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purpose: "pagination",
+        paginationOptions: { minChars: 100, targetChars: 260, maxChars: 400 },
+        isDefault: true,
+      }),
+    ),
+  );
+  change("用户提示词", "{{content}}");
+  await userEvent.click(screen.getByRole("button", { name: "保存模板" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("未知");
+  expect(aiService.saveTemplate).toHaveBeenCalledTimes(1);
 });

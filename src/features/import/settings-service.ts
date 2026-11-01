@@ -23,8 +23,7 @@ const keys = [
   "autoClassify",
   "autoTags",
   "autoSummary",
-  "autoOrganize",
-  "autoPaginate",
+  "aiAutoPaginate",
   "modelConfigId",
   "retentionDays",
 ] as const;

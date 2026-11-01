@@ -136,3 +136,19 @@ pub async fn ai_suggest_titles(
 pub fn ai_cancel(job_id: String, ai: State<'_, AiService>) {
     ai.cancel(&job_id);
 }
+
+#[tauri::command]
+pub async fn ai_suggest_pagination(
+    request: PaginationRequest,
+    database: State<'_, Database>,
+    ai: State<'_, AiService>,
+    cms: State<'_, CmsService>,
+) -> Result<PaginationResult, CommandError> {
+    let generation = cms.authorize().await?;
+    let id = request.job_id.clone();
+    let result = ai
+        .run(&id, ai.suggest_pagination(&database, request))
+        .await?;
+    cms.ensure_generation(generation).await?;
+    Ok(result)
+}

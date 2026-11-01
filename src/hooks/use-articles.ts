@@ -1,33 +1,19 @@
-import { useEffect, useState } from "react";
 import { articleService } from "@/services/cms";
-import type { Article } from "@/types/article";
-import { toast } from "sonner";
+import { businessKeys } from "@/lib/query-runtime";
+import { useBusinessQuery, useQueryUser } from "./use-business-query";
 
 export function useArticles() {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    let active = true;
-    articleService
-      .getArticles()
-      .then((data) => {
-        if (active) setArticles(data);
-      })
-      .catch((reason: unknown) => {
-        if (active) {
-          const message =
-            reason instanceof Error ? reason.message : "读取文章失败";
-          setError(message);
-          toast.error(message);
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-  return { articles, loading, error };
+  const user = useQueryUser();
+  const query = useBusinessQuery(businessKeys.localArticles(user), () =>
+    articleService.getArticles(),
+  );
+  return {
+    articles: query.data ?? [],
+    loading: query.isPending,
+    error: query.error?.message ?? null,
+    refreshing: query.isFetching,
+    refresh: () => {
+      void query.refetch();
+    },
+  };
 }

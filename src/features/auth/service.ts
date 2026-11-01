@@ -9,6 +9,11 @@ import { articleMemory } from "@/features/cms-articles/state";
 import { channelQueryMemory } from "@/features/channels/query-memory";
 import { channelEditBuffers } from "@/features/channels/edit-buffer";
 import {
+  clearBusinessQueries,
+  retainQueryUser,
+  suspendBusinessQueries,
+} from "@/lib/query-runtime";
+import {
   loginInputSchema,
   type AuthSession,
   type LoginInput,
@@ -38,10 +43,12 @@ function update(value: AuthSnapshot) {
 }
 function begin() {
   invalidateClientRequests();
+  suspendBusinessQueries();
   return ++version;
 }
 function accept(session: AuthSession | null) {
   if (session) {
+    retainQueryUser(session.user.userId);
     articleMemory.retainUser(session.user.userId);
     channelQueryMemory.retainUser(session.user.userId);
     channelEditBuffers.retainUser(session.user.userId);
@@ -120,6 +127,7 @@ export const authService = {
   },
   async logout() {
     begin();
+    clearBusinessQueries();
     articleMemory.clear();
     channelQueryMemory.clear();
     channelEditBuffers.clear();

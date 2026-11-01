@@ -67,6 +67,7 @@ pub fn run() {
             commands::ai_list_models,
             commands::ai_test_model,
             commands::ai_suggest_titles,
+            commands::ai_suggest_pagination,
             commands::ai_cancel,
             commands::get_app_info,
             commands::health_check,

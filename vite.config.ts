@@ -12,7 +12,12 @@ export default defineConfig(() => ({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     restoreMocks: true,
-    exclude: ["**/node_modules/**", "**/src-tauri/**", "**/.tools/**"],
+    exclude: [
+      "**/node_modules/**",
+      "**/src-tauri/**",
+      "**/.tools/**",
+      "scripts/**",
+    ],
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

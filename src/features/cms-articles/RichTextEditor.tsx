@@ -1,18 +1,24 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { selectionToInsertionEnd } from "@tiptap/core";
 import {
   EditorContent,
   useEditor,
   useEditorState,
   type Editor,
 } from "@tiptap/react";
-import { DOMParser as SchemaParser, Fragment, Slice } from "@tiptap/pm/model";
+import { DOMParser as SchemaParser, Slice } from "@tiptap/pm/model";
 import { closeHistory } from "@tiptap/pm/history";
-import { TextSelection, type SelectionBookmark } from "@tiptap/pm/state";
+import {
+  TextSelection,
+  type SelectionBookmark,
+  type Transaction,
+} from "@tiptap/pm/state";
+import type { Node as EditorNode } from "@tiptap/pm/model";
 import {
   AlignCenterIcon,
   AlignLeftIcon,
   BoldIcon,
+  BookOpenIcon,
   ChevronDownIcon,
   CodeXmlIcon,
   EraserIcon,
@@ -57,6 +63,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { articleService } from "./service";
+import { PaginationAssistant } from "./PaginationAssistant";
+import { insertionBoundary, readPagination } from "./editor-pagination";
+import { deletePageBreakAt } from "./editor-page-break";
 import {
   cleanHtml,
   editorExtensions,
@@ -83,12 +92,14 @@ function ToolHint({ label, children }: { label: string; children: ReactNode }) {
 
 export default function RichTextEditor({
   initialHtml,
+  title,
   disabled,
   onChange,
   onUploading,
   onError,
 }: {
   initialHtml: string;
+  title: string;
   disabled: boolean;
   onChange: (html: string) => void;
   onUploading: (value: boolean) => void;
@@ -128,6 +139,8 @@ export default function RichTextEditor({
     bookmark: SelectionBookmark;
   } | null>(null);
   const [sourceError, setSourceError] = useState("");
+  const [paginationOpen, setPaginationOpen] = useState(false);
+  const paginationLocation = useRef<number | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const toolbar = useRef<HTMLDivElement>(null);
   const fileSelection = useRef<SelectionBookmark | null>(null);
@@ -238,6 +251,8 @@ export default function RichTextEditor({
       setLink(null);
       setSource(null);
       setSourceError("");
+      setPaginationOpen(false);
+      paginationLocation.current = null;
       latest.current.onUploading(false);
     });
     return () => {
@@ -536,6 +551,10 @@ export default function RichTextEditor({
         : "0",
       undo: editor?.can().undo() ?? false,
       redo: editor?.can().redo() ?? false,
+      doc: editor?.state.doc,
+      paginationBoundary: editor
+        ? insertionBoundary(editor.state.doc, editor.state.selection.to)
+        : null,
     }),
   });
   const locked =
@@ -609,37 +628,75 @@ export default function RichTextEditor({
       );
     }
   }
+  function commitPagination(transaction: Transaction) {
+    // 每次分页操作独立成组，撤销不连带相邻输入；仍走原 onUpdate 和原文恢复机制。
+    // 弹框内调整时保持焦点和背景滚动位置，关闭后再回到正文。
+    editor!.view.dispatch(
+      closeHistory(paginationOpen ? transaction : transaction.scrollIntoView()),
+    );
+    editor!.view.dispatch(
+      closeHistory(editor!.state.tr).setMeta("addToHistory", false),
+    );
+    if (!paginationOpen) editor!.view.focus();
+  }
   function insertPageBreak() {
     if (!canEdit()) return;
     const target = editor!;
-    const paragraph = target.schema.nodes.paragraph;
-    const marker = paragraph.create(null, target.schema.text(pageBreak));
-    // 直接在选区末尾的零宽范围插入，避免邻近选区落到分隔线等节点上并替换原内容。
-    const end = target.state.selection.to;
-    const transaction = closeHistory(target.state.tr).replaceRange(
-      end,
-      end,
-      new Slice(Fragment.from(marker), 0, 0),
+    const position = insertionBoundary(
+      target.state.doc,
+      target.state.selection.to,
     );
-    // 块拟合可能把插入点移到段落外，使用实际插入终点定位后续输入位置。
-    selectionToInsertionEnd(transaction, 0, 1);
-    const { $from } = transaction.selection;
-    if (
-      $from.parent.type === paragraph &&
-      $from.parent.textContent === pageBreak
-    ) {
-      // 文末或紧邻其他分页时补普通空段落，让后续输入不会改写分页标记。
-      const position = $from.parentOffset ? $from.after() : $from.before();
-      transaction.insert(position, paragraph.create());
-      transaction.setSelection(
-        TextSelection.create(transaction.doc, position + 1),
-      );
-    }
-    target.view.dispatch(transaction.scrollIntoView());
-    target.view.dispatch(
-      closeHistory(target.state.tr).setMeta("addToHistory", false),
+    if (position === null) return;
+    const marker = target.schema.nodes.paragraph.create(
+      null,
+      target.schema.text(pageBreak),
     );
-    target.view.focus();
+    // 改为顶层内容块之后插入，不再拆分光标所在段落，也不会替换选中文字。
+    const transaction = target.state.tr.insert(position, marker);
+    transaction.setSelection(
+      TextSelection.near(
+        transaction.doc.resolve(position + marker.nodeSize),
+        1,
+      ),
+    );
+    commitPagination(transaction);
+  }
+  function removePageBreak(index: number) {
+    if (!canEdit()) return;
+    const item = readPagination(editor!.state.doc).breaks[index];
+    if (!item) return;
+    deletePageBreakAt(editor!.view, item.position, !paginationOpen);
+  }
+  function applyPagination(base: EditorNode, candidate: EditorNode) {
+    if (!canEdit() || editor!.state.doc !== base || base.eq(candidate)) return;
+    const transaction = editor!.state.tr.replaceWith(
+      0,
+      base.content.size,
+      candidate.content,
+    );
+    transaction.setSelection(TextSelection.atStart(transaction.doc));
+    commitPagination(transaction);
+  }
+  function locatePage(position: number) {
+    if (!canEdit()) return;
+    // 先恢复正文焦点，让 ProseMirror 能从正文选区找到实际滚动视口。
+    editor!.view.focus();
+    // 定位只改变选区，不进入历史，也不回写 newsText。
+    editor!.view.dispatch(
+      editor!.state.tr
+        .setSelection(
+          TextSelection.near(editor!.state.doc.resolve(position), 1),
+        )
+        .scrollIntoView(),
+    );
+  }
+  function finishPaginationClose() {
+    const position = paginationLocation.current;
+    paginationLocation.current = null;
+    if (!canEdit()) return;
+    // 等弹框焦点锁释放后再定位，防止正文焦点被弹框抢回或外层抽屉误关闭。
+    if (position !== null) locatePage(position);
+    else editor!.view.focus();
   }
   function openLink() {
     if (!canEdit()) return;
@@ -714,13 +771,13 @@ export default function RichTextEditor({
     );
   }
   return (
-    // 外层不创建额外滚动容器；sticky 的负偏移补偿表单 p-4，吸顶后紧贴抽屉标题。
+    // 正文与元数据共用抽屉滚动视口，工具栏吸顶后紧贴抽屉标题。
     <div className="cms-rich-editor min-w-0 rounded-md border">
       <div
         ref={toolbar}
         role="toolbar"
         aria-label="正文工具栏"
-        className="sticky -top-4 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
+        className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
       >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -869,7 +926,28 @@ export default function RichTextEditor({
           fileSelection.current = editor!.state.selection.getBookmark();
           fileInput.current!.click();
         })}
-        {action("插入分页符", <SeparatorHorizontalIcon />, insertPageBreak)}
+        {action(
+          "插入分页符",
+          <SeparatorHorizontalIcon />,
+          insertPageBreak,
+          state?.paginationBoundary == null,
+        )}
+        <Button
+          type="button"
+          variant={paginationOpen ? "secondary" : "ghost"}
+          size="sm"
+          disabled={locked}
+          aria-expanded={paginationOpen}
+          aria-haspopup="dialog"
+          aria-controls="cms-pagination-assistant"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => {
+            if (canEdit()) setPaginationOpen(true);
+          }}
+        >
+          <BookOpenIcon data-icon="inline-start" />
+          分页助手
+        </Button>
         {action(
           "撤销",
           <UndoIcon />,
@@ -935,6 +1013,24 @@ export default function RichTextEditor({
       ) : (
         <EditorContent editor={editor} />
       )}
+      {/* 每次打开持有独立初稿；关闭卸载时只清除未应用的临时状态。 */}
+      {paginationOpen && state?.doc && !compatibility && (
+        <PaginationAssistant
+          title={title}
+          doc={state.doc}
+          locked={locked}
+          canInsert={state.paginationBoundary !== null}
+          onInsert={insertPageBreak}
+          onRemove={removePageBreak}
+          onApply={applyPagination}
+          onLocate={(position) => {
+            paginationLocation.current = position;
+            setPaginationOpen(false);
+          }}
+          onClose={() => setPaginationOpen(false)}
+          onAfterClose={finishPaginationClose}
+        />
+      )}
       <Dialog
         open={!!source}
         onOpenChange={(open) => {
@@ -956,7 +1052,10 @@ export default function RichTextEditor({
                 : "编辑当前正文的 HTML，应用后返回富文本编辑。仍需保存修改才写入 CMS。"}
             </DialogDescription>
           </DialogHeader>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <ScrollArea
+            className="flex-1"
+            viewportProps={{ className: "px-1 py-1" }}
+          >
             <Field data-invalid={!!sourceError} data-disabled={sourceLocked}>
               <FieldLabel htmlFor="cms-body-source">正文 HTML</FieldLabel>
               <Textarea
@@ -990,7 +1089,7 @@ export default function RichTextEditor({
                 </p>
               )}
             </Field>
-          </div>
+          </ScrollArea>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={closeSource}>
               取消

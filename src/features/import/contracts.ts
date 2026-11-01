@@ -1,13 +1,12 @@
 import { z } from "zod";
 
-// 五项处理设置随任务入队固定；保留天数只属于应用级清理规则。
+// 处理设置随任务入队固定；保留天数只属于应用级清理规则。
 export const harvestSettingsSchema = z.object({
   developerMode: z.boolean().default(false),
   autoClassify: z.boolean(),
   autoTags: z.boolean(),
   autoSummary: z.boolean(),
-  autoOrganize: z.boolean(),
-  autoPaginate: z.boolean(),
+  aiAutoPaginate: z.boolean().default(false),
   modelConfigId: z.string().min(1).max(100).nullable(),
   retentionDays: z.number().int().min(1).max(36500).nullable(),
 });
@@ -73,7 +72,7 @@ function statusText(job: HarvestJob): string {
           formatting: "格式化中",
           metadata: "生成元数据中",
           organizing: "整理正文中",
-          paginating: "内容分页中",
+          paginating: "AI 自动分页中",
           submitting: "提交 CMS 中",
         }[job.stage]
       : "处理中";

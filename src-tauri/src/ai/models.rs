@@ -158,7 +158,46 @@ impl AiModelConfig {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PaginationOptions {
+    pub min_chars: u32,
+    pub target_chars: u32,
+    pub max_chars: u32,
+}
+impl PaginationOptions {
+    pub fn validate(&self) -> Result<(), AiError> {
+        if self.min_chars == 0
+            || self.min_chars > self.target_chars
+            || self.target_chars > self.max_chars
+            || self.max_chars > 10_000
+        {
+            return Err(AiError::invalid(
+                "页长须满足：1 ≤ 最少字数 ≤ 目标字数 ≤ 最多字数 ≤ 10000",
+            ));
+        }
+        Ok(())
+    }
+}
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum TemplatePurpose {
+    #[default]
+    Title,
+    Pagination,
+}
+impl TemplatePurpose {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Title => "title",
+            Self::Pagination => "pagination",
+        }
+    }
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct PromptTemplate {
+    #[serde(default)]
+    pub purpose: TemplatePurpose,
+    pub pagination_options: Option<PaginationOptions>,
     pub id: String,
     pub name: String,
     pub system_prompt: String,
@@ -178,8 +217,20 @@ impl PromptTemplate {
             return Err(AiError::invalid("系统指令最多 20000 字符"));
         }
         rules(self.candidate_count, self.max_length)?;
-        super::titles::validate_variables(&self.system_prompt)?;
-        super::titles::validate_variables(&self.user_prompt)
+        match self.purpose {
+            TemplatePurpose::Title => {
+                super::titles::validate_variables(&self.system_prompt)?;
+                super::titles::validate_variables(&self.user_prompt)
+            }
+            TemplatePurpose::Pagination => {
+                self.pagination_options
+                    .as_ref()
+                    .ok_or_else(|| AiError::invalid("请配置分页页长"))?
+                    .validate()?;
+                super::pagination::validate_variables(&self.system_prompt)?;
+                super::pagination::validate_variables(&self.user_prompt)
+            }
+        }
     }
 }
 

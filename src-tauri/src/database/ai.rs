@@ -42,14 +42,25 @@ impl Database {
                 })
             })
             .collect::<Result<Vec<_>, AiError>>()?;
-        let rows =
-            sqlx::query("SELECT * FROM ai_prompt_templates ORDER BY is_default DESC,name,id")
-                .fetch_all(&self.pool)
-                .await?;
+        let rows = sqlx::query(
+            "SELECT * FROM ai_prompt_templates ORDER BY purpose DESC,is_default DESC,name,id",
+        )
+        .fetch_all(&self.pool)
+        .await?;
         let templates = rows
             .iter()
             .map(|r| {
                 Ok(PromptTemplate {
+                    purpose: match r.try_get::<&str, _>("purpose")? {
+                        "title" => TemplatePurpose::Title,
+                        "pagination" => TemplatePurpose::Pagination,
+                        _ => return Err(AiError::new("AI_STORAGE", "无效的模板用途")),
+                    },
+                    pagination_options: r
+                        .try_get::<Option<String>, _>("pagination_options")?
+                        .map(|v| serde_json::from_str(&v))
+                        .transpose()
+                        .map_err(|_| AiError::new("AI_STORAGE", "无效的分页参数"))?,
                     id: r.try_get("id")?,
                     name: r.try_get("name")?,
                     system_prompt: r.try_get("system_prompt")?,
@@ -132,6 +143,14 @@ impl Database {
     pub async fn ai_save_template(&self, r: &PromptTemplate) -> Result<(), AiError> {
         r.validate()?;
         let mut tx = self.pool.begin().await?;
+        let old: Option<String> =
+            sqlx::query_scalar("SELECT purpose FROM ai_prompt_templates WHERE id=?")
+                .bind(&r.id)
+                .fetch_optional(&mut *tx)
+                .await?;
+        if old.is_some_and(|v| v != r.purpose.as_str()) {
+            return Err(AiError::invalid("已有模板不能更换用途，请新增模板"));
+        }
         if let Some(id) = &r.model_config_id
             && sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM ai_models WHERE id=?")
                 .bind(id)
@@ -142,12 +161,16 @@ impl Database {
             return Err(AiError::invalid("绑定模型不存在，请重新选择"));
         }
         if r.is_default {
-            sqlx::query("UPDATE ai_prompt_templates SET is_default=0 WHERE is_default=1")
-                .execute(&mut *tx)
-                .await?;
+            sqlx::query(
+                "UPDATE ai_prompt_templates SET is_default=0 WHERE is_default=1 AND purpose=?",
+            )
+            .bind(r.purpose.as_str())
+            .execute(&mut *tx)
+            .await?;
         }
-        sqlx::query("INSERT INTO ai_prompt_templates VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,system_prompt=excluded.system_prompt,user_prompt=excluded.user_prompt,model_config_id=excluded.model_config_id,candidate_count=excluded.candidate_count,max_length=excluded.max_length,is_default=excluded.is_default")
+        sqlx::query("INSERT INTO ai_prompt_templates(id,name,system_prompt,user_prompt,model_config_id,candidate_count,max_length,is_default,purpose,pagination_options) VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,system_prompt=excluded.system_prompt,user_prompt=excluded.user_prompt,model_config_id=excluded.model_config_id,candidate_count=excluded.candidate_count,max_length=excluded.max_length,is_default=excluded.is_default,pagination_options=excluded.pagination_options")
             .bind(&r.id).bind(r.name.trim()).bind(&r.system_prompt).bind(&r.user_prompt).bind(&r.model_config_id).bind(r.candidate_count).bind(r.max_length).bind(r.is_default)
+            .bind(r.purpose.as_str()).bind(r.pagination_options.as_ref().map(serde_json::to_string).transpose().map_err(|_| AiError::invalid("无效的分页参数"))?)
             .execute(&mut *tx).await?;
         tx.commit().await?;
         Ok(())

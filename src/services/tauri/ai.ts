@@ -11,6 +11,9 @@ import {
   type AiModelConfig,
   type PromptTemplate,
   type TitleSuggestionRequest,
+  paginationRequestSchema,
+  paginationResultSchema,
+  type PaginationRequest,
 } from "@/features/ai/contracts";
 
 export const aiIpc = {
@@ -36,6 +39,10 @@ export const aiIpc = {
   suggest: (request: TitleSuggestionRequest) =>
     invokeCommand("ai_suggest_titles", suggestionResultSchema, {
       request: suggestionRequestSchema.parse(request),
+    }),
+  paginate: (request: PaginationRequest) =>
+    invokeCommand("ai_suggest_pagination", paginationResultSchema, {
+      request: paginationRequestSchema.parse(request),
     }),
   cancel: (jobId: string) => invokeCommand("ai_cancel", z.null(), { jobId }),
 };

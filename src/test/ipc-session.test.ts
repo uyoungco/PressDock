@@ -58,3 +58,40 @@ describe("IPC 会话边界", () => {
     unsubscribe();
   });
 });
+
+describe("IPC 字符串错误", () => {
+  it.each([
+    "Command ai_suggest_pagination not allowed by ACL",
+    "ai_suggest_pagination not allowed on any window/webview/URL context",
+    "ai_suggest_pagination not allowed. Permissions associated with this command: allow-ai-suggest-pagination",
+  ])("权限拒绝转换为中文提示：%s", async (message) => {
+    vi.mocked(invoke).mockRejectedValueOnce(message);
+    await expect(
+      invokeCommand("ai_suggest_pagination", z.unknown()),
+    ).rejects.toMatchObject({
+      code: "IPC_PERMISSION_DENIED",
+      message: "当前应用未开放此操作的调用权限，请更新应用后重试",
+    });
+  });
+  it.each([
+    "Command ai_suggest_pagination not found",
+    "unknown command ai_suggest_pagination",
+  ])("命令不可用转换为中文提示：%s", async (message) => {
+    vi.mocked(invoke).mockRejectedValueOnce(message);
+    await expect(
+      invokeCommand("ai_suggest_pagination", z.unknown()),
+    ).rejects.toMatchObject({
+      code: "IPC_COMMAND_UNAVAILABLE",
+      message: "当前应用版本不支持此操作，请更新应用后重试",
+    });
+  });
+  it("未知字符串不回显原始错误或敏感信息", async () => {
+    vi.mocked(invoke).mockRejectedValueOnce("演示内部错误 secret=demo-only");
+    await expect(
+      invokeCommand("ai_suggest_pagination", z.unknown()),
+    ).rejects.toMatchObject({
+      code: "IPC_ERROR",
+      message: "本地服务调用失败，请重试",
+    });
+  });
+});

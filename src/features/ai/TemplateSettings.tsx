@@ -1,3 +1,5 @@
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { useRef, useState } from "react";
 import { Copy, Plus, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,12 +23,17 @@ import { AiChoice, AiField } from "./fields";
 import {
   templateSchema,
   templateVariables,
+  paginationVariables,
+  defaultPaginationOptions,
   type PromptTemplate,
 } from "./contracts";
 import { aiService } from "./service";
 import { useAiSettings } from "./use-settings";
 
-const blank = (): PromptTemplate => ({
+const blank = (purpose: PromptTemplate["purpose"]): PromptTemplate => ({
+  purpose,
+  paginationOptions:
+    purpose === "pagination" ? { ...defaultPaginationOptions } : null,
   id: crypto.randomUUID(),
   name: "",
   systemPrompt: "你是一名严谨的新闻编辑。保留事实，不夸大、不编造。",
@@ -38,10 +45,21 @@ const blank = (): PromptTemplate => ({
   isDefault: false,
 });
 
-export function TemplateSettings({ active }: { active: boolean }) {
+export function TemplateSettings({
+  active,
+  initialPurpose = "title",
+}: {
+  active: boolean;
+  initialPurpose?: PromptTemplate["purpose"];
+}) {
   const { settings, loading, busy, error, run, refresh } =
     useAiSettings(active);
+  const [purpose, setPurpose] =
+    useState<PromptTemplate["purpose"]>(initialPurpose);
   const [draft, setDraft] = useState<PromptTemplate | null>(null);
+  const drafts = useRef<
+    Partial<Record<PromptTemplate["purpose"], PromptTemplate | null>>
+  >({});
   const [remove, setRemove] = useState<PromptTemplate | null>(null);
   const [target, setTarget] = useState<"systemPrompt" | "userPrompt">(
     "userPrompt",
@@ -49,6 +67,7 @@ export function TemplateSettings({ active }: { active: boolean }) {
   const systemRef = useRef<HTMLTextAreaElement>(null);
   const userRef = useRef<HTMLTextAreaElement>(null);
   const disabled = busy || loading;
+  const templates = settings.templates.filter((t) => t.purpose === purpose);
   function insert(name: string) {
     if (!draft) return;
     const input =
@@ -70,16 +89,46 @@ export function TemplateSettings({ active }: { active: boolean }) {
     });
   }
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          每个标题模板绑定一个模型；生成时可临时调整，不影响已保存模板。
+          每类模板分别设置默认项；生成时可临时选择模型，不影响已保存模板。
         </p>
-        <Button disabled={disabled} onClick={() => setDraft(blank())}>
-          <Plus />
+        <Button
+          disabled={disabled}
+          onClick={() => {
+            const next = blank(purpose);
+            if (purpose === "pagination") {
+              next.systemPrompt =
+                "判断相邻内容的语义绑定与自然边界。仅返回 bind_after、prefer_after 两个字符串数组。";
+              next.userPrompt = "标题：{{title}}\n内容块：{{blocks}}";
+            }
+            setDraft(next);
+          }}
+        >
+          <Plus data-icon="inline-start" />
           新增模板
         </Button>
       </div>
+      <ToggleGroup
+        type="single"
+        value={purpose}
+        disabled={disabled}
+        onValueChange={(value) => {
+          if (
+            (value === "title" || value === "pagination") &&
+            value !== purpose
+          ) {
+            drafts.current[purpose] = draft;
+            setPurpose(value);
+            setDraft(drafts.current[value] ?? null);
+          }
+        }}
+        aria-label="模板用途"
+      >
+        <ToggleGroupItem value="title">标题优化</ToggleGroupItem>
+        <ToggleGroupItem value="pagination">文章分页</ToggleGroupItem>
+      </ToggleGroup>
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -104,15 +153,17 @@ export function TemplateSettings({ active }: { active: boolean }) {
       <div className="grid min-w-0 gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
         <Card className="h-fit min-w-0 shadow-none">
           <CardHeader>
-            <CardTitle>标题模板</CardTitle>
+            <CardTitle>
+              {purpose === "title" ? "标题模板" : "分页模板"}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {!settings.templates.length && (
+          <CardContent className="flex flex-col gap-2">
+            {!templates.length && (
               <p className="text-sm text-muted-foreground">
                 暂无模板，请新增。
               </p>
             )}
-            {settings.templates.map((t) => (
+            {templates.map((t) => (
               <Button
                 key={t.id}
                 variant={draft?.id === t.id ? "secondary" : "ghost"}
@@ -121,7 +172,7 @@ export function TemplateSettings({ active }: { active: boolean }) {
                 onClick={() => setDraft({ ...t })}
               >
                 {t.isDefault && (
-                  <Star className="shrink-0 size-4" aria-label="默认模板" />
+                  <Star className="shrink-0" aria-label="默认模板" />
                 )}
                 {t.name}
               </Button>
@@ -133,12 +184,14 @@ export function TemplateSettings({ active }: { active: boolean }) {
             <CardHeader>
               <CardTitle>编辑提示词模板</CardTitle>
               <CardDescription>
-                变量会替换为本次编辑内容。AI 返回候选标题后，仍需人工核对事实。
+                {purpose === "title"
+                  ? "变量会替换为本次编辑内容。候选标题仍需核对事实。"
+                  : "AI 判断语义关系，本地按页长计算分页点；正文和图片不会由 AI 重写。"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form
-                className="space-y-4"
+                className="flex flex-col gap-4"
                 onSubmit={(event) => {
                   event.preventDefault();
                   void run(async () => {
@@ -172,46 +225,85 @@ export function TemplateSettings({ active }: { active: boolean }) {
                     setDraft({ ...draft, modelConfigId: value || null })
                   }
                 />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <AiField id="ai-template-count" label="默认候选数量">
-                    <Input
-                      id="ai-template-count"
-                      type="number"
-                      min={1}
-                      max={10}
-                      disabled={disabled}
-                      value={draft.candidateCount || ""}
-                      onChange={(e) =>
-                        setDraft({
-                          ...draft,
-                          candidateCount: Number(e.target.value),
-                        })
-                      }
-                    />
-                  </AiField>
-                  <AiField id="ai-template-length" label="标题最大字数">
-                    <Input
-                      id="ai-template-length"
-                      type="number"
-                      min={1}
-                      max={200}
-                      disabled={disabled}
-                      value={draft.maxLength || ""}
-                      onChange={(e) =>
-                        setDraft({
-                          ...draft,
-                          maxLength: Number(e.target.value),
-                        })
-                      }
-                    />
-                  </AiField>
-                </div>
-                <div className="space-y-2">
+                {draft.purpose === "title" ? (
+                  <FieldGroup className="grid sm:grid-cols-2">
+                    <AiField id="ai-template-count" label="默认候选数量">
+                      <Input
+                        id="ai-template-count"
+                        type="number"
+                        min={1}
+                        max={10}
+                        disabled={disabled}
+                        value={draft.candidateCount || ""}
+                        onChange={(e) =>
+                          setDraft({
+                            ...draft,
+                            candidateCount: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </AiField>
+                    <AiField id="ai-template-length" label="标题最大字数">
+                      <Input
+                        id="ai-template-length"
+                        type="number"
+                        min={1}
+                        max={200}
+                        disabled={disabled}
+                        value={draft.maxLength || ""}
+                        onChange={(e) =>
+                          setDraft({
+                            ...draft,
+                            maxLength: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </AiField>
+                  </FieldGroup>
+                ) : (
+                  <FieldGroup className="grid sm:grid-cols-3">
+                    {(
+                      [
+                        ["minChars", "建议最少字数"],
+                        ["targetChars", "目标字数"],
+                        ["maxChars", "建议最多字数"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <Field key={key}>
+                        <FieldLabel htmlFor={`ai-pagination-${key}`}>
+                          {label}
+                        </FieldLabel>
+                        <Input
+                          id={`ai-pagination-${key}`}
+                          type="number"
+                          min={1}
+                          max={10000}
+                          disabled={disabled}
+                          value={draft.paginationOptions?.[key] ?? ""}
+                          onChange={(e) =>
+                            setDraft({
+                              ...draft,
+                              paginationOptions: {
+                                ...(draft.paginationOptions ??
+                                  defaultPaginationOptions),
+                                [key]: Number(e.target.value),
+                              },
+                            })
+                          }
+                        />
+                      </Field>
+                    ))}
+                  </FieldGroup>
+                )}
+                <div className="flex flex-col gap-2">
                   <p className="text-sm font-medium">
                     插入变量（插入最近聚焦的提示词）
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {templateVariables.map((name) => (
+                    {(purpose === "title"
+                      ? templateVariables
+                      : paginationVariables
+                    ).map((name) => (
                       <Button
                         key={name}
                         type="button"
@@ -223,7 +315,9 @@ export function TemplateSettings({ active }: { active: boolean }) {
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    title：当前标题；content：正文或摘要；count：数量；max_length：最大字数；requirements：补充要求。
+                    {purpose === "title"
+                      ? "title：当前标题；content：正文或摘要；count：数量；max_length：最大字数；requirements：补充要求。"
+                      : "title：当前标题；blocks：编号内容块。页长不受提示词中的字数要求控制，请修改上方参数。"}
                   </p>
                 </div>
                 <AiField id="ai-template-system" label="系统指令">
@@ -280,7 +374,7 @@ export function TemplateSettings({ active }: { active: boolean }) {
                       })
                     }
                   >
-                    <Copy />
+                    <Copy data-icon="inline-start" />
                     复制模板
                   </Button>
                   {settings.templates.some((t) => t.id === draft.id) && (
@@ -290,7 +384,7 @@ export function TemplateSettings({ active }: { active: boolean }) {
                       disabled={disabled}
                       onClick={() => setRemove(draft)}
                     >
-                      <Trash2 />
+                      <Trash2 data-icon="inline-start" />
                       删除模板
                     </Button>
                   )}

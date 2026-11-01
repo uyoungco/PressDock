@@ -5,7 +5,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
 } from "@/components/ui/select";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 export function AiField({
   id,
@@ -19,15 +21,13 @@ export function AiField({
   children: ReactNode;
 }) {
   return (
-    <div className="min-w-0 space-y-2">
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-      </label>
+    <Field className="min-w-0">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
       {children}
       {hint && (
         <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p>
       )}
-    </div>
+    </Field>
   );
 }
 export function AiChoice({
@@ -71,11 +71,13 @@ export function AiChoice({
           <SelectValue />
         </SelectTrigger>
         <SelectContent portalContainer={portalContainer ?? undefined}>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
+          <SelectGroup>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
     </AiField>

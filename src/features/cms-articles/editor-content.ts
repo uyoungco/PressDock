@@ -5,8 +5,9 @@ import TextAlign from "@tiptap/extension-text-align";
 import { Placeholder } from "@tiptap/extensions";
 import { DOMParser as SchemaParser, DOMSerializer } from "@tiptap/pm/model";
 import DOMPurify from "dompurify";
+import { CmsPagination, pageBreak } from "./editor-page-break";
 
-export const pageBreak = "[!--empirenews.page--]";
+export { pageBreak } from "./editor-page-break";
 const dimensions = ["width", "height", "max-width", "max-height"];
 const blocks = new Set([
   "P",
@@ -78,6 +79,7 @@ export const editorExtensions = [
   }).configure({ inline: true, allowBase64: false }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
   Placeholder.configure({ placeholder: "请输入正文…" }),
+  CmsPagination,
   Extension.create({
     name: "cmsCaption",
     addGlobalAttributes() {
