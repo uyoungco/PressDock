@@ -13,6 +13,7 @@ pub struct HarvestService {
     active: Mutex<Option<Arc<Context>>>,
     pub(crate) maintenance_warning: Option<String>,
     pub(super) source_ready: watch::Sender<webview::Readiness>,
+    pub(super) cdp: tokio::sync::Mutex<Option<cdp::Browser>>,
 }
 #[derive(Clone, Copy)]
 enum Stop {
@@ -24,6 +25,11 @@ pub(super) struct Context {
     pub id: String,
     user_id: i64,
     pub generation: u64,
+    source_mode: SourceMode,
+    pub source_interaction: watch::Sender<Option<SourceInteraction>>,
+    pub selected_tab: watch::Sender<Option<String>>,
+    pub cdp_client: Mutex<Option<Arc<cdp::Client>>>,
+    pub cdp_target: Mutex<Option<cdp::Active>>,
     developer_mode: bool,
     attempt: i64,
     cancelled: watch::Sender<Stop>,
@@ -130,11 +136,12 @@ impl HarvestService {
             active: Mutex::new(None),
             maintenance_warning,
             source_ready: watch::channel(webview::Readiness::Loading).0,
+            cdp: tokio::sync::Mutex::new(None),
         }
     }
     pub(super) fn source_event(&self, app: &AppHandle, step: &str, data: Value) {
         let active = self.active.lock().ok().and_then(|active| active.clone());
-        if let Some(context) = active {
+        if let Some(context) = active.filter(|context| context.source_mode == SourceMode::Webview) {
             context.trace(app, step, "state", || data);
             // 真实销毁也唤醒等待验证的任务，使其报告关闭，而不是无限等待继续按钮。
             if step == "source.window.destroyed" {
@@ -147,7 +154,47 @@ impl HarvestService {
             && let Some(active) = active.as_ref()
         {
             active.cancelled.send_replace(Stop::Session);
+            if let Some(client) = active.cdp_client.lock().expect("活动 CDP 连接锁").as_ref() {
+                client.close();
+            }
         }
+        if let Ok(mut cached) = self.cdp.try_lock()
+            && let Some(browser) = cached.take()
+        {
+            browser.close();
+        }
+    }
+    pub(crate) fn decorate_jobs(&self, jobs: &mut [Job], user: i64) {
+        if let Ok(active) = self.active.lock()
+            && let Some(context) = active.as_ref().filter(|context| context.user_id == user)
+        {
+            for job in jobs
+                .iter_mut()
+                .filter(|job| job.id == context.id && job.status == Status::WaitingUser)
+            {
+                job.source_interaction = context.source_interaction.borrow().clone();
+            }
+        }
+    }
+    pub(crate) async fn select_source_tab(
+        &self,
+        app: &AppHandle,
+        id: &str,
+        user: i64,
+        target_id: &str,
+    ) -> Result<(), HarvestError> {
+        let job = app.state::<Database>().harvest_view(id, user).await?;
+        let context = self
+            .active
+            .lock()
+            .expect("活动采集任务锁")
+            .clone()
+            .filter(|context| context.id == id && context.user_id == user)
+            .ok_or_else(|| HarvestError::invalid("采集任务已中断，请重试"))?;
+        if job.status != Status::WaitingUser || job.source_mode != SourceMode::Cdp {
+            return Err(HarvestError::invalid("当前任务没有等待选择浏览器标签页"));
+        }
+        cdp::select_tab(app, &context, target_id).await
     }
     pub(crate) async fn action(
         &self,
@@ -204,12 +251,33 @@ impl HarvestService {
                 }
                 db.harvest_delete(id, user).await?;
             }
-            Action::Show if job.status == Status::WaitingUser => webview::show(app)?,
+            Action::Show if job.status == Status::WaitingUser => {
+                if job.source_mode == SourceMode::Cdp {
+                    let target = active
+                        .as_ref()
+                        .and_then(|context| {
+                            context
+                                .cdp_target
+                                .lock()
+                                .expect("活动 CDP 标签页锁")
+                                .clone()
+                        })
+                        .ok_or_else(|| HarvestError::invalid("请先选择采集标签页"))?;
+                    target.show().await?;
+                } else {
+                    webview::show(app)?;
+                }
+            }
             Action::Resume if job.status == Status::WaitingUser => {
-                active
-                    .ok_or_else(|| HarvestError::invalid("采集任务已中断，请重试"))?
-                    .resume
-                    .notify_one();
+                let context =
+                    active.ok_or_else(|| HarvestError::invalid("采集任务已中断，请重试"))?;
+                if matches!(
+                    *context.source_interaction.borrow(),
+                    Some(SourceInteraction::SelectTab { .. })
+                ) {
+                    return Err(HarvestError::invalid("请先选择采集标签页"));
+                }
+                context.resume.notify_one();
             }
             _ => db.harvest_action(id, user, &action).await?,
         }
@@ -235,7 +303,8 @@ async fn process(
         app,
         "start",
         "input",
-        || json!({"job":stored.job,"options":options}),
+        // 调试地址可能携带连接凭据，不随任务配置写入 Console 日志。
+        || json!({"job":stored.job,"options":{"sourceMode":options.source_mode,"cdpBrowser":options.cdp_browser,"developerMode":options.developer_mode,"autoClassify":options.auto_classify,"autoTags":options.auto_tags,"autoSummary":options.auto_summary,"aiAutoPaginate":options.ai_auto_paginate,"modelConfigId":options.model_config_id}}),
     );
     let article = if let Some(prepared) = stored.prepared {
         context.trace(
@@ -263,7 +332,7 @@ async fn process(
             );
             raw
         } else {
-            let (raw, final_url) = webview::collect(app, context, &stored.job.url).await?;
+            let (raw, final_url) = source::collect(app, context, &stored.job.url, options).await?;
             db.harvest_save_raw(&context.id, &raw, &final_url).await?;
             context.trace(
                 app,
@@ -481,6 +550,11 @@ pub fn start(app: AppHandle) {
                 id: job.job.id.clone(),
                 user_id: user,
                 generation,
+                source_mode: job.options.processing.source_mode,
+                source_interaction: watch::channel(None).0,
+                selected_tab: watch::channel(None).0,
+                cdp_client: Mutex::new(None),
+                cdp_target: Mutex::new(None),
                 developer_mode: job.options.processing.developer_mode,
                 attempt: job.job.attempts,
                 cancelled,

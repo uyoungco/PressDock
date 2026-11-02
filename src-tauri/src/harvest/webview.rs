@@ -1,9 +1,9 @@
+use super::source::{SNAPSHOT, Snapshot};
 use super::*;
 use crate::error::Diagnostic;
 use serde::Deserialize;
 use serde_json::json;
 use std::{
-    collections::HashSet,
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
@@ -11,43 +11,6 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder}
 use tokio::sync::oneshot;
 
 const LABEL: &str = "harvest-source";
-// 静态脚本只返回页面快照；不暴露 invoke，也不把 CMS 会话或密钥注入来源网页。
-const SNAPSHOT: &str = r#"(() => {
- const roots=[...document.querySelectorAll('div[data-testid="article"]')];
- const title=document.querySelector('#header > div:nth-child(1)')?.textContent?.trim() || '';
- const writer=document.querySelector('p[data-testid="author-name"]')?.textContent?.trim() || '';
- const ready=['interactive','complete'].includes(document.readyState) && roots.some(e=>e.textContent.trim() || e.querySelector('img,video,audio,iframe'));
- if(!ready) return {readyState:document.readyState,articleCount:roots.length,url:location.href,title,writer,html:'',next:null,documentToken:window.__pressdockHarvestPreviousDocument || null};
- const html=roots.map(root=>{
-  const copy=root.cloneNode(true);
-  copy.querySelectorAll('span[data-testid="report-btn"]').forEach(e=>e.remove());
-  const walker=document.createTreeWalker(copy,NodeFilter.SHOW_COMMENT); const comments=[];
-  while(walker.nextNode())comments.push(walker.currentNode); comments.forEach(e=>e.remove());
-  const originals=[...root.querySelectorAll('img')];
-  copy.querySelectorAll('img').forEach((image,index)=>{ const source=originals[index]; const src=source?.getAttribute('data-src') || source?.currentSrc || image.getAttribute('src'); if(src)try{image.setAttribute('src',new URL(src,location.href).href)}catch{} });
-  [copy,...copy.querySelectorAll('*')].forEach(e=>{
-   ['class','href','style'].forEach(a=>e.removeAttribute(a));
-  }); return copy.outerHTML;
- }).join('');
- return {readyState:document.readyState,articleCount:roots.length,url:location.href,title,writer,html,next:document.querySelector('a.next-page')?.getAttribute('href') || null,documentToken:window.__pressdockHarvestPreviousDocument || null};
- })()"#;
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Snapshot {
-    #[serde(default)]
-    url: String,
-    #[serde(default)]
-    title: String,
-    #[serde(default)]
-    writer: String,
-    #[serde(default)]
-    html: String,
-    next: Option<String>,
-    document_token: Option<String>,
-    ready_state: String,
-    article_count: usize,
-}
 #[derive(Deserialize, serde::Serialize)]
 struct ScriptError {
     name: String,
@@ -269,7 +232,10 @@ async fn evaluate(window: &WebviewWindow, script: &str) -> Result<serde_json::Va
     }
     Ok(evaluation.value.unwrap_or(serde_json::Value::Null))
 }
-async fn navigate(window: &WebviewWindow, url: &url::Url) -> Result<String, HarvestError> {
+pub(super) async fn navigate(
+    window: &WebviewWindow,
+    url: &url::Url,
+) -> Result<String, HarvestError> {
     // navigate 异步生效；标记旧文档，避免把上一页或用户手动打开的页面当作本页。
     let token = uuid::Uuid::new_v4().to_string();
     evaluate(
@@ -283,7 +249,7 @@ async fn navigate(window: &WebviewWindow, url: &url::Url) -> Result<String, Harv
     window.navigate(url.clone())?;
     Ok(token)
 }
-async fn snapshot(window: &WebviewWindow) -> Result<Snapshot, HarvestError> {
+pub(super) async fn snapshot(window: &WebviewWindow) -> Result<Snapshot, HarvestError> {
     let value = evaluate(window, SNAPSHOT).await?;
     serde_json::from_value(value.clone()).map_err(|error| {
         HarvestError::new("HARVEST_WEBVIEW_DATA", "来源页面快照格式无效").diagnosed(
@@ -295,192 +261,22 @@ async fn snapshot(window: &WebviewWindow) -> Result<Snapshot, HarvestError> {
         )
     })
 }
-pub(super) async fn collect(
+pub(super) async fn open(
     app: &AppHandle,
     context: &worker::Context,
-    url: &str,
-) -> Result<(RawArticle, String), HarvestError> {
-    let window_started = Instant::now();
+) -> Result<WebviewWindow, HarvestError> {
+    let started = Instant::now();
     let reused = app.get_webview_window(LABEL).is_some();
     let window = window(app).await?;
-    context.trace(app, "source.window", "state", || json!({"window":LABEL,"reused":reused,"ready":true,"elapsedMs":window_started.elapsed().as_millis()}));
+    context.trace(app, "source.window", "state", || json!({"window":LABEL,"reused":reused,"ready":true,"elapsedMs":started.elapsed().as_millis()}));
     let _ = window.hide();
-    let mut next = source_url(url)?;
-    let mut visited = HashSet::new();
-    let mut parts = Vec::new();
-    let mut first_title = String::new();
-    let mut first_writer = String::new();
-    let mut final_url = String::new();
-    for page_index in 0..30 {
-        if !visited.insert(next.to_string()) {
-            return Err(HarvestError::new(
-                "HARVEST_PAGINATION",
-                "来源分页循环，未提交不完整文章",
-            ));
-        }
-        context.trace(
-            app,
-            "source.navigation",
-            "input",
-            || json!({"page":page_index+1,"url":next.as_str()}),
-        );
-        let mut previous_document = navigate(&window, &next).await?;
-        let mut last_title = String::new();
-        let page = loop {
-            let started = Instant::now();
-            let deadline = started + Duration::from_secs(30);
-            let mut found = None;
-            let mut read_errors = 0;
-            let mut last_error = None;
-            let mut last_snapshot = None;
-            while Instant::now() < deadline {
-                if app.get_webview_window(LABEL).is_none() {
-                    return Err(closed(&window));
-                }
-                let snapshot = snapshot(&window).await;
-                let page = match snapshot {
-                    Ok(page) => page,
-                    Err(error) => {
-                        if matches!(error.code, "HARVEST_PAGE_LIMIT" | "HARVEST_WEBVIEW_CLOSED") {
-                            return Err(error);
-                        }
-                        read_errors += 1;
-                        let signature = format!(
-                            "{}:{}:{:?}",
-                            error.code,
-                            error.message,
-                            error
-                                .diagnostic
-                                .as_ref()
-                                .map(|diagnostic| &diagnostic.causes)
-                        );
-                        if last_error.as_ref().map(|(last, _)| last) != Some(&signature) {
-                            context.error(app, "source.snapshot", &error, || json!({"page":page_index+1,"url":next.as_str(),"readErrors":read_errors,"elapsedMs":started.elapsed().as_millis()}));
-                        }
-                        last_error = Some((signature, error));
-                        tokio::time::sleep(Duration::from_millis(250)).await;
-                        continue;
-                    }
-                };
-                last_snapshot = Some(
-                    json!({"url":page.url,"title":page.title,"readyState":page.ready_state,"articleCount":page.article_count,"previousDocument":page.document_token.as_deref()==Some(previous_document.as_str())}),
-                );
-                {
-                    if page.document_token.as_deref() == Some(previous_document.as_str()) {
-                        tokio::time::sleep(Duration::from_millis(250)).await;
-                        continue;
-                    }
-                    if page_index == 0 && !page.title.is_empty() && page.title != last_title {
-                        context.title(app, &page.title).await?;
-                        last_title = page.title.clone();
-                    }
-                    if !page.html.is_empty() {
-                        source_url(&page.url)?;
-                        found = Some(page);
-                        break;
-                    }
-                }
-                tokio::time::sleep(Duration::from_millis(250)).await;
-            }
-            if let Some(page) = found {
-                context.trace(app, "source.navigation", "output", || json!({"page":page_index+1,"url":page.url,"elapsedMs":started.elapsed().as_millis(),"readErrors":read_errors}));
-                break page;
-            }
-            if let Some((_, error)) = &last_error {
-                context.error(app, "source.wait", error, || json!({"page":page_index+1,"url":next.as_str(),"elapsedMs":started.elapsed().as_millis(),"readErrors":read_errors,"lastSnapshot":last_snapshot}));
-            }
-            context.trace(app, "source.wait", "state", || json!({"page":page_index+1,"url":next.as_str(),"elapsedMs":started.elapsed().as_millis(),"readErrors":read_errors,"lastSnapshot":last_snapshot}));
-            context
-                .progress(app, Status::WaitingUser, Stage::Collecting)
-                .await?;
-            context.trace(
-                app,
-                "source.verification",
-                "state",
-                || json!({"page":page_index+1,"reason":"正文等待超时，请完成来源验证后继续"}),
-            );
-            window.show()?;
-            window.set_focus()?;
-            context.resume.notified().await;
-            if app.get_webview_window(LABEL).is_none() {
-                return Err(closed(&window));
-            }
-            context
-                .progress(app, Status::Running, Stage::Collecting)
-                .await?;
-            // 验证后从本任务的原链接重新导航，沿用已登录会话和正常重定向。
-            // 这样既支持 mbd→百家号回跳，也不会提交用户验证期间另行打开的文章。
-            let _ = window.hide();
-            context.trace(app, "source.navigation", "input", || json!({"page":page_index+1,"url":next.as_str(),"reason":"验证后重新加载任务链接"}));
-            previous_document = navigate(&window, &next).await?;
-        };
-        if page_index == 0 {
-            first_title = page.title.clone();
-            first_writer = page.writer.clone();
-            final_url = page.url.clone();
-        }
-        let current = source_url(&page.url)?;
-        if current != next && !visited.insert(current.to_string()) {
-            return Err(HarvestError::new(
-                "HARVEST_PAGINATION",
-                "来源分页重定向到已采页面，未提交不完整文章",
-            ));
-        }
-        context.trace(app, "source.page", "output", || json!({"page":page_index+1,"url":page.url,"title":page.title,"writer":page.writer,"html":page.html,"next":page.next}));
-        parts.push(page.html);
-        if parts.iter().map(String::len).sum::<usize>() > 16 * 1024 * 1024 {
-            return Err(HarvestError::new(
-                "HARVEST_PAGE_LIMIT",
-                "合并正文超过 16 MiB",
-            ));
-        }
-        app.state::<crate::database::Database>()
-            .harvest_save_partial(
-                &context.id,
-                &RawArticle {
-                    title: first_title.clone(),
-                    writer: first_writer.clone(),
-                    source_url: url.into(),
-                    news_html: parts.join("\n"),
-                },
-            )
-            .await?;
-        if first_title.trim().is_empty() {
-            return Err(HarvestError::new(
-                "HARVEST_TITLE",
-                "未提取到文章标题，未提交文章",
-            ));
-        }
-        match page.next {
-            Some(link) => {
-                if page_index == 29 {
-                    return Err(HarvestError::new(
-                        "HARVEST_PAGINATION",
-                        "来源超过 30 页，未提交不完整文章",
-                    ));
-                }
-                let joined = current.join(&link).map_err(|error| {
-                    HarvestError::invalid("来源分页链接无效").diagnosed(Diagnostic::error(
-                        "source.pagination.url",
-                        &error,
-                        json!({"page":page_index+1,"url":current.as_str()}),
-                    ))
-                })?;
-                next = source_url(joined.as_str())?;
-            }
-            None => break,
-        }
+    Ok(window)
+}
+pub(super) fn ensure_open(app: &AppHandle, window: &WebviewWindow) -> Result<(), HarvestError> {
+    if app.get_webview_window(LABEL).is_none() {
+        return Err(closed(window));
     }
-    let _ = window.hide();
-    Ok((
-        RawArticle {
-            title: first_title,
-            writer: first_writer,
-            source_url: url.into(),
-            news_html: parts.join("\n"),
-        },
-        final_url,
-    ))
+    Ok(())
 }
 pub(super) fn show(app: &AppHandle) -> Result<(), HarvestError> {
     let window = app

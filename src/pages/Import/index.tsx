@@ -22,6 +22,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
 import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
@@ -127,6 +136,16 @@ export default function ImportPage() {
   const notificationError = useAtomValue(harvestNotificationErrorAtom);
   const maintenanceWarning = list.data?.maintenanceWarning;
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
+  // 弹窗读取实时任务数据，候选失效、任务结束或换号后不保留旧候选。
+  const selectingJob = jobs.find(
+    (job) => job.id === selectingId && job.status === "waitingUser",
+  );
+  const selectingTabs =
+    selectingJob?.sourceInteraction?.kind === "selectTab"
+      ? selectingJob.sourceInteraction.tabs
+      : null;
   const [confirm, setConfirm] = useState<{
     job: HarvestJob;
     action: "confirmSubmitted" | "confirmNotSubmitted" | "delete";
@@ -232,26 +251,43 @@ export default function ImportPage() {
         meta: { label: "操作" },
         cell: ({ row: { original: job } }) => (
           <div className="flex flex-wrap gap-1">
-            {job.status === "waitingUser" && (
-              <>
+            {job.status === "waitingUser" &&
+              job.sourceInteraction?.kind === "selectTab" && (
                 <Button
                   variant="outline"
                   size="xs"
                   disabled={busyId === job.id}
-                  onClick={() => void act(job, "show")}
+                  onClick={() => {
+                    setSelectedTarget(null);
+                    setSelectingId(job.id);
+                  }}
                 >
-                  打开来源窗口
+                  选择标签页
                 </Button>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  disabled={busyId === job.id}
-                  onClick={() => void act(job, "resume")}
-                >
-                  验证完成，继续
-                </Button>
-              </>
-            )}
+              )}
+            {job.status === "waitingUser" &&
+              job.sourceInteraction?.kind !== "selectTab" && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    disabled={busyId === job.id}
+                    onClick={() => void act(job, "show")}
+                  >
+                    {job.sourceMode === "cdp"
+                      ? "打开浏览器标签页"
+                      : "打开来源窗口"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    disabled={busyId === job.id}
+                    onClick={() => void act(job, "resume")}
+                  >
+                    验证完成，继续
+                  </Button>
+                </>
+              )}
             {["queued", "running", "waitingUser"].includes(job.status) && (
               <Button
                 variant="ghost"
@@ -490,6 +526,86 @@ export default function ImportPage() {
           </CardContent>
         </Card>
       </div>
+      <Dialog
+        open={selectingTabs !== null}
+        onOpenChange={(open) => {
+          if (!open && !busyId) setSelectingId(null);
+        }}
+      >
+        <DialogContent>
+          <DialogTitle>选择采集标签页</DialogTitle>
+          <DialogDescription>
+            同一文章链接匹配了多个标签页，请选择要读取的页面。关闭弹窗后任务继续等待，可稍后重新选择或取消任务。
+          </DialogDescription>
+          <FieldSet>
+            <FieldLegend className="sr-only">候选标签页</FieldLegend>
+            <FieldGroup className="max-h-80 overflow-y-auto">
+              {selectingTabs?.map((tab) => (
+                <Field key={tab.targetId} orientation="horizontal">
+                  <input
+                    id={`harvest-tab-${tab.targetId}`}
+                    type="radio"
+                    name="harvest-source-tab"
+                    className="mt-1 size-4 accent-primary"
+                    value={tab.targetId}
+                    checked={selectedTarget === tab.targetId}
+                    disabled={!!busyId}
+                    onChange={() => setSelectedTarget(tab.targetId)}
+                  />
+                  <FieldContent className="min-w-0">
+                    <FieldLabel htmlFor={`harvest-tab-${tab.targetId}`}>
+                      {tab.title || "无标题"}
+                    </FieldLabel>
+                    <FieldDescription className="break-all">
+                      {tab.url}
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              ))}
+              {selectingTabs?.length === 0 && (
+                <FieldDescription>
+                  候选标签页均已失效，请关闭弹窗，取消任务后重试。
+                </FieldDescription>
+              )}
+            </FieldGroup>
+          </FieldSet>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              disabled={!!busyId}
+              onClick={() => setSelectingId(null)}
+            >
+              稍后选择
+            </Button>
+            <Button
+              disabled={
+                !!busyId ||
+                !selectingTabs?.some((tab) => tab.targetId === selectedTarget)
+              }
+              onClick={() => {
+                if (!selectingJob || !selectedTarget || actionLock.current)
+                  return;
+                actionLock.current = true;
+                setBusyId(selectingJob.id);
+                void importService
+                  .selectSourceTab(selectingJob.id, selectedTarget)
+                  .then(() => setSelectingId(null))
+                  .catch((reason) => toast.error(message(reason)))
+                  .finally(() => {
+                    actionLock.current = false;
+                    setBusyId(null);
+                    void invalidateBusinessQueries(
+                      client,
+                      businessKeys.harvest(userId),
+                    );
+                  });
+              }}
+            >
+              读取所选标签页
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={!!confirm}
         onOpenChange={(open) => {

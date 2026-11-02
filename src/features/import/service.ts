@@ -16,7 +16,14 @@ export const importService = {
   },
   list: harvestIpc.list,
   subscribe: harvestIpc.subscribe,
-  action: harvestIpc.action,
+  // 切换获取方式后立即重试也先补存，后端只刷新任务的获取配置。
+  action: (id: string, action: Parameters<typeof harvestIpc.action>[1]) =>
+    action === "retry"
+      ? harvestSettingsService.withSavedSettings(() =>
+          harvestIpc.action(id, action),
+        )
+      : harvestIpc.action(id, action),
+  selectSourceTab: harvestIpc.selectSourceTab,
   settings: harvestSettingsService.load,
   settingsAutosave: harvestSettingsService,
   openSource: (url: string) => cmsIpc.openLink(importUrlSchema.parse(url)),

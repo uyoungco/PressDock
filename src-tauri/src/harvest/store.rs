@@ -12,6 +12,8 @@ fn enum_value<T: DeserializeOwned>(value: &str) -> Result<T, HarvestError> {
 }
 fn job_row(row: &SqliteRow) -> Result<Job, HarvestError> {
     Ok(Job {
+        source_mode: enum_value(row.try_get("source_mode")?)?,
+        source_interaction: None,
         developer_mode: row.try_get("developer_mode")?,
         id: row.try_get("id")?,
         url: row.try_get("url")?,
@@ -87,18 +89,18 @@ impl Database {
         if NaiveDate::parse_from_str(date, "%Y-%m-%d").is_err() || date.len() != 10 {
             return Err(HarvestError::invalid("采集日期须为 YYYY-MM-DD"));
         }
-        let rows=sqlx::query("SELECT id,url,title,collection_date,status,stage,warnings,error,attempts,created_at,updated_at,cms_article_id,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode FROM harvest_jobs WHERE user_id=? AND collection_date=? ORDER BY created_at DESC,id DESC")
+        let rows=sqlx::query("SELECT id,url,title,collection_date,status,stage,warnings,error,attempts,created_at,updated_at,cms_article_id,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(options,'$.sourceMode'),'webview') AS source_mode FROM harvest_jobs WHERE user_id=? AND collection_date=? ORDER BY created_at DESC,id DESC")
             .bind(user).bind(date).fetch_all(&self.pool).await?;
         rows.iter().map(job_row).collect()
     }
     pub(crate) async fn harvest_view(&self, id: &str, user: i64) -> Result<Job, HarvestError> {
         // 列表和操作只读轻量字段，避免每次状态刷新反复加载完整 HTML/payload。
-        let row=sqlx::query("SELECT id,url,title,collection_date,status,stage,warnings,error,attempts,created_at,updated_at,cms_article_id,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode FROM harvest_jobs WHERE id=? AND user_id=?")
+        let row=sqlx::query("SELECT id,url,title,collection_date,status,stage,warnings,error,attempts,created_at,updated_at,cms_article_id,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(options,'$.sourceMode'),'webview') AS source_mode FROM harvest_jobs WHERE id=? AND user_id=?")
             .bind(id).bind(user).fetch_optional(&self.pool).await?.ok_or_else(||HarvestError::invalid("采集任务不存在或不属于当前账号"))?;
         job_row(&row)
     }
     pub(crate) async fn harvest_job(&self, id: &str, user: i64) -> Result<StoredJob, HarvestError> {
-        let row=sqlx::query("SELECT h.*,COALESCE(json_extract(h.options,'$.developerMode'),0) AS developer_mode,s.title AS raw_title,s.content AS raw_html FROM harvest_jobs h LEFT JOIN source_articles s ON s.id=h.source_id WHERE h.id=? AND h.user_id=?")
+        let row=sqlx::query("SELECT h.*,COALESCE(json_extract(h.options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(h.options,'$.sourceMode'),'webview') AS source_mode,s.title AS raw_title,s.content AS raw_html FROM harvest_jobs h LEFT JOIN source_articles s ON s.id=h.source_id WHERE h.id=? AND h.user_id=?")
             .bind(id).bind(user).fetch_optional(&self.pool).await?.ok_or_else(||HarvestError::invalid("采集任务不存在或不属于当前账号"))?;
         let raw = row
             .try_get::<Option<String>, _>("raw_html")?
@@ -155,7 +157,7 @@ impl Database {
         let time = now();
         let mut tx = self.pool.begin().await?;
         // 请求 ID 保持幂等；账号、来源、任务模式分别去重，调试结果不阻挡之后的正常采集。
-        if let Some(row) = sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode FROM harvest_jobs WHERE id=?")
+        if let Some(row) = sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(options,'$.sourceMode'),'webview') AS source_mode FROM harvest_jobs WHERE id=?")
             .bind(&request.id)
             .fetch_optional(&mut *tx)
             .await?
@@ -170,7 +172,7 @@ impl Database {
         sqlx::query("INSERT INTO harvest_jobs(id,user_id,url,normalized_url,collection_date,timezone,status,options,created_at,updated_at) VALUES(?,?,?,?,?,?,'queued',?,?,?) ON CONFLICT DO NOTHING")
             .bind(&request.id).bind(user).bind(request.url.trim()).bind(&normalized).bind(local.format("%Y-%m-%d").to_string()).bind(local.format("%:z").to_string())
             .bind(serde_json::to_string(&job_options)?).bind(&time).bind(&time).execute(&mut *tx).await?;
-        let row = sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode FROM harvest_jobs WHERE user_id=? AND normalized_url=? AND COALESCE(json_extract(options,'$.developerMode'),0)=?")
+        let row = sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(options,'$.sourceMode'),'webview') AS source_mode FROM harvest_jobs WHERE user_id=? AND normalized_url=? AND COALESCE(json_extract(options,'$.developerMode'),0)=?")
             .bind(user)
             .bind(normalized)
             .bind(options.developer_mode)
@@ -326,8 +328,14 @@ impl Database {
             }
             _ => return Err(HarvestError::invalid("当前任务状态不允许此操作")),
         };
-        let result=sqlx::query("UPDATE harvest_jobs SET status=?,error=NULL,updated_at=? WHERE id=? AND user_id=? AND status=?")
-            .bind(status.as_str()).bind(now()).bind(id).bind(user).bind(job.status.as_str()).execute(&self.pool).await?;
+        // 获取配置和重新排队在同一条 UPDATE 中完成；只替换三项，保留 AI/开发者模式及检查点。
+        let result = if matches!(action, Action::Retry) {
+            sqlx::query("UPDATE harvest_jobs SET status='queued',error=NULL,updated_at=?,options=json_set(options,'$.sourceMode',COALESCE((SELECT json_extract(options,'$.sourceMode') FROM harvest_settings WHERE id=1),'webview'),'$.cdpBrowser',COALESCE((SELECT json_extract(options,'$.cdpBrowser') FROM harvest_settings WHERE id=1),'chrome'),'$.cdpAddress',(SELECT json_extract(options,'$.cdpAddress') FROM harvest_settings WHERE id=1)) WHERE id=? AND user_id=? AND status=?")
+                .bind(now()).bind(id).bind(user).bind(job.status.as_str()).execute(&self.pool).await?
+        } else {
+            sqlx::query("UPDATE harvest_jobs SET status=?,error=NULL,updated_at=? WHERE id=? AND user_id=? AND status=?")
+                .bind(status.as_str()).bind(now()).bind(id).bind(user).bind(job.status.as_str()).execute(&self.pool).await?
+        };
         if result.rows_affected() != 1 {
             return Err(HarvestError::invalid("任务状态已变化，请刷新记录"));
         }

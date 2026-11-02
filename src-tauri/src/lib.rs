@@ -59,6 +59,7 @@ pub fn run() {
             commands::harvest_list_jobs,
             commands::harvest_enqueue,
             commands::harvest_job_action,
+            commands::harvest_select_source_tab,
             commands::ai_load_settings,
             commands::ai_save_provider,
             commands::ai_save_model,
@@ -98,6 +99,12 @@ pub fn run() {
             commands::list_channel_image_presets,
             commands::save_channel_image_presets
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            // 应用退出时释放本程序的 CDP 连接，用户浏览器及标签页继续保留。
+            if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<harvest::HarvestService>().stop();
+            }
+        });
 }

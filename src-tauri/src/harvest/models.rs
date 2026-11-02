@@ -1,9 +1,31 @@
 use super::HarvestError;
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Copy, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SourceMode {
+    #[default]
+    Webview,
+    Cdp,
+}
+#[derive(Clone, Copy, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum CdpBrowser {
+    #[default]
+    Chrome,
+    Edge,
+}
+
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Options {
+    // 历史配置默认 WebView；获取配置随入队固定，仅手动重试时替换为最新值。
+    #[serde(default)]
+    pub source_mode: SourceMode,
+    #[serde(default)]
+    pub cdp_browser: CdpBrowser,
+    #[serde(default)]
+    pub cdp_address: Option<String>,
     // 旧配置及旧任务无此字段时仍按正常采集执行，模式只在入队时固定。
     #[serde(default)]
     pub developer_mode: bool,
@@ -32,6 +54,14 @@ pub struct Settings {
 }
 impl Settings {
     pub fn validate(&self) -> Result<(), HarvestError> {
+        if self
+            .options
+            .cdp_address
+            .as_ref()
+            .is_some_and(|address| address.len() > 4096)
+        {
+            return Err(HarvestError::invalid("数据目录或 CDP 地址最多 4096 字节"));
+        }
         if self
             .retention_days
             .is_some_and(|days| days == 0 || days > 36500)
@@ -106,6 +136,9 @@ impl Stage {
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Job {
+    pub source_mode: SourceMode,
+    // 标签页候选只属于活动任务，不写入历史记录，也不跨应用重启恢复。
+    pub source_interaction: Option<SourceInteraction>,
     pub developer_mode: bool,
     pub id: String,
     pub url: String,
@@ -119,6 +152,19 @@ pub struct Job {
     pub created_at: String,
     pub updated_at: String,
     pub cms_article_id: Option<String>,
+}
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceTab {
+    pub target_id: String,
+    pub title: String,
+    pub url: String,
+}
+#[derive(Clone, Serialize)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum SourceInteraction {
+    SelectTab { tabs: Vec<SourceTab> },
+    Verification,
 }
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

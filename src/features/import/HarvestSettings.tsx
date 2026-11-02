@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Field,
@@ -149,6 +150,97 @@ export function HarvestSettings({
         <LoadState loading={loading && !form} error={error} />
         {form && (
           <FieldGroup>
+            {/* 获取配置沿用自动保存，隐藏 CDP 字段时保留用户已填写的地址。 */}
+            <FieldSet>
+              <FieldLegend variant="label">素材获取方式</FieldLegend>
+              <FieldGroup>
+                <Field>
+                  <ToggleGroup
+                    type="single"
+                    variant="outline"
+                    aria-label="素材获取方式"
+                    value={form.sourceMode}
+                    disabled={loading}
+                    onValueChange={(value) => {
+                      if (value === "webview" || value === "cdp")
+                        autosave.update({ sourceMode: value });
+                    }}
+                  >
+                    <ToggleGroupItem value="webview">
+                      内置 WebView
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="cdp">浏览器 CDP</ToggleGroupItem>
+                  </ToggleGroup>
+                  <FieldDescription>
+                    新任务使用入队时的获取方式；旧任务重试使用最新获取配置，AI
+                    规则和开发者模式保留原快照。
+                  </FieldDescription>
+                </Field>
+                {form.sourceMode === "cdp" && (
+                  <>
+                    <Field>
+                      <FieldLabel>连接的浏览器</FieldLabel>
+                      <ToggleGroup
+                        type="single"
+                        variant="outline"
+                        aria-label="连接的浏览器"
+                        value={form.cdpBrowser}
+                        disabled={loading}
+                        onValueChange={(value) => {
+                          if (value === "chrome" || value === "edge")
+                            autosave.update({ cdpBrowser: value });
+                        }}
+                      >
+                        <ToggleGroupItem value="chrome">Chrome</ToggleGroupItem>
+                        <ToggleGroupItem value="edge">
+                          Microsoft Edge
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="harvest-cdp-address">
+                        数据目录或 CDP 地址
+                      </FieldLabel>
+                      <Input
+                        id="harvest-cdp-address"
+                        value={form.cdpAddress ?? ""}
+                        maxLength={4096}
+                        disabled={loading}
+                        placeholder="留空自动发现已运行的浏览器"
+                        onChange={(event) =>
+                          autosave.update({
+                            cdpAddress: event.target.value || null,
+                          })
+                        }
+                      />
+                      <FieldDescription>
+                        支持浏览器数据目录、DevToolsActivePort 文件、HTTP/HTTPS
+                        调试入口及浏览器级 WS/WSS
+                        地址。优先读取已有文章标签页并复用登录状态。
+                      </FieldDescription>
+                    </Field>
+                    <FieldContent>
+                      <FieldDescription>
+                        在 {form.cdpBrowser === "chrome" ? "Chrome" : "Edge"}{" "}
+                        中打开{" "}
+                        <code>
+                          {form.cdpBrowser}://inspect/#remote-debugging
+                        </code>
+                        ，勾选“允许此浏览器实例进行远程调试”。保持浏览器打开，开始采集时在浏览器连接提示中点击“允许”。
+                      </FieldDescription>
+                      <FieldDescription>
+                        {form.cdpBrowser === "chrome"
+                          ? "Chrome 需为 144 或更新版本。"
+                          : ""}
+                        找不到选项时，请在{" "}
+                        <code>{form.cdpBrowser}://settings/help</code>{" "}
+                        更新浏览器。自动发现失败可填写自定义数据目录或调试地址后重试。
+                      </FieldDescription>
+                    </FieldContent>
+                  </>
+                )}
+              </FieldGroup>
+            </FieldSet>
             <Field
               orientation="horizontal"
               data-disabled={modeSaving || loading}

@@ -52,7 +52,9 @@ pub async fn harvest_list_jobs(
     harvest: State<'_, HarvestService>,
 ) -> Result<JobList, CommandError> {
     let (user, generation) = cms.harvest_identity().await?;
-    let jobs = database.harvest_list(user, &date).await?;
+    let mut jobs = database.harvest_list(user, &date).await?;
+    // 历史状态来自 SQLite；当前候选标签页只从同账号的活动上下文附加。
+    harvest.decorate_jobs(&mut jobs, user);
     cms.ensure_generation(generation).await?;
     Ok(JobList {
         jobs,
@@ -71,9 +73,10 @@ pub async fn harvest_enqueue(
     let (user, generation) = cms.harvest_identity().await?;
     let _lock = ai.operations.lock().await;
     cms.ensure_generation(generation).await?;
-    let (job, options) = database.harvest_enqueue(user, &request).await?;
+    let (job, mut options) = database.harvest_enqueue(user, &request).await?;
     cms.ensure_generation(generation).await?;
     if job.developer_mode {
+        options.cdp_address = None;
         // 返回已有记录时也使用它的原模式/设置，不把当前开关套到历史任务上。
         let _ = app.emit_to(
             "main",
@@ -101,9 +104,38 @@ pub async fn harvest_job_action(
     app: AppHandle,
     cms: State<'_, CmsService>,
     harvest: State<'_, HarvestService>,
+    ai: State<'_, AiService>,
 ) -> Result<(), CommandError> {
     let (user, generation) = cms.harvest_identity().await?;
+    // 重试和设置保存/入队共用锁，使获取配置快照与已确认的设置一致。
+    let _lock = if matches!(action, Action::Retry) {
+        Some(ai.operations.lock().await)
+    } else {
+        None
+    };
+    cms.ensure_generation(generation).await?;
     harvest.action(&app, &id, user, action).await?;
+    cms.ensure_generation(generation).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn harvest_select_source_tab(
+    id: String,
+    target_id: String,
+    window: WebviewWindow,
+    app: AppHandle,
+    cms: State<'_, CmsService>,
+    harvest: State<'_, HarvestService>,
+) -> Result<(), CommandError> {
+    // 浏览器页面不能借助此命令操作用户的其他标签页。
+    if window.label() != "main" || uuid::Uuid::parse_str(&id).is_err() || target_id.is_empty() {
+        return Err(HarvestError::invalid("无效的标签页选择请求").into());
+    }
+    let (user, generation) = cms.harvest_identity().await?;
+    harvest
+        .select_source_tab(&app, &id, user, &target_id)
+        .await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }

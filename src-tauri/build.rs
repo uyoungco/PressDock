@@ -11,6 +11,7 @@ fn main() {
                 "harvest_list_jobs",
                 "harvest_enqueue",
                 "harvest_job_action",
+                "harvest_select_source_tab",
                 "ai_load_settings",
                 "ai_save_provider",
                 "ai_save_model",

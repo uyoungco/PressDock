@@ -11,6 +11,7 @@
     "allow-harvest-list-jobs",
     "allow-harvest-enqueue",
     "allow-harvest-job-action",
+    "allow-harvest-select-source-tab",
     "core:event:allow-listen",
     "core:event:allow-unlisten",
     "allow-ai-load-settings",

@@ -29,6 +29,9 @@ beforeEach(() => {
   invalidateClientRequests();
   vi.resetAllMocks();
   persisted = {
+    sourceMode: "webview",
+    cdpBrowser: "chrome",
+    cdpAddress: null,
     developerMode: false,
     autoClassify: false,
     autoTags: true,

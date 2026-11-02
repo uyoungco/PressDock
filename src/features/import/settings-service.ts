@@ -20,6 +20,9 @@ const emptySnapshot: SettingsSnapshot = {
   modeSaving: false,
 };
 const keys = [
+  "sourceMode",
+  "cdpBrowser",
+  "cdpAddress",
   "autoClassify",
   "autoTags",
   "autoSummary",
