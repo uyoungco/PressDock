@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+// 本机桥接状态独立于采集设置，不作为任务获取方式或处理快照的一部分。
+export const harvestBridgeSchema = z.object({
+  running: z.boolean(),
+  error: z.string().nullable(),
+});
+export type HarvestBridge = z.infer<typeof harvestBridgeSchema>;
+
 // 获取配置在手动重试时更新；AI/开发者模式仍沿用入队快照，保留天数只用于清理。
 export const harvestSettingsSchema = z.object({
   sourceMode: z.enum(["webview", "cdp"]).default("webview"),

@@ -1,3 +1,4 @@
+pub(crate) mod bridge;
 mod cdp;
 mod content;
 mod models;

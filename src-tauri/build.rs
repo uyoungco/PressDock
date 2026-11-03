@@ -10,6 +10,8 @@ fn main() {
                 "harvest_save_settings",
                 "harvest_list_jobs",
                 "harvest_enqueue",
+                "harvest_bridge_status",
+                "harvest_install_userscript",
                 "harvest_job_action",
                 "harvest_select_source_tab",
                 "ai_load_settings",

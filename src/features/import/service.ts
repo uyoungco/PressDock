@@ -5,6 +5,8 @@ import { harvestSettingsService } from "./settings-service";
 
 // 导入现在返回持久任务，不再把“入队成功”当作已经采到文章。
 export const importService = {
+  bridgeStatus: harvestIpc.bridgeStatus,
+  installUserscript: harvestIpc.installUserscript,
   setDeveloperMode: harvestSettingsService.setDeveloperMode,
   openDevtools: harvestIpc.openDevtools,
   subscribeDebug: harvestIpc.subscribeDebug,

@@ -36,6 +36,10 @@ pub fn run() {
             app.manage(ai::AiService::new()?);
             app.manage(cms::CmsService::new(&directory)?);
             app.manage(harvest::HarvestService::new(cleanup_warning));
+            // 本机桥接开箱即用；监听失败由设置页展示，不阻止桌面应用启动。
+            app.manage(tauri::async_runtime::block_on(
+                harvest::bridge::Bridge::start(app.handle().clone()),
+            ));
             // 手动沿用 main 配置创建窗口，以便在任何页面脚本之前安装全局右键规则。
             let config = app
                 .config()
@@ -58,6 +62,8 @@ pub fn run() {
             commands::harvest_save_settings,
             commands::harvest_list_jobs,
             commands::harvest_enqueue,
+            commands::harvest_bridge_status,
+            commands::harvest_install_userscript,
             commands::harvest_job_action,
             commands::harvest_select_source_tab,
             commands::ai_load_settings,
@@ -104,6 +110,7 @@ pub fn run() {
         .run(|app, event| {
             // 应用退出时释放本程序的 CDP 连接，用户浏览器及标签页继续保留。
             if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<harvest::bridge::Bridge>().stop();
                 app.state::<harvest::HarvestService>().stop();
             }
         });

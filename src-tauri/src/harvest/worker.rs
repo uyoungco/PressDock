@@ -130,6 +130,42 @@ impl Context {
     }
 }
 impl HarvestService {
+    // 桌面 IPC 与油猴 HTTP 共用入口，确保设置快照、去重、日志及通知保持一致。
+    pub(crate) async fn enqueue(
+        &self,
+        app: &AppHandle,
+        request: &EnqueueRequest,
+    ) -> Result<Job, HarvestError> {
+        let database = app.state::<Database>();
+        let cms = app.state::<CmsService>();
+        let ai = app.state::<AiService>();
+        let (user, generation) = cms.harvest_identity().await?;
+        let _lock = ai.operations.lock().await;
+        cms.ensure_generation(generation).await?;
+        let (job, mut options) = database.harvest_enqueue(user, request).await?;
+        cms.ensure_generation(generation).await?;
+        if job.developer_mode {
+            options.cdp_address = None;
+            // 返回已有记录时也使用它的原模式/设置，不把当前开关套到历史任务上。
+            let _ = app.emit_to(
+                "main",
+                "harvest-debug",
+                DebugEvent {
+                    user_id: user,
+                    job_id: job.id.clone(),
+                    attempt: job.attempts,
+                    timestamp: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+                    step: "enqueue".into(),
+                    kind: "output",
+                    data: crate::error::redact(serde_json::json!({"requestId":request.id,"job":job,"options":options,"reused":job.id != request.id,"reason":if job.id != request.id {"定位已有记录；失败任务请点击重试"} else {"新任务入队"}}), &[]),
+                    diagnostic: None,
+                },
+            );
+        }
+        self.wake.notify_one();
+        changed(app);
+        Ok(job)
+    }
     pub(crate) fn new(maintenance_warning: Option<String>) -> Self {
         Self {
             wake: Notify::new(),

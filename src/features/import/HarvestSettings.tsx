@@ -34,7 +34,8 @@ import { aiService } from "@/features/ai/service";
 import { aiErrorMessage } from "@/features/ai/use-settings";
 import { emptySettings, type AiSettings } from "@/features/ai/contracts";
 import { importService } from "./service";
-import { ServiceError } from "@/services/tauri/client";
+import { isDesktop, ServiceError } from "@/services/tauri/client";
+import type { HarvestBridge } from "./contracts";
 
 const autosave = importService.settingsAutosave;
 function flushOnLeave() {
@@ -59,6 +60,79 @@ const switches = [
     "复用分页助手的默认模板、绑定模型和页长规则；失败保留原排版并继续导入。",
   ],
 ] as const;
+
+function UserscriptConnection({ active }: { active: boolean }) {
+  const [connection, setConnection] = useState<HarvestBridge | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [installing, setInstalling] = useState(false);
+  useEffect(() => {
+    if (!active || !isDesktop()) return;
+    let current = true;
+    // 桥接状态独立读取，连接失败不阻止原有采集设置加载和自动保存。
+    setError(null);
+    importService.bridgeStatus().then(
+      (value) => {
+        if (current) setConnection(value);
+      },
+      (reason: unknown) => {
+        if (current) setError(aiErrorMessage(reason));
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [active]);
+  async function install() {
+    setInstalling(true);
+    try {
+      await importService.installUserscript();
+      toast.success("已在系统浏览器打开油猴脚本，请确认安装");
+    } catch (reason) {
+      toast.error(aiErrorMessage(reason));
+    } finally {
+      setInstalling(false);
+    }
+  }
+  const failure = error ?? connection?.error;
+  return (
+    <FieldSet>
+      <FieldLegend variant="label">油猴一键导入</FieldLegend>
+      <FieldContent>
+        <FieldDescription>
+          安装脚本后，在百家号或 mbd.baidu.com 点击“导入
+          PressDock”，即可加入采集队列。
+          无需连接码或配对，保持软件运行并登录即可使用。
+        </FieldDescription>
+        <FieldDescription>
+          使用已保存的采集设置，最终结果在“素材导入”的采集记录中查看。
+        </FieldDescription>
+        <p className="text-sm text-muted-foreground">
+          {connection?.running
+            ? "本机连接已就绪"
+            : failure
+              ? "本机连接不可用"
+              : isDesktop()
+                ? "正在检查本机连接…"
+                : "请在桌面版 PressDock 中安装脚本"}
+        </p>
+        {failure && (
+          <Alert variant="destructive">
+            <AlertTitle>油猴连接不可用</AlertTitle>
+            <AlertDescription>{failure}</AlertDescription>
+          </Alert>
+        )}
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!connection?.running || installing}
+          onClick={() => void install()}
+        >
+          {installing ? "正在打开…" : "安装油猴脚本"}
+        </Button>
+      </FieldContent>
+    </FieldSet>
+  );
+}
 
 export function HarvestSettings({
   active,
@@ -148,6 +222,7 @@ export function HarvestSettings({
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <LoadState loading={loading && !form} error={error} />
+        <UserscriptConnection active={active} />
         {form && (
           <FieldGroup>
             {/* 获取配置沿用自动保存，隐藏 CDP 字段时保留用户已填写的地址。 */}

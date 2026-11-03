@@ -7,12 +7,17 @@ import {
   harvestListSchema,
   harvestActionSchema,
   harvestDebugSchema,
+  harvestBridgeSchema,
   type HarvestDebugEvent,
   type HarvestSettings,
   type HarvestAction,
 } from "@/features/import/contracts";
 
 export const harvestIpc = {
+  bridgeStatus: () =>
+    invokeCommand("harvest_bridge_status", harvestBridgeSchema),
+  installUserscript: () =>
+    invokeCommand("harvest_install_userscript", z.null()),
   setDeveloperMode: (enabled: boolean) =>
     invokeCommand("harvest_set_developer_mode", z.boolean(), {
       enabled: z.boolean().parse(enabled),

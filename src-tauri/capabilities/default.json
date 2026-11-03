@@ -10,6 +10,8 @@
     "allow-harvest-save-settings",
     "allow-harvest-list-jobs",
     "allow-harvest-enqueue",
+    "allow-harvest-bridge-status",
+    "allow-harvest-install-userscript",
     "allow-harvest-job-action",
     "allow-harvest-select-source-tab",
     "core:event:allow-listen",
