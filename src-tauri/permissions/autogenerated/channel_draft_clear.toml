@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-channel-draft-clear"
+description = "Enables the channel_draft_clear command without any pre-configured scope."
+commands.allow = ["channel_draft_clear"]
+
+[[permission]]
+identifier = "deny-channel-draft-clear"
+description = "Denies the channel_draft_clear command without any pre-configured scope."
+commands.deny = ["channel_draft_clear"]

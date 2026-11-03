@@ -11,7 +11,9 @@ export class ServiceError extends Error {
     this.name = "ServiceError";
   }
 }
-export const isDesktop = () => isTauri();
+export const isAppRuntime = () => isTauri();
+/** @deprecated 兼容旧调用方；此函数检测 Tauri 运行环境，包含 Android。 */
+export const isDesktop = isAppRuntime;
 let sessionEpoch = 0;
 const authExpiredListeners = new Set<() => void>();
 const invalidationListeners = new Set<() => void>();

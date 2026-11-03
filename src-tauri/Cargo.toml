@@ -17,6 +17,9 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
+[features]
+android-demo = []
+
 [dependencies]
 tauri = { version = "2", features = ["devtools"] }
 serde = { version = "1", features = ["derive"] }
@@ -24,9 +27,9 @@ serde_json = "1"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite-bundled", "migrate", "macros"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "sync", "time", "net"] }
 base64 = "0.22"
-reqwest = { version = "0.13.5", default-features = false, features = ["native-tls", "json", "query", "charset", "system-proxy", "multipart"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "query", "charset", "multipart"] }
 tauri-plugin-opener = "2"
-keyring = "4.2.0"
+
 thiserror = "2"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1", features = ["v4"] }
@@ -40,12 +43,21 @@ lcms2 = { version = "6.2", features = ["static"] }
 tauri-plugin-dialog = "2"
 scraper = { version = "0.27", default-features = false }
 regex = "1"
-tokio-tungstenite = { version = "0.30.0", features = ["native-tls"] }
+tokio-tungstenite = { version = "0.30.0", default-features = false, features = ["connect", "handshake"] }
 futures-util = { version = "0.3.34", features = ["sink"] }
 # 复用锁文件已有的 HTTP 栈处理本机请求，不自行解析 HTTP 报文。
 hyper = { version = "1", features = ["server", "http1"] }
 hyper-util = { version = "0.1", features = ["tokio"] }
 http-body-util = "0.1"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+keyring = "4.2.0"
+reqwest = { version = "0.13.5", default-features = false, features = ["native-tls", "system-proxy"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+reqwest = { version = "0.13.5", default-features = false, features = ["rustls"] }
+rustls-platform-verifier = "0.7.1"
+jni = "0.22"
 
 [dev-dependencies]
 tauri = { version = "2", features = ["test"] }

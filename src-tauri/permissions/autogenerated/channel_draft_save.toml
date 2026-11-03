@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-channel-draft-save"
+description = "Enables the channel_draft_save command without any pre-configured scope."
+commands.allow = ["channel_draft_save"]
+
+[[permission]]
+identifier = "deny-channel-draft-save"
+description = "Denies the channel_draft_save command without any pre-configured scope."
+commands.deny = ["channel_draft_save"]

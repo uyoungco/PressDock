@@ -1,0 +1,6 @@
+{
+  "app": {
+    "windows": [{ "label": "main", "create": true, "title": "PressDock" }],
+    "security": { "capabilities": ["android"] }
+  }
+}

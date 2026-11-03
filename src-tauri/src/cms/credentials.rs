@@ -11,6 +11,7 @@ pub(super) struct NativeVault {
     pub disabled_path: PathBuf,
 }
 
+#[cfg(not(target_os = "android"))]
 impl NativeVault {
     fn entry(&self) -> Result<keyring::Entry, ()> {
         keyring::Entry::new("com.example.pressdock.cms", "newsadmin.nccontrol.com.cn")
@@ -18,6 +19,7 @@ impl NativeVault {
     }
 }
 
+#[cfg(not(target_os = "android"))]
 impl CredentialVault for NativeVault {
     fn load(&self) -> Result<Option<String>, ()> {
         // 凭据库删除失败时，非秘密的禁用标记阻止下次恢复已退出的会话。
@@ -46,6 +48,35 @@ impl CredentialVault for NativeVault {
                 Err(_) => Err(()),
             })
             .is_ok();
+        if disabled || deleted { Ok(()) } else { Err(()) }
+    }
+}
+
+#[cfg(target_os = "android")]
+impl CredentialVault for NativeVault {
+    fn load(&self) -> Result<Option<String>, ()> {
+        if self.disabled_path.try_exists().map_err(|_| ())? {
+            return Ok(None);
+        }
+        #[derive(serde::Deserialize)]
+        struct Secret {
+            value: Option<String>,
+        }
+        crate::platform::call::<Secret>("loadSecret", serde_json::json!({})).map(|v| v.value)
+    }
+    fn save(&self, secret: &str) -> Result<(), ()> {
+        std::fs::write(&self.disabled_path, b"disabled").map_err(|_| ())?;
+        crate::platform::call::<serde_json::Value>(
+            "saveSecret",
+            serde_json::json!({"secret":secret}),
+        )?;
+        std::fs::remove_file(&self.disabled_path).map_err(|_| ())
+    }
+    fn clear(&self) -> Result<(), ()> {
+        let disabled = std::fs::write(&self.disabled_path, b"disabled").is_ok();
+        let deleted =
+            crate::platform::call::<serde_json::Value>("deleteSecret", serde_json::json!({}))
+                .is_ok();
         if disabled || deleted { Ok(()) } else { Err(()) }
     }
 }

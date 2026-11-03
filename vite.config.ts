@@ -7,6 +7,13 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [react(), tailwindcss()],
+  // Android 的原生启动检查与 Tailwind v4 的最低 Chromium 版本保持一致。
+  build: {
+    target:
+      process.env.VITE_PRESSDOCK_PLATFORM === "android"
+        ? "chrome111"
+        : undefined,
+  },
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
     environment: "jsdom",

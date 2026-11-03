@@ -1,4 +1,13 @@
 fn main() {
+    println!("cargo:rerun-if-env-changed=PRESSDOCK_DEMO");
+    if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("android") {
+        let demo_feature = std::env::var_os("CARGO_FEATURE_ANDROID_DEMO").is_some();
+        let demo_package = std::env::var("PRESSDOCK_DEMO").as_deref() == Ok("1");
+        assert_eq!(
+            demo_feature, demo_package,
+            "演示包与 Rust 功能必须一致，请使用 npm run android:build:demo"
+        );
+    }
     println!("cargo:rerun-if-changed=migrations");
     tauri_build::try_build(
         tauri_build::Attributes::new()
@@ -24,6 +33,9 @@ fn main() {
                 "ai_suggest_titles",
                 "ai_suggest_pagination",
                 "ai_cancel",
+                "channel_draft_load",
+                "channel_draft_save",
+                "channel_draft_clear",
                 "get_app_info",
                 "health_check",
                 "list_articles",

@@ -12,6 +12,8 @@ node_modules
 *.tsbuildinfo
 *.exe
 coverage/
+*.apk
+*.aab
 .env
 .env.*
 !.env.example

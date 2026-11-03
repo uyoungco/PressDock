@@ -53,6 +53,10 @@
     "allow-image-cancel",
     "allow-image-export",
     "allow-list-channel-image-presets",
-    "allow-save-channel-image-presets"
-  ]
+    "allow-save-channel-image-presets",
+    "allow-channel-draft-load",
+    "allow-channel-draft-save",
+    "allow-channel-draft-clear"
+  ],
+  "platforms": ["windows", "linux", "macOS"]
 }

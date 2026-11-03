@@ -234,6 +234,8 @@ AI 只返回语义绑定和优选边界，页数与页长由本地全局算法�
 
 配置保存在本机 SQLite，同一工作区所有账号共用；API 密钥只进入系统凭据库，保存失败明确报错，绝不回退明文。密钥输入留空保留已有密钥，前端读取只有配置状态，不回传秘密。AI 鉴权失败不会使 CMS 退出。自动化验证使用本地 HTTP、凭据替身及明确标识的演示数据，不请求真实 AI、不改线上 CMS。
 
-Android 尚未初始化 SDK / 原生工程或生成 APK，当前提供可运行的移动布局；后续见 [Android 计划](docs/android-plan.md)。不要直接将桌面尺寸和原生行为用于 Android。
+Android 首版已接入原生工程、Keystore、SQLite 素材草稿与渠道素材移动视图，运行要求为 Android 7.0+、ARM64 及系统 WebView 111+；旧组件显示原生更新提示。Windows 运行 `npm run android:build` 构建 ARM64 调试 APK；安装与真机验收见 [Android 开发与验收计划](docs/android-plan.md)。文章管理、采集和 AI 标题优化暂未开放到 Android。
+
+交互测试使用 `npm run android:build:demo` 生成独立的“PressDock 演示版”：只使用本机 Mock 数据、移除网络权限、无需真实账号，可与正式版同时安装。演示素材修改与 SQLite 草稿均保存在演示版自己的数据目录中。
 
 详细说明：[架构](docs/architecture.md)、[开发指南](docs/development.md)、[初始化验收报告](docs/initialization-report.md)。官方参考：[Tauri 初始化](https://v2.tauri.app/start/create-project/)、[Tauri 系统依赖](https://v2.tauri.app/start/prerequisites/)、[shadcn Vite 安装](https://ui.shadcn.com/docs/installation/vite)。

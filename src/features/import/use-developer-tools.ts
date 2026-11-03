@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { authService } from "@/features/auth/service";
@@ -6,7 +7,7 @@ import { importService } from "./service";
 
 export function useDeveloperTools() {
   useEffect(() => {
-    if (!isDesktop()) return;
+    if (!isDesktop() || isAndroid()) return;
     let active = true;
     let unlisten: (() => void) | undefined;
     let consoleUser: number | null = null;

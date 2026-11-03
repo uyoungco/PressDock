@@ -31,9 +31,20 @@ pub async fn cms_restore_session(
 pub async fn cms_logout(
     cms: State<'_, CmsService>,
     harvest: State<'_, crate::harvest::HarvestService>,
+    database: State<'_, crate::database::Database>,
+    gate: State<'_, super::DraftGate>,
 ) -> Result<LogoutResult, CommandError> {
+    let _guard = gate.0.lock().await;
     harvest.stop();
-    Ok(cms.logout().await)
+    let result = cms.logout().await;
+    // 明确退出清除此设备的素材草稿，即使会话已过期也可完成清理。
+    {
+        sqlx::query("DELETE FROM channel_edit_drafts")
+            .execute(&database.pool)
+            .await
+            .map_err(|_| CmsError::new("DRAFT_STORAGE", "已退出登录，但本机草稿清理失败"))?;
+    }
+    Ok(result)
 }
 #[tauri::command]
 pub async fn cms_list_promote_channels(

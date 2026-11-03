@@ -1,11 +1,17 @@
 mod ai;
 mod articles;
+mod channel_drafts;
+#[cfg(not(feature = "android-demo"))]
+mod cms;
+#[cfg(feature = "android-demo")]
+#[path = "demo_cms.rs"]
 mod cms;
 mod image_presets;
 mod images;
 mod system;
 pub use ai::*;
 pub use articles::*;
+pub use channel_drafts::*;
 pub use cms::*;
 pub use image_presets::*;
 pub use images::*;

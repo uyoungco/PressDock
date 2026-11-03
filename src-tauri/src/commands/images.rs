@@ -95,32 +95,62 @@ pub async fn image_export(
     };
     imaging::check(&guard.flag)?;
     cms.ensure_generation(generation).await?;
-    let mut path = selected
-        .into_path()
-        .map_err(|_| imaging::invalid("保存位置无效"))?;
-    if path.extension().is_none() {
-        path.set_extension(format.extension());
+    #[cfg(target_os = "android")]
+    {
+        use base64::Engine;
+        let uri = match selected {
+            tauri_plugin_dialog::FilePath::Url(uri) if uri.scheme() == "content" => uri.to_string(),
+            _ => return Err(imaging::invalid("保存位置无效").into()),
+        };
+        let data = base64::engine::general_purpose::STANDARD.encode(bytes);
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Saved {
+            file_name: String,
+        }
+        let saved = tauri::async_runtime::spawn_blocking(move || {
+            crate::platform::call::<Saved>(
+                "writeDocument",
+                serde_json::json!({"uri":uri,"data":data}),
+            )
+        })
+        .await
+        .map_err(|_| imaging::invalid("图片保存失败"))?
+        .map_err(|_| imaging::invalid("图片保存失败"))?;
+        return Ok(ExportResult {
+            saved: true,
+            file_name: Some(saved.file_name),
+        });
     }
-    let extension = path
-        .extension()
-        .and_then(|v| v.to_str())
-        .unwrap_or_default()
-        .to_ascii_lowercase();
-    if extension != format.extension() && !(format == Format::Jpeg && extension == "jpeg") {
-        return Err(imaging::invalid("文件扩展名必须与输出图片格式一致").into());
+    #[cfg(not(target_os = "android"))]
+    {
+        let mut path = selected
+            .into_path()
+            .map_err(|_| imaging::invalid("保存位置无效"))?;
+        if path.extension().is_none() {
+            path.set_extension(format.extension());
+        }
+        let extension = path
+            .extension()
+            .and_then(|v| v.to_str())
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        if extension != format.extension() && !(format == Format::Jpeg && extension == "jpeg") {
+            return Err(imaging::invalid("文件扩展名必须与输出图片格式一致").into());
+        }
+        let file_name = path
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned());
+        let flag = guard.flag.clone();
+        tauri::async_runtime::spawn_blocking(move || {
+            imaging::check(&flag)?;
+            imaging::write_new(&path, &bytes, &flag)
+        })
+        .await
+        .map_err(|_| imaging::invalid("图片保存失败"))??;
+        Ok(ExportResult {
+            saved: true,
+            file_name,
+        })
     }
-    let file_name = path
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned());
-    let flag = guard.flag.clone();
-    tauri::async_runtime::spawn_blocking(move || {
-        imaging::check(&flag)?;
-        imaging::write_new(&path, &bytes, &flag)
-    })
-    .await
-    .map_err(|_| imaging::invalid("图片保存失败"))??;
-    Ok(ExportResult {
-        saved: true,
-        file_name,
-    })
 }

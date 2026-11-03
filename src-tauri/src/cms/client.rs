@@ -60,6 +60,8 @@ struct SessionState {
 }
 
 pub struct CmsService {
+    #[cfg(feature = "android-demo")]
+    demo: Option<super::demo::DemoCms>,
     client: Client,
     base_url: String,
     vault: Arc<dyn CredentialVault>,
@@ -70,6 +72,19 @@ pub struct CmsService {
 }
 
 impl CmsService {
+    #[cfg(feature = "android-demo")]
+    pub(crate) fn with_demo(mut self, demo: super::demo::DemoCms) -> Self {
+        self.demo = Some(demo);
+        self
+    }
+
+    #[cfg(feature = "android-demo")]
+    pub(crate) fn demo(&self) -> Result<&super::demo::DemoCms, CmsError> {
+        self.demo
+            .as_ref()
+            .ok_or_else(|| CmsError::new("DEMO_ONLY", "演示数据未初始化，已阻止操作"))
+    }
+
     #[cfg(test)]
     pub(super) fn test_timeout(&mut self, duration: Duration) {
         self.client = Client::builder()
@@ -98,6 +113,8 @@ impl CmsService {
         vault: Arc<dyn CredentialVault>,
     ) -> Result<Self, reqwest::Error> {
         Ok(Self {
+            #[cfg(feature = "android-demo")]
+            demo: None,
             client: Client::builder()
                 .retry(reqwest::retry::never())
                 .connect_timeout(Duration::from_secs(10))
@@ -339,6 +356,10 @@ impl CmsService {
     }
 
     pub async fn authorize(&self) -> Result<u64, CmsError> {
+        #[cfg(feature = "android-demo")]
+        if let Some(demo) = &self.demo {
+            return demo.authorize().await;
+        }
         let state = self.state.lock().await;
         if state.session.is_none() {
             return Err(CmsError::expired());
@@ -346,7 +367,30 @@ impl CmsService {
         Ok(state.generation)
     }
 
+    pub async fn draft_user(&self) -> Result<i64, CmsError> {
+        #[cfg(feature = "android-demo")]
+        if let Some(demo) = &self.demo {
+            demo.authorize().await?;
+            return Ok(super::demo::USER_ID);
+        }
+        self.state
+            .lock()
+            .await
+            .session
+            .as_ref()
+            .map(|s| s.user.user_id)
+            .ok_or_else(CmsError::expired)
+    }
+
     pub async fn ensure_generation(&self, generation: u64) -> Result<(), CmsError> {
+        #[cfg(feature = "android-demo")]
+        if let Some(demo) = &self.demo {
+            return if demo.authorize().await? == generation {
+                Ok(())
+            } else {
+                Err(CmsError::new("SESSION_CHANGED", "演示会话已变化"))
+            };
+        }
         let state = self.state.lock().await;
         if state.generation != generation || state.session.is_none() {
             return Err(CmsError::new("SESSION_CHANGED", "登录状态已变化，请重试"));

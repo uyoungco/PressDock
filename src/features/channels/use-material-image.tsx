@@ -1,4 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { isDemo } from "@/lib/platform";
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -195,7 +196,9 @@ export function useMaterialImage(
           <DialogDescription>
             {work?.channel || "未选择渠道"} /{" "}
             {work?.subChannel || "未选择子渠道"} ·
-            确认结果后上传，保存素材后才关联。已配置的参数锁定。
+            {isDemo()
+              ? "演示：确认后存入本机，保存后关联演示素材。"
+              : "确认结果后上传，保存素材后才关联。已配置的参数锁定。"}
           </DialogDescription>
           <ScrollArea
             className="-mx-1 flex-1"
@@ -222,7 +225,11 @@ export function useMaterialImage(
                     </div>
                     {work.uploading && (
                       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/90">
-                        <p role="status">正在上传处理后的图片…</p>
+                        <p role="status">
+                          {isDemo()
+                            ? "正在保存本机演示图片…"
+                            : "正在上传处理后的图片…"}
+                        </p>
                         <Button variant="outline" onClick={close}>
                           取消回填
                         </Button>
