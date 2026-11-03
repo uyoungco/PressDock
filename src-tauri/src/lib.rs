@@ -5,16 +5,21 @@ mod database;
 mod error;
 mod harvest;
 mod imaging;
+mod platform;
 mod system;
 mod window_policy;
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(platform::init());
+    builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(std::sync::Arc::new(imaging::ImageJobs::default()))
+        .manage(commands::DraftGate::default())
         .setup(|app| {
             let directory = app.path().app_data_dir()?;
             let database = tauri::async_runtime::block_on(async {
@@ -32,23 +37,37 @@ pub fn run() {
             app.manage(window_policy::WindowPolicy(
                 std::sync::atomic::AtomicBool::new(developer_mode),
             ));
+            #[cfg(feature = "android-demo")]
+            let demo =
+                tauri::async_runtime::block_on(cms::demo::DemoCms::new(database.pool.clone()))?;
             app.manage(database);
             app.manage(ai::AiService::new()?);
-            app.manage(cms::CmsService::new(&directory)?);
+            let cms = cms::CmsService::new(&directory)?;
+            #[cfg(feature = "android-demo")]
+            let cms = cms.with_demo(demo);
+            app.manage(cms);
             app.manage(harvest::HarvestService::new(cleanup_warning));
+            // 本机桥接开箱即用；监听失败由设置页展示，不阻止桌面应用启动。
+            #[cfg(desktop)]
+            app.manage(tauri::async_runtime::block_on(
+                harvest::bridge::Bridge::start(app.handle().clone()),
+            ));
             // 手动沿用 main 配置创建窗口，以便在任何页面脚本之前安装全局右键规则。
-            let config = app
-                .config()
-                .app
-                .windows
-                .iter()
-                .find(|window| window.label == "main")
-                .expect("主窗口配置");
-            tauri::WebviewWindowBuilder::from_config(app, config)?
-                .initialization_script_for_all_frames(window_policy::script(developer_mode))
-                .on_page_load(|window, _| window_policy::apply(&window))
-                .build()?;
-            harvest::start(app.handle().clone());
+            #[cfg(desktop)]
+            {
+                let config = app
+                    .config()
+                    .app
+                    .windows
+                    .iter()
+                    .find(|window| window.label == "main")
+                    .expect("主窗口配置");
+                tauri::WebviewWindowBuilder::from_config(app, config)?
+                    .initialization_script_for_all_frames(window_policy::script(developer_mode))
+                    .on_page_load(|window, _| window_policy::apply(&window))
+                    .build()?;
+                harvest::start(app.handle().clone());
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -58,7 +77,10 @@ pub fn run() {
             commands::harvest_save_settings,
             commands::harvest_list_jobs,
             commands::harvest_enqueue,
+            commands::harvest_bridge_status,
+            commands::harvest_install_userscript,
             commands::harvest_job_action,
+            commands::harvest_select_source_tab,
             commands::ai_load_settings,
             commands::ai_save_provider,
             commands::ai_save_model,
@@ -69,6 +91,9 @@ pub fn run() {
             commands::ai_suggest_titles,
             commands::ai_suggest_pagination,
             commands::ai_cancel,
+            commands::channel_draft_load,
+            commands::channel_draft_save,
+            commands::channel_draft_clear,
             commands::get_app_info,
             commands::health_check,
             commands::list_articles,
@@ -98,6 +123,14 @@ pub fn run() {
             commands::list_channel_image_presets,
             commands::save_channel_image_presets
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            // 应用退出时释放本程序的 CDP 连接，用户浏览器及标签页继续保留。
+            if matches!(event, tauri::RunEvent::Exit) {
+                #[cfg(desktop)]
+                app.state::<harvest::bridge::Bridge>().stop();
+                app.state::<harvest::HarvestService>().stop();
+            }
+        });
 }

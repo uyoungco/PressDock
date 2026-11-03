@@ -10,6 +10,7 @@ import { authService, safeReturnPath } from "@/features/auth/service";
 import { RestoreFailure, SessionLoading } from "@/features/auth/components";
 import { loginInputSchema } from "@/types/cms";
 import { isDesktop } from "@/services/tauri/client";
+import { isDemo } from "@/lib/platform";
 
 export default function Login() {
   const auth = useAuth();
@@ -53,6 +54,44 @@ export default function Login() {
       setPassword("");
     }
   }
+  if (isDemo())
+    return (
+      <main className="flex min-h-dvh items-center justify-center bg-muted/30 p-5">
+        <Card className="w-full max-w-sm shadow-none">
+          <CardContent className="space-y-5 pt-6">
+            <h1 className="text-2xl font-semibold">PressDock 演示版</h1>
+            <p className="text-sm leading-6 text-muted-foreground">
+              本机 Mock 数据，包含 80
+              条样例素材。筛选、编辑、排序和图片操作只影响演示工作区。
+            </p>
+            <p className="rounded-md bg-amber-100 p-3 text-sm text-amber-950">
+              无需真实账号 · 无网络权限 · 数据仅保存在本机
+            </p>
+            {auth.error && (
+              <p role="alert" className="text-sm text-destructive">
+                {auth.error}
+              </p>
+            )}
+            <Button
+              className="w-full"
+              disabled={busy || !desktop}
+              onClick={() => {
+                if (submitting.current) return;
+                submitting.current = true;
+                void authService
+                  .login({ username: "demo", password: "demo" })
+                  .catch(() => {})
+                  .finally(() => {
+                    submitting.current = false;
+                  });
+              }}
+            >
+              {busy ? "正在进入演示…" : "进入演示工作区"}
+            </Button>
+          </CardContent>
+        </Card>
+      </main>
+    );
   return (
     <main className="flex min-h-dvh items-center justify-center bg-muted/30 p-5">
       <div className="w-full max-w-sm space-y-6">

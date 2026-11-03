@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "android:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-android.ps1",
+    "android:build:demo": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-android.ps1 -Demo"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { cmsIpc } from "@/services/tauri/cms";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { promoteImageSchema, type PromoteImagePayload } from "@/types/cms";
@@ -71,7 +72,7 @@ export class PromoteImageCache {
   constructor(
     private readonly load: (url: string) => Promise<PromoteImagePayload>,
     private readonly dimensions = decode,
-    private readonly limit = 64 * 1024 * 1024,
+    private readonly limit = (isAndroid() ? 24 : 64) * 1024 * 1024,
   ) {}
 
   clear() {

@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { atom, createStore } from "jotai";
 import { QueryClient, type QueryKey } from "@tanstack/react-query";
 import { queryClientAtom } from "jotai-tanstack-query";
@@ -6,6 +7,7 @@ import type { PromoteQuery } from "@/types/cms";
 import type { ArticleView, CmsArticleQuery } from "@/types/cms-article";
 
 export const channelFilterAtom = atom<PromoteQuery | null>(null);
+export const channelPositionsAtom = atom<Record<string, number>>({});
 export const articleFiltersAtom = atom<
   Partial<Record<ArticleView, CmsArticleQuery>>
 >({});
@@ -42,7 +44,7 @@ export function createQueryRuntime() {
     defaultOptions: {
       queries: {
         staleTime: Infinity,
-        gcTime: Infinity,
+        gcTime: isAndroid() ? 5 * 60 * 1000 : Infinity,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         refetchInterval: false,
@@ -70,6 +72,7 @@ export function resetQueryRuntime(runtime: QueryRuntime) {
   runtime.client.clear();
   runtime.store.set(businessQueriesEnabledAtom, true);
   runtime.store.set(channelFilterAtom, null);
+  runtime.store.set(channelPositionsAtom, {});
   runtime.store.set(globalSearchAtom, "");
   runtime.store.set(articleFiltersAtom, {});
   runtime.store.set(harvestDateAtom, null);

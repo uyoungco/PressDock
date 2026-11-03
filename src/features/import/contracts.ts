@@ -1,7 +1,17 @@
 import { z } from "zod";
 
-// 处理设置随任务入队固定；保留天数只属于应用级清理规则。
+// 本机桥接状态独立于采集设置，不作为任务获取方式或处理快照的一部分。
+export const harvestBridgeSchema = z.object({
+  running: z.boolean(),
+  error: z.string().nullable(),
+});
+export type HarvestBridge = z.infer<typeof harvestBridgeSchema>;
+
+// 获取配置在手动重试时更新；AI/开发者模式仍沿用入队快照，保留天数只用于清理。
 export const harvestSettingsSchema = z.object({
+  sourceMode: z.enum(["webview", "cdp"]).default("webview"),
+  cdpBrowser: z.enum(["chrome", "edge"]).default("chrome"),
+  cdpAddress: z.string().max(4096).nullable().default(null),
   developerMode: z.boolean().default(false),
   autoClassify: z.boolean(),
   autoTags: z.boolean(),
@@ -12,6 +22,23 @@ export const harvestSettingsSchema = z.object({
 });
 export type HarvestSettings = z.infer<typeof harvestSettingsSchema>;
 export const harvestJobSchema = z.object({
+  sourceMode: z.enum(["webview", "cdp"]).default("webview"),
+  sourceInteraction: z
+    .discriminatedUnion("kind", [
+      z.object({ kind: z.literal("verification") }),
+      z.object({
+        kind: z.literal("selectTab"),
+        tabs: z
+          .object({
+            targetId: z.string().min(1),
+            title: z.string(),
+            url: z.string(),
+          })
+          .array(),
+      }),
+    ])
+    .nullable()
+    .default(null),
   developerMode: z.boolean().default(false),
   id: z.uuid(),
   url: z.url({ protocol: /^https?$/ }),
@@ -65,6 +92,11 @@ export function localCollectionDate(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 function statusText(job: HarvestJob): string {
+  if (
+    job.status === "waitingUser" &&
+    job.sourceInteraction?.kind === "selectTab"
+  )
+    return "等待选择标签页";
   if (job.status === "running") {
     return job.stage
       ? {

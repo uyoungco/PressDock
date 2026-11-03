@@ -47,7 +47,15 @@ fn registered_commands_have_build_manifest_and_main_window_permissions() {
     );
     let commands: Vec<_> = regex::Regex::new(r"commands::(\w+)")
         .unwrap()
-        .captures_iter(handler)
+        .captures_iter(
+            handler
+                .split_once("tauri::generate_handler![")
+                .unwrap()
+                .1
+                .split_once("])")
+                .unwrap()
+                .0,
+        )
         .map(|capture| capture[1].to_string())
         .collect();
     assert!(!commands.is_empty());

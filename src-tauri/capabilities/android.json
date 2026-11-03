@@ -1,0 +1,33 @@
+{
+  "identifier": "android",
+  "description": "Android 渠道素材与图片处理业务权限",
+  "platforms": ["android"],
+  "windows": ["main"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-get-app-info",
+    "allow-health-check",
+    "allow-cms-login",
+    "allow-cms-restore-session",
+    "allow-cms-logout",
+    "allow-cms-list-promote-channels",
+    "allow-cms-list-promote-data",
+    "allow-cms-load-promote-image",
+    "allow-cms-get-promote-data",
+    "allow-cms-create-promote-data",
+    "allow-cms-update-promote-data",
+    "allow-cms-delete-promote-data",
+    "allow-cms-save-promote-order",
+    "allow-cms-upload-promote-image",
+    "allow-open-external-link",
+    "allow-image-inspect",
+    "allow-image-process",
+    "allow-image-cancel",
+    "allow-image-export",
+    "allow-list-channel-image-presets",
+    "allow-channel-draft-load",
+    "allow-channel-draft-save",
+    "allow-channel-draft-clear"
+  ]
+}

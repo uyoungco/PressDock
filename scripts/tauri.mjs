@@ -11,6 +11,24 @@ const localCargo = path.join(
   process.platform === "win32" ? "cargo.exe" : "cargo",
 );
 const env = { ...process.env };
+if (process.argv[2] === "android") {
+  env.VITE_PRESSDOCK_PLATFORM = "android";
+  env.VITE_PRESSDOCK_DEMO = env.PRESSDOCK_DEMO === "1" ? "1" : "0";
+  const androidRoot = path.join(root, ".tools", "android");
+  env.GRADLE_USER_HOME ??= path.join(androidRoot, "gradle");
+  const { readdirSync } = await import("node:fs");
+  const javaRoot = path.join(androidRoot, "java");
+  if (existsSync(javaRoot)) {
+    const java = readdirSync(javaRoot, { withFileTypes: true }).find((entry) =>
+      entry.isDirectory(),
+    );
+    if (java) env.JAVA_HOME = path.join(javaRoot, java.name);
+  }
+  if (existsSync(path.join(androidRoot, "sdk"))) {
+    env.ANDROID_HOME = path.join(androidRoot, "sdk");
+    env.NDK_HOME = path.join(env.ANDROID_HOME, "ndk", "28.2.13676358");
+  }
+}
 const pathKey =
   Object.keys(env).find((key) => key.toLowerCase() === "path") ?? "PATH";
 if (existsSync(localCargo)) {

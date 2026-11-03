@@ -1,3 +1,4 @@
+import { isAndroid, isDemo } from "@/lib/platform";
 import { useState } from "react";
 import { cn } from "cn";
 import {
@@ -29,8 +30,10 @@ export function MaterialForm({
   error,
   channels,
   title,
+  draftStatus,
 }: {
   title?: string;
+  draftStatus?: string | null;
   channels?: {
     groups: ChannelGroup[];
     loading: boolean;
@@ -60,6 +63,17 @@ export function MaterialForm({
     ["smallText", "SmallText"],
     ["writer", "Writer"],
   ];
+  const mobileLabels: Record<keyof PromoteInput, string> = {
+    channel: "渠道",
+    subChannel: "子渠道",
+    publishDate: "发布日期",
+    url: "文章链接",
+    title: "标题",
+    titlePic: "主图地址",
+    titlePic2: "第二张图片地址",
+    smallText: "摘要",
+    writer: "作者",
+  };
   return (
     <Dialog
       open
@@ -69,7 +83,7 @@ export function MaterialForm({
     >
       <DialogContent
         ref={setPortalContainer}
-        className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-2xl"
+        className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-2xl max-md:top-0 max-md:left-0 max-md:h-dvh max-md:max-h-dvh max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none"
         showCloseButton={!busy && !image.working}
         onInteractOutside={(e) => e.preventDefault()}
       >
@@ -78,7 +92,9 @@ export function MaterialForm({
             {title ?? (edit.base ? "修改素材" : "新增素材")}
           </DialogTitle>
           <DialogDescription>
-            带 * 的字段必填。上传图片只回填地址，保存后才关联素材。
+            {isDemo()
+              ? "演示数据：图片仅存入本机，保存后关联演示素材。"
+              : "带 * 的字段必填。上传图片只回填地址，保存后才关联素材。"}
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="-mx-1 flex-1">
@@ -104,107 +120,117 @@ export function MaterialForm({
               </p>
             )}
             {channels?.loading && <p role="status">正在读取渠道配置…</p>}
-            {fields.map(([field, label]) => (
-              <div key={field} className="space-y-2">
-                <label htmlFor={`material-${field}`} className="text-sm">
-                  {["channel", "title", "titlePic"].includes(field) ? "* " : ""}
-                  {label}
-                </label>
-                {/* 文章转素材从真实配置选择；子渠道铺满表单行，避免长名称被过早截断。 */}
-                {channels && (field === "channel" || field === "subChannel") ? (
-                  <SearchableSelect
-                    className={cn(field === "subChannel" && "w-full")}
-                    portalContainer={portalContainer}
-                    id={`material-${field}`}
-                    value={edit.input[field] ?? ""}
-                    options={(field === "channel"
-                      ? channels.groups.map((group) => group.channel)
-                      : (channels.groups.find(
-                          (group) => group.channel === edit.input.channel,
-                        )?.subchannels ?? [])
-                    ).map((value) => ({ value, label: value }))}
-                    placeholder={
-                      field === "channel" ? "选择渠道" : "选择子渠道"
-                    }
-                    disabled={
-                      busy ||
-                      image.working ||
-                      channels.loading ||
-                      !!channels.error ||
-                      (field === "subChannel" &&
-                        !channels.groups.find(
-                          (group) => group.channel === edit.input.channel,
-                        )?.subchannels.length)
-                    }
-                    onValueChange={(value) =>
-                      onChange(
-                        field === "channel"
-                          ? { ...edit.input, channel: value, subChannel: "" }
-                          : { ...edit.input, subChannel: value },
-                      )
-                    }
-                  />
-                ) : field === "smallText" ? (
-                  <Textarea
-                    id={`material-${field}`}
-                    value={edit.input[field] ?? ""}
-                    disabled={busy}
-                    onChange={(e) =>
-                      onChange({ ...edit.input, [field]: e.target.value })
-                    }
-                  />
-                ) : (
-                  <div className="flex items-start gap-2">
-                    <Input
+            {fields.map(([field, originalLabel]) => {
+              const label = isAndroid() ? mobileLabels[field] : originalLabel;
+              return (
+                <div key={field} className="space-y-2">
+                  <label htmlFor={`material-${field}`} className="text-sm">
+                    {["channel", "title", "titlePic"].includes(field)
+                      ? "* "
+                      : ""}
+                    {label}
+                  </label>
+                  {/* 文章转素材从真实配置选择；子渠道铺满表单行，避免长名称被过早截断。 */}
+                  {channels &&
+                  (field === "channel" || field === "subChannel") ? (
+                    <SearchableSelect
+                      className={cn(
+                        (isAndroid() || field === "subChannel") && "w-full",
+                      )}
+                      portalContainer={portalContainer}
                       id={`material-${field}`}
-                      type={field === "publishDate" ? "date" : "text"}
                       value={edit.input[field] ?? ""}
+                      options={(field === "channel"
+                        ? channels.groups.map((group) => group.channel)
+                        : (channels.groups.find(
+                            (group) => group.channel === edit.input.channel,
+                          )?.subchannels ?? [])
+                      ).map((value) => ({ value, label: value }))}
+                      placeholder={
+                        field === "channel" ? "选择渠道" : "选择子渠道"
+                      }
                       disabled={
                         busy ||
-                        (image.working &&
-                          [
-                            "channel",
-                            "subChannel",
-                            "titlePic",
-                            "titlePic2",
-                          ].includes(field))
+                        image.working ||
+                        channels.loading ||
+                        !!channels.error ||
+                        (field === "subChannel" &&
+                          !channels.groups.find(
+                            (group) => group.channel === edit.input.channel,
+                          )?.subchannels.length)
                       }
-                      onPaste={
-                        field === "titlePic" || field === "titlePic2"
-                          ? (event) => image.paste(event, field)
-                          : undefined
+                      onValueChange={(value) =>
+                        onChange(
+                          field === "channel"
+                            ? { ...edit.input, channel: value, subChannel: "" }
+                            : { ...edit.input, subChannel: value },
+                        )
                       }
+                    />
+                  ) : field === "smallText" ? (
+                    <Textarea
+                      id={`material-${field}`}
+                      value={edit.input[field] ?? ""}
+                      disabled={busy}
                       onChange={(e) =>
                         onChange({ ...edit.input, [field]: e.target.value })
                       }
                     />
-                    {field === "title" && (
-                      <TitleOptimizer
-                        title={edit.input.title}
-                        content={edit.input.smallText ?? ""}
-                        disabled={busy || image.working}
-                        titleInputId="material-title"
-                        onAdopt={(title) => onChange({ ...edit.input, title })}
+                  ) : (
+                    <div className="flex items-start gap-2">
+                      <Input
+                        id={`material-${field}`}
+                        type={field === "publishDate" ? "date" : "text"}
+                        value={edit.input[field] ?? ""}
+                        disabled={
+                          busy ||
+                          (image.working &&
+                            [
+                              "channel",
+                              "subChannel",
+                              "titlePic",
+                              "titlePic2",
+                            ].includes(field))
+                        }
+                        onPaste={
+                          field === "titlePic" || field === "titlePic2"
+                            ? (event) => image.paste(event, field)
+                            : undefined
+                        }
+                        onChange={(e) =>
+                          onChange({ ...edit.input, [field]: e.target.value })
+                        }
                       />
-                    )}
-                  </div>
-                )}
-                {(field === "titlePic" || field === "titlePic2") && (
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    aria-label={`上传 ${label}`}
-                    disabled={busy || image.working}
-                    className="block max-w-full text-xs file:mr-3 file:rounded-md file:border file:bg-secondary file:px-3 file:py-2"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      e.target.value = "";
-                      image.start(file, field);
-                    }}
-                  />
-                )}
-              </div>
-            ))}
+                      {field === "title" && !isAndroid() && (
+                        <TitleOptimizer
+                          title={edit.input.title}
+                          content={edit.input.smallText ?? ""}
+                          disabled={busy || image.working}
+                          titleInputId="material-title"
+                          onAdopt={(title) =>
+                            onChange({ ...edit.input, title })
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
+                  {(field === "titlePic" || field === "titlePic2") && (
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      aria-label={`上传 ${label}`}
+                      disabled={busy || image.working}
+                      className="block max-w-full text-xs file:mr-3 file:rounded-md file:border file:bg-secondary file:px-3 file:py-2"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        image.start(file, field);
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
             {(error || image.error) && (
               <p role="alert" className="text-sm text-destructive">
                 {error || image.error}
@@ -212,6 +238,11 @@ export function MaterialForm({
             )}
           </form>
         </ScrollArea>
+        {draftStatus && (
+          <p role="status" className="text-sm text-muted-foreground">
+            {draftStatus}
+          </p>
+        )}
         <DialogFooter className="shrink-0">
           <Button
             variant="outline"

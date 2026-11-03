@@ -11,6 +11,7 @@ import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { isDemo } from "@/lib/platform";
 
 export function MobileLayout({
   children,
@@ -18,8 +19,16 @@ export function MobileLayout({
 }: PropsWithChildren<{ contentScroll?: "page" | "contained" }>) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex h-dvh min-w-0 flex-col overflow-hidden">
+    <div className="flex h-dvh min-w-0 flex-col overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <TopBar onMenu={() => setOpen(true)} />
+      {isDemo() && (
+        <div
+          role="status"
+          className="shrink-0 bg-amber-100 px-4 py-1 text-center text-xs text-amber-950"
+        >
+          演示模式 · Mock 数据 · 操作仅保存在本机
+        </div>
+      )}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-72 p-5">
           <SheetTitle className="flex items-center gap-2">

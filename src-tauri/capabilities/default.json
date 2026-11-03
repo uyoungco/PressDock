@@ -10,7 +10,10 @@
     "allow-harvest-save-settings",
     "allow-harvest-list-jobs",
     "allow-harvest-enqueue",
+    "allow-harvest-bridge-status",
+    "allow-harvest-install-userscript",
     "allow-harvest-job-action",
+    "allow-harvest-select-source-tab",
     "core:event:allow-listen",
     "core:event:allow-unlisten",
     "allow-ai-load-settings",
@@ -50,6 +53,10 @@
     "allow-image-cancel",
     "allow-image-export",
     "allow-list-channel-image-presets",
-    "allow-save-channel-image-presets"
-  ]
+    "allow-save-channel-image-presets",
+    "allow-channel-draft-load",
+    "allow-channel-draft-save",
+    "allow-channel-draft-clear"
+  ],
+  "platforms": ["windows", "linux", "macOS"]
 }

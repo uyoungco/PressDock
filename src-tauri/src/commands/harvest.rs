@@ -1,5 +1,41 @@
 use crate::{ai::AiService, cms::CmsService, database::Database, error::CommandError, harvest::*};
-use tauri::{AppHandle, Emitter, State, WebviewWindow};
+use tauri::{AppHandle, State, WebviewWindow};
+use tauri_plugin_opener::OpenerExt;
+
+#[tauri::command]
+pub async fn harvest_bridge_status(
+    cms: State<'_, CmsService>,
+    bridge: State<'_, bridge::Bridge>,
+) -> Result<bridge::BridgeInfo, CommandError> {
+    cms.authorize().await?;
+    Ok(bridge.info.clone())
+}
+
+#[tauri::command]
+pub async fn harvest_install_userscript(
+    window: WebviewWindow,
+    app: AppHandle,
+    cms: State<'_, CmsService>,
+    bridge: State<'_, bridge::Bridge>,
+) -> Result<(), CommandError> {
+    // 安装入口只允许主窗口打开内嵌脚本的固定地址，不接受网页提供的任意 URL。
+    if window.label() != "main" {
+        return Err(HarvestError::invalid("仅支持在主窗口安装油猴脚本").into());
+    }
+    let generation = cms.authorize().await?;
+    if !bridge.info.running {
+        return Err(
+            HarvestError::new("BRIDGE_UNAVAILABLE", "油猴连接未启动，请检查连接状态").into(),
+        );
+    }
+    app.opener()
+        .open_url(bridge::INSTALL_URL, None::<&str>)
+        .map_err(|_| {
+            HarvestError::new("OPEN_LINK", "无法打开系统浏览器，请手动安装独立油猴脚本")
+        })?;
+    cms.ensure_generation(generation).await?;
+    Ok(())
+}
 
 #[tauri::command]
 pub async fn harvest_load_settings(
@@ -52,7 +88,9 @@ pub async fn harvest_list_jobs(
     harvest: State<'_, HarvestService>,
 ) -> Result<JobList, CommandError> {
     let (user, generation) = cms.harvest_identity().await?;
-    let jobs = database.harvest_list(user, &date).await?;
+    let mut jobs = database.harvest_list(user, &date).await?;
+    // 历史状态来自 SQLite；当前候选标签页只从同账号的活动上下文附加。
+    harvest.decorate_jobs(&mut jobs, user);
     cms.ensure_generation(generation).await?;
     Ok(JobList {
         jobs,
@@ -63,36 +101,9 @@ pub async fn harvest_list_jobs(
 pub async fn harvest_enqueue(
     request: EnqueueRequest,
     app: AppHandle,
-    database: State<'_, Database>,
-    cms: State<'_, CmsService>,
-    ai: State<'_, AiService>,
     harvest: State<'_, HarvestService>,
 ) -> Result<Job, CommandError> {
-    let (user, generation) = cms.harvest_identity().await?;
-    let _lock = ai.operations.lock().await;
-    cms.ensure_generation(generation).await?;
-    let (job, options) = database.harvest_enqueue(user, &request).await?;
-    cms.ensure_generation(generation).await?;
-    if job.developer_mode {
-        // 返回已有记录时也使用它的原模式/设置，不把当前开关套到历史任务上。
-        let _ = app.emit_to(
-            "main",
-            "harvest-debug",
-            DebugEvent {
-                user_id: user,
-                job_id: job.id.clone(),
-                attempt: job.attempts,
-                timestamp: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
-                step: "enqueue".into(),
-                kind: "output",
-                data: crate::error::redact(serde_json::json!({"requestId":request.id,"job":job,"options":options,"reused":job.id != request.id,"reason":if job.id != request.id {"定位已有记录；失败任务请点击重试"} else {"新任务入队"}}), &[]),
-                diagnostic: None,
-            },
-        );
-    }
-    harvest.wake.notify_one();
-    crate::harvest::worker::changed(&app);
-    Ok(job)
+    Ok(harvest.enqueue(&app, &request).await?)
 }
 #[tauri::command]
 pub async fn harvest_job_action(
@@ -101,9 +112,38 @@ pub async fn harvest_job_action(
     app: AppHandle,
     cms: State<'_, CmsService>,
     harvest: State<'_, HarvestService>,
+    ai: State<'_, AiService>,
 ) -> Result<(), CommandError> {
     let (user, generation) = cms.harvest_identity().await?;
+    // 重试和设置保存/入队共用锁，使获取配置快照与已确认的设置一致。
+    let _lock = if matches!(action, Action::Retry) {
+        Some(ai.operations.lock().await)
+    } else {
+        None
+    };
+    cms.ensure_generation(generation).await?;
     harvest.action(&app, &id, user, action).await?;
+    cms.ensure_generation(generation).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn harvest_select_source_tab(
+    id: String,
+    target_id: String,
+    window: WebviewWindow,
+    app: AppHandle,
+    cms: State<'_, CmsService>,
+    harvest: State<'_, HarvestService>,
+) -> Result<(), CommandError> {
+    // 浏览器页面不能借助此命令操作用户的其他标签页。
+    if window.label() != "main" || uuid::Uuid::parse_str(&id).is_err() || target_id.is_empty() {
+        return Err(HarvestError::invalid("无效的标签页选择请求").into());
+    }
+    let (user, generation) = cms.harvest_identity().await?;
+    harvest
+        .select_source_tab(&app, &id, user, &target_id)
+        .await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }

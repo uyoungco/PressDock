@@ -1,3 +1,4 @@
+import { homePath, routeAvailable } from "@/lib/platform";
 import { cmsIpc } from "@/services/tauri/cms";
 import {
   invalidateClientRequests,
@@ -105,7 +106,7 @@ export const authService = {
   },
   async login(input: LoginInput) {
     if (!isDesktop())
-      throw new ServiceError("DESKTOP_REQUIRED", "请在 PressDock 桌面端登录");
+      throw new ServiceError("DESKTOP_REQUIRED", "请在 PressDock 应用内登录");
     const request = loginInputSchema.parse(input);
     const operation = begin();
     update({ status: "authenticating", session: null, error: null });
@@ -153,23 +154,24 @@ export function safeReturnPath(value: string | null): string {
     value.startsWith("//") ||
     unsafe(value)
   )
-    return "/dashboard";
+    return homePath();
   try {
     const url = new URL(value, "https://pressdock.invalid");
     if (url.origin !== "https://pressdock.invalid" || url.pathname === "/login")
-      return "/dashboard";
+      return homePath();
     // 只允许已实现的工作区页面，路径按解码后再次校验。
     const path = decodeURIComponent(url.pathname);
-    if (unsafe(path)) return "/dashboard";
+    if (unsafe(path)) return homePath();
     if (
       !/^\/(dashboard|articles|import|images|publish|settings|channels)$/.test(
         path,
       ) &&
       !/^\/articles\/(quality|review-[123])$/.test(path)
     )
-      return "/dashboard";
+      return homePath();
+    if (!routeAvailable(url.pathname)) return homePath();
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
-    return "/dashboard";
+    return homePath();
   }
 }

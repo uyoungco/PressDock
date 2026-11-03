@@ -15,12 +15,14 @@ fn failure() -> AiError {
     )
 }
 
+#[cfg(not(target_os = "android"))]
 impl NativeAiVault {
     fn entry(reference: &str) -> Result<keyring::Entry, AiError> {
         keyring::Entry::new("com.example.pressdock.ai", reference).map_err(|_| failure())
     }
 }
 
+#[cfg(not(target_os = "android"))]
 impl AiVault for NativeAiVault {
     fn load(&self, reference: &str) -> Result<String, AiError> {
         Self::entry(reference)?
@@ -37,5 +39,18 @@ impl AiVault for NativeAiVault {
             Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
             Err(_) => Err(failure()),
         }
+    }
+}
+
+#[cfg(target_os = "android")]
+impl AiVault for NativeAiVault {
+    fn load(&self, _: &str) -> Result<String, AiError> {
+        Err(failure())
+    }
+    fn save(&self, _: &str, _: &str) -> Result<(), AiError> {
+        Err(failure())
+    }
+    fn clear(&self, _: &str) -> Result<(), AiError> {
+        Err(failure())
     }
 }

@@ -7,6 +7,7 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
+import { isAndroid, homePath, routeAvailable } from "@/lib/platform";
 import { lazy, Suspense } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DesktopLayout } from "@/layouts/DesktopLayout";
@@ -14,6 +15,7 @@ import { MobileLayout } from "@/layouts/MobileLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RequireSession, SessionBoundary } from "@/features/auth/components";
 import { useDeveloperTools } from "@/features/import/use-developer-tools";
+import { useAndroidShell } from "./android-shell";
 const Login = lazy(() => import("@/pages/Login"));
 const Channels = lazy(() => import("@/pages/Channels"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -24,10 +26,12 @@ const Publish = lazy(() => import("@/pages/Publish"));
 const Settings = lazy(() => import("@/pages/Settings"));
 
 function Workspace() {
+  useAndroidShell();
   useDeveloperTools();
   const mobile = useIsMobile();
   const { pathname } = useLocation();
-  const Layout = mobile ? MobileLayout : DesktopLayout;
+  const Layout = isAndroid() || mobile ? MobileLayout : DesktopLayout;
+  if (!routeAvailable(pathname)) return <Navigate replace to={homePath()} />;
   return (
     <Layout
       contentScroll={
@@ -58,7 +62,7 @@ function RouteError() {
             ? error.message
             : "发生未知错误"}
       </p>
-      <Link to="/dashboard" className="underline">
+      <Link to={homePath()} className="underline">
         返回工作台
       </Link>
     </div>
@@ -84,7 +88,7 @@ export const routes = [
           </RequireSession>
         ),
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
+          { index: true, element: <Navigate to={homePath()} replace /> },
           { path: "/dashboard", element: <Dashboard /> },
           {
             path: "/articles",
@@ -101,7 +105,7 @@ export const routes = [
           { path: "/publish", element: <Publish /> },
           { path: "/settings", element: <Settings /> },
           { path: "/channels", element: <Channels /> },
-          { path: "*", element: <Navigate to="/dashboard" replace /> },
+          { path: "*", element: <Navigate to={homePath()} replace /> },
         ],
       },
     ],

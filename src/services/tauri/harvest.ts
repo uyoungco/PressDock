@@ -7,12 +7,17 @@ import {
   harvestListSchema,
   harvestActionSchema,
   harvestDebugSchema,
+  harvestBridgeSchema,
   type HarvestDebugEvent,
   type HarvestSettings,
   type HarvestAction,
 } from "@/features/import/contracts";
 
 export const harvestIpc = {
+  bridgeStatus: () =>
+    invokeCommand("harvest_bridge_status", harvestBridgeSchema),
+  installUserscript: () =>
+    invokeCommand("harvest_install_userscript", z.null()),
   setDeveloperMode: (enabled: boolean) =>
     invokeCommand("harvest_set_developer_mode", z.boolean(), {
       enabled: z.boolean().parse(enabled),
@@ -33,6 +38,11 @@ export const harvestIpc = {
     invokeCommand("harvest_job_action", z.null(), {
       id: z.uuid().parse(id),
       action: harvestActionSchema.parse(action),
+    }),
+  selectSourceTab: (id: string, targetId: string) =>
+    invokeCommand("harvest_select_source_tab", z.null(), {
+      id: z.uuid().parse(id),
+      targetId: z.string().min(1).parse(targetId),
     }),
   // 事件只通知重新读取；文章数据与状态以 Rust/SQLite 返回的校验结果为准。
   subscribe: (refresh: () => void) => listen("harvest-changed", refresh),

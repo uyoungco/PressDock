@@ -1,3 +1,4 @@
+import { isAndroid, isDemo } from "@/lib/platform";
 import { useState } from "react";
 import { useAtom } from "jotai";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -41,7 +42,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
       const result = await authService.logout();
       if (!result.credentialsCleared)
         toast.error("已退出当前会话，但安全凭据未能禁用。请检查应用数据目录。");
-      else if (!result.remoteSucceeded)
+      else if (!isDemo() && !result.remoteSucceeded)
         toast.warning("已退出本地会话，后台退出请求未成功。");
     } catch (reason) {
       if (reason instanceof ServiceError && reason.code === "SESSION_CHANGED")
@@ -69,32 +70,43 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
       >
         <PanelLeft className="size-4" />
       </Button>
-      <span className="hidden text-sm text-muted-foreground md:block">
+      <span
+        className={
+          isAndroid()
+            ? "hidden"
+            : "hidden text-sm text-muted-foreground md:block"
+        }
+      >
         工作空间 <span className="px-2 text-border">/</span>{" "}
         <span className="text-foreground">{current?.label ?? "PressDock"}</span>
       </span>
-      <form
-        className="relative ml-auto min-w-0 flex-1 sm:w-60 sm:flex-none"
-        onSubmit={(e) => {
-          e.preventDefault();
-          // 顶部搜索提交到当前文章类别；其他页面默认查询优质文章。
-          const target = /^\/articles\/(quality|review-[123])$/.test(pathname)
-            ? pathname
-            : "/articles/quality";
-          navigate(
-            `${target}?${new URLSearchParams({ title: search, current: "1", pagesize: "50" })}`,
-          );
-        }}
-      >
-        <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
-        <Input
-          aria-label="搜索文章"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="搜索文章，回车查看"
-          className="h-9 bg-muted/40 pl-9"
-        />
-      </form>
+      {!isAndroid() && (
+        <form
+          className="relative ml-auto min-w-0 flex-1 sm:w-60 sm:flex-none"
+          onSubmit={(e) => {
+            e.preventDefault();
+            // 顶部搜索提交到当前文章类别；其他页面默认查询优质文章。
+            const target = /^\/articles\/(quality|review-[123])$/.test(pathname)
+              ? pathname
+              : "/articles/quality";
+            navigate(
+              `${target}?${new URLSearchParams({ title: search, current: "1", pagesize: "50" })}`,
+            );
+          }}
+        >
+          <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
+          <Input
+            aria-label="搜索文章"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索文章，回车查看"
+            className="h-9 bg-muted/40 pl-9"
+          />
+        </form>
+      )}
+      {isAndroid() && (
+        <span className="mr-auto text-sm">{current?.label ?? "PressDock"}</span>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label="切换主题">
@@ -117,14 +129,16 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="打开设置"
-        onClick={() => navigate("/settings")}
-      >
-        <Settings className="size-4" />
-      </Button>
+      {!isAndroid() && (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="打开设置"
+          onClick={() => navigate("/settings")}
+        >
+          <Settings className="size-4" />
+        </Button>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" aria-label="账号菜单">
@@ -141,9 +155,11 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
         <DialogContent>
           <DialogTitle>退出登录？</DialogTitle>
           <DialogDescription>
-            {dirty
-              ? "当前有未保存修改，退出后将丢失。取消退出可返回保存修改。"
-              : "退出后需要重新登录才能进入工作区。"}
+            {isAndroid()
+              ? "退出后需要重新登录，并会清除此设备尚未提交的素材草稿。"
+              : dirty
+                ? "当前有未保存修改，退出后将丢失。取消退出可返回保存修改。"
+                : "退出后需要重新登录才能进入工作区。"}
           </DialogDescription>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmLogout(false)}>

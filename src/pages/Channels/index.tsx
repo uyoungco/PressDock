@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { isAndroid } from "@/lib/platform";
+import { useChannelController } from "@/features/channels/use-channel-controller";
+import { MobileChannelView } from "@/features/channels/MobileChannelView";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { Copy, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,19 +20,12 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MaterialImage } from "@/features/channels/MaterialImage";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
-import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
-import {
-  businessKeys,
-  channelFilterAtom,
-  invalidateBusinessQueries,
-} from "@/lib/query-runtime";
+import { useAtomValue } from "jotai";
+import { channelFilterAtom } from "@/lib/query-runtime";
 import { MaterialTable } from "@/features/channels/MaterialTable";
 import { materialColumnPreferences } from "@/features/channels/table-model";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
 import { DataTableColumnSettings } from "@/components/ui/data-table-column-settings";
-import { useChannelActions } from "@/features/channels/use-channel-actions";
 import {
   Dialog,
   DialogContent,
@@ -37,13 +33,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  channelService,
   channelQueryParams,
   readChannelQuery,
 } from "@/features/channels/service";
 import {
   pageSizes,
-  type PromotePage,
   type PromoteQuery,
   type PromoteRecord,
   type PromoteField,
@@ -51,19 +45,14 @@ import {
 
 const show = (value: string | number | null) =>
   value === "" || value === null ? "—" : String(value);
-const queryKey = (query: PromoteQuery) => channelQueryParams(query).toString();
-const sameFilters = (a: PromoteQuery, b: PromoteQuery) =>
-  a.channel === b.channel &&
-  a.subchannel === b.subchannel &&
-  a.publishdate === b.publishdate &&
-  a.pagesize === b.pagesize;
-
 function MaterialDetail({
   row,
   onClose,
+  onEdit,
 }: {
   row: PromoteRecord | null;
   onClose: () => void;
+  onEdit?: (row: PromoteRecord) => void;
 }) {
   const fields: [PromoteField, string][] = [
     ["id", "素材 ID"],
@@ -104,6 +93,18 @@ function MaterialDetail({
         <DialogDescription>
           查看渠道素材的标题、摘要和关联信息。
         </DialogDescription>
+        {row && onEdit && (
+          <Button
+            className="shrink-0"
+            variant="outline"
+            onClick={() => {
+              onClose();
+              onEdit(row);
+            }}
+          >
+            编辑此素材
+          </Button>
+        )}
         {row && (
           <ScrollArea
             className="-mx-1 flex-1"
@@ -163,7 +164,7 @@ export default function Channels() {
         replace
         to={{
           pathname: "/channels",
-          search: `?${channelQueryParams(remembered ?? readChannelQuery(params))}`,
+          search: `?${channelQueryParams(remembered ?? { ...readChannelQuery(params), ...(isAndroid() ? { pagesize: 20 as const } : {}) })}`,
         }}
       />
     );
@@ -176,121 +177,45 @@ function ChannelResults() {
     "channels",
     materialColumnPreferences,
   );
-  const [params, setParams] = useSearchParams();
-  const applied = useMemo(() => readChannelQuery(params), [params]);
-  const key = queryKey(applied);
-  const [draft, setDraft] = useState(applied);
-  const user = useQueryUser();
-  const client = useQueryClient();
-  const remember = useSetAtom(channelFilterAtom);
-  const groupQuery = useBusinessQuery(
-    businessKeys.groups(user),
-    channelService.groups,
-  );
-  const groups = groupQuery.data ?? [];
-  const groupsLoading = groupQuery.isPending;
-  const groupsError = groupQuery.error?.message ?? null;
-  const list = useBusinessQuery(businessKeys.channelPage(user, applied), () =>
-    channelService.list(applied),
-  );
-  const matchingResult = list.data ?? null;
-  const loading = list.isPending;
-  const error = list.error?.message ?? null;
-  const previousResult = useRef<{
-    query: PromoteQuery;
-    page: PromotePage;
-  } | null>(null);
-  const [selected, setSelected] = useState<PromoteRecord | null>(null);
-  const listViewport = useRef<HTMLDivElement>(null);
-  const mutationRefresh = useRef<{ key: string; deleted: boolean } | null>(
-    null,
-  );
-  const refresh = () => {
-    void invalidateBusinessQueries(client, businessKeys.channels(user));
-  };
-  const actions = useChannelActions(applied, (deleted) => {
-    mutationRefresh.current = { key, deleted };
-  });
-  const locked = actions.sorting || actions.busy;
-  const nextState = client.getQueryState<PromotePage>(
-    businessKeys.channelPage(user, {
-      ...applied,
-      current: applied.current + 1,
-    }),
-  );
-  const end =
-    !!matchingResult &&
-    (matchingResult.data.length < applied.pagesize ||
-      (!!nextState?.data &&
-        !nextState.isInvalidated &&
-        nextState.dataUpdatedAt >= list.dataUpdatedAt &&
-        !nextState.data.data.length));
-
-  useEffect(() => {
-    remember(applied);
-    setDraft(applied);
-    setSelected(null);
-    if (listViewport.current) listViewport.current.scrollTop = 0;
-  }, [applied, remember]);
-  useEffect(() => {
-    if (!list.data || list.isFetching || list.isError) return;
-    const page = list.data;
-    const mutation =
-      mutationRefresh.current?.key === key ? mutationRefresh.current : null;
-    mutationRefresh.current = null;
-    if (mutation?.deleted && !page.data.length && applied.current > 1) {
-      setParams(
-        channelQueryParams({ ...applied, current: applied.current - 1 }),
-        { replace: true },
-      );
-      return;
-    }
-    const previous = previousResult.current;
-    if (
-      !page.data.length &&
-      previous &&
-      sameFilters(applied, previous.query) &&
-      applied.current === previous.query.current + 1
-    ) {
-      setParams(channelQueryParams(previous.query), { replace: true });
-      toast.info("已到末页");
-      return;
-    }
-    previousResult.current = { query: applied, page };
-  }, [
+  const controller = useChannelController();
+  const {
     applied,
-    key,
-    list.data,
-    list.dataUpdatedAt,
-    list.isFetching,
-    list.isError,
-    setParams,
-  ]);
-  useEffect(() => {
-    if (list.error && mutationRefresh.current?.key === key) {
-      mutationRefresh.current = null;
-      toast.warning("操作已完成，但列表刷新失败，请重试列表");
-    }
-  }, [list.error, key]);
-
-  const subchannels =
-    groups.find((group) => group.channel === draft.channel)?.subchannels ?? [];
-  function submit(query: PromoteQuery) {
-    if (locked) return;
-    if (listViewport.current) listViewport.current.scrollTop = 0;
-    if (queryKey(query) === key) refresh();
-    else setParams(channelQueryParams(query));
-  }
-  const sortReason =
-    !applied.channel || !applied.subchannel || !applied.publishdate
-      ? "请填写渠道、子渠道和日期并搜索后排序"
-      : queryKey(draft) !== key
-        ? "筛选条件尚未搜索，请先搜索"
-        : list.isFetching || error || !matchingResult
-          ? "请等待当前页成功加载"
-          : matchingResult.data.length < 2
-            ? "当前页至少需要两条素材"
-            : "";
+    draft,
+    setDraft,
+    groups,
+    groupsLoading,
+    groupsError,
+    list,
+    groupQuery,
+    matchingResult,
+    loading,
+    error,
+    selected,
+    setSelected,
+    listViewport,
+    refresh,
+    actions,
+    locked,
+    end,
+    subchannels,
+    submit,
+    sortReason,
+  } = controller;
+  const compact = useIsMobile();
+  if (isAndroid() || compact)
+    return (
+      <>
+        <MobileChannelView controller={controller} />
+        <MaterialDetail
+          row={selected}
+          onClose={() => setSelected(null)}
+          onEdit={(row) => {
+            void actions.beginEdit(row);
+          }}
+        />
+        {actions.dialogs}
+      </>
+    );
   return (
     <>
       <Card className="h-full min-h-0 min-w-0 flex-1 gap-0 overflow-hidden py-0 shadow-none">
@@ -589,7 +514,13 @@ function ChannelResults() {
           </div>
         </div>
       </Card>
-      <MaterialDetail row={selected} onClose={() => setSelected(null)} />
+      <MaterialDetail
+        row={selected}
+        onClose={() => setSelected(null)}
+        onEdit={(row) => {
+          void actions.beginEdit(row);
+        }}
+      />
       {actions.dialogs}
     </>
   );

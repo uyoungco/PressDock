@@ -10,3 +10,5 @@ pub(crate) use tests::ipc_service;
 
 pub use client::{CmsError, CmsService};
 pub use models::*;
+#[cfg(feature = "android-demo")]
+pub(crate) mod demo;
