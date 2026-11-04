@@ -110,14 +110,13 @@ export function MaterialImage({
           )}
         </div>
       )}
-      {image && (
-        <div className="mt-1 space-y-0.5 text-xs leading-4 text-muted-foreground">
-          <p>{imageByteSize(image.byteSize)}</p>
-          <p>
-            {image.width} × {image.height} px
-          </p>
-        </div>
-      )}
+      <div
+        aria-hidden={!image}
+        className="mt-1 space-y-0.5 text-xs leading-4 text-muted-foreground"
+      >
+        <p>{image ? imageByteSize(image.byteSize) : "\u00a0"}</p>
+        <p>{image ? `${image.width} × ${image.height} px` : "\u00a0"}</p>
+      </div>
     </div>
   );
 }
