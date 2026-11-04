@@ -18,15 +18,28 @@ if (process.argv[2] === "android") {
   env.GRADLE_USER_HOME ??= path.join(androidRoot, "gradle");
   const { readdirSync } = await import("node:fs");
   const javaRoot = path.join(androidRoot, "java");
-  if (existsSync(javaRoot)) {
+  if (!env.JAVA_HOME && existsSync(javaRoot)) {
     const java = readdirSync(javaRoot, { withFileTypes: true }).find((entry) =>
       entry.isDirectory(),
     );
-    if (java) env.JAVA_HOME = path.join(javaRoot, java.name);
+    if (java) {
+      const home = path.join(javaRoot, java.name);
+      const javaHome = existsSync(path.join(home, "Contents", "Home"))
+        ? path.join(home, "Contents", "Home")
+        : home;
+      const executable = process.platform === "win32" ? "java.exe" : "java";
+      if (existsSync(path.join(javaHome, "bin", executable))) {
+        env.JAVA_HOME = javaHome;
+      }
+    }
   }
-  if (existsSync(path.join(androidRoot, "sdk"))) {
+  env.ANDROID_HOME ??= env.ANDROID_SDK_ROOT;
+  if (!env.ANDROID_HOME && existsSync(path.join(androidRoot, "sdk"))) {
     env.ANDROID_HOME = path.join(androidRoot, "sdk");
-    env.NDK_HOME = path.join(env.ANDROID_HOME, "ndk", "28.2.13676358");
+  }
+  if (env.ANDROID_HOME && !env.NDK_HOME) {
+    const ndk = path.join(env.ANDROID_HOME, "ndk", "28.2.13676358");
+    if (existsSync(ndk)) env.NDK_HOME = ndk;
   }
 }
 const pathKey =
