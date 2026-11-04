@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { isDemo } from "@/lib/platform";
+import { isAndroid, isDemo } from "@/lib/platform";
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -183,7 +183,8 @@ export function useMaterialImage(
         }}
       >
         <DialogContent
-          className="flex max-h-[95dvh] flex-col sm:max-w-6xl"
+          data-mobile-fullscreen={isAndroid() || undefined}
+          className="flex max-h-[95dvh] flex-col overflow-hidden sm:max-w-6xl"
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -191,7 +192,14 @@ export function useMaterialImage(
           }}
         >
           <DialogTitle>
-            处理 {work ? imageFieldLabels[work.field] : "素材图片"}
+            处理{" "}
+            {work
+              ? isAndroid()
+                ? work.field === "titlePic"
+                  ? "主图"
+                  : "第二张图片"
+                : imageFieldLabels[work.field]
+              : "素材图片"}
           </DialogTitle>
           <DialogDescription>
             {work?.channel || "未选择渠道"} /{" "}
@@ -200,8 +208,13 @@ export function useMaterialImage(
               ? "演示：确认后存入本机，保存后关联演示素材。"
               : "确认结果后上传，保存素材后才关联。已配置的参数锁定。"}
           </DialogDescription>
+          {/* 竖屏让组件自己滚动参数，底部确认不再随外层内容滚走。 */}
           <ScrollArea
-            className="-mx-1 flex-1"
+            className={
+              isAndroid()
+                ? "-mx-1 min-h-0 flex-1 [&>[data-slot=scroll-area-viewport]>[data-slot=scroll-area-content]]:h-full"
+                : "-mx-1 flex-1"
+            }
             viewportProps={{ className: "px-1 py-1" }}
           >
             {work && (
@@ -214,8 +227,11 @@ export function useMaterialImage(
                     </Button>
                   </div>
                 ) : work.preset ? (
-                  <div className="relative">
-                    <div inert={work.uploading}>
+                  <div className={isAndroid() ? "relative h-full" : "relative"}>
+                    <div
+                      inert={work.uploading}
+                      className={isAndroid() ? "h-full" : undefined}
+                    >
                       <ImageProcessor
                         image={work.file}
                         preset={work.preset}

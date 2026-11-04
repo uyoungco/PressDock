@@ -47,89 +47,100 @@ export function MobileChannelView({
     <section className="flex min-h-0 flex-1 flex-col" aria-label="渠道素材管理">
       <div
         data-slot="mobile-channel-toolbar"
-        className="flex shrink-0 flex-wrap items-center gap-2 border-b p-3"
+        className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2"
       >
         {c.actions.hasRetainedDraft && (
           <Button
-            className="min-h-12 w-full"
+            className="h-9 w-full"
             variant="secondary"
             onClick={c.actions.resumeDraft}
           >
             继续本机草稿
           </Button>
         )}
-        <Button
-          className="min-h-12"
-          disabled={c.locked}
-          onClick={() => {
-            c.setDraft(c.applied);
-            setFilterOpen(true);
-          }}
-        >
-          筛选{" "}
-          {[
-            c.applied.channel,
-            c.applied.subchannel,
-            c.applied.publishdate,
-          ].filter(Boolean).length || ""}
-        </Button>
-        <Button
-          className="min-h-12"
-          variant="outline"
-          disabled={c.locked || c.list.isFetching}
-          onClick={c.refresh}
-        >
-          {c.list.isFetching ? "刷新中…" : "刷新"}
-        </Button>
-        <Button
-          className="ml-auto min-h-12"
-          disabled={c.locked}
-          onClick={c.actions.create}
-        >
-          新增
-        </Button>
-        <div
-          data-slot="mobile-channel-conditions"
-          className="flex w-full flex-wrap gap-1"
-          aria-label="已应用条件"
-        >
-          {[c.applied.channel, c.applied.subchannel, c.applied.publishdate]
-            .filter(Boolean)
-            .map((v) => (
-              <Badge
-                key={v}
-                variant="secondary"
-                className="max-w-full whitespace-normal break-words"
-              >
-                {v}
-              </Badge>
-            ))}
-        </div>
-        <Button
-          className="min-h-12"
-          variant="outline"
-          disabled={c.actions.busy || (!c.actions.sorting && !!c.sortReason)}
-          onClick={() =>
-            c.actions.sorting
-              ? void c.actions.saveOrder()
-              : c.actions.startSort(rows)
-          }
-        >
-          {c.actions.sorting ? "保存当前页排序" : "排序"}
-        </Button>
+        {/* 排序时只保留提交与取消；禁用原因不再独占一整行。 */}
         {c.actions.sorting ? (
-          <Button
-            className="min-h-12"
-            variant="ghost"
-            disabled={c.actions.busy}
-            onClick={c.actions.cancelSort}
-          >
-            取消排序
-          </Button>
+          <>
+            <Button
+              disabled={c.actions.busy}
+              onClick={() => void c.actions.saveOrder()}
+            >
+              保存当前页排序
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={c.actions.busy}
+              onClick={c.actions.cancelSort}
+            >
+              取消排序
+            </Button>
+          </>
         ) : (
-          c.sortReason && (
-            <p className="text-xs text-muted-foreground">{c.sortReason}</p>
-          )
+          <>
+            <Button
+              disabled={c.locked}
+              onClick={() => {
+                c.setDraft(c.applied);
+                setFilterOpen(true);
+              }}
+            >
+              筛选{" "}
+              {[
+                c.applied.channel,
+                c.applied.subchannel,
+                c.applied.publishdate,
+              ].filter(Boolean).length || ""}
+            </Button>
+            <Button
+              variant="outline"
+              disabled={c.locked || c.list.isFetching}
+              onClick={c.refresh}
+            >
+              {c.list.isFetching ? "刷新中…" : "刷新"}
+            </Button>
+            <Button
+              variant="outline"
+              title={c.sortReason || undefined}
+              aria-describedby={c.sortReason ? "mobile-sort-reason" : undefined}
+              disabled={c.actions.busy || !!c.sortReason}
+              onClick={() => c.actions.startSort(rows)}
+            >
+              排序
+            </Button>
+            {c.sortReason && (
+              <span id="mobile-sort-reason" className="sr-only">
+                {c.sortReason}
+              </span>
+            )}
+            <Button
+              className="ml-auto"
+              disabled={c.locked}
+              onClick={c.actions.create}
+            >
+              新增
+            </Button>
+          </>
+        )}
+        {[c.applied.channel, c.applied.subchannel, c.applied.publishdate].some(
+          Boolean,
+        ) && (
+          <div
+            data-slot="mobile-channel-conditions"
+            className="flex w-full flex-wrap gap-1"
+            aria-label="已应用条件"
+          >
+            {[c.applied.channel, c.applied.subchannel, c.applied.publishdate]
+              .filter(Boolean)
+              .map((v) => (
+                <Badge
+                  key={v}
+                  variant="secondary"
+                  className="max-w-full whitespace-normal break-words"
+                >
+                  {v}
+                </Badge>
+              ))}
+          </div>
         )}
       </div>
       <div
@@ -172,13 +183,16 @@ export function MobileChannelView({
             >
               <button
                 type="button"
-                className="min-h-12 text-left font-medium leading-relaxed"
+                className="min-h-9 text-left font-medium leading-relaxed"
                 onClick={() => c.setSelected(row)}
                 disabled={c.locked}
               >
                 <span className="line-clamp-2">{row.title || "无标题"}</span>
               </button>
-              <div className="flex flex-wrap gap-2">
+              <div
+                data-slot="mobile-material-images"
+                className="flex flex-wrap gap-2"
+              >
                 <MaterialImage
                   compact
                   url={row.titlePic}
@@ -195,16 +209,21 @@ export function MobileChannelView({
                 )}
               </div>
               <p className="break-words text-sm text-muted-foreground">
-                {[row.channel, row.subChannel, row.publishDate?.slice(0, 10)]
-                  .filter(Boolean)
-                  .join(" · ")}
+                {[row.channel, row.subChannel].filter(Boolean).join(" · ")}
+                {/* 日期整体换行，避免窄屏把年月日拆成两行。 */}
+                {row.publishDate && (
+                  <span className="inline-block whitespace-nowrap">
+                    {" · "}
+                    {row.publishDate.slice(0, 10)}
+                  </span>
+                )}
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 {c.actions.sorting ? (
                   <>
                     <span>第 {i + 1} 位</span>
                     <Button
-                      className="min-h-12"
+                      className="h-9"
                       variant="outline"
                       disabled={c.actions.busy || i === 0}
                       onClick={() => c.actions.move(row.id, rows[i - 1].id)}
@@ -212,7 +231,7 @@ export function MobileChannelView({
                       上移
                     </Button>
                     <Button
-                      className="min-h-12"
+                      className="h-9"
                       variant="outline"
                       disabled={c.actions.busy || i === rows.length - 1}
                       onClick={() => c.actions.move(row.id, rows[i + 1].id)}
@@ -223,7 +242,7 @@ export function MobileChannelView({
                 ) : (
                   <>
                     <Button
-                      className="min-h-12"
+                      className="h-9"
                       variant="outline"
                       disabled={c.locked}
                       onClick={() => void c.actions.beginEdit(row)}
@@ -231,16 +250,13 @@ export function MobileChannelView({
                       编辑
                     </Button>
                     <Button
-                      className="min-h-12"
+                      className="h-9"
                       variant="ghost"
                       disabled={c.locked}
                       onClick={() => c.actions.requestDelete(row)}
                     >
                       删除
                     </Button>
-                    <span className="ml-auto text-xs text-muted-foreground">
-                      ID {row.id}
-                    </span>
                   </>
                 )}
               </div>
@@ -249,14 +265,15 @@ export function MobileChannelView({
         </ul>
       </div>
       <div
-        className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t p-3"
+        data-slot="mobile-pagination"
+        className="flex shrink-0 items-center justify-between gap-2 border-t px-3 py-1.5"
         aria-label="素材分页"
       >
-        <label className="text-sm">
-          第 {c.applied.current} 页 · 每页{" "}
+        <label className="flex items-center gap-1 text-xs">
+          第 {c.applied.current} 页
           <select
             aria-label="每页条数"
-            className="min-h-12 rounded-md border bg-background px-2"
+            className="h-8 rounded-md border bg-background px-1"
             value={c.applied.pagesize}
             disabled={c.locked}
             onChange={(e) =>
@@ -269,14 +286,15 @@ export function MobileChannelView({
           >
             {pageSizes.map((n) => (
               <option key={n} value={n}>
-                {n}
+                {n} 条/页
               </option>
             ))}
           </select>
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <Button
-            className="min-h-12"
+            size="sm"
+            className="h-8"
             variant="outline"
             disabled={c.locked || c.loading || c.applied.current <= 1}
             onClick={() =>
@@ -286,7 +304,8 @@ export function MobileChannelView({
             上一页
           </Button>
           <Button
-            className="min-h-12"
+            size="sm"
+            className="h-8"
             variant="outline"
             disabled={
               c.locked || c.loading || !!c.error || !c.matchingResult || c.end
@@ -307,7 +326,8 @@ export function MobileChannelView({
       >
         <SheetContent
           side="bottom"
-          className="max-h-[90dvh] overflow-y-auto rounded-t-xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+          data-mobile-fullscreen
+          className="flex max-h-[90dvh] flex-col overflow-hidden rounded-t-xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
           onEscapeKeyDown={(e) => {
             if (selection) {
               e.preventDefault();
@@ -316,21 +336,22 @@ export function MobileChannelView({
             }
           }}
         >
-          <SheetTitle>
-            {selection
-              ? `选择${selection === "channel" ? "渠道" : "子渠道"}`
-              : "筛选渠道素材"}
-          </SheetTitle>
-          <SheetDescription>
-            {selection
-              ? "搜索本机已加载的选项，选择后返回筛选。"
-              : "设置条件后点击应用。"}
-          </SheetDescription>
+          {/* 标题和底部操作固定，选项及表单仅在中间区域滚动。 */}
+          <div className="flex shrink-0 flex-col gap-2 pr-8">
+            <SheetTitle>
+              {selection
+                ? `选择${selection === "channel" ? "渠道" : "子渠道"}`
+                : "筛选渠道素材"}
+            </SheetTitle>
+            <SheetDescription>
+              {selection ? "选择后返回筛选。" : "设置条件后点击应用。"}
+            </SheetDescription>
+          </div>
           {selection ? (
             <>
               <Button
                 variant="outline"
-                className="min-h-12"
+                className="h-9"
                 onClick={() => {
                   setSelection(null);
                   setSearch("");
@@ -340,14 +361,15 @@ export function MobileChannelView({
               </Button>
               <Input
                 aria-label="搜索选项"
-                className="min-h-12"
+                placeholder={`搜索${selection === "channel" ? "渠道" : "子渠道"}名称`}
+                className="h-10 shrink-0"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
               <div
                 role="listbox"
                 aria-label="可选条件"
-                className="flex flex-col gap-1"
+                className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto"
               >
                 {choices.map((value) => (
                   <Button
@@ -357,7 +379,7 @@ export function MobileChannelView({
                     variant={
                       c.draft[selection] === value ? "secondary" : "ghost"
                     }
-                    className="h-auto min-h-12 justify-start whitespace-normal text-left"
+                    className="h-auto min-h-10 justify-start whitespace-normal text-left"
                     onClick={() => {
                       c.setDraft({
                         ...c.draft,
@@ -376,50 +398,52 @@ export function MobileChannelView({
             </>
           ) : (
             <>
-              <FieldGroup>
-                <Field>
-                  <FieldLabel>渠道</FieldLabel>
-                  <Button
-                    className="h-auto min-h-12 justify-start whitespace-normal text-left"
-                    variant="outline"
-                    disabled={c.groupsLoading || !!c.groupsError}
-                    onClick={() => setSelection("channel")}
-                  >
-                    {c.draft.channel || "全部渠道"}
-                  </Button>
-                </Field>
-                <Field>
-                  <FieldLabel>子渠道</FieldLabel>
-                  <Button
-                    className="h-auto min-h-12 justify-start whitespace-normal text-left"
-                    variant="outline"
-                    disabled={
-                      !c.draft.channel || c.groupsLoading || !!c.groupsError
-                    }
-                    onClick={() => setSelection("subchannel")}
-                  >
-                    {c.draft.subchannel || "全部子渠道"}
-                  </Button>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="mobile-publish-date">
-                    发布日期
-                  </FieldLabel>
-                  <Input
-                    id="mobile-publish-date"
-                    type="date"
-                    className="min-h-12"
-                    value={c.draft.publishdate}
-                    onChange={(e) =>
-                      c.setDraft({ ...c.draft, publishdate: e.target.value })
-                    }
-                  />
-                </Field>
-              </FieldGroup>
-              <div className="flex gap-2">
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel>渠道</FieldLabel>
+                    <Button
+                      className="h-auto min-h-10 justify-start whitespace-normal text-left"
+                      variant="outline"
+                      disabled={c.groupsLoading || !!c.groupsError}
+                      onClick={() => setSelection("channel")}
+                    >
+                      {c.draft.channel || "全部渠道"}
+                    </Button>
+                  </Field>
+                  <Field>
+                    <FieldLabel>子渠道</FieldLabel>
+                    <Button
+                      className="h-auto min-h-10 justify-start whitespace-normal text-left"
+                      variant="outline"
+                      disabled={
+                        !c.draft.channel || c.groupsLoading || !!c.groupsError
+                      }
+                      onClick={() => setSelection("subchannel")}
+                    >
+                      {c.draft.subchannel || "全部子渠道"}
+                    </Button>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="mobile-publish-date">
+                      发布日期
+                    </FieldLabel>
+                    <Input
+                      id="mobile-publish-date"
+                      type="date"
+                      className="h-10"
+                      value={c.draft.publishdate}
+                      onChange={(e) =>
+                        c.setDraft({ ...c.draft, publishdate: e.target.value })
+                      }
+                    />
+                  </Field>
+                </FieldGroup>
+              </div>
+              <div className="flex shrink-0 gap-2 border-t pt-3">
                 <Button
                   variant="outline"
-                  className="min-h-12 flex-1"
+                  className="h-10 flex-1"
                   onClick={() =>
                     c.setDraft({
                       ...c.applied,
@@ -433,7 +457,7 @@ export function MobileChannelView({
                   清空
                 </Button>
                 <Button
-                  className="min-h-12 flex-1"
+                  className="h-10 flex-1"
                   onClick={() => {
                     c.submit({ ...c.draft, current: 1 });
                     setFilterOpen(false);

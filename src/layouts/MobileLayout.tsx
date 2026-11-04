@@ -11,7 +11,7 @@ import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { isDemo } from "@/lib/platform";
+import { isAndroid, isDemo } from "@/lib/platform";
 
 export function MobileLayout({
   children,
@@ -41,6 +41,8 @@ export function MobileLayout({
               <NavigationItems onNavigate={() => setOpen(false)} />
             </nav>
           </ScrollArea>
+          {/* Android 将辅助状态移到导航内，避免列表底部常驻占位。 */}
+          {isAndroid() && <StatusBar />}
         </SheetContent>
       </Sheet>
       <main
@@ -53,12 +55,26 @@ export function MobileLayout({
         {contentScroll === "contained" ? (
           children
         ) : (
-          <ScrollArea className="flex-1">
-            <div className="p-4">{children}</div>
+          <ScrollArea
+            className={cn(
+              "flex-1",
+              isAndroid() &&
+                "[&>[data-slot=scroll-area-viewport]>[data-slot=scroll-area-content]]:h-full",
+            )}
+          >
+            {/* 图片页的工作区填满剩余高度，内部参数滚动而底部操作固定。 */}
+            <div
+              className={cn(
+                "p-4",
+                isAndroid() && "flex h-full min-h-0 flex-col",
+              )}
+            >
+              {children}
+            </div>
           </ScrollArea>
         )}
       </main>
-      <StatusBar />
+      {!isAndroid() && <StatusBar />}
     </div>
   );
 }

@@ -359,15 +359,10 @@
   border: 1px solid var(--border);
   padding: 0.5em;
 }
-/* Android 的触控与键盘规则不影响桌面密度。原生窗口负责系统栏和 IME 留白。 */
+/* Android 不再将所有控件强制撑到 48px：按钮 36px，输入 40px，分页单独收紧。 */
 html[data-platform="android"]
-  :is(
-    button,
-    [role="combobox"],
-    input:not([type="checkbox"]):not([type="radio"]),
-    select
-  ) {
-  min-height: 48px;
+  :is([role="combobox"], input:not([type="checkbox"], [type="radio"]), select) {
+  min-height: 40px;
 }
 html[data-platform="android"] :is(input, textarea, select) {
   font-size: 16px;
@@ -375,11 +370,98 @@ html[data-platform="android"] :is(input, textarea, select) {
 html[data-platform="android"] :is(button, a) {
   touch-action: manipulation;
 }
-html[data-platform="android"] button {
-  min-width: 48px;
+html[data-platform="android"] :is(button, [data-slot="button"]) {
+  min-height: 36px;
+  min-width: 36px;
 }
 html[data-platform="android"] :is([role="menuitem"], [role="option"]) {
-  min-height: 48px;
+  min-height: 40px;
+}
+/* 竖屏把空间留给素材；全屏面板只滚动内容，操作区保持在底部。 */
+@media (orientation: portrait) {
+  html[data-platform="android"] [data-mobile-fullscreen] {
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
+    /* Tailwind v4 的 translate 是独立属性，全屏时也需清除居中偏移。 */
+    translate: none;
+    transform: none;
+    border-radius: 0;
+  }
+  html[data-platform="android"] [data-slot="mobile-material-images"] {
+    grid-area: 1 / 2 / 4 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  html[data-platform="android"] [data-slot="mobile-channel-item"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 8px 12px;
+    align-items: start;
+  }
+  html[data-platform="android"] [data-slot="mobile-channel-item"] > button {
+    grid-area: 1 / 1;
+  }
+  html[data-platform="android"] [data-slot="mobile-channel-item"] > p {
+    grid-area: 2 / 1;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-channel-item"]
+    > div:last-child {
+    grid-area: 3 / 1;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-material-images"]
+    [data-slot="material-image"] {
+    width: 96px;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-material-images"]
+    [data-slot="material-image"]
+    > :first-child {
+    width: 96px;
+    height: 44px;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-material-images"]
+    [data-slot="material-image-meta"] {
+    display: none;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-detail-images"]
+    [data-slot="material-image"]
+    > :first-child {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  html[data-platform="android"]
+    [data-slot="mobile-pagination"]
+    :is(button, select) {
+    height: 32px;
+    min-height: 32px;
+  }
+  html[data-platform="android"] .image-processor {
+    display: flex;
+    min-height: 0;
+    max-height: 100%;
+    flex-direction: column;
+  }
+  html[data-platform="android"] [data-slot="image-workspace"] {
+    /* 预览与参数按内容高度依次排列，避免受限 grid 自动行互相覆盖。 */
+    display: block;
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html[data-platform="android"] [data-slot="image-canvas"] {
+    height: 32dvh;
+    min-height: 176px;
+    flex: none;
+  }
 }
 @media (max-height: 500px) {
   [data-slot="mobile-channel-conditions"] {

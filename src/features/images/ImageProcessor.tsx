@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactCrop, { type PercentCrop } from "react-image-crop";
@@ -361,7 +362,10 @@ function ProcessorEditor({
           本地处理 · 原图独立保留
         </span>
       </div>
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div
+        data-slot="image-workspace"
+        className="grid lg:grid-cols-[minmax(0,1fr)_300px]"
+      >
         <div className="flex min-h-0 min-w-0 flex-col border-b lg:border-r lg:border-b-0">
           <div className="flex items-center justify-between gap-2 border-b px-3 py-2">
             <div className="flex gap-1" aria-label="图片预览模式">
@@ -392,7 +396,10 @@ function ProcessorEditor({
             </span>
           </div>
           {/* 独立尺寸容器避免放大后的图片反过来撑高 flex 工作区。 */}
-          <div className="relative h-[min(58vh,620px)] min-h-80 flex-1">
+          <div
+            data-slot="image-canvas"
+            className="relative h-[min(58vh,620px)] min-h-80 flex-1"
+          >
             <ScrollArea
               viewportRef={viewport}
               orientation="both"
@@ -733,18 +740,23 @@ function ProcessorEditor({
                 正在处理，请稍候…
               </p>
             )}
-            <Button
-              className="w-full"
-              variant="secondary"
-              disabled={busy}
-              onClick={() => void process()}
-            >
-              {busy ? "正在处理…" : "处理预览"}
-            </Button>
+            {!isAndroid() && (
+              <Button
+                className="w-full"
+                variant="secondary"
+                disabled={busy}
+                onClick={() => void process()}
+              >
+                {busy ? "正在处理…" : "处理预览"}
+              </Button>
+            )}
           </div>
         </aside>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/20 px-4 py-3">
+      {/* Android 主操作固定在滚动区外，先生成预览，确认后才上传或导出。 */}
+      <div
+        className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-t bg-muted/20 ${isAndroid() ? "px-3 py-2" : "px-4 py-3"}`}
+      >
         <Button variant="ghost" onClick={reset}>
           <RotateCcw className="size-4" />
           重置
@@ -760,13 +772,18 @@ function ProcessorEditor({
             取消
           </Button>
           <Button
-            disabled={busy || !processed}
+            disabled={busy || (!isAndroid() && !processed)}
             onClick={() => {
               if (processed && !busy) onConfirm(processed.result);
+              else if (isAndroid()) void process();
             }}
           >
-            <Check className="size-4" />
-            确认结果
+            <Check data-icon="inline-start" />
+            {isAndroid() && !processed
+              ? busy
+                ? "正在处理…"
+                : "处理预览"
+              : "确认结果"}
           </Button>
         </div>
       </div>

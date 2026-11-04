@@ -26,6 +26,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { authService } from "@/features/auth/service";
 import { toast } from "sonner";
 import { ServiceError } from "@/services/tauri/client";
+import { cn } from "@/lib/utils";
 
 export function TopBar({ onMenu }: { onMenu: () => void }) {
   const [theme, setTheme] = useAtom(themeAtom);
@@ -61,7 +62,13 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
     { value: "system", label: "跟随系统", icon: Monitor },
   ];
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-background px-4">
+    // Android 顶栏随紧凑按钮收为 48px，减少竖屏固定区域占用。
+    <header
+      className={cn(
+        "flex h-14 shrink-0 items-center gap-3 border-b bg-background px-4",
+        isAndroid() && "h-12 px-3",
+      )}
+    >
       <Button
         variant="ghost"
         size="icon"

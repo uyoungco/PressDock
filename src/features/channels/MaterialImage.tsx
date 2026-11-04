@@ -69,7 +69,12 @@ export function MaterialImage({
   const image = current?.image;
   const frame = compact ? "h-20 w-32" : "h-64 w-full";
   return (
-    <div ref={container} className={compact ? "w-32 shrink-0" : "min-w-0"}>
+    // 标记图片与元信息，移动列表可压缩缩略图，详情仍保留实际尺寸和体积。
+    <div
+      ref={container}
+      data-slot="material-image"
+      className={compact ? "w-32 shrink-0" : "min-w-0"}
+    >
       {image ? (
         <button
           type="button"
@@ -111,6 +116,7 @@ export function MaterialImage({
         </div>
       )}
       <div
+        data-slot="material-image-meta"
         aria-hidden={!image}
         className="mt-1 space-y-0.5 text-xs leading-4 text-muted-foreground"
       >

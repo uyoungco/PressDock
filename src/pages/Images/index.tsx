@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -32,11 +33,13 @@ export default function Images() {
   }
   return (
     <>
-      <PageHeader
-        demo={false}
-        title="图片处理"
-        description="裁剪取景、控制文件体积，转换为 JPG、PNG 或 WebP。"
-      />
+      {(!isAndroid() || !file) && (
+        <PageHeader
+          demo={false}
+          title="图片处理"
+          description="裁剪取景、控制文件体积，转换为 JPG、PNG 或 WebP。"
+        />
+      )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
         <div className="flex items-center gap-3">
           <ImagePlus className="size-5 text-muted-foreground" />
@@ -49,10 +52,23 @@ export default function Images() {
             </p>
           </div>
         </div>
+        {/* 文件控件清空后仍展示应用持有的文件名，避免误报“未选择”。 */}
+        {isAndroid() && (
+          <div className="flex w-full min-w-0 items-center gap-3">
+            <Button asChild variant="outline" disabled={saving}>
+              <label htmlFor="image-file">
+                {file ? "更换图片" : "选择图片"}
+              </label>
+            </Button>
+            <span className="min-w-0 truncate text-sm text-muted-foreground">
+              {file?.name ?? "尚未选择图片"}
+            </span>
+          </div>
+        )}
         <Input
           id="image-file"
           aria-label="选择本地图片"
-          className="max-w-xs"
+          className={isAndroid() ? "sr-only" : "max-w-xs"}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           disabled={saving}
@@ -69,8 +85,8 @@ export default function Images() {
         />
       </div>
       {file ? (
-        <div className="relative">
-          <div inert={saving}>
+        <div className={isAndroid() ? "relative min-h-0 flex-1" : "relative"}>
+          <div inert={saving} className={isAndroid() ? "h-full" : undefined}>
             <ImageProcessor
               image={file}
               onConfirm={(result) => void exportImage(result)}
@@ -101,7 +117,9 @@ export default function Images() {
           <ImagePlus className="mb-4 size-12 stroke-1 text-muted-foreground" />
           <h2 className="text-base font-medium">选择一张图片开始处理</h2>
           <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-            在左侧拖动裁剪框，在右侧设置输出尺寸、文件体积和格式。确认结果后选择本地保存位置。
+            {isAndroid()
+              ? "选择图片后，裁剪画面并设置输出参数。预览确认后保存到本机。"
+              : "在左侧拖动裁剪框，在右侧设置输出尺寸、文件体积和格式。确认结果后选择本地保存位置。"}
           </p>
         </div>
       )}

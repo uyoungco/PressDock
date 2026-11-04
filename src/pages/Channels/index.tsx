@@ -88,7 +88,10 @@ function MaterialDetail({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-3xl">
+      <DialogContent
+        data-mobile-fullscreen={isAndroid() || undefined}
+        className="flex max-h-[85dvh] flex-col sm:max-w-3xl"
+      >
         <DialogTitle>素材详情</DialogTitle>
         <DialogDescription>
           查看渠道素材的标题、摘要和关联信息。
@@ -110,7 +113,29 @@ function MaterialDetail({
             className="-mx-1 flex-1"
             viewportProps={{ className: "px-1 py-1" }}
           >
-            <div className="grid gap-3 sm:grid-cols-2">
+            {/* 手机先确认素材内容，再查看图片；技术字段保留在下方。 */}
+            {isAndroid() && (
+              <div className="mb-4 flex flex-col gap-2">
+                <h2 className="text-base font-medium">
+                  {row.title || "无标题"}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {[row.channel, row.subChannel, row.publishDate?.slice(0, 10)]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                <p className="whitespace-pre-wrap text-sm">
+                  {row.smallText || "暂无摘要"}
+                </p>
+              </div>
+            )}
+            <div
+              data-slot={isAndroid() ? "mobile-detail-images" : undefined}
+              className={cn(
+                "grid gap-3 sm:grid-cols-2",
+                isAndroid() && "grid-cols-2",
+              )}
+            >
               <MaterialImage
                 key={`first-${row.id}`}
                 url={row.titlePic}
@@ -123,30 +148,42 @@ function MaterialDetail({
               />
             </div>
             <dl className="divide-y text-sm">
-              {fields.map(([field, label]) => (
-                <div
-                  key={field}
-                  className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 py-3"
-                >
-                  <dt className="text-muted-foreground">{label}</dt>
-                  <dd className="min-w-0 whitespace-pre-wrap break-all">
-                    {show(row[field])}
-                    {["url", "landUrl", "titlePic", "titlePic2"].includes(
-                      field,
-                    ) &&
-                      row[field] && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          aria-label={`复制${label}`}
-                          onClick={() => void copy(String(row[field]))}
-                        >
-                          <Copy className="size-3.5" />
-                        </Button>
-                      )}
-                  </dd>
-                </div>
-              ))}
+              {fields
+                .filter(
+                  ([field]) =>
+                    !isAndroid() ||
+                    ![
+                      "title",
+                      "smallText",
+                      "channel",
+                      "subChannel",
+                      "publishDate",
+                    ].includes(field),
+                )
+                .map(([field, label]) => (
+                  <div
+                    key={field}
+                    className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 py-3"
+                  >
+                    <dt className="text-muted-foreground">{label}</dt>
+                    <dd className="min-w-0 whitespace-pre-wrap break-all">
+                      {show(row[field])}
+                      {["url", "landUrl", "titlePic", "titlePic2"].includes(
+                        field,
+                      ) &&
+                        row[field] && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            aria-label={`复制${label}`}
+                            onClick={() => void copy(String(row[field]))}
+                          >
+                            <Copy className="size-3.5" />
+                          </Button>
+                        )}
+                    </dd>
+                  </div>
+                ))}
             </dl>
           </ScrollArea>
         )}
