@@ -196,7 +196,7 @@ it("普通 Select 显示映射标签并在禁用时收起弹层", async () => {
   const { rerender } = render(<Example />);
   expect(screen.getByLabelText("普通选择")).toHaveTextContent("新闻频道");
   await userEvent.click(screen.getByLabelText("普通选择"));
-  expect(screen.getByRole("listbox")).toBeInTheDocument();
+  expect(await screen.findByRole("listbox")).toBeInTheDocument();
   rerender(<Example disabled />);
   await waitFor(() =>
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument(),

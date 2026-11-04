@@ -6,7 +6,7 @@ use std::{
     collections::HashSet,
     time::{Duration, Instant},
 };
-use tauri::{AppHandle, Manager, WebviewWindow};
+use tauri::{AppHandle, Manager};
 
 // 静态脚本只返回页面快照；不暴露 invoke，也不把 CMS 会话或密钥注入来源网页。
 pub(super) const SNAPSHOT: &str = r#"(() => {
@@ -47,7 +47,7 @@ pub(super) struct Snapshot {
 }
 // 两种传输只负责页面操作，正文提取、分页边界及检查点由同一流程维护。
 enum PageSource {
-    Webview(Box<WebviewWindow>),
+    Webview(Box<webview::Source>),
     Cdp(cdp::Page),
 }
 impl PageSource {
@@ -77,13 +77,9 @@ impl PageSource {
             Self::Cdp(page) => page.ensure_open(),
         }
     }
-    async fn show(&self) -> Result<(), HarvestError> {
+    async fn show(&self, app: &AppHandle) -> Result<(), HarvestError> {
         match self {
-            Self::Webview(window) => {
-                window.show()?;
-                window.set_focus()?;
-                Ok(())
-            }
+            Self::Webview(_) => webview::show(app),
             Self::Cdp(page) => page.show().await,
         }
     }
@@ -232,7 +228,7 @@ pub(super) async fn collect(
                 "state",
                 || json!({"page":page_index+1,"reason":"正文等待超时，请完成来源验证后继续"}),
             );
-            source.show().await?;
+            source.show(app).await?;
             source.wait(context).await?;
             source.ensure_open(app)?;
             context.source_interaction.send_replace(None);
@@ -241,7 +237,7 @@ pub(super) async fn collect(
                 .await?;
             // WebView 验证后重新导航；CDP 保留当前标签页及验证状态，直接重读。
             if let PageSource::Webview(window) = &source {
-                let _ = window.hide();
+                webview::hide(window);
                 previous_document = Some(webview::navigate(window, &next).await?);
             }
         };
@@ -303,7 +299,7 @@ pub(super) async fn collect(
         }
     }
     if let PageSource::Webview(window) = &source {
-        let _ = window.hide();
+        webview::hide(window);
     }
     Ok((
         RawArticle {

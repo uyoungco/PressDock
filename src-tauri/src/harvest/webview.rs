@@ -11,6 +11,13 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder}
 use tokio::sync::oneshot;
 
 const LABEL: &str = "harvest-source";
+pub(super) type Source = WebviewWindow;
+
+pub(super) fn release(_app: &AppHandle) {}
+
+pub(super) fn hide(source: &Source) {
+    let _ = source.hide();
+}
 #[derive(Deserialize, serde::Serialize)]
 struct ScriptError {
     name: String,

@@ -377,6 +377,142 @@ html[data-platform="android"] :is(button, [data-slot="button"]) {
 html[data-platform="android"] :is([role="menuitem"], [role="option"]) {
   min-height: 40px;
 }
+/* 导入控件与确认框限定 Android，避免改变桌面表格和设置布局。 */
+html[data-platform="android"] [data-slot="mobile-import"] button,
+html[data-platform="android"]
+  [data-import-settings]
+  :is(button, [data-slot="button"]),
+html[data-platform="android"] [data-import-dialog] button {
+  min-height: 44px;
+}
+html[data-platform="android"] [data-import-settings] {
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-import-settings]
+  :is(input, textarea, [role="combobox"]) {
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-platform="android"] [data-import-dialog] {
+  display: flex;
+  flex-direction: column;
+  width: calc(
+    100% - max(1rem, env(safe-area-inset-left), env(safe-area-inset-right)) * 2
+  );
+  max-width: 32rem;
+  max-height: calc(
+    100dvh - max(1rem, env(safe-area-inset-top), env(safe-area-inset-bottom)) *
+      2
+  );
+  overflow: hidden;
+  animation: none;
+}
+html[data-platform="android"]
+  [data-import-dialog]
+  > [data-slot="dialog-title"] {
+  flex-shrink: 0;
+  padding-right: 2rem;
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-import-dialog]
+  > [data-slot="dialog-description"] {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior: contain;
+}
+html[data-platform="android"]
+  [data-import-dialog]
+  > [data-slot="dialog-footer"] {
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+/* 渠道弹框横竖屏都占满视口，独立于其他全屏面板和桌面弹框。 */
+html[data-platform="android"] [data-channel-dialog] {
+  inset: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  overflow: hidden;
+  translate: none;
+  transform: none;
+  scale: none;
+  animation: none;
+  transition: none;
+  border-radius: 0;
+}
+html[data-platform="android"]
+  [data-channel-dialog]
+  :is(
+    [data-slot="dialog-header"],
+    [data-slot="dialog-title"],
+    [data-slot="dialog-description"]
+  ) {
+  min-width: 0;
+  flex-shrink: 0;
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-channel-dialog]
+  > :is([data-slot="dialog-title"], [data-slot="dialog-description"]) {
+  padding-right: 2rem;
+}
+html[data-platform="android"]
+  [data-channel-dialog]
+  > [data-slot="dialog-close"] {
+  top: max(0.5rem, env(safe-area-inset-top));
+  right: max(0.5rem, env(safe-area-inset-right));
+}
+html[data-platform="android"] [data-channel-dialog="detail"] h2,
+html[data-platform="android"] [data-channel-dialog="detail"] p {
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"] [data-channel-dialog="image"] .image-processor {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  flex-direction: column;
+}
+html[data-platform="android"]
+  [data-channel-dialog="image"]
+  [data-slot="channel-image-editor"]
+  > :not(.image-processor) {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-channel-dialog="image"]
+  .image-processor
+  > :first-child {
+  flex-shrink: 0;
+}
+html[data-platform="android"]
+  [data-channel-dialog="image"]
+  [data-slot="image-workspace"] {
+  display: block;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+html[data-platform="android"]
+  [data-channel-dialog="image"]
+  [data-slot="image-canvas"] {
+  height: 32dvh;
+  min-height: 128px;
+  flex: none;
+}
 /* 竖屏把空间留给素材；全屏面板只滚动内容，操作区保持在底部。 */
 @media (orientation: portrait) {
   html[data-platform="android"] [data-mobile-fullscreen] {

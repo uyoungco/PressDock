@@ -1,0 +1,80 @@
+{
+  "browserSimulation": true,
+  "nativeRuntimeVerified": false,
+  "lifecycle": [
+    {
+      "stage": "first",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+      "title": "【演示数据】PC 文章标题",
+      "articleCount": 1,
+      "next": "/source-fixture?page=2",
+      "url": "http://127.0.0.1:1435/source-fixture?first=1"
+    },
+    {
+      "stage": "refresh",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+      "title": "【演示数据】PC 文章标题",
+      "articleCount": 1,
+      "next": "/source-fixture?page=2",
+      "url": "http://127.0.0.1:1435/source-fixture?first=1"
+    },
+    {
+      "stage": "pagination",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+      "title": "【演示数据】PC 文章标题",
+      "articleCount": 1,
+      "next": "/source-fixture?page=2",
+      "url": "http://127.0.0.1:1435/source-fixture?page=2"
+    },
+    {
+      "stage": "verification-return",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+      "title": "【演示数据】PC 文章标题",
+      "articleCount": 1,
+      "next": "/source-fixture?page=2",
+      "url": "http://127.0.0.1:1435/source-fixture?verified=1"
+    }
+  ],
+  "requests": {
+    "requests": [
+      {
+        "url": "/source-fixture?first=1",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      },
+      {
+        "url": "/source-fixture?first=1",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      },
+      {
+        "url": "/source-fixture?page=2",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      },
+      {
+        "url": "/source-fixture?verified=1",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      }
+    ],
+    "rebuilt": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+      "articleCount": 1
+    },
+    "mobileControl": {
+      "articleCount": 0,
+      "html": ""
+    }
+  },
+  "redirect": {
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36",
+    "title": "【演示数据】PC 文章标题",
+    "requests": [
+      {
+        "url": "/source-fixture?redirect=1",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      },
+      {
+        "url": "/source-fixture?redirected=1",
+        "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.47 Safari/537.36"
+      }
+    ]
+  }
+}

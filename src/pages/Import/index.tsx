@@ -7,7 +7,16 @@ import {
   type ComponentProps,
   type FormEvent,
 } from "react";
-import { Download, Link2, LoaderCircle, RefreshCw } from "lucide-react";
+import {
+  Download,
+  Link2,
+  LoaderCircle,
+  RefreshCw,
+  Settings2,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { FlexRender } from "@tanstack/react-table";
+import { isAndroid } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -50,6 +59,7 @@ import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
 import {
   businessKeys,
   harvestDateAtom,
+  harvestUrlAtom,
   harvestNotificationErrorAtom,
   harvestNotificationsReadyAtom,
   invalidateBusinessQueries,
@@ -111,9 +121,13 @@ const message = (reason: unknown) =>
   reason instanceof Error ? reason.message : "采集操作失败，请重试";
 
 export default function ImportPage() {
+  const android = isAndroid();
   const userId = useQueryUser();
   const client = useQueryClient();
-  const [url, setUrl] = useState("");
+  const [desktopUrl, setDesktopUrl] = useState("");
+  const [draftUrl, setDraftUrl] = useAtom(harvestUrlAtom);
+  const url = android ? draftUrl : desktopUrl;
+  const setUrl = android ? setDraftUrl : setDesktopUrl;
   const [busy, setBusy] = useState(false);
   const [rememberedDate, rememberDate] = useAtom(harvestDateAtom);
   const today = localCollectionDate();
@@ -207,7 +221,10 @@ export default function ImportPage() {
         cell: ({ row: { original: job } }) => (
           <a
             href={job.url}
-            className="block truncate text-left font-medium hover:underline"
+            className={cn(
+              "block text-left font-medium hover:underline",
+              android ? "break-all" : "truncate",
+            )}
             title={job.title || job.url}
             onClick={(event) => {
               event.preventDefault();
@@ -355,7 +372,7 @@ export default function ImportPage() {
         ),
       },
     ],
-    [act, busyId],
+    [act, busyId, android],
   );
   const table = useDataTable({
     data: jobs,
@@ -409,130 +426,281 @@ export default function ImportPage() {
   }
   return (
     <>
-      <PageHeader
-        title="素材导入"
-        description="提交文章链接，后台采集并处理；调试任务仅保存本地，正常任务添加到 CMS。"
-        demo={false}
-      />
-      <div className="flex flex-col gap-5">
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Link2 />
-              通过链接采集
-            </CardTitle>
-            <CardDescription>
-              支持百家号与
-              mbd.baidu.com。入队后可继续输入，离开页面任务仍会执行。
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={submit} className="flex flex-col gap-3">
-              <label htmlFor="article-url" className="text-sm font-medium">
-                文章链接
-              </label>
-              <div className="flex flex-wrap gap-3">
-                <Input
-                  ref={input}
-                  id="article-url"
-                  type="url"
-                  value={url}
-                  onChange={(event) => setUrl(event.target.value)}
-                  placeholder="粘贴文章链接，按回车开始采集"
-                  required
-                  disabled={busy}
-                  aria-invalid={!!inputError}
-                  aria-describedby={inputError ? "import-error" : undefined}
-                  className="min-w-60 flex-1"
-                />
-                <Button type="submit" disabled={busy}>
-                  {busy ? (
-                    <LoaderCircle
-                      data-icon="inline-start"
-                      className="animate-spin"
-                    />
-                  ) : (
-                    <Download data-icon="inline-start" />
-                  )}
-                  {busy ? "正在入队…" : "开始采集"}
-                </Button>
-              </div>
-              {inputError && (
-                <p
-                  id="import-error"
-                  role="alert"
-                  className="text-sm text-destructive"
-                >
-                  {inputError}
-                </p>
-              )}
-            </form>
-          </CardContent>
-        </Card>
-        <Card className="min-w-0 shadow-none">
-          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <CardTitle>采集记录</CardTitle>
-              <CardDescription>
-                默认显示当天。点击标题打开原文，完成后直接添加到 CMS。
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="harvest-date" className="sr-only">
-                采集日期
-              </label>
-              <Input
-                id="harvest-date"
-                type="date"
-                value={date}
-                onChange={(event) => {
-                  if (event.target.value) setDate(event.target.value);
-                }}
-                className="w-40"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="刷新采集记录"
-                onClick={refresh}
-                disabled={list.isFetching}
-                aria-busy={list.isFetching}
-              >
-                <RefreshCw className={cn(list.isFetching && "animate-spin")} />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="flex min-w-0 flex-col gap-3">
+      {android ? (
+        <section
+          data-slot="mobile-import"
+          className="flex min-h-0 min-w-0 flex-1 flex-col gap-2"
+        >
+          <div className="flex shrink-0 items-center justify-between gap-2">
+            <h1 className="text-lg font-semibold">素材导入</h1>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/settings?tab=harvest">
+                <Settings2 data-icon="inline-start" />
+                导入设置
+              </Link>
+            </Button>
+          </div>
+          <form onSubmit={submit} className="shrink-0">
+            <FieldGroup>
+              <Field data-invalid={!!inputError}>
+                <FieldLabel htmlFor="article-url" className="sr-only">
+                  文章链接
+                </FieldLabel>
+                <div className="flex min-w-0 gap-2">
+                  <Input
+                    ref={input}
+                    id="article-url"
+                    type="url"
+                    inputMode="url"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    value={url}
+                    onChange={(event) => setUrl(event.target.value)}
+                    placeholder="粘贴百家号或 mbd 文章链接"
+                    required
+                    disabled={busy}
+                    aria-invalid={!!inputError}
+                    aria-describedby={inputError ? "import-error" : undefined}
+                    className="h-11 min-w-0 flex-1"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={busy}
+                    className="h-11 shrink-0"
+                  >
+                    {busy ? (
+                      <LoaderCircle
+                        data-icon="inline-start"
+                        className="animate-spin"
+                      />
+                    ) : (
+                      <Download data-icon="inline-start" />
+                    )}
+                    {busy ? "入队中" : "开始采集"}
+                  </Button>
+                </div>
+                {inputError && (
+                  <p
+                    id="import-error"
+                    role="alert"
+                    className="text-sm break-words text-destructive"
+                  >
+                    {inputError}
+                  </p>
+                )}
+              </Field>
+            </FieldGroup>
+          </form>
+          <div className="flex shrink-0 items-center gap-2">
+            <label htmlFor="harvest-date" className="shrink-0 text-sm">
+              采集记录
+            </label>
+            <Input
+              id="harvest-date"
+              type="date"
+              value={date}
+              onChange={(event) => {
+                if (event.target.value) setDate(event.target.value);
+              }}
+              className="h-11 min-w-0 flex-1"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-11 shrink-0"
+              aria-label="刷新采集记录"
+              disabled={list.isFetching}
+              aria-busy={list.isFetching}
+              onClick={refresh}
+            >
+              <RefreshCw className={cn(list.isFetching && "animate-spin")} />
+            </Button>
+          </div>
+          <div
+            role="region"
+            aria-label="采集记录"
+            tabIndex={0}
+            data-slot="import-records"
+            className="flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pb-2"
+          >
+            <p className="text-xs text-muted-foreground">
+              应用保持前台时执行；完成后添加 CMS。退到后台会中断，返回后可重试。
+            </p>
             <LoadState loading={loading} error={error} retry={refresh} />
             {notificationError && (
-              <p role="alert" className="text-sm text-muted-foreground">
+              <p
+                role="alert"
+                className="text-sm break-words text-muted-foreground"
+              >
                 {notificationError}
               </p>
             )}
             {maintenanceWarning && (
-              <p role="alert" className="text-sm text-muted-foreground">
+              <p
+                role="alert"
+                className="text-sm break-words text-muted-foreground"
+              >
                 启动历史清理未完成：{maintenanceWarning}
               </p>
             )}
-            <DataTable
-              table={table}
-              aria-label="采集记录"
-              emptyMessage={
-                date === localCollectionDate()
+            {!loading && !error && !jobs.length && (
+              <p
+                role="status"
+                className="py-8 text-center text-sm text-muted-foreground"
+              >
+                {date === localCollectionDate()
                   ? "今天暂无采集记录"
-                  : "该日期暂无采集记录"
-              }
-            />
-          </CardContent>
-        </Card>
-      </div>
+                  : "该日期暂无采集记录"}
+              </p>
+            )}
+            {table.getRowModel().rows.map((row) => (
+              <Card key={row.id} className="shrink-0 gap-0 py-0 shadow-none">
+                <CardContent className="flex min-w-0 flex-col gap-3 p-3">
+                  <article
+                    aria-label={row.original.title || row.original.url}
+                    className="flex min-w-0 flex-col gap-3"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <div key={cell.id} className="min-w-0">
+                        <FlexRender cell={cell} />
+                      </div>
+                    ))}
+                  </article>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <>
+          <PageHeader
+            title="素材导入"
+            description="提交文章链接，后台采集并处理；调试任务仅保存本地，正常任务添加到 CMS。"
+            demo={false}
+          />
+          <div className="flex flex-col gap-5">
+            <Card className="shadow-none">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Link2 />
+                  通过链接采集
+                </CardTitle>
+                <CardDescription>
+                  支持百家号与
+                  mbd.baidu.com。入队后可继续输入，离开页面任务仍会执行。
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={submit} className="flex flex-col gap-3">
+                  <label htmlFor="article-url" className="text-sm font-medium">
+                    文章链接
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    <Input
+                      ref={input}
+                      id="article-url"
+                      type="url"
+                      value={url}
+                      onChange={(event) => setUrl(event.target.value)}
+                      placeholder="粘贴文章链接，按回车开始采集"
+                      required
+                      disabled={busy}
+                      aria-invalid={!!inputError}
+                      aria-describedby={inputError ? "import-error" : undefined}
+                      className="min-w-60 flex-1"
+                    />
+                    <Button type="submit" disabled={busy}>
+                      {busy ? (
+                        <LoaderCircle
+                          data-icon="inline-start"
+                          className="animate-spin"
+                        />
+                      ) : (
+                        <Download data-icon="inline-start" />
+                      )}
+                      {busy ? "正在入队…" : "开始采集"}
+                    </Button>
+                  </div>
+                  {inputError && (
+                    <p
+                      id="import-error"
+                      role="alert"
+                      className="text-sm text-destructive"
+                    >
+                      {inputError}
+                    </p>
+                  )}
+                </form>
+              </CardContent>
+            </Card>
+            <Card className="min-w-0 shadow-none">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-col gap-1">
+                  <CardTitle>采集记录</CardTitle>
+                  <CardDescription>
+                    默认显示当天。点击标题打开原文，完成后直接添加到 CMS。
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="harvest-date" className="sr-only">
+                    采集日期
+                  </label>
+                  <Input
+                    id="harvest-date"
+                    type="date"
+                    value={date}
+                    onChange={(event) => {
+                      if (event.target.value) setDate(event.target.value);
+                    }}
+                    className="w-40"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="刷新采集记录"
+                    onClick={refresh}
+                    disabled={list.isFetching}
+                    aria-busy={list.isFetching}
+                  >
+                    <RefreshCw
+                      className={cn(list.isFetching && "animate-spin")}
+                    />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="flex min-w-0 flex-col gap-3">
+                <LoadState loading={loading} error={error} retry={refresh} />
+                {notificationError && (
+                  <p role="alert" className="text-sm text-muted-foreground">
+                    {notificationError}
+                  </p>
+                )}
+                {maintenanceWarning && (
+                  <p role="alert" className="text-sm text-muted-foreground">
+                    启动历史清理未完成：{maintenanceWarning}
+                  </p>
+                )}
+                <DataTable
+                  table={table}
+                  aria-label="采集记录"
+                  emptyMessage={
+                    date === localCollectionDate()
+                      ? "今天暂无采集记录"
+                      : "该日期暂无采集记录"
+                  }
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
       <Dialog
         open={selectingTabs !== null}
         onOpenChange={(open) => {
           if (!open && !busyId) setSelectingId(null);
         }}
       >
-        <DialogContent>
+        <DialogContent data-import-dialog={android ? "select-tabs" : undefined}>
           <DialogTitle>选择采集标签页</DialogTitle>
           <DialogDescription>
             同一文章链接匹配了多个标签页，请选择要读取的页面。关闭弹窗后任务继续等待，可稍后重新选择或取消任务。
@@ -612,7 +780,7 @@ export default function ImportPage() {
           if (!open && !busyId) setConfirm(null);
         }}
       >
-        <DialogContent>
+        <DialogContent data-import-dialog={android ? "confirm" : undefined}>
           <DialogTitle>
             {confirm?.action === "delete"
               ? "删除这条采集记录？"

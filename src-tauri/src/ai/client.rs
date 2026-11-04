@@ -352,6 +352,9 @@ impl AiService {
         path: &str,
         body: Option<Value>,
     ) -> Result<Value, AiError> {
+        if cfg!(feature = "android-demo") {
+            return Err(AiError::new("DEMO_ONLY", "演示版不调用真实 AI 接口"));
+        }
         let address = format!("{}/{path}", provider.base_url.trim_end_matches('/'));
         let mut request = self.client.request(method, address);
         if let Some(secret) = secret {

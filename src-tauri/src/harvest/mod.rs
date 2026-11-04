@@ -7,10 +7,24 @@ mod source;
 mod store;
 #[cfg(test)]
 mod tests;
+#[cfg(not(target_os = "android"))]
+mod webview;
+#[cfg(target_os = "android")]
+#[path = "android_webview.rs"]
 mod webview;
 pub(crate) mod worker;
 pub use models::*;
 pub use worker::{HarvestService, start};
+
+#[cfg(target_os = "android")]
+pub(crate) fn ensure_mobile_source(options: &Options) -> Result<(), HarvestError> {
+    if options.source_mode != SourceMode::Webview {
+        return Err(HarvestError::invalid(
+            "Android 仅支持内置 WebView，请在采集设置中选择内置采集后重试",
+        ));
+    }
+    Ok(())
+}
 
 pub struct HarvestError {
     pub code: &'static str,

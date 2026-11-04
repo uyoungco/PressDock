@@ -89,7 +89,7 @@ function MaterialDetail({
       }}
     >
       <DialogContent
-        data-mobile-fullscreen={isAndroid() || undefined}
+        data-channel-dialog={isAndroid() ? "detail" : undefined}
         className="flex max-h-[85dvh] flex-col sm:max-w-3xl"
       >
         <DialogTitle>素材详情</DialogTitle>

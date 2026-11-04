@@ -58,6 +58,8 @@ pub async fn harvest_save_settings(
     let generation = cms.authorize().await?;
     let _lock = ai.operations.lock().await;
     cms.ensure_generation(generation).await?;
+    #[cfg(target_os = "android")]
+    ensure_mobile_source(&request.options)?;
     database.harvest_save_settings(&request).await?;
     crate::window_policy::sync(&app, request.options.developer_mode);
     cms.ensure_generation(generation).await?;

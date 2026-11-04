@@ -93,6 +93,49 @@ fn registered_commands_have_build_manifest_and_main_window_permissions() {
     );
 }
 
+#[test]
+fn android_import_permissions_only_cover_main_business_configuration() {
+    let capability: Value =
+        serde_json::from_str(include_str!("../../capabilities/android.json")).unwrap();
+    assert_eq!(capability["windows"], json!(["main"]));
+    assert_eq!(capability["platforms"], json!(["android"]));
+    assert!(capability.get("remote").is_none());
+    let permissions = capability["permissions"].as_array().unwrap();
+    for command in [
+        "harvest-load-settings",
+        "harvest-save-settings",
+        "harvest-set-developer-mode",
+        "harvest-list-jobs",
+        "harvest-enqueue",
+        "harvest-job-action",
+        "ai-load-settings",
+        "ai-save-provider",
+        "ai-save-model",
+        "ai-save-template",
+        "ai-delete-config",
+        "ai-list-models",
+        "ai-test-model",
+        "ai-cancel",
+    ] {
+        assert!(permissions.contains(&json!(format!("allow-{command}"))));
+    }
+    for command in [
+        "harvest-bridge-status",
+        "harvest-install-userscript",
+        "harvest-select-source-tab",
+        "harvest-open-devtools",
+        "ai-suggest-titles",
+        "ai-suggest-pagination",
+    ] {
+        assert!(!permissions.contains(&json!(format!("allow-{command}"))));
+    }
+    assert!(
+        permissions
+            .iter()
+            .all(|p| !p.as_str().unwrap().contains("pressdock-platform"))
+    );
+}
+
 async fn fixture(
     delay: Duration,
     protocol: Protocol,

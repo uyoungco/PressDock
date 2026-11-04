@@ -25,7 +25,7 @@ export function useAndroidShell() {
         );
       } else if (pathname !== homePath() && pathname !== "/login") {
         event.preventDefault();
-        void navigate(homePath());
+        void navigate(pathname === "/settings" ? "/import" : homePath());
       }
     };
     window.addEventListener("pressdock-back", back);

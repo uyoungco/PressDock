@@ -36,6 +36,7 @@ android {
     buildToolsVersion = "36.0.0"
     namespace = "com.example.pressdock"
     defaultConfig {
+        buildConfigField("boolean", "PRESSDOCK_DEMO", pressdockDemo.toString())
         manifestPlaceholders["usesCleartextTraffic"] = "false"
         applicationId = if (pressdockDemo) "com.example.pressdock.demo" else "com.example.pressdock"
         manifestPlaceholders["pressdockLabel"] = if (pressdockDemo) "PressDock 演示版" else "PressDock"

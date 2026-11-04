@@ -29,6 +29,7 @@ import {
 } from "./contracts";
 import { aiService } from "./service";
 import { useAiSettings } from "./use-settings";
+import { isAndroid } from "@/lib/platform";
 
 const blank = (purpose: PromptTemplate["purpose"]): PromptTemplate => ({
   purpose,
@@ -48,14 +49,17 @@ const blank = (purpose: PromptTemplate["purpose"]): PromptTemplate => ({
 export function TemplateSettings({
   active,
   initialPurpose = "title",
+  purposeOnly,
 }: {
   active: boolean;
   initialPurpose?: PromptTemplate["purpose"];
+  purposeOnly?: PromptTemplate["purpose"];
 }) {
   const { settings, loading, busy, error, run, refresh } =
     useAiSettings(active);
-  const [purpose, setPurpose] =
-    useState<PromptTemplate["purpose"]>(initialPurpose);
+  const [purpose, setPurpose] = useState<PromptTemplate["purpose"]>(
+    purposeOnly ?? initialPurpose,
+  );
   const [draft, setDraft] = useState<PromptTemplate | null>(null);
   const drafts = useRef<
     Partial<Record<PromptTemplate["purpose"], PromptTemplate | null>>
@@ -110,25 +114,27 @@ export function TemplateSettings({
           新增模板
         </Button>
       </div>
-      <ToggleGroup
-        type="single"
-        value={purpose}
-        disabled={disabled}
-        onValueChange={(value) => {
-          if (
-            (value === "title" || value === "pagination") &&
-            value !== purpose
-          ) {
-            drafts.current[purpose] = draft;
-            setPurpose(value);
-            setDraft(drafts.current[value] ?? null);
-          }
-        }}
-        aria-label="模板用途"
-      >
-        <ToggleGroupItem value="title">标题优化</ToggleGroupItem>
-        <ToggleGroupItem value="pagination">文章分页</ToggleGroupItem>
-      </ToggleGroup>
+      {!purposeOnly && (
+        <ToggleGroup
+          type="single"
+          value={purpose}
+          disabled={disabled}
+          onValueChange={(value) => {
+            if (
+              (value === "title" || value === "pagination") &&
+              value !== purpose
+            ) {
+              drafts.current[purpose] = draft;
+              setPurpose(value);
+              setDraft(drafts.current[value] ?? null);
+            }
+          }}
+          aria-label="模板用途"
+        >
+          <ToggleGroupItem value="title">标题优化</ToggleGroupItem>
+          <ToggleGroupItem value="pagination">文章分页</ToggleGroupItem>
+        </ToggleGroup>
+      )}
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {error}
@@ -406,7 +412,9 @@ export function TemplateSettings({
           if (!open && !busy) setRemove(null);
         }}
       >
-        <DialogContent>
+        <DialogContent
+          data-import-dialog={isAndroid() ? "template-delete" : undefined}
+        >
           <DialogTitle>删除提示词模板？</DialogTitle>
           <DialogDescription>
             将删除“{remove?.name}”。

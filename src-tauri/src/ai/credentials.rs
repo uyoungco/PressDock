@@ -44,13 +44,29 @@ impl AiVault for NativeAiVault {
 
 #[cfg(target_os = "android")]
 impl AiVault for NativeAiVault {
-    fn load(&self, _: &str) -> Result<String, AiError> {
-        Err(failure())
+    fn load(&self, reference: &str) -> Result<String, AiError> {
+        #[derive(serde::Deserialize)]
+        struct Secret {
+            value: String,
+        }
+        crate::platform::call::<Secret>("loadAiSecret", serde_json::json!({"reference":reference}))
+            .map(|secret| secret.value)
+            .map_err(|_| failure())
     }
-    fn save(&self, _: &str, _: &str) -> Result<(), AiError> {
-        Err(failure())
+    fn save(&self, reference: &str, secret: &str) -> Result<(), AiError> {
+        crate::platform::call::<serde_json::Value>(
+            "saveAiSecret",
+            serde_json::json!({"reference":reference,"secret":secret}),
+        )
+        .map(|_| ())
+        .map_err(|_| failure())
     }
-    fn clear(&self, _: &str) -> Result<(), AiError> {
-        Err(failure())
+    fn clear(&self, reference: &str) -> Result<(), AiError> {
+        crate::platform::call::<serde_json::Value>(
+            "deleteAiSecret",
+            serde_json::json!({"reference":reference}),
+        )
+        .map(|_| ())
+        .map_err(|_| failure())
     }
 }

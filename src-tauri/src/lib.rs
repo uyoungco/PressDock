@@ -47,6 +47,8 @@ pub fn run() {
             let cms = cms.with_demo(demo);
             app.manage(cms);
             app.manage(harvest::HarvestService::new(cleanup_warning));
+            #[cfg(target_os = "android")]
+            platform::bind(app.handle());
             // 本机桥接开箱即用；监听失败由设置页展示，不阻止桌面应用启动。
             #[cfg(desktop)]
             app.manage(tauri::async_runtime::block_on(
@@ -66,8 +68,9 @@ pub fn run() {
                     .initialization_script_for_all_frames(window_policy::script(developer_mode))
                     .on_page_load(|window, _| window_policy::apply(&window))
                     .build()?;
-                harvest::start(app.handle().clone());
             }
+            #[cfg(any(desktop, target_os = "android"))]
+            harvest::start(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

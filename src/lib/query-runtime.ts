@@ -14,6 +14,7 @@ export const articleFiltersAtom = atom<
 export const harvestDateAtom = atom<{ date: string; today: string } | null>(
   null,
 );
+export const harvestUrlAtom = atom("");
 export const publishTabAtom = atom("pending");
 export const harvestNotificationErrorAtom = atom<string | null>(null);
 export const harvestNotificationsReadyAtom = atom(false);
@@ -76,6 +77,7 @@ export function resetQueryRuntime(runtime: QueryRuntime) {
   runtime.store.set(globalSearchAtom, "");
   runtime.store.set(articleFiltersAtom, {});
   runtime.store.set(harvestDateAtom, null);
+  runtime.store.set(harvestUrlAtom, "");
   runtime.store.set(publishTabAtom, "pending");
   runtime.store.set(harvestNotificationErrorAtom, null);
   runtime.store.set(harvestNotificationsReadyAtom, false);

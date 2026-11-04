@@ -98,7 +98,7 @@ export function MaterialForm({
     >
       <DialogContent
         ref={setPortalContainer}
-        data-mobile-fullscreen={isAndroid() || undefined}
+        data-channel-dialog={isAndroid() ? "edit" : undefined}
         className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-2xl max-md:top-0 max-md:left-0 max-md:h-dvh max-md:max-h-dvh max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none"
         showCloseButton={!busy && !image.working}
         onInteractOutside={(e) => e.preventDefault()}

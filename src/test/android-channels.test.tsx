@@ -151,6 +151,10 @@ describe("Android 渠道样板", () => {
     fireEvent.scroll(viewport);
     await userEvent.click(screen.getByRole("button", { name: "渠道新闻 1" }));
     await screen.findByRole("heading", { name: "素材详情" });
+    expect(screen.getByRole("dialog", { name: "素材详情" })).toHaveAttribute(
+      "data-channel-dialog",
+      "detail",
+    );
     await userEvent.keyboard("{Escape}");
     expect(viewport.scrollTop).toBe(640);
     await userEvent.click(screen.getAllByRole("button", { name: "编辑" })[0]);

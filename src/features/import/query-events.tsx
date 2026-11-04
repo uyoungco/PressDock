@@ -1,4 +1,3 @@
-import { isAndroid } from "@/lib/platform";
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,7 +18,7 @@ export function HarvestQueryEvents() {
   const user = auth.session?.user.userId;
   useEffect(() => {
     setReady(false);
-    if (user === undefined || isAndroid()) return;
+    if (user === undefined) return;
     let active = true;
     let stop: (() => void) | undefined;
     setError(null);

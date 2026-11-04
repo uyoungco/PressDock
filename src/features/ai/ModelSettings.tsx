@@ -26,6 +26,7 @@ import {
 } from "./contracts";
 import { AiChoice, AiField } from "./fields";
 import { useAiSettings } from "./use-settings";
+import { isAndroid } from "@/lib/platform";
 
 const blankProvider = (): SaveProviderRequest => ({
   id: "",
@@ -595,7 +596,9 @@ export function ModelSettings({ active }: { active: boolean }) {
           if (!open && !busy) setRemove(null);
         }}
       >
-        <DialogContent>
+        <DialogContent
+          data-import-dialog={isAndroid() ? "model-delete" : undefined}
+        >
           <DialogTitle>
             删除{remove?.kind === "provider" ? "提供商" : "模型"}？
           </DialogTitle>

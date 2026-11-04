@@ -4,4 +4,5 @@ export const isAndroid = () =>
 export const isDemo = () => import.meta.env.VITE_PRESSDOCK_DEMO === "1";
 export const homePath = () => (isAndroid() ? "/channels" : "/dashboard");
 export const routeAvailable = (path: string) =>
-  !isAndroid() || ["/channels", "/images"].includes(path);
+  !isAndroid() ||
+  ["/channels", "/images", "/import", "/settings"].includes(path);

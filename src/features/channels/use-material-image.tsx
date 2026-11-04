@@ -170,6 +170,68 @@ export function useMaterialImage(
       if (isCurrent(current.id)) uploadGate.current = false;
     }
   }
+  const content = work && (
+    <>
+      {work.loading ? (
+        <div
+          className={
+            isAndroid()
+              ? "flex flex-col items-center gap-4 overflow-y-auto py-8 text-center"
+              : "space-y-4 py-8 text-center"
+          }
+        >
+          <p role="status">正在读取子渠道图片预设…</p>
+          <Button variant="outline" onClick={close}>
+            取消图片处理
+          </Button>
+        </div>
+      ) : work.preset ? (
+        <div className={isAndroid() ? "relative min-h-0 flex-1" : "relative"}>
+          <div
+            data-slot={isAndroid() ? "channel-image-editor" : undefined}
+            inert={work.uploading}
+            className={isAndroid() ? "h-full min-h-0" : undefined}
+          >
+            <ImageProcessor
+              image={work.file}
+              preset={work.preset}
+              onConfirm={(result) => void confirm(result)}
+              onCancel={close}
+            />
+          </div>
+          {work.uploading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/90">
+              <p role="status">
+                {isDemo() ? "正在保存本机演示图片…" : "正在上传处理后的图片…"}
+              </p>
+              <Button variant="outline" onClick={close}>
+                取消回填
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={isAndroid() ? "flex flex-wrap gap-2" : "flex gap-2"}>
+          <Button onClick={() => void loadPreset(work)}>重试读取预设</Button>
+          <Button variant="outline" onClick={close}>
+            取消图片处理
+          </Button>
+        </div>
+      )}
+      {work.error && (
+        <p
+          role="alert"
+          className={
+            isAndroid()
+              ? "max-h-[25dvh] shrink-0 overflow-y-auto text-sm break-words text-destructive"
+              : "text-sm text-destructive"
+          }
+        >
+          {work.error}
+        </p>
+      )}
+    </>
+  );
   return {
     working: work !== null,
     error,
@@ -183,7 +245,7 @@ export function useMaterialImage(
         }}
       >
         <DialogContent
-          data-mobile-fullscreen={isAndroid() || undefined}
+          data-channel-dialog={isAndroid() ? "image" : undefined}
           className="flex max-h-[95dvh] flex-col overflow-hidden sm:max-w-6xl"
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
@@ -208,68 +270,19 @@ export function useMaterialImage(
               ? "演示：确认后存入本机，保存后关联演示素材。"
               : "确认结果后上传，保存素材后才关联。已配置的参数锁定。"}
           </DialogDescription>
-          {/* 竖屏让组件自己滚动参数，底部确认不再随外层内容滚走。 */}
-          <ScrollArea
-            className={
-              isAndroid()
-                ? "-mx-1 min-h-0 flex-1 [&>[data-slot=scroll-area-viewport]>[data-slot=scroll-area-content]]:h-full"
-                : "-mx-1 flex-1"
-            }
-            viewportProps={{ className: "px-1 py-1" }}
-          >
-            {work && (
-              <>
-                {work.loading ? (
-                  <div className="space-y-4 py-8 text-center">
-                    <p role="status">正在读取子渠道图片预设…</p>
-                    <Button variant="outline" onClick={close}>
-                      取消图片处理
-                    </Button>
-                  </div>
-                ) : work.preset ? (
-                  <div className={isAndroid() ? "relative h-full" : "relative"}>
-                    <div
-                      inert={work.uploading}
-                      className={isAndroid() ? "h-full" : undefined}
-                    >
-                      <ImageProcessor
-                        image={work.file}
-                        preset={work.preset}
-                        onConfirm={(result) => void confirm(result)}
-                        onCancel={close}
-                      />
-                    </div>
-                    {work.uploading && (
-                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-background/90">
-                        <p role="status">
-                          {isDemo()
-                            ? "正在保存本机演示图片…"
-                            : "正在上传处理后的图片…"}
-                        </p>
-                        <Button variant="outline" onClick={close}>
-                          取消回填
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Button onClick={() => void loadPreset(work)}>
-                      重试读取预设
-                    </Button>
-                    <Button variant="outline" onClick={close}>
-                      取消图片处理
-                    </Button>
-                  </div>
-                )}
-                {work.error && (
-                  <p role="alert" className="text-sm text-destructive">
-                    {work.error}
-                  </p>
-                )}
-              </>
-            )}
-          </ScrollArea>
+          {isAndroid() ? (
+            // 仅参数工作区滚动，避免外层 ScrollArea 带走底部操作。
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
+              {content}
+            </div>
+          ) : (
+            <ScrollArea
+              className="-mx-1 flex-1"
+              viewportProps={{ className: "px-1 py-1" }}
+            >
+              {content}
+            </ScrollArea>
+          )}
         </DialogContent>
       </Dialog>
     ),

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { isAndroid } from "@/lib/platform";
 import { useAtom } from "jotai";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -20,11 +22,14 @@ import {
 } from "./sections";
 
 export default function Settings() {
+  const android = isAndroid();
   const [params, setParams] = useSearchParams();
   const [tab, setTab] = useState(() =>
     ["ai-models", "ai-templates", "harvest"].includes(params.get("tab") ?? "")
       ? params.get("tab")!
-      : "general",
+      : android
+        ? "harvest"
+        : "general",
   );
   const [theme, setTheme] = useAtom(themeAtom);
   const auth = useAuth();
@@ -56,10 +61,24 @@ export default function Settings() {
     };
   }, []);
   return (
-    <>
+    <div
+      data-import-settings={android ? "android" : undefined}
+      className="min-w-0"
+    >
       <PageHeader
-        title="系统设置"
-        description="管理采集与 AI 处理、工作区外观、图片预设和 AI 模型。"
+        title={android ? "导入设置" : "系统设置"}
+        description={
+          android
+            ? "配置采集规则、AI 模型和默认分页模板。"
+            : "管理采集与 AI 处理、工作区外观、图片预设和 AI 模型。"
+        }
+        action={
+          android && (
+            <Button asChild variant="outline">
+              <Link to="/import">返回素材导入</Link>
+            </Button>
+          )
+        }
         demo={false}
       />
       <Tabs value={tab} onValueChange={setTab} className="min-w-0 gap-5">
@@ -68,32 +87,42 @@ export default function Settings() {
           viewportProps={{ className: "pb-1" }}
         >
           <TabsList aria-label="设置模块" className="h-10! min-w-max">
-            <TabsTrigger value="general" className="px-4">
-              常规设置
-            </TabsTrigger>
+            {!android && (
+              <TabsTrigger value="general" className="px-4">
+                常规设置
+              </TabsTrigger>
+            )}
             <TabsTrigger value="harvest" className="px-4">
               采集与 AI 处理
             </TabsTrigger>
-            <TabsTrigger value="image-presets" className="px-4">
-              图片预设
-            </TabsTrigger>
-            <TabsTrigger value="services" className="px-4">
-              服务连接
-            </TabsTrigger>
+            {!android && (
+              <>
+                <TabsTrigger value="image-presets" className="px-4">
+                  图片预设
+                </TabsTrigger>
+                <TabsTrigger value="services" className="px-4">
+                  服务连接
+                </TabsTrigger>
+              </>
+            )}
             <TabsTrigger value="ai-models" className="px-4">
               AI 模型
             </TabsTrigger>
             <TabsTrigger value="ai-templates" className="px-4">
-              提示词模板
+              {android ? "分页模板" : "提示词模板"}
             </TabsTrigger>
-            <TabsTrigger value="about" className="px-4">
-              关于应用
-            </TabsTrigger>
+            {!android && (
+              <TabsTrigger value="about" className="px-4">
+                关于应用
+              </TabsTrigger>
+            )}
           </TabsList>
         </ScrollArea>
-        <TabsContent value="general" className="min-w-0">
-          <GeneralSettings theme={theme} onThemeChange={setTheme} />
-        </TabsContent>
+        {!android && (
+          <TabsContent value="general" className="min-w-0">
+            <GeneralSettings theme={theme} onThemeChange={setTheme} />
+          </TabsContent>
+        )}
         <TabsContent
           value="harvest"
           forceMount
@@ -108,24 +137,28 @@ export default function Settings() {
             }}
           />
         </TabsContent>
-        <TabsContent
-          value="image-presets"
-          forceMount
-          hidden={tab !== "image-presets"}
-          className="min-w-0"
-        >
-          <ImagePresetSettings />
-        </TabsContent>
-        <TabsContent value="services" className="min-w-0">
-          <ServiceConnections
-            health={health}
-            info={info}
-            session={auth.session}
-          />
-        </TabsContent>
-        <TabsContent value="about" className="min-w-0">
-          <AboutApplication info={info} />
-        </TabsContent>
+        {!android && (
+          <>
+            <TabsContent
+              value="image-presets"
+              forceMount
+              hidden={tab !== "image-presets"}
+              className="min-w-0"
+            >
+              <ImagePresetSettings />
+            </TabsContent>
+            <TabsContent value="services" className="min-w-0">
+              <ServiceConnections
+                health={health}
+                info={info}
+                session={auth.session}
+              />
+            </TabsContent>
+            <TabsContent value="about" className="min-w-0">
+              <AboutApplication info={info} />
+            </TabsContent>
+          </>
+        )}
         <TabsContent
           value="ai-models"
           forceMount
@@ -142,15 +175,20 @@ export default function Settings() {
         >
           <TemplateSettings
             key={
-              params.get("purpose") === "pagination" ? "pagination" : "title"
+              android || params.get("purpose") === "pagination"
+                ? "pagination"
+                : "title"
             }
             active={tab === "ai-templates"}
             initialPurpose={
-              params.get("purpose") === "pagination" ? "pagination" : "title"
+              android || params.get("purpose") === "pagination"
+                ? "pagination"
+                : "title"
             }
+            purposeOnly={android ? "pagination" : undefined}
           />
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }

@@ -8,6 +8,166 @@ use wiremock::{
 };
 
 #[tokio::test]
+async fn mobile_interrupt_checkpoints_restart_and_submission_unknown_remain_account_isolated() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("demo-mobile-import.db");
+    let db = Database::open(&path).await.unwrap();
+    let raw = RawArticle {
+        title: "【演示数据】手机前台导入".into(),
+        writer: "演示作者".into(),
+        source_url: "https://baijiahao.baidu.com/s?id=9001".into(),
+        news_html: "<p>【演示数据】不可变原文</p>".into(),
+    };
+    let article = FormattedArticle {
+        title: raw.title.clone(),
+        writer: raw.writer.clone(),
+        source_url: raw.source_url.clone(),
+        news_text: "<p>【演示数据】处理检查点</p>".into(),
+        title_pic: String::new(),
+        small_text: String::new(),
+        class_id: 1,
+        tags: vec!["演示".into()],
+    };
+    let interrupted = uuid::Uuid::new_v4().to_string();
+    db.harvest_enqueue(
+        1,
+        &EnqueueRequest {
+            id: interrupted.clone(),
+            url: raw.source_url.clone(),
+        },
+    )
+    .await
+    .unwrap();
+    assert!(db.harvest_claim(2).await.unwrap().is_none());
+    assert_eq!(
+        db.harvest_claim(1).await.unwrap().unwrap().job.id,
+        interrupted
+    );
+    db.harvest_save_raw(&interrupted, &raw, &raw.source_url)
+        .await
+        .unwrap();
+    db.harvest_save_result(&interrupted, &article, false)
+        .await
+        .unwrap();
+    db.harvest_progress(&interrupted, Status::Running, Stage::Metadata)
+        .await
+        .unwrap();
+    db.harvest_finish(&interrupted, Status::Interrupted, Some("演示退后台"), None)
+        .await
+        .unwrap();
+
+    let unknown = uuid::Uuid::new_v4().to_string();
+    db.harvest_enqueue(
+        1,
+        &EnqueueRequest {
+            id: unknown.clone(),
+            url: "https://baijiahao.baidu.com/s?id=9002".into(),
+        },
+    )
+    .await
+    .unwrap();
+    assert_eq!(db.harvest_claim(1).await.unwrap().unwrap().job.id, unknown);
+    db.harvest_save_raw(&unknown, &raw, &raw.source_url)
+        .await
+        .unwrap();
+    db.harvest_save_result(&unknown, &article, true)
+        .await
+        .unwrap();
+    db.harvest_submitting(&unknown).await.unwrap();
+
+    let cancelled = uuid::Uuid::new_v4().to_string();
+    db.harvest_enqueue(
+        1,
+        &EnqueueRequest {
+            id: cancelled.clone(),
+            url: "https://baijiahao.baidu.com/s?id=9003".into(),
+        },
+    )
+    .await
+    .unwrap();
+    db.harvest_cancel(&cancelled, 1).await.unwrap();
+    let other = uuid::Uuid::new_v4().to_string();
+    db.harvest_enqueue(
+        2,
+        &EnqueueRequest {
+            id: other.clone(),
+            url: raw.source_url.clone(),
+        },
+    )
+    .await
+    .unwrap();
+    db.pool.close().await;
+
+    let reopened = Database::open(&path).await.unwrap();
+    reopened.harvest_recover().await.unwrap();
+    assert!(reopened.harvest_claim(1).await.unwrap().is_none());
+    assert!(reopened.harvest_job(&interrupted, 2).await.is_err());
+    assert!(
+        reopened
+            .harvest_action(&unknown, 2, &Action::ConfirmNotSubmitted)
+            .await
+            .is_err()
+    );
+    let saved = reopened.harvest_job(&interrupted, 1).await.unwrap();
+    assert!(saved.job.status == Status::Interrupted);
+    assert_eq!(saved.raw.unwrap().news_html, raw.news_html);
+    assert_eq!(saved.formatted.unwrap().news_text, article.news_text);
+    let saved = reopened.harvest_job(&unknown, 1).await.unwrap();
+    assert!(saved.job.status == Status::SubmissionUnknown);
+    assert_eq!(saved.prepared.unwrap().news_text, article.news_text);
+    assert!(
+        reopened
+            .harvest_action(&unknown, 1, &Action::Retry)
+            .await
+            .is_err()
+    );
+    assert!(reopened.harvest_delete(&unknown, 1).await.is_err());
+    assert!(
+        reopened
+            .harvest_job(&cancelled, 1)
+            .await
+            .unwrap()
+            .job
+            .status
+            == Status::Cancelled
+    );
+    assert_eq!(
+        reopened.harvest_claim(2).await.unwrap().unwrap().job.id,
+        other
+    );
+    reopened
+        .harvest_action(&unknown, 1, &Action::ConfirmNotSubmitted)
+        .await
+        .unwrap();
+    assert!(reopened.harvest_claim(1).await.unwrap().is_none());
+    reopened
+        .harvest_action(&interrupted, 1, &Action::Retry)
+        .await
+        .unwrap();
+    assert_eq!(
+        reopened.harvest_claim(1).await.unwrap().unwrap().job.id,
+        interrupted
+    );
+    let mut replacement = raw.clone();
+    replacement.news_html = "<p>演示：不应覆盖原文</p>".into();
+    reopened
+        .harvest_save_raw(&interrupted, &replacement, &raw.source_url)
+        .await
+        .unwrap();
+    assert_eq!(
+        reopened
+            .harvest_job(&interrupted, 1)
+            .await
+            .unwrap()
+            .raw
+            .unwrap()
+            .news_html,
+        raw.news_html
+    );
+    reopened.pool.close().await;
+}
+
+#[tokio::test]
 async fn harvest_upgrade_disables_paid_pagination_and_preserves_legacy_checkpoints() {
     let pool = SqlitePoolOptions::new()
         .max_connections(1)

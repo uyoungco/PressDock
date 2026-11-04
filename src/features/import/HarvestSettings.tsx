@@ -36,6 +36,7 @@ import { emptySettings, type AiSettings } from "@/features/ai/contracts";
 import { importService } from "./service";
 import { isDesktop, ServiceError } from "@/services/tauri/client";
 import type { HarvestBridge } from "./contracts";
+import { isAndroid } from "@/lib/platform";
 
 const autosave = importService.settingsAutosave;
 function flushOnLeave() {
@@ -202,7 +203,9 @@ export function HarvestSettings({
       if (!mounted.current) return;
       toast.success(
         saved
-          ? "开发者模式已开启，可按 F12 打开 DevTools"
+          ? isAndroid()
+            ? "仅处理模式已开启，新任务不提交 CMS"
+            : "开发者模式已开启，可按 F12 打开 DevTools"
           : "开发者模式已关闭，仅影响之后新入队的任务",
       );
     } catch (reason) {
@@ -222,7 +225,7 @@ export function HarvestSettings({
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <LoadState loading={loading && !form} error={error} />
-        <UserscriptConnection active={active} />
+        {!isAndroid() && <UserscriptConnection active={active} />}
         {form && (
           <FieldGroup>
             {/* 获取配置沿用自动保存，隐藏 CDP 字段时保留用户已填写的地址。 */}
@@ -244,14 +247,22 @@ export function HarvestSettings({
                     <ToggleGroupItem value="webview">
                       内置 WebView
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="cdp">浏览器 CDP</ToggleGroupItem>
+                    {!isAndroid() && (
+                      <ToggleGroupItem value="cdp">浏览器 CDP</ToggleGroupItem>
+                    )}
                   </ToggleGroup>
                   <FieldDescription>
-                    新任务使用入队时的获取方式；旧任务重试使用最新获取配置，AI
-                    规则和开发者模式保留原快照。
+                    {isAndroid() ? (
+                      "手机使用 PC UA 加载来源页面。应用保持前台时执行，退到后台后需返回重试中断任务。"
+                    ) : (
+                      <>
+                        新任务使用入队时的获取方式；旧任务重试使用最新获取配置，AI
+                        规则和开发者模式保留原快照。
+                      </>
+                    )}
                   </FieldDescription>
                 </Field>
-                {form.sourceMode === "cdp" && (
+                {!isAndroid() && form.sourceMode === "cdp" && (
                   <>
                     <Field>
                       <FieldLabel>连接的浏览器</FieldLabel>
@@ -333,7 +344,7 @@ export function HarvestSettings({
               />
               <FieldContent>
                 <FieldLabel htmlFor="harvest-developer-mode">
-                  开发者模式
+                  {isAndroid() ? "仅处理，不提交 CMS" : "开发者模式"}
                 </FieldLabel>
                 {modeSaving && (
                   <span role="status" className="text-xs text-muted-foreground">
@@ -341,9 +352,15 @@ export function HarvestSettings({
                   </span>
                 )}
                 <FieldDescription>
-                  开关即时保存，开启后按 F12 打开
-                  DevTools，逐步打印业务数据。仍调用 CMS 格式化，但不创建 CMS
-                  文章。
+                  {isAndroid() ? (
+                    "开关即时保存。开启后仍会采集、格式化及调用启用的 AI，仅将结果保存在本机。"
+                  ) : (
+                    <>
+                      开关即时保存，开启后按 F12 打开
+                      DevTools，逐步打印业务数据。仍调用 CMS 格式化，但不创建
+                      CMS 文章。
+                    </>
+                  )}
                 </FieldDescription>
                 <FieldDescription>
                   仅影响开启后新入队的任务；已有正常任务仍会提交

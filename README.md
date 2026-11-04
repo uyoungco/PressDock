@@ -235,7 +235,11 @@ AI 只返回语义绑定和优选边界，页数与页长由本地全局算法�
 
 配置保存在本机 SQLite，同一工作区所有账号共用；API 密钥只进入系统凭据库，保存失败明确报错，绝不回退明文。密钥输入留空保留已有密钥，前端读取只有配置状态，不回传秘密。AI 鉴权失败不会使 CMS 退出。自动化验证使用本地 HTTP、凭据替身及明确标识的演示数据，不请求真实 AI、不改线上 CMS。
 
-Android 首版已接入原生工程、Keystore、SQLite 素材草稿与渠道素材移动视图，运行要求为 Android 7.0+、ARM64 及系统 WebView 111+；旧组件显示原生更新提示。Windows / macOS 均运行 `npm run android:build` 构建 ARM64 调试 APK；安装与真机验收见 [Android 开发与验收计划](docs/android-plan.md)。文章管理、采集和 AI 标题优化暂未开放到 Android。
+Android 已接入原生工程、Keystore、SQLite 素材草稿、渠道素材移动视图和前台素材导入，运行要求为 Android 7.0+、ARM64 及系统 WebView 111+；旧组件显示原生更新提示。Windows / macOS 均运行 `npm run android:build` 构建正式配置的 ARM64 调试 APK；历史安装与设备记录见 [Android 开发与验收计划](docs/android-plan.md)。文章管理和 AI 标题优化暂未开放到 Android。
+
+手机“素材导入 → 导入设置”可配置采集规则、AI 提供商／模型和默认分页模板。来源使用独立原生 WebView，在首次加载前设置与设备内核版本一致的 Windows Chrome UA，后续刷新、验证及分页沿用 PC UA；共用桌面文章选择器。手机只支持 HTTPS 来源和内置采集，不提供 CDP、油猴及 F12 调试入口。来源网页没有业务 IPC 或 CMS／AI 凭据权限。
+
+导入工作器在应用前台执行，离开导入页仍继续；退到后台中断当前任务并保留已保存检查点，返回后继续领取排队任务，中断任务须手动重试。提交阶段中断则标为“提交结果待确认”，先核对 CMS，禁止自动重发。“仅处理，不提交 CMS”仍会执行启用的 AI。AI 凭据独立使用 Android Keystore 加密，按 UUID 引用隔离，配置失败回滚沿用现有逻辑。演示包保持无网络权限，并在采集、AI 请求入口显式阻断真实请求。浏览器和原生编译验证的范围见 [Android 素材导入验收](docs/android-import-qa.md)。
 
 交互测试使用 `npm run android:build:demo` 生成独立的“PressDock 演示版”：只使用本机 Mock 数据、移除网络权限、无需真实账号，可与正式版同时安装。演示素材修改与 SQLite 草稿均保存在演示版自己的数据目录中。
 

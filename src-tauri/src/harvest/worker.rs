@@ -9,9 +9,13 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::{Notify, watch};
 
 pub struct HarvestService {
+    started: std::sync::atomic::AtomicBool,
+    background_epoch: std::sync::atomic::AtomicU64,
+    pub(crate) foreground: watch::Sender<bool>,
     pub(crate) wake: Notify,
     active: Mutex<Option<Arc<Context>>>,
     pub(crate) maintenance_warning: Option<String>,
+    #[cfg(not(target_os = "android"))]
     pub(super) source_ready: watch::Sender<webview::Readiness>,
     pub(super) cdp: tokio::sync::Mutex<Option<cdp::Browser>>,
 }
@@ -20,6 +24,7 @@ enum Stop {
     None,
     Cancel,
     Session,
+    Background,
 }
 pub(super) struct Context {
     pub id: String,
@@ -47,7 +52,7 @@ impl Context {
         data: impl FnOnce() -> Value,
     ) {
         // 按任务快照输出，关闭设置不截断旧调试任务；正常任务不构建大正文日志对象。
-        if self.developer_mode {
+        if self.developer_mode && !cfg!(target_os = "android") {
             let _ = app.emit_to(
                 "main",
                 "harvest-debug",
@@ -72,7 +77,7 @@ impl Context {
         error: &HarvestError,
         data: impl FnOnce() -> Value,
     ) {
-        if self.developer_mode {
+        if self.developer_mode && !cfg!(target_os = "android") {
             let _ = app.emit_to(
                 "main",
                 "harvest-debug",
@@ -136,15 +141,28 @@ impl HarvestService {
         app: &AppHandle,
         request: &EnqueueRequest,
     ) -> Result<Job, HarvestError> {
+        if cfg!(feature = "android-demo") {
+            return Err(HarvestError::new(
+                "DEMO_ONLY",
+                "演示版不访问来源网站、CMS 或 AI，请在隔离演示页演练导入",
+            ));
+        }
         let database = app.state::<Database>();
         let cms = app.state::<CmsService>();
         let ai = app.state::<AiService>();
         let (user, generation) = cms.harvest_identity().await?;
+        #[cfg(target_os = "android")]
+        {
+            if source_url(&request.url)?.scheme() != "https" {
+                return Err(HarvestError::invalid("Android 采集请使用 HTTPS 文章链接"));
+            }
+            ensure_mobile_source(&database.harvest_settings().await?.options)?;
+        }
         let _lock = ai.operations.lock().await;
         cms.ensure_generation(generation).await?;
         let (job, mut options) = database.harvest_enqueue(user, request).await?;
         cms.ensure_generation(generation).await?;
-        if job.developer_mode {
+        if job.developer_mode && !cfg!(target_os = "android") {
             options.cdp_address = None;
             // 返回已有记录时也使用它的原模式/设置，不把当前开关套到历史任务上。
             let _ = app.emit_to(
@@ -168,12 +186,30 @@ impl HarvestService {
     }
     pub(crate) fn new(maintenance_warning: Option<String>) -> Self {
         Self {
+            started: std::sync::atomic::AtomicBool::new(false),
+            background_epoch: std::sync::atomic::AtomicU64::new(0),
+            foreground: watch::channel(!cfg!(target_os = "android")).0,
             wake: Notify::new(),
             active: Mutex::new(None),
             maintenance_warning,
+            #[cfg(not(target_os = "android"))]
             source_ready: watch::channel(webview::Readiness::Loading).0,
             cdp: tokio::sync::Mutex::new(None),
         }
+    }
+    #[cfg(any(target_os = "android", test))]
+    pub(crate) fn set_foreground(&self, foreground: bool) {
+        if !foreground {
+            self.background_epoch
+                .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            if let Ok(active) = self.active.lock()
+                && let Some(active) = active.as_ref()
+            {
+                // 即使快速返回前台，也不能丢失这次中断。
+                active.cancelled.send_replace(Stop::Background);
+            }
+        }
+        self.foreground.send_replace(foreground);
     }
     pub(super) fn source_event(&self, app: &AppHandle, step: &str, data: Value) {
         let active = self.active.lock().ok().and_then(|active| active.clone());
@@ -186,6 +222,8 @@ impl HarvestService {
         }
     }
     pub(crate) fn stop(&self) {
+        #[cfg(target_os = "android")]
+        crate::harvest::webview::close();
         if let Ok(active) = self.active.lock()
             && let Some(active) = active.as_ref()
         {
@@ -240,6 +278,10 @@ impl HarvestService {
         action: Action,
     ) -> Result<(), HarvestError> {
         let db = app.state::<Database>();
+        #[cfg(target_os = "android")]
+        if matches!(action, Action::Retry) {
+            ensure_mobile_source(&db.harvest_settings().await?.options)?;
+        }
         let job = db.harvest_view(id, user).await?;
         if matches!(action, Action::Cancel) {
             db.harvest_cancel(id, user).await?;
@@ -253,6 +295,7 @@ impl HarvestService {
             }
             // 排队任务取消后不会再被 worker 领取，也要输出 SQLite 中的最终状态。
             if job.developer_mode
+                && !cfg!(target_os = "android")
                 && let Ok(saved) = db.harvest_view(id, user).await
             {
                 let _ = app.emit_to(
@@ -327,14 +370,41 @@ enum Outcome {
     Created(Option<String>),
     DebugCompleted,
 }
+
+fn outcome_status(result: &Result<Outcome, HarvestError>, stage: Option<Stage>) -> Status {
+    match result {
+        Ok(Outcome::Created(_)) => Status::Succeeded,
+        Ok(Outcome::DebugCompleted) => Status::DebugCompleted,
+        Err(error)
+            if stage == Some(Stage::Submitting)
+                && !matches!(error.code, "CMS_REMOTE" | "CMS_FORBIDDEN" | "AUTH_EXPIRED") =>
+        {
+            Status::SubmissionUnknown
+        }
+        Err(error) if matches!(error.code, "AUTH_EXPIRED" | "SESSION_CHANGED") => {
+            Status::WaitingLogin
+        }
+        Err(error) if error.code == "HARVEST_CANCELLED" => Status::Cancelled,
+        Err(error) if error.code == "HARVEST_BACKGROUND" => Status::Interrupted,
+        _ => Status::Failed,
+    }
+}
 async fn process(
     app: &AppHandle,
     context: &Context,
     stored: StoredJob,
 ) -> Result<Outcome, HarvestError> {
+    if cfg!(feature = "android-demo") {
+        return Err(HarvestError::new(
+            "DEMO_ONLY",
+            "演示版禁止访问真实采集、CMS 和 AI 接口",
+        ));
+    }
     let db = app.state::<Database>();
     let cms = app.state::<CmsService>();
     let options = &stored.options.processing;
+    #[cfg(target_os = "android")]
+    ensure_mobile_source(options)?;
     context.trace(
         app,
         "start",
@@ -535,11 +605,25 @@ async fn process(
     ))
 }
 pub fn start(app: AppHandle) {
+    if app
+        .state::<HarvestService>()
+        .started
+        .swap(true, std::sync::atomic::Ordering::SeqCst)
+    {
+        return;
+    }
     tauri::async_runtime::spawn(async move {
         let service = app.state::<HarvestService>();
         let db = app.state::<Database>();
         let cms = app.state::<CmsService>();
+        let mut foreground = service.foreground.subscribe();
         loop {
+            if foreground.wait_for(|active| *active).await.is_err() {
+                return;
+            }
+            let background_epoch = service
+                .background_epoch
+                .load(std::sync::atomic::Ordering::SeqCst);
             let identity = cms.harvest_identity().await;
             let stored = match identity {
                 Ok((user, _)) => db.harvest_claim(user).await,
@@ -599,6 +683,14 @@ pub fn start(app: AppHandle) {
             if let Ok(mut active) = service.active.lock() {
                 *active = Some(context.clone());
             }
+            if background_epoch
+                != service
+                    .background_epoch
+                    .load(std::sync::atomic::Ordering::SeqCst)
+                || !*foreground.borrow()
+            {
+                context.cancelled.send_replace(Stop::Background);
+            }
             // 领取后、控制器登记前可能已被取消；必须先复核持久状态再执行任何步骤。
             if !matches!(db.harvest_view(&context.id,user).await,Ok(job) if job.status==Status::Running)
             {
@@ -618,7 +710,8 @@ pub fn start(app: AppHandle) {
                 Ok::<(), crate::cms::CmsError>(())
             };
             let result = tokio::select! {biased;
-                _=cancellation.changed()=>Err(match *cancellation.borrow() { Stop::Session=>HarvestError::new("SESSION_CHANGED","账号已退出或变化，请用原账号重新登录"), _=>HarvestError::new("HARVEST_CANCELLED","任务已取消") }),
+                _=cancellation.changed()=>Err(match *cancellation.borrow() { Stop::Session=>HarvestError::new("SESSION_CHANGED","账号已退出或变化，请用原账号重新登录"), Stop::Background=>HarvestError::new("HARVEST_BACKGROUND","应用退到后台，任务已中断；返回后可手动重试"), _=>HarvestError::new("HARVEST_CANCELLED","任务已取消") }),
+                _=foreground.wait_for(|active| !*active)=>Err(HarvestError::new("HARVEST_BACKGROUND","应用退到后台，任务已中断；返回后可手动重试")),
                 result=auth_guard=>Err(result.err().map(HarvestError::from).unwrap_or_else(||HarvestError::new("SESSION_CHANGED","登录状态已变化"))),
                 result=process(&app,&context,job)=>result,
             };
@@ -626,24 +719,7 @@ pub fn start(app: AppHandle) {
                 context.error(&app, "processing.failed", error, || json!({}));
             }
             let saved = db.harvest_view(&context.id, user).await;
-            let status = match (&result, &saved) {
-                (Ok(Outcome::Created(_)), _) => Status::Succeeded,
-                (Ok(Outcome::DebugCompleted), _) => Status::DebugCompleted,
-                (Err(error), Ok(saved))
-                    if saved.stage == Some(Stage::Submitting)
-                        && !matches!(
-                            error.code,
-                            "CMS_REMOTE" | "CMS_FORBIDDEN" | "AUTH_EXPIRED"
-                        ) =>
-                {
-                    Status::SubmissionUnknown
-                }
-                (Err(error), _) if matches!(error.code, "AUTH_EXPIRED" | "SESSION_CHANGED") => {
-                    Status::WaitingLogin
-                }
-                (Err(error), _) if error.code == "HARVEST_CANCELLED" => Status::Cancelled,
-                _ => Status::Failed,
-            };
+            let status = outcome_status(&result, saved.as_ref().ok().and_then(|job| job.stage));
             let message = result.as_ref().err().map(|error| error.message.as_str());
             let cms_id = match &result {
                 Ok(Outcome::Created(id)) => id.as_deref(),
@@ -662,7 +738,66 @@ pub fn start(app: AppHandle) {
             if let Ok(mut active) = service.active.lock() {
                 *active = None;
             }
+            webview::release(&app);
             changed(&app);
         }
     });
+}
+
+#[cfg(test)]
+mod foreground_tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn background_gate_waits_for_foreground_and_interrupts_active_work() {
+        let service = HarvestService::new(None);
+        service.set_foreground(false);
+        let mut receiver = service.foreground.subscribe();
+        assert!(
+            tokio::time::timeout(
+                Duration::from_millis(10),
+                receiver.wait_for(|active| *active)
+            )
+            .await
+            .is_err()
+        );
+        service.set_foreground(true);
+        assert!(*receiver.wait_for(|active| *active).await.unwrap());
+        service.set_foreground(false);
+        let result: Result<Outcome, HarvestError> = tokio::select! {
+            _=receiver.wait_for(|active| !*active)=>Err(HarvestError::new("HARVEST_BACKGROUND", "演示退后台")),
+            _=std::future::pending::<()>()=>unreachable!(),
+        };
+        assert!(outcome_status(&result, Some(Stage::Metadata)) == Status::Interrupted);
+        assert!(outcome_status(&result, Some(Stage::Submitting)) == Status::SubmissionUnknown);
+        assert!(
+            outcome_status(
+                &Err(HarvestError::new("SESSION_CHANGED", "演示换号")),
+                Some(Stage::Metadata)
+            ) == Status::WaitingLogin
+        );
+        assert!(
+            outcome_status(
+                &Err(HarvestError::new("HARVEST_CANCELLED", "演示取消")),
+                Some(Stage::Submitting)
+            ) == Status::SubmissionUnknown
+        );
+        assert!(
+            outcome_status(&Ok(Outcome::Created(None)), Some(Stage::Submitting))
+                == Status::Succeeded
+        );
+        let before = service
+            .background_epoch
+            .load(std::sync::atomic::Ordering::SeqCst);
+        service.set_foreground(true);
+        service.set_foreground(false);
+        service.set_foreground(true);
+        assert!(*receiver.borrow());
+        assert_ne!(
+            before,
+            service
+                .background_epoch
+                .load(std::sync::atomic::Ordering::SeqCst)
+        );
+    }
 }
