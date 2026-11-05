@@ -184,35 +184,46 @@ it("无预设允许调整；取消与 Escape 仅关闭图片弹框并恢复输�
 it.each([
   ["主图地址", "主图"],
   ["第二张图片地址", "第二张图片"],
-])("Android %s 处理返回编辑后保留标题、图片地址和焦点", async (label, name) => {
-  vi.stubEnv("VITE_PRESSDOCK_PLATFORM", "android");
-  render(<Harness />);
-  const title = screen.getByLabelText("* 标题", { exact: true });
-  await userEvent.clear(title);
-  await userEvent.type(title, "演示：尚未保存的标题");
-  const input = screen.getByRole("textbox", { name: new RegExp(label) });
-  const originalUrl = (input as HTMLInputElement).value;
-  for (const action of ["取消", "Escape", "Close"]) {
-    await userEvent.upload(screen.getByLabelText(`上传 ${label}`), file);
-    const dialog = await screen.findByRole("dialog", { name: `处理 ${name}` });
-    expect(dialog).toHaveAttribute("data-channel-dialog", "image");
-    await screen.findByRole("region", { name: "图片处理组件" });
-    if (action === "Escape") await userEvent.keyboard("{Escape}");
-    else
-      await userEvent.click(
-        within(dialog).getByRole("button", { name: action }),
+])(
+  "Android %s 处理返回编辑后保留内容，但不自动激活输入框",
+  async (label, name) => {
+    vi.stubEnv("VITE_PRESSDOCK_PLATFORM", "android");
+    render(<Harness />);
+    const title = screen.getByLabelText("* 标题", { exact: true });
+    await userEvent.clear(title);
+    await userEvent.type(title, "演示：尚未保存的标题");
+    const input = screen.getByRole("textbox", { name: new RegExp(label) });
+    const originalUrl = (input as HTMLInputElement).value;
+    for (const action of ["取消", "Escape", "Close"]) {
+      await userEvent.upload(screen.getByLabelText(`上传 ${label}`), file);
+      const dialog = await screen.findByRole("dialog", {
+        name: `处理 ${name}`,
+      });
+      expect(dialog).toHaveAttribute("data-channel-dialog", "image");
+      await screen.findByRole("region", { name: "图片处理组件" });
+      if (action === "Escape") await userEvent.keyboard("{Escape}");
+      else
+        await userEvent.click(
+          within(dialog).getByRole("button", { name: action }),
+        );
+      await waitFor(() =>
+        expect(screen.getByRole("dialog", { name: "修改素材" })).toHaveFocus(),
       );
-    await waitFor(() => expect(input).toHaveFocus());
-    expect(screen.getByRole("dialog", { name: "修改素材" })).toHaveAttribute(
-      "data-channel-dialog",
-      "edit",
-    );
-    expect(title).toHaveValue("演示：尚未保存的标题");
-    expect(input).toHaveValue(originalUrl);
-  }
-  expect(channelService.upload).not.toHaveBeenCalled();
-  expect(saved).not.toHaveBeenCalled();
-});
+      expect(input).not.toHaveFocus();
+      expect(title).not.toHaveFocus();
+      expect(screen.getByRole("dialog", { name: "修改素材" })).toHaveAttribute(
+        "data-channel-dialog",
+        "edit",
+      );
+      expect(title).toHaveValue("演示：尚未保存的标题");
+      expect(input).toHaveValue(originalUrl);
+    }
+    await userEvent.click(title);
+    expect(title).toHaveFocus();
+    expect(channelService.upload).not.toHaveBeenCalled();
+    expect(saved).not.toHaveBeenCalled();
+  },
+);
 
 it.each(["TitlePic", "TitlePic2"])(
   "粘贴仅在 %s 获得焦点时触发，并取第一张图",

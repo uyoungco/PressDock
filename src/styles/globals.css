@@ -431,6 +431,9 @@ html[data-platform="android"]
 }
 /* 渠道弹框横竖屏都占满视口，独立于其他全屏面板和桌面弹框。 */
 html[data-platform="android"] [data-channel-dialog] {
+  /* 压缩器会合并独立变换属性，同时清零 Tailwind 变量以消除基础居中位移。 */
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
   inset: 0;
   width: 100%;
   min-width: 0;
@@ -516,12 +519,13 @@ html[data-platform="android"]
 /* 竖屏把空间留给素材；全屏面板只滚动内容，操作区保持在底部。 */
 @media (orientation: portrait) {
   html[data-platform="android"] [data-mobile-fullscreen] {
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
     inset: 0;
     width: 100%;
     max-width: none;
     height: 100dvh;
     max-height: 100dvh;
-    /* Tailwind v4 的 translate 是独立属性，全屏时也需清除居中偏移。 */
     translate: none;
     transform: none;
     border-radius: 0;
@@ -646,6 +650,8 @@ html[data-platform="android"]
   max-width: 100%;
 }
 html[data-platform="android"] [data-settings-dialog] {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -748,6 +754,8 @@ html[data-platform="android"] [data-article-dialog="filter"],
 html[data-platform="android"] [data-article-dialog="source"],
 html[data-platform="android"] [data-article-dialog="pagination"],
 html[data-platform="android"] [data-article-dialog="image"] {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
   inset: 0;
   width: 100%;
   height: 100dvh;

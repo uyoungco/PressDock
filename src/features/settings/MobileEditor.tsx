@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useMobileSettings } from "./mobile-state";
+import { focusOverlayContent } from "@/lib/overlay-focus";
 
 // 三类设置编辑共用手机容器，桌面仍渲染原来的 Card 和内联表单。
 export function MobileEditor({
@@ -35,6 +36,7 @@ export function MobileEditor({
       <DialogContent
         data-settings-dialog="editor"
         showCloseButton={false}
+        onOpenAutoFocus={focusOverlayContent}
         onInteractOutside={(event) => event.preventDefault()}
         onEscapeKeyDown={(event) => {
           if (busy) event.preventDefault();

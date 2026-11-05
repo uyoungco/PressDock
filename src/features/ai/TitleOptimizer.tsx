@@ -1,4 +1,5 @@
 import { isAndroid } from "@/lib/platform";
+import { focusOverlayContent } from "@/lib/overlay-focus";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -61,9 +62,11 @@ export function TitleOptimizer({
     title: string;
     content: string;
   } | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   return (
     <>
       <Button
+        ref={trigger}
         type="button"
         size="sm"
         variant="outline"
@@ -81,9 +84,12 @@ export function TitleOptimizer({
           }
           onClose={() => {
             setSource(null);
-            requestAnimationFrame(() =>
-              document.getElementById(titleInputId)?.focus(),
-            );
+            requestAnimationFrame(() => {
+              const target = isAndroid()
+                ? trigger.current
+                : document.getElementById(titleInputId);
+              target?.focus({ preventScroll: true });
+            });
           }}
           onAdopt={onAdopt}
         />
@@ -241,6 +247,10 @@ function TitleDialog({
       <DialogContent
         data-settings-dialog={isAndroid() ? "title" : undefined}
         className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-2xl"
+        onOpenAutoFocus={focusOverlayContent}
+        onCloseAutoFocus={(event) => {
+          if (isAndroid()) event.preventDefault();
+        }}
         onInteractOutside={(event) => event.preventDefault()}
       >
         <DialogHeader className="shrink-0 pr-8">

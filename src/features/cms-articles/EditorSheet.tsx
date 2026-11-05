@@ -1,4 +1,5 @@
 import { isAndroid } from "@/lib/platform";
+import { focusOverlayContent } from "@/lib/overlay-focus";
 import { ArrowLeft } from "lucide-react";
 import {
   Dialog,
@@ -331,9 +332,7 @@ export function EditorSheet({
       <SheetContent
         ref={setPortalContainer}
         data-article-dialog={isAndroid() ? "edit" : undefined}
-        onOpenAutoFocus={(event) => {
-          if (isAndroid()) event.preventDefault();
-        }}
+        onOpenAutoFocus={focusOverlayContent}
         side="right"
         className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-5xl"
         showCloseButton={!locked && !isAndroid()}

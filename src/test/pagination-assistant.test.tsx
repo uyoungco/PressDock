@@ -21,6 +21,7 @@ import {
   ServiceError,
 } from "@/services/tauri/client";
 import RichTextEditor from "@/features/cms-articles/RichTextEditor";
+import * as platform from "@/lib/platform";
 
 vi.mock("@/features/ai/service", () => ({
   aiService: { load: vi.fn(), paginate: vi.fn() },
@@ -72,6 +73,37 @@ const generate = async () => {
   await waitFor(() => expect(button).toBeEnabled());
   await userEvent.click(button);
 };
+
+it("Android 源码与链接编辑不自动激活输入，关闭后不重新激活正文", async () => {
+  vi.spyOn(platform, "isAndroid").mockReturnValue(true);
+  const onChange = vi.fn();
+  render(
+    <MemoryRouter>
+      <TooltipProvider>
+        <RichTextEditor
+          initialHtml="<p>【演示数据】不修改的正文。</p>"
+          title="演示文章"
+          disabled={false}
+          onChange={onChange}
+          onUploading={vi.fn()}
+          onError={vi.fn()}
+        />
+      </TooltipProvider>
+    </MemoryRouter>,
+  );
+  for (const name of ["HTML 源码", "编辑链接"]) {
+    await userEvent.click(screen.getByRole("button", { name: "更多正文操作" }));
+    await userEvent.click(screen.getByRole("menuitem", { name }));
+    const dialog = await screen.findByRole("dialog", { name });
+    await waitFor(() => expect(dialog).toHaveFocus());
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.getByRole("toolbar", { name: "正文工具栏" })).toHaveFocus(),
+    );
+    expect(screen.getByRole("textbox", { name: "文章正文" })).not.toHaveFocus();
+  }
+  expect(onChange).not.toHaveBeenCalled();
+});
 
 it("隐藏配置选择并使用默认分页模板绑定的模型；生成预览后显式应用", async () => {
   const settings = paginationSettings();

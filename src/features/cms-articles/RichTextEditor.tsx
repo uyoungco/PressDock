@@ -1,4 +1,5 @@
 import { isAndroid } from "@/lib/platform";
+import { focusOverlayContent } from "@/lib/overlay-focus";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
@@ -699,6 +700,10 @@ export default function RichTextEditor({
     if (!canEdit()) return;
     // 等弹框焦点锁释放后再定位，防止正文焦点被弹框抢回或外层抽屉误关闭。
     if (position !== null) locatePage(position);
+    else restoreEditorFocus();
+  }
+  function restoreEditorFocus() {
+    if (isAndroid()) toolbar.current?.focus({ preventScroll: true });
     else editor!.view.focus();
   }
   function openLink() {
@@ -779,6 +784,7 @@ export default function RichTextEditor({
       <div
         ref={toolbar}
         role="toolbar"
+        tabIndex={-1}
         aria-label="正文工具栏"
         className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
       >
@@ -1211,9 +1217,10 @@ export default function RichTextEditor({
         <DialogContent
           data-article-dialog={isAndroid() ? "source" : undefined}
           className="flex max-h-[85dvh] flex-col sm:max-w-4xl"
+          onOpenAutoFocus={focusOverlayContent}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            if (canEdit()) editor!.view.focus();
+            if (canEdit()) restoreEditorFocus();
           }}
         >
           <DialogHeader className="pr-8">
@@ -1285,9 +1292,10 @@ export default function RichTextEditor({
       >
         <DialogContent
           data-article-dialog={isAndroid() ? "link" : undefined}
+          onOpenAutoFocus={focusOverlayContent}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            if (canEdit()) editor!.view.focus();
+            if (canEdit()) restoreEditorFocus();
           }}
         >
           <DialogHeader>

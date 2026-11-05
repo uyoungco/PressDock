@@ -89,6 +89,24 @@ async function setup(path = full) {
   return { router, ...view };
 }
 describe("Android 渠道样板", () => {
+  it("进入素材编辑不激活输入框，仍可用 Tab 或手动点击输入", async () => {
+    const { router } = await setup();
+    await userEvent.click(screen.getAllByRole("button", { name: "编辑" })[0]);
+    const dialog = await screen.findByRole("dialog", { name: "修改素材" });
+    const title = screen.getByLabelText("* 标题");
+    await waitFor(() => expect(dialog).toHaveFocus());
+    expect(title).not.toHaveFocus();
+    await userEvent.tab();
+    expect(title).toHaveFocus();
+    await userEvent.click(screen.getByRole("button", { name: "取消" }));
+    await userEvent.click(screen.getAllByRole("button", { name: "编辑" })[0]);
+    await screen.findByRole("dialog", { name: "修改素材" });
+    await userEvent.click(screen.getByLabelText("* 标题"));
+    expect(screen.getByLabelText("* 标题")).toHaveFocus();
+    expect(channelDraftService.save).not.toHaveBeenCalled();
+    expect(channelService.update).not.toHaveBeenCalled();
+    router.dispose();
+  });
   it("筛选草案取消不查询，换渠道清子渠道，应用后才查询", async () => {
     const { router } = await setup();
     await userEvent.click(screen.getByRole("button", { name: "筛选 3" }));

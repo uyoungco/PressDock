@@ -250,7 +250,14 @@ export function useMaterialImage(
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            if (focusTarget.current?.isConnected) focusTarget.current.focus();
+            if (focusTarget.current?.isConnected) {
+              const target = isAndroid()
+                ? focusTarget.current.closest<HTMLElement>(
+                    '[data-channel-dialog="edit"]',
+                  )
+                : focusTarget.current;
+              target?.focus({ preventScroll: true });
+            }
           }}
         >
           <DialogTitle>

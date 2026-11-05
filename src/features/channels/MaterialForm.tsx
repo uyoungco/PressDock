@@ -1,4 +1,5 @@
 import { isAndroid, isDemo } from "@/lib/platform";
+import { focusOverlayContent } from "@/lib/overlay-focus";
 import { useState } from "react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { MaterialImage } from "./MaterialImage";
@@ -101,6 +102,7 @@ export function MaterialForm({
         data-channel-dialog={isAndroid() ? "edit" : undefined}
         className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-2xl max-md:top-0 max-md:left-0 max-md:h-dvh max-md:max-h-dvh max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none"
         showCloseButton={!busy && !image.working}
+        onOpenAutoFocus={focusOverlayContent}
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="shrink-0 pr-8">

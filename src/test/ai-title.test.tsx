@@ -18,6 +18,7 @@ import type { PromoteInput } from "@/types/cms";
 import { aiResult, aiSettings } from "./ai-fixtures";
 import { deferred, session } from "./cms-fixtures";
 import { chooseOption } from "./select-helpers";
+import * as platform from "@/lib/platform";
 
 vi.mock("@/features/ai/service", () => ({
   aiService: { load: vi.fn(), suggest: vi.fn() },
@@ -123,6 +124,21 @@ it("首次打开仅生成一次，临时参数不自动请求，采用回填并�
   expect(screen.getByLabelText("标题")).toHaveValue("演示候选标题一");
   await waitFor(() => expect(screen.getByLabelText("标题")).toHaveFocus());
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+it("Android 标题弹框打开和取消均不激活输入框，关闭后回到优化按钮", async () => {
+  vi.spyOn(platform, "isAndroid").mockReturnValue(true);
+  mount();
+  const trigger = screen.getByRole("button", { name: "AI 优化" });
+  await userEvent.click(trigger);
+  const dialog = await screen.findByRole("dialog", { name: "AI 优化标题" });
+  await screen.findByLabelText("补充要求（仅本次）");
+  await waitFor(() => expect(dialog).toHaveFocus());
+  await userEvent.keyboard("{Escape}");
+  await waitFor(() => expect(trigger).toHaveFocus());
+  expect(screen.getByLabelText("标题")).not.toHaveFocus();
+  expect(screen.getByLabelText("标题")).toHaveValue("当前标题");
+  expect(aiService.suggest).not.toHaveBeenCalled();
 });
 it("关闭会取消，旧结果不会污染重新打开的弹窗", async () => {
   const pending = deferred<ReturnType<typeof aiResult>>();
