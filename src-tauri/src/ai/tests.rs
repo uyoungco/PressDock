@@ -278,6 +278,153 @@ async fn pagination_migration_preserves_title_settings_and_separates_defaults() 
 }
 
 #[tokio::test]
+async fn title_prompt_migration_updates_only_builtin_system_prompt_once() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("ai.db");
+    let pool = sqlx::SqlitePool::connect_with(
+        sqlx::sqlite::SqliteConnectOptions::new()
+            .filename(&path)
+            .create_if_missing(true)
+            .foreign_keys(true),
+    )
+    .await
+    .unwrap();
+    sqlx::migrate!("./migrations")
+        .run_to(8, &pool)
+        .await
+        .unwrap();
+    let db = Database { pool };
+    db.ai_save_provider(
+        &provider("demo", "https://demo.example/v1", Protocol::Responses),
+        None,
+    )
+    .await
+    .unwrap();
+    db.ai_save_model(&model("demo-model", "demo"))
+        .await
+        .unwrap();
+    let mut builtin = db
+        .ai_settings()
+        .await
+        .unwrap()
+        .templates
+        .into_iter()
+        .find(|t| t.id == "builtin-news-title")
+        .unwrap();
+    builtin.name = "演示：已重命名的内置模板".into();
+    builtin.system_prompt = "演示：升级前的自定义系统指令".into();
+    builtin.user_prompt =
+        "演示：保留 {{title}} {{content}} {{count}} {{max_length}} {{requirements}}".into();
+    builtin.model_config_id = Some("demo-model".into());
+    builtin.candidate_count = 3;
+    builtin.max_length = 42;
+    db.ai_save_template(&builtin).await.unwrap();
+    let mut custom = builtin.clone();
+    custom.id = "demo-custom-title".into();
+    custom.system_prompt = "演示：保留自建模板的系统指令".into();
+    db.ai_save_template(&custom).await.unwrap();
+    let mut pagination = db
+        .ai_settings()
+        .await
+        .unwrap()
+        .templates
+        .into_iter()
+        .find(|t| t.purpose == TemplatePurpose::Pagination)
+        .unwrap();
+    pagination.system_prompt = "演示：保留分页系统指令".into();
+    pagination.model_config_id = Some("demo-model".into());
+    db.ai_save_template(&pagination).await.unwrap();
+    let mut expected = serde_json::to_value(db.ai_settings().await.unwrap()).unwrap();
+    db.pool.close().await;
+
+    let db = Database::open(&path).await.unwrap();
+    let settings = db.ai_settings().await.unwrap();
+    let mut upgraded = settings
+        .templates
+        .iter()
+        .find(|t| t.id == builtin.id)
+        .unwrap()
+        .clone();
+    assert!(upgraded.system_prompt.contains("根据当前标题"));
+    assert!(upgraded.system_prompt.contains("点击进来、继续阅读的欲望"));
+    assert!(upgraded.system_prompt.contains("不编造信息"));
+    expected["templates"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|t| t["id"] == builtin.id)
+        .unwrap()["systemPrompt"] = json!(upgraded.system_prompt);
+    assert_eq!(serde_json::to_value(settings).unwrap(), expected);
+
+    upgraded.system_prompt = "演示：升级后再次修改的指令".into();
+    db.ai_save_template(&upgraded).await.unwrap();
+    let expected = serde_json::to_value(db.ai_settings().await.unwrap()).unwrap();
+    db.pool.close().await;
+    let db = Database::open(&path).await.unwrap();
+    assert_eq!(
+        serde_json::to_value(db.ai_settings().await.unwrap()).unwrap(),
+        expected
+    );
+    db.pool.close().await;
+}
+
+#[tokio::test]
+async fn title_prompt_migration_initializes_fresh_databases_and_preserves_deletion() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("ai.db");
+    let db = Database::open(&path).await.unwrap();
+    let settings = db.ai_settings().await.unwrap();
+    let builtin = settings
+        .templates
+        .iter()
+        .find(|t| t.id == "builtin-news-title")
+        .unwrap();
+    assert!(builtin.system_prompt.contains("点击进来、继续阅读的欲望"));
+    assert_eq!(
+        (
+            builtin.candidate_count,
+            builtin.max_length,
+            builtin.is_default
+        ),
+        (5, 30, true)
+    );
+    builtin.validate().unwrap();
+    let expected = serde_json::to_value(settings).unwrap();
+    db.pool.close().await;
+    let db = Database::open(&path).await.unwrap();
+    assert_eq!(
+        serde_json::to_value(db.ai_settings().await.unwrap()).unwrap(),
+        expected
+    );
+    db.pool.close().await;
+
+    let deleted_path = dir.path().join("deleted.db");
+    let pool = sqlx::SqlitePool::connect_with(
+        sqlx::sqlite::SqliteConnectOptions::new()
+            .filename(&deleted_path)
+            .create_if_missing(true),
+    )
+    .await
+    .unwrap();
+    sqlx::migrate!("./migrations")
+        .run_to(8, &pool)
+        .await
+        .unwrap();
+    let db = Database { pool };
+    db.ai_delete_config("template", "builtin-news-title")
+        .await
+        .unwrap();
+    let expected = serde_json::to_value(db.ai_settings().await.unwrap()).unwrap();
+    db.pool.close().await;
+    let db = Database::open(&deleted_path).await.unwrap();
+    assert_eq!(
+        serde_json::to_value(db.ai_settings().await.unwrap()).unwrap(),
+        expected
+    );
+    db.pool.close().await;
+}
+
+#[tokio::test]
 async fn pagination_uses_saved_provider_protocol_limits_and_rejects_partial_output() {
     for (protocol, field) in [
         (Protocol::ChatCompletions, "max_tokens"),
