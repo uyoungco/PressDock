@@ -243,7 +243,8 @@ export function MaterialForm({
                             onChange({ ...edit.input, [field]: e.target.value })
                           }
                         />
-                        {field === "title" && !isAndroid() && (
+                        {/* Android 复用标题服务；采用只回填表单，保存素材才提交 CMS。 */}
+                        {field === "title" && (
                           <TitleOptimizer
                             title={edit.input.title}
                             content={edit.input.smallText ?? ""}

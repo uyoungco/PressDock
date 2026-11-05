@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { isAndroid } from "@/lib/platform";
+import { useSettingsDraft } from "@/features/settings/mobile-state";
 import { CopyIcon, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
@@ -75,6 +78,7 @@ const formats = [
 ];
 
 export function ImagePresetSettings() {
+  const android = isAndroid();
   const [groups, setGroups] = useState<ChannelGroup[]>([]);
   const [configs, setConfigs] = useState<ChannelImagePresets[]>([]);
   const [channel, setChannel] = useState("");
@@ -121,6 +125,30 @@ export function ImagePresetSettings() {
       active = false;
     };
   }, [retry]);
+  // 设置分项切换保留 drafts；仅真实改动触发离页提醒，保存成功仍由原逻辑清理。
+  useSettingsDraft(
+    "image-presets",
+    Object.entries(drafts).some(([entryKey, value]) => {
+      const [savedChannel, savedSubChannel] = JSON.parse(entryKey) as [
+        string,
+        string,
+      ];
+      const saved =
+        configs.find(
+          (entry) =>
+            entry.channel === savedChannel &&
+            entry.subChannel === savedSubChannel,
+        ) ?? emptyPresets(savedChannel, savedSubChannel);
+      return (
+        JSON.stringify(value) !==
+        JSON.stringify({
+          titlePic: toDraft(saved.titlePic),
+          titlePic2: toDraft(saved.titlePic2),
+        })
+      );
+    }),
+    saving,
+  );
   const key = JSON.stringify([channel, subChannel]);
   const config =
     configs.find(
@@ -213,7 +241,7 @@ export function ImagePresetSettings() {
       if (mounted.current) setSaving(false);
     }
   }
-  return (
+  const content = (
     <Card className="min-w-0 shadow-none xl:col-span-2">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
@@ -323,6 +351,7 @@ export function ImagePresetSettings() {
         )}
         {channel && subChannel && (
           <form
+            id="settings-image-presets-form"
             onSubmit={(event) => {
               event.preventDefault();
               void save();
@@ -428,17 +457,48 @@ export function ImagePresetSettings() {
               清空后点击保存才生效。尺寸单边最多 16384 px，总像素最多 2400
               万，体积上限最多 20480 KiB。
             </p>
-            <Button type="submit" disabled={disabled}>
-              {saving ? "正在保存预设…" : "保存图片预设"}
-            </Button>
+            {!android && (
+              <Button type="submit" disabled={disabled}>
+                {saving ? "正在保存预设…" : "保存图片预设"}
+              </Button>
+            )}
           </form>
         )}
-        {error && (
+        {error && !android && (
           <p role="alert" className="text-sm text-destructive">
             {error}
           </p>
         )}
       </CardContent>
     </Card>
+  );
+  // 手机保存操作移出滚动正文；桌面继续使用原来的卡片及表单按钮。
+  return android ? (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <ScrollArea
+        className="flex-1"
+        viewportProps={{ className: "overscroll-contain" }}
+      >
+        {content}
+      </ScrollArea>
+      {error && (
+        <p role="alert" className="shrink-0 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+      {channel && subChannel && (
+        <Button
+          data-settings-save="presets"
+          className="min-h-11 shrink-0"
+          type="submit"
+          form="settings-image-presets-form"
+          disabled={disabled}
+        >
+          {saving ? "正在保存预设…" : "保存图片预设"}
+        </Button>
+      )}
+    </div>
+  ) : (
+    content
   );
 }

@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { isAndroid, isDemo } from "@/lib/platform";
+import MobileArticles from "./MobileArticles";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -48,6 +51,16 @@ import {
 export default function Articles({ view }: { view: ArticleView }) {
   const [params] = useSearchParams();
   const remembered = useAtomValue(articleFiltersAtom)[view];
+  // 原生演示不具备文章接口；浏览器验收使用独立注入的内存替身。
+  if (isAndroid() && isDemo())
+    return (
+      <Alert>
+        <AlertTitle>演示版暂不支持文章管理</AlertTitle>
+        <AlertDescription>
+          演示包仅提供本机渠道素材和图片，不连接 CMS。
+        </AlertDescription>
+      </Alert>
+    );
   if (!params.size)
     return (
       <Navigate
@@ -59,7 +72,11 @@ export default function Articles({ view }: { view: ArticleView }) {
       />
     );
   // 切换类别时重新挂载，避免表单、请求结果和分页在不同审核级别间串用。
-  return <ArticleResults key={view} view={view} />;
+  return isAndroid() ? (
+    <MobileArticles key={view} view={view} />
+  ) : (
+    <ArticleResults key={view} view={view} />
+  );
 }
 function ArticleResults({ view }: { view: ArticleView }) {
   const [params, setParams] = useSearchParams();

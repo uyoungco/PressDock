@@ -1,4 +1,4 @@
-import { routeAvailable } from "@/lib/platform";
+import { isAndroid, isDemo, routeAvailable } from "@/lib/platform";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
@@ -25,7 +25,11 @@ export function NavigationItems({
   const { pathname } = useLocation();
   const [groupOpen, setGroupOpen] = useState(pathname.startsWith("/articles"));
   return navigation
-    .filter((item) => routeAvailable(item.to))
+    .filter(
+      (item) =>
+        routeAvailable(item.to) &&
+        !(isAndroid() && isDemo() && item.to === "/articles"),
+    )
     .map(({ to, label, icon: Icon, children }) => {
       const active = pathname.startsWith(to);
       const classes = cn(

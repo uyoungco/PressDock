@@ -11,7 +11,8 @@ export function useAndroidShell() {
     document.documentElement.dataset.platform = "android";
     const back = (event: Event) => {
       const overlay = document.querySelector(
-        '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [role="listbox"][data-state="open"], [role="menu"][data-state="open"]',
+        // Radix 使用 data-state，Base UI 的选择器使用 data-open；两者都优先处理浮层。
+        '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [role="listbox"][data-state="open"], [role="menu"][data-state="open"], [role="dialog"][data-open], [role="listbox"][data-open], [role="menu"][data-open]',
       );
       if (overlay) {
         event.preventDefault();
@@ -25,7 +26,10 @@ export function useAndroidShell() {
         );
       } else if (pathname !== homePath() && pathname !== "/login") {
         event.preventDefault();
-        void navigate(pathname === "/settings" ? "/import" : homePath());
+        // 完整设置拥有分项、提供商和编辑层级，不再统一返回素材导入。
+        if (pathname === "/settings")
+          window.dispatchEvent(new Event("pressdock-settings-back"));
+        else void navigate(homePath());
       }
     };
     window.addEventListener("pressdock-back", back);

@@ -19,7 +19,8 @@ import { aiService } from "@/features/ai/service";
 import { emptySettings } from "@/features/ai/contracts";
 import { aiErrorMessage } from "@/features/ai/use-settings";
 import { onClientInvalidated } from "@/services/tauri/client";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { isAndroid } from "@/lib/platform";
 
 export function PaginationAssistant({
   doc,
@@ -45,6 +46,7 @@ export function PaginationAssistant({
   onAfterClose: () => void;
 }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [draft, setDraft] = useState<{
     base: Node;
     title: string;
@@ -175,6 +177,91 @@ export function PaginationAssistant({
     controller.current?.abort();
     onClose();
   }
+  // 手机生成、取消和应用固定在底部，长预览滚动不会遮挡主操作。
+  const generationControls = (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={locked || nested || loading || busy || !configured}
+        onClick={generate}
+      >
+        {busy ? "正在生成分页…" : "AI 生成分页"}
+      </Button>
+      {busy && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            controller.current?.abort();
+            setBusy(false);
+          }}
+        >
+          取消生成
+        </Button>
+      )}
+    </>
+  );
+  const draftControls = draft && (
+    <div className="flex flex-wrap gap-2">
+      <Button
+        type="button"
+        size="sm"
+        disabled={locked || busy || stale}
+        onClick={() => {
+          if (!locked && !busy && draft.base === doc && draft.title === title) {
+            onApply(draft.base, draft.candidate);
+            setDraft(null);
+          }
+        }}
+      >
+        应用初稿
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          controller.current?.abort();
+          setBusy(false);
+          setDraft(null);
+          setError("");
+          setSelected(0);
+        }}
+      >
+        取消初稿
+      </Button>
+    </div>
+  );
+  const mergeControls = (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={locked || busy || previewing || nested || index === 0}
+        onClick={() => {
+          onRemove(index - 1);
+          setSelected(index - 1);
+        }}
+      >
+        与上一页合并
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={
+          locked || busy || previewing || nested || index >= breaks.length
+        }
+        onClick={() => onRemove(index)}
+      >
+        删除当前页后分页点
+      </Button>
+    </>
+  );
   return (
     <Dialog
       open
@@ -183,6 +270,7 @@ export function PaginationAssistant({
       }}
     >
       <DialogContent
+        data-article-dialog={isAndroid() ? "pagination" : undefined}
         id="cms-pagination-assistant"
         // Portal 脱离正文容器后仍需同一排版作用域，避免预览丢失图片尺寸和文字样式。
         className="cms-rich-editor flex max-h-[85dvh] flex-col sm:max-w-4xl"
@@ -220,7 +308,10 @@ export function PaginationAssistant({
                     size="sm"
                     onClick={() => {
                       close();
-                      navigate("/settings?tab=ai-templates&purpose=pagination");
+                      // 手机经过文章离页确认保留草稿，设置返回同一文章类别。
+                      navigate(
+                        `/settings?tab=ai-templates&purpose=pagination${isAndroid() ? `&returnTo=${pathname.slice(1)}` : ""}`,
+                      );
                     }}
                   >
                     配置默认分页模板
@@ -238,28 +329,7 @@ export function PaginationAssistant({
               >
                 在当前段落后分页
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={locked || nested || loading || busy || !configured}
-                onClick={generate}
-              >
-                {busy ? "正在生成分页…" : "AI 生成分页"}
-              </Button>
-              {busy && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    controller.current?.abort();
-                    setBusy(false);
-                  }}
-                >
-                  取消生成
-                </Button>
-              )}
+              {!isAndroid() && generationControls}
             </div>
             {nested && (
               <Alert>
@@ -290,42 +360,7 @@ export function PaginationAssistant({
                 </AlertDescription>
               </Alert>
             )}
-            {draft && (
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={locked || busy || stale}
-                  onClick={() => {
-                    if (
-                      !locked &&
-                      !busy &&
-                      draft.base === doc &&
-                      draft.title === title
-                    ) {
-                      onApply(draft.base, draft.candidate);
-                      setDraft(null);
-                    }
-                  }}
-                >
-                  应用初稿
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    controller.current?.abort();
-                    setBusy(false);
-                    setDraft(null);
-                    setError("");
-                    setSelected(0);
-                  }}
-                >
-                  取消初稿
-                </Button>
-              </div>
-            )}
+            {!isAndroid() && draftControls}
             <ScrollArea className="max-h-32">
               <nav aria-label="正文页码" className="flex flex-wrap gap-1">
                 {pages.map((page, pageIndex) => (
@@ -371,6 +406,9 @@ export function PaginationAssistant({
                 定位正文
               </Button>
             </div>
+            {isAndroid() && (
+              <div className="flex flex-wrap gap-2">{mergeControls}</div>
+            )}
             <p className="text-sm text-muted-foreground" role="status">
               第 {index + 1} / {pages.length} 页 · {current.characters}{" "}
               字（不含空白）
@@ -387,29 +425,11 @@ export function PaginationAssistant({
           </div>
         </ScrollArea>
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={locked || busy || previewing || nested || index === 0}
-            onClick={() => {
-              onRemove(index - 1);
-              setSelected(index - 1);
-            }}
-          >
-            与上一页合并
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={
-              locked || busy || previewing || nested || index >= breaks.length
-            }
-            onClick={() => onRemove(index)}
-          >
-            删除当前页后分页点
-          </Button>
+          {isAndroid()
+            ? previewing
+              ? draftControls
+              : generationControls
+            : mergeControls}
           <Button type="button" variant="outline" onClick={close}>
             关闭
           </Button>

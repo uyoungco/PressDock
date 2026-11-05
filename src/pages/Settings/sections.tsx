@@ -1,3 +1,4 @@
+import { isAndroid, isDemo } from "@/lib/platform";
 import { Monitor, Database, Plug, Sparkles, Info } from "lucide-react";
 import {
   Card,
@@ -90,7 +91,9 @@ export function ServiceConnections({
             本地服务
           </CardTitle>
           <CardDescription>
-            桌面端通过类型化 IPC 检查后端与数据库。
+            {isAndroid()
+              ? "检查本机服务与数据库状态。"
+              : "桌面端通过类型化 IPC 检查后端与数据库。"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -100,7 +103,9 @@ export function ServiceConnections({
           <p className="mt-2 text-xs text-muted-foreground">
             {info
               ? `运行平台：${info.platform}`
-              : "数据库：应用数据目录 / pressdock.db（桌面端）"}
+              : isAndroid()
+                ? "数据库：本机应用数据目录"
+                : "数据库：应用数据目录 / pressdock.db（桌面端）"}
           </p>
         </CardContent>
       </Card>
@@ -110,7 +115,13 @@ export function ServiceConnections({
             <Plug className="size-4" />
             CMS 连接
           </CardTitle>
-          <Badge variant="secondary">已登录 · 只读素材</Badge>
+          <Badge variant="secondary">
+            {isAndroid()
+              ? isDemo()
+                ? "演示会话 · 本机数据"
+                : "已登录"
+              : "已登录 · 只读素材"}
+          </Badge>
         </CardHeader>
         <CardContent className="space-y-2 text-sm break-words text-muted-foreground">
           <p>新闻管理后台 · newsadmin.nccontrol.com.cn</p>
@@ -123,7 +134,11 @@ export function ServiceConnections({
               ? "会话已安全保存，重启后验证恢复。"
               : "会话仅本次运行有效，关闭后需要重新登录。"}
           </p>
-          <p>渠道素材支持筛选和查看；发布接口尚未接入。</p>
+          <p>
+            {isAndroid()
+              ? "渠道素材支持查询、新增、修改、图片处理和排序。"
+              : "渠道素材支持筛选和查看；发布接口尚未接入。"}
+          </p>
         </CardContent>
       </Card>
       <Card className="min-w-0 shadow-none">

@@ -132,9 +132,7 @@ describe("Android 渠道样板", () => {
         }),
       ),
     );
-    expect(
-      screen.queryByRole("button", { name: /AI 优化/ }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /AI 优化/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "取消" }));
     await userEvent.click(
       screen.getByRole("button", { name: "保留草稿并返回" }),

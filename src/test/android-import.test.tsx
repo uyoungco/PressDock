@@ -139,9 +139,10 @@ it("配置往返恢复内存链接，账号缓存重置清除草稿", async () =
   fireEvent.change(screen.getByLabelText("文章链接"), {
     target: { value: "https://baijiahao.baidu.com/s?id=demo" },
   });
-  fireEvent.click(screen.getByRole("link", { name: "导入设置" }));
-  await screen.findByRole("heading", { name: "导入设置" });
-  fireEvent.click(screen.getByRole("link", { name: "返回素材导入" }));
+  fireEvent.click(screen.getByRole("link", { name: "系统设置" }));
+  await screen.findByRole("heading", { name: "采集与 AI 处理" });
+  fireEvent.click(screen.getByRole("button", { name: "返回上一级" }));
+  fireEvent.click(screen.getByRole("button", { name: "返回上一级" }));
   await screen.findByRole("article");
   expect(screen.getByLabelText("文章链接")).toHaveValue(
     "https://baijiahao.baidu.com/s?id=demo",
@@ -150,22 +151,17 @@ it("配置往返恢复内存链接，账号缓存重置清除草稿", async () =
   expect(runtime.store.get(harvestUrlAtom)).toBe("");
 });
 
-it("Android 设置只开放导入相关模块，不访问油猴桥接，分页模板不能切换到标题用途", async () => {
-  setup("/settings");
+it("Android 完整设置保留采集深链接，不访问油猴桥接，分页入口定位对应用途", async () => {
+  setup("/settings?tab=harvest&returnTo=import");
   await screen.findByLabelText("仅处理，不提交 CMS");
-  expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
-    "采集与 AI 处理",
-    "AI 模型",
-    "分页模板",
-  ]);
   expect(screen.queryByText("浏览器 CDP")).not.toBeInTheDocument();
   expect(screen.queryByText(/F12/)).not.toBeInTheDocument();
   expect(harvestIpc.bridgeStatus).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "配置默认分页模板" }));
   await screen.findByRole("button", { name: /演示分页模板/ });
   expect(
-    screen.queryByRole("group", { name: "模板用途" }),
-  ).not.toBeInTheDocument();
+    screen.getByRole("radiogroup", { name: "模板用途" }),
+  ).toBeInTheDocument();
   expect(screen.queryByText("桌面图片预设")).not.toBeInTheDocument();
 });
 

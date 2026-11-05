@@ -1,6 +1,6 @@
 {
   "identifier": "android",
-  "description": "Android 主窗口的渠道、图片、前台采集与 AI 配置权限",
+  "description": "Android 主窗口的渠道、文章、图片、前台采集与 AI 配置权限",
   "platforms": ["android"],
   "windows": ["main"],
   "permissions": [
@@ -21,10 +21,17 @@
     "allow-ai-delete-config",
     "allow-ai-list-models",
     "allow-ai-test-model",
+    "allow-ai-suggest-titles",
+    "allow-ai-suggest-pagination",
     "allow-ai-cancel",
     "allow-cms-login",
     "allow-cms-restore-session",
     "allow-cms-logout",
+    "allow-cms-list-articles",
+    "allow-cms-list-article-classes",
+    "allow-cms-get-article",
+    "allow-cms-update-article",
+    "allow-cms-add-article-to-promote",
     "allow-cms-list-promote-channels",
     "allow-cms-list-promote-data",
     "allow-cms-load-promote-image",
@@ -40,6 +47,7 @@
     "allow-image-cancel",
     "allow-image-export",
     "allow-list-channel-image-presets",
+    "allow-save-channel-image-presets",
     "allow-channel-draft-load",
     "allow-channel-draft-save",
     "allow-channel-draft-clear"

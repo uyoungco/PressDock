@@ -1,6 +1,7 @@
+import { isAndroid } from "@/lib/platform";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LoaderCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,6 +104,11 @@ function TitleDialog({
   onAdopt: (value: string) => void;
 }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // 文章转素材沿用文章内存草稿，不误跳到渠道工作区。
+  const returnTo = /^\/articles\/(quality|review-[123])$/.test(pathname)
+    ? pathname.slice(1)
+    : "channels";
   const [settings, setSettings] = useState<AiSettings>(emptySettings);
   const [options, setOptions] = useState<Options>({
     templateId: "",
@@ -114,6 +120,7 @@ function TitleDialog({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attempted, setAttempted] = useState(false);
   const [result, setResult] = useState<TitleSuggestionResult | null>(null);
   const controller = useRef<AbortController | null>(null);
   const mounted = useRef(false);
@@ -128,6 +135,7 @@ function TitleDialog({
     const version = ++sequence.current;
     setError(null);
     setResult(null);
+    setAttempted(true);
     try {
       countSchema.parse(next.candidateCount);
       lengthSchema.parse(next.maxLength);
@@ -179,7 +187,11 @@ function TitleDialog({
         if (template) {
           const next = fromTemplate(template);
           setOptions(next);
-          if (data.models.some((m) => m.id === next.modelConfigId))
+          // 手机先展示发送内容和配置，由用户明确点击后请求；桌面维持首次自动生成。
+          if (
+            !isAndroid() &&
+            data.models.some((m) => m.id === next.modelConfigId)
+          )
             void generate(next);
         }
       })
@@ -227,6 +239,7 @@ function TitleDialog({
       }}
     >
       <DialogContent
+        data-settings-dialog={isAndroid() ? "title" : undefined}
         className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-2xl"
         onInteractOutside={(event) => event.preventDefault()}
       >
@@ -244,6 +257,9 @@ function TitleDialog({
               <p className="text-sm break-words">
                 {source.title || "（未填写标题）"}
               </p>
+              {isAndroid() && source.content.trim() && (
+                <p className="text-sm break-words">{source.content}</p>
+              )}
               <p className="text-xs text-muted-foreground">
                 参考正文/摘要：{[...source.content].length} 字符，发送至所选 AI
                 服务。候选标题需人工核对。
@@ -265,7 +281,11 @@ function TitleDialog({
                       variant="outline"
                       onClick={() => {
                         close();
-                        navigate("/settings?tab=ai-models");
+                        navigate(
+                          isAndroid()
+                            ? `/settings?tab=ai-models&returnTo=${returnTo}`
+                            : "/settings?tab=ai-models",
+                        );
                       }}
                     >
                       前往 AI 模型设置
@@ -274,7 +294,11 @@ function TitleDialog({
                       variant="outline"
                       onClick={() => {
                         close();
-                        navigate("/settings?tab=ai-templates");
+                        navigate(
+                          isAndroid()
+                            ? `/settings?tab=ai-templates&purpose=title&returnTo=${returnTo}`
+                            : "/settings?tab=ai-templates",
+                        );
                       }}
                     >
                       前往提示词模板
@@ -376,7 +400,11 @@ function TitleDialog({
                           variant="outline"
                           onClick={() => {
                             close();
-                            navigate("/settings?tab=ai-templates");
+                            navigate(
+                              isAndroid()
+                                ? `/settings?tab=ai-templates&purpose=title&returnTo=${returnTo}`
+                                : "/settings?tab=ai-templates",
+                            );
                           }}
                         >
                           前往提示词模板
@@ -462,7 +490,11 @@ function TitleDialog({
               onClick={() => void generate(options)}
             >
               <Sparkles />
-              {busy ? "正在生成…" : "重新生成"}
+              {busy
+                ? "正在生成…"
+                : isAndroid() && !attempted
+                  ? "生成标题"
+                  : "重新生成"}
             </Button>
           )}
         </DialogFooter>

@@ -1,3 +1,4 @@
+import { isAndroid } from "@/lib/platform";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
@@ -29,6 +30,7 @@ import {
   ListIcon,
   ListOrderedIcon,
   RedoIcon,
+  MoreHorizontalIcon,
   SeparatorHorizontalIcon,
   UnderlineIcon,
   UndoIcon,
@@ -45,6 +47,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
@@ -779,201 +782,369 @@ export default function RichTextEditor({
         aria-label="正文工具栏"
         className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
       >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* 手机只常显高频操作，其余命令共用当前编辑器和选区。 */}
+        {isAndroid() ? (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={locked}
+                  aria-label="正文样式"
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  {state?.heading === "0" ? "正文" : `H${state?.heading}`}
+                  <ChevronDownIcon data-icon="inline-end" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuRadioGroup
+                    value={state?.heading ?? "0"}
+                    onValueChange={(value) => {
+                      if (!canEdit()) return;
+                      const chain = editor!.chain().focus();
+                      if (value === "0") chain.setParagraph().run();
+                      else
+                        chain
+                          .toggleHeading({
+                            level: Number(value) as 1 | 2 | 3 | 4 | 5,
+                          })
+                          .run();
+                    }}
+                  >
+                    {[0, 1, 2, 3, 4, 5].map((level) => (
+                      <DropdownMenuRadioItem key={level} value={String(level)}>
+                        {level ? `标题 ${level}` : "正文"}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {action("加粗", <BoldIcon />, () =>
+              editor!.chain().focus().toggleBold().run(),
+            )}
+            {action("上传图片", <ImagePlusIcon />, () => {
+              fileSelection.current = editor!.state.selection.getBookmark();
+              fileInput.current!.click();
+            })}
             <Button
               type="button"
-              variant="ghost"
+              size="sm"
+              variant={paginationOpen ? "secondary" : "ghost"}
+              disabled={locked}
+              aria-expanded={paginationOpen}
+              aria-haspopup="dialog"
+              aria-controls="cms-pagination-assistant"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                if (canEdit()) setPaginationOpen(true);
+              }}
+            >
+              分页助手
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="更多正文操作"
+                  disabled={sourceLocked}
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  <MoreHorizontalIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                data-article-menu
+                align="end"
+                onCloseAutoFocus={(event) => event.preventDefault()}
+              >
+                <DropdownMenuGroup>
+                  {[
+                    {
+                      label: "斜体",
+                      run: () => editor!.chain().focus().toggleItalic().run(),
+                    },
+                    {
+                      label: "下划线",
+                      run: () =>
+                        editor!.chain().focus().toggleUnderline().run(),
+                    },
+                    {
+                      label: "无序列表",
+                      run: () =>
+                        editor!.chain().focus().toggleBulletList().run(),
+                    },
+                    {
+                      label: "有序列表",
+                      run: () =>
+                        editor!.chain().focus().toggleOrderedList().run(),
+                    },
+                    {
+                      label: "左对齐",
+                      run: () =>
+                        editor!.chain().focus().setTextAlign("left").run(),
+                    },
+                    {
+                      label: "居中",
+                      run: () =>
+                        editor!.chain().focus().setTextAlign("center").run(),
+                    },
+                    {
+                      label: "清除格式",
+                      run: () =>
+                        editor!
+                          .chain()
+                          .focus()
+                          .unsetAllMarks()
+                          .clearNodes()
+                          .run(),
+                    },
+                    { label: "编辑链接", run: openLink },
+                    {
+                      label: "插入分页符",
+                      run: insertPageBreak,
+                      unavailable: state?.paginationBoundary == null,
+                    },
+                    {
+                      label: "撤销",
+                      run: () => editor!.chain().focus().undo().run(),
+                      unavailable: !state?.undo,
+                    },
+                    {
+                      label: "重做",
+                      run: () => editor!.chain().focus().redo().run(),
+                      unavailable: !state?.redo,
+                    },
+                    {
+                      label: "HTML 源码",
+                      run: openSource,
+                      unavailable: sourceLocked,
+                    },
+                  ].map((item) => (
+                    <DropdownMenuItem
+                      key={item.label}
+                      disabled={
+                        (item.label === "HTML 源码" ? sourceLocked : locked) ||
+                        item.unavailable
+                      }
+                      onSelect={() => {
+                        if (item.label === "HTML 源码" || canEdit()) item.run();
+                      }}
+                    >
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        ) : (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={locked}
+                  aria-label="正文样式"
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  {state?.heading === "0" ? "正文" : `H${state?.heading}`}
+                  <ChevronDownIcon data-icon="inline-end" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuRadioGroup
+                    value={state?.heading ?? "0"}
+                    onValueChange={(value) => {
+                      if (!canEdit()) return;
+                      const chain = editor!.chain().focus();
+                      if (value === "0") chain.setParagraph().run();
+                      else
+                        chain
+                          .toggleHeading({
+                            level: Number(value) as 1 | 2 | 3 | 4 | 5,
+                          })
+                          .run();
+                    }}
+                  >
+                    {[0, 1, 2, 3, 4, 5].map((level) => (
+                      <DropdownMenuRadioItem key={level} value={String(level)}>
+                        {level ? `标题 ${level}` : "正文"}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ToggleGroup
+              type="multiple"
+              size="sm"
+              spacing={0}
+              value={state?.marks ?? []}
+              disabled={locked}
+              aria-label="文字格式"
+            >
+              {(
+                [
+                  ["bold", "加粗", BoldIcon],
+                  ["italic", "斜体", ItalicIcon],
+                  ["underline", "下划线", UnderlineIcon],
+                ] as const
+              ).map(([name, label, Icon]) => (
+                <ToolHint key={name} label={label}>
+                  <ToggleGroupItem
+                    value={name}
+                    aria-label={label}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      if (!canEdit()) return;
+                      const chain = editor!.chain().focus();
+                      if (name === "bold") chain.toggleBold().run();
+                      else if (name === "italic") chain.toggleItalic().run();
+                      else chain.toggleUnderline().run();
+                    }}
+                  >
+                    <Icon />
+                  </ToggleGroupItem>
+                </ToolHint>
+              ))}
+            </ToggleGroup>
+            {action("清除格式", <EraserIcon />, () =>
+              editor!.chain().focus().unsetAllMarks().clearNodes().run(),
+            )}
+            <Separator orientation="vertical" className="h-5" />
+            <ToggleGroup
+              type="single"
+              size="sm"
+              spacing={0}
+              value={state?.list ?? ""}
+              disabled={locked}
+              aria-label="列表格式"
+            >
+              <ToolHint label="无序列表">
+                <ToggleGroupItem
+                  value="bulletList"
+                  aria-label="无序列表"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => {
+                    if (canEdit())
+                      editor!.chain().focus().toggleBulletList().run();
+                  }}
+                >
+                  <ListIcon />
+                </ToggleGroupItem>
+              </ToolHint>
+              <ToolHint label="有序列表">
+                <ToggleGroupItem
+                  value="orderedList"
+                  aria-label="有序列表"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => {
+                    if (canEdit())
+                      editor!.chain().focus().toggleOrderedList().run();
+                  }}
+                >
+                  <ListOrderedIcon />
+                </ToggleGroupItem>
+              </ToolHint>
+            </ToggleGroup>
+            <ToggleGroup
+              type="single"
+              size="sm"
+              spacing={0}
+              value={state?.align ?? "left"}
+              disabled={locked}
+              aria-label="文字对齐"
+              onValueChange={(value) => {
+                if (value && canEdit())
+                  editor!.chain().focus().setTextAlign(value).run();
+              }}
+            >
+              <ToolHint label="左对齐">
+                <ToggleGroupItem
+                  value="left"
+                  aria-label="左对齐"
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  <AlignLeftIcon />
+                </ToggleGroupItem>
+              </ToolHint>
+              <ToolHint label="居中">
+                <ToggleGroupItem
+                  value="center"
+                  aria-label="居中"
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  <AlignCenterIcon />
+                </ToggleGroupItem>
+              </ToolHint>
+            </ToggleGroup>
+            <Separator orientation="vertical" className="h-5" />
+            {action("编辑链接", <LinkIcon />, openLink)}
+            {action("上传图片", <ImagePlusIcon />, () => {
+              fileSelection.current = editor!.state.selection.getBookmark();
+              fileInput.current!.click();
+            })}
+            {action(
+              "插入分页符",
+              <SeparatorHorizontalIcon />,
+              insertPageBreak,
+              state?.paginationBoundary == null,
+            )}
+            <Button
+              type="button"
+              variant={paginationOpen ? "secondary" : "ghost"}
               size="sm"
               disabled={locked}
-              aria-label="正文样式"
+              aria-expanded={paginationOpen}
+              aria-haspopup="dialog"
+              aria-controls="cms-pagination-assistant"
               onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                if (canEdit()) setPaginationOpen(true);
+              }}
             >
-              {state?.heading === "0" ? "正文" : `H${state?.heading}`}
-              <ChevronDownIcon data-icon="inline-end" />
+              <BookOpenIcon data-icon="inline-start" />
+              分页助手
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuRadioGroup
-                value={state?.heading ?? "0"}
-                onValueChange={(value) => {
-                  if (!canEdit()) return;
-                  const chain = editor!.chain().focus();
-                  if (value === "0") chain.setParagraph().run();
-                  else
-                    chain
-                      .toggleHeading({
-                        level: Number(value) as 1 | 2 | 3 | 4 | 5,
-                      })
-                      .run();
-                }}
-              >
-                {[0, 1, 2, 3, 4, 5].map((level) => (
-                  <DropdownMenuRadioItem key={level} value={String(level)}>
-                    {level ? `标题 ${level}` : "正文"}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <ToggleGroup
-          type="multiple"
-          size="sm"
-          spacing={0}
-          value={state?.marks ?? []}
-          disabled={locked}
-          aria-label="文字格式"
-        >
-          {(
-            [
-              ["bold", "加粗", BoldIcon],
-              ["italic", "斜体", ItalicIcon],
-              ["underline", "下划线", UnderlineIcon],
-            ] as const
-          ).map(([name, label, Icon]) => (
-            <ToolHint key={name} label={label}>
-              <ToggleGroupItem
-                value={name}
-                aria-label={label}
+            {action(
+              "撤销",
+              <UndoIcon />,
+              () => editor!.chain().focus().undo().run(),
+              !state?.undo,
+            )}
+            {action(
+              "重做",
+              <RedoIcon />,
+              () => editor!.chain().focus().redo().run(),
+              !state?.redo,
+            )}
+            <Separator orientation="vertical" className="h-5" />
+            <ToolHint label="HTML 源码">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="HTML 源码"
+                disabled={sourceLocked}
                 onMouseDown={(event) => event.preventDefault()}
-                onClick={() => {
-                  if (!canEdit()) return;
-                  const chain = editor!.chain().focus();
-                  if (name === "bold") chain.toggleBold().run();
-                  else if (name === "italic") chain.toggleItalic().run();
-                  else chain.toggleUnderline().run();
-                }}
+                onClick={openSource}
               >
-                <Icon />
-              </ToggleGroupItem>
+                <CodeXmlIcon />
+              </Button>
             </ToolHint>
-          ))}
-        </ToggleGroup>
-        {action("清除格式", <EraserIcon />, () =>
-          editor!.chain().focus().unsetAllMarks().clearNodes().run(),
+          </>
         )}
-        <Separator orientation="vertical" className="h-5" />
-        <ToggleGroup
-          type="single"
-          size="sm"
-          spacing={0}
-          value={state?.list ?? ""}
-          disabled={locked}
-          aria-label="列表格式"
-        >
-          <ToolHint label="无序列表">
-            <ToggleGroupItem
-              value="bulletList"
-              aria-label="无序列表"
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                if (canEdit()) editor!.chain().focus().toggleBulletList().run();
-              }}
-            >
-              <ListIcon />
-            </ToggleGroupItem>
-          </ToolHint>
-          <ToolHint label="有序列表">
-            <ToggleGroupItem
-              value="orderedList"
-              aria-label="有序列表"
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                if (canEdit())
-                  editor!.chain().focus().toggleOrderedList().run();
-              }}
-            >
-              <ListOrderedIcon />
-            </ToggleGroupItem>
-          </ToolHint>
-        </ToggleGroup>
-        <ToggleGroup
-          type="single"
-          size="sm"
-          spacing={0}
-          value={state?.align ?? "left"}
-          disabled={locked}
-          aria-label="文字对齐"
-          onValueChange={(value) => {
-            if (value && canEdit())
-              editor!.chain().focus().setTextAlign(value).run();
-          }}
-        >
-          <ToolHint label="左对齐">
-            <ToggleGroupItem
-              value="left"
-              aria-label="左对齐"
-              onMouseDown={(event) => event.preventDefault()}
-            >
-              <AlignLeftIcon />
-            </ToggleGroupItem>
-          </ToolHint>
-          <ToolHint label="居中">
-            <ToggleGroupItem
-              value="center"
-              aria-label="居中"
-              onMouseDown={(event) => event.preventDefault()}
-            >
-              <AlignCenterIcon />
-            </ToggleGroupItem>
-          </ToolHint>
-        </ToggleGroup>
-        <Separator orientation="vertical" className="h-5" />
-        {action("编辑链接", <LinkIcon />, openLink)}
-        {action("上传图片", <ImagePlusIcon />, () => {
-          fileSelection.current = editor!.state.selection.getBookmark();
-          fileInput.current!.click();
-        })}
-        {action(
-          "插入分页符",
-          <SeparatorHorizontalIcon />,
-          insertPageBreak,
-          state?.paginationBoundary == null,
-        )}
-        <Button
-          type="button"
-          variant={paginationOpen ? "secondary" : "ghost"}
-          size="sm"
-          disabled={locked}
-          aria-expanded={paginationOpen}
-          aria-haspopup="dialog"
-          aria-controls="cms-pagination-assistant"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => {
-            if (canEdit()) setPaginationOpen(true);
-          }}
-        >
-          <BookOpenIcon data-icon="inline-start" />
-          分页助手
-        </Button>
-        {action(
-          "撤销",
-          <UndoIcon />,
-          () => editor!.chain().focus().undo().run(),
-          !state?.undo,
-        )}
-        {action(
-          "重做",
-          <RedoIcon />,
-          () => editor!.chain().focus().redo().run(),
-          !state?.redo,
-        )}
-        <Separator orientation="vertical" className="h-5" />
-        <ToolHint label="HTML 源码">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label="HTML 源码"
-            disabled={sourceLocked}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={openSource}
-          >
-            <CodeXmlIcon />
-          </Button>
-        </ToolHint>
       </div>
       <input
         ref={fileInput}
@@ -1038,6 +1209,7 @@ export default function RichTextEditor({
         }}
       >
         <DialogContent
+          data-article-dialog={isAndroid() ? "source" : undefined}
           className="flex max-h-[85dvh] flex-col sm:max-w-4xl"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -1112,6 +1284,7 @@ export default function RichTextEditor({
         }}
       >
         <DialogContent
+          data-article-dialog={isAndroid() ? "link" : undefined}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             if (canEdit()) editor!.view.focus();

@@ -628,3 +628,198 @@ html[data-platform="android"]
     grid-area: 1 / 3 / 3 / 4;
   }
 }
+
+/* 系统设置和标题优化单独限定 Android，全屏规则不改变桌面 Dialog。 */
+html[data-platform="android"] [data-mobile-settings] {
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-mobile-settings]
+  :is(button, [data-slot="button"]),
+html[data-platform="android"] [data-settings-dialog] button {
+  min-height: 44px;
+}
+html[data-platform="android"]
+  [data-mobile-settings]
+  :is(input, textarea, [role="combobox"]) {
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-platform="android"] [data-settings-dialog] {
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-width: 0;
+  padding: max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  translate: none;
+  transform: none;
+  scale: none;
+  animation: none;
+  transition: none;
+  border-radius: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"]
+  [data-settings-dialog]
+  > [data-slot="dialog-header"],
+html[data-platform="android"]
+  [data-settings-dialog]
+  > [data-slot="dialog-footer"] {
+  flex-shrink: 0;
+}
+html[data-platform="android"]
+  [data-settings-dialog]
+  > [data-slot="dialog-footer"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+html[data-platform="android"]
+  [data-settings-dialog]
+  > [data-slot="dialog-footer"]
+  > button {
+  flex: 1;
+}
+
+/* 设置操作反馈避开固定保存栏；小屏及旋转时不让提示撑宽页面。 */
+html[data-platform="android"]:has(
+    [data-mobile-settings],
+    [data-settings-dialog="title"],
+    [data-mobile-articles]
+  )
+  [data-sonner-toaster][data-y-position="bottom"] {
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  max-width: calc(100vw - 2rem);
+}
+html[data-platform="android"]:has(
+    [data-mobile-settings],
+    [data-settings-dialog="title"],
+    [data-mobile-articles]
+  )
+  [data-sonner-toast] {
+  /* 淡入保留，取消从屏幕底部滑入，避免动画经过保存按钮。 */
+  transition-property: opacity, height, box-shadow;
+}
+html[data-platform="android"]:has(
+    [data-mobile-settings],
+    [data-settings-dialog="title"],
+    [data-mobile-articles]
+  )
+  [data-sonner-toast][data-removed="true"] {
+  pointer-events: none;
+}
+
+/* 文章手机工作区只由平台和专用用途标记启用，桌面抽屉及通用组件保持原样。 */
+html[data-platform="android"] [data-mobile-articles] {
+  overflow: hidden;
+}
+html[data-platform="android"] [data-mobile-articles] [data-slot="card"] {
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"] [data-mobile-articles] [aria-label="文章分页"] {
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+html[data-platform="android"]
+  [data-mobile-articles]
+  [aria-label="文章分页"]
+  > div {
+  width: 100%;
+  margin-left: 0;
+  justify-content: space-between;
+}
+html[data-platform="android"] [data-article-dialog] {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 2rem);
+}
+html[data-platform="android"] [data-article-dialog="edit"],
+html[data-platform="android"] [data-article-dialog="filter"],
+html[data-platform="android"] [data-article-dialog="source"],
+html[data-platform="android"] [data-article-dialog="pagination"],
+html[data-platform="android"] [data-article-dialog="image"] {
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: 100dvh;
+  transform: none;
+  translate: none;
+  border-radius: 0;
+  /* 与现有底栏的 1rem 负边距配套，避免可用高度缩短时越过视口边界。 */
+  padding: max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  scale: none;
+  animation: none;
+  transition: none;
+}
+html[data-platform="android"] [data-article-dialog="edit"] {
+  gap: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+html[data-platform="android"] [data-article-dialog] [data-slot="dialog-header"],
+html[data-platform="android"] [data-article-dialog] [data-slot="dialog-footer"],
+html[data-platform="android"] [data-article-dialog] [data-slot="sheet-header"],
+html[data-platform="android"] [data-article-dialog] [data-slot="sheet-footer"] {
+  flex-shrink: 0;
+}
+html[data-platform="android"]
+  [data-article-dialog]
+  [data-slot="dialog-footer"] {
+  flex-flow: row wrap;
+}
+html[data-platform="android"]
+  [data-article-dialog]
+  [data-slot="scroll-area-viewport"] {
+  overscroll-behavior: contain;
+}
+html[data-platform="android"]
+  [data-article-dialog]
+  input:not([type="checkbox"]) {
+  height: 40px;
+  min-width: 0;
+}
+html[data-platform="android"] [data-article-dialog] button,
+html[data-platform="android"] [data-mobile-articles] button,
+html[data-platform="android"] [data-article-menu] [role="menuitem"],
+html[data-platform="android"] [data-article-dialog] [data-slot="tabs-list"] {
+  min-height: 44px;
+}
+html[data-platform="android"] [data-article-dialog] [role="toolbar"] {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+html[data-platform="android"] [data-article-dialog] [role="toolbar"] button {
+  flex-shrink: 0;
+  min-width: 40px;
+}
+html[data-platform="android"] [data-article-dialog] .cms-editor-body {
+  overflow-wrap: anywhere;
+}
+html[data-platform="android"] [data-article-dialog] .cms-editor-body img {
+  max-width: 100%;
+}
+html[data-platform="android"]
+  [data-article-dialog="link"]
+  > [data-slot="field-group"] {
+  min-height: 0;
+  overflow: auto;
+}
+
+/* 文章列表两行分页栏比编辑底栏更高，成功反馈避开两者及安全区。 */
+html[data-platform="android"]:has([data-mobile-articles])
+  [data-sonner-toaster][data-y-position="bottom"] {
+  bottom: calc(6rem + env(safe-area-inset-bottom));
+}

@@ -434,9 +434,9 @@ export default function ImportPage() {
           <div className="flex shrink-0 items-center justify-between gap-2">
             <h1 className="text-lg font-semibold">素材导入</h1>
             <Button asChild variant="outline" size="sm">
-              <Link to="/settings?tab=harvest">
+              <Link to="/settings?tab=harvest&returnTo=import">
                 <Settings2 data-icon="inline-start" />
-                导入设置
+                系统设置
               </Link>
             </Button>
           </div>

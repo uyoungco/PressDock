@@ -94,7 +94,7 @@ fn registered_commands_have_build_manifest_and_main_window_permissions() {
 }
 
 #[test]
-fn android_import_permissions_only_cover_main_business_configuration() {
+fn android_settings_permissions_only_cover_main_business_window() {
     let capability: Value =
         serde_json::from_str(include_str!("../../capabilities/android.json")).unwrap();
     assert_eq!(capability["windows"], json!(["main"]));
@@ -115,6 +115,16 @@ fn android_import_permissions_only_cover_main_business_configuration() {
         "ai-delete-config",
         "ai-list-models",
         "ai-test-model",
+        // 手机新增图片预设保存和手动标题优化，来源 WebView 仍不授权。
+        "save-channel-image-presets",
+        "ai-suggest-titles",
+        // 文章管理复用现有 CMS 契约和分页服务，授权仍只限 main。
+        "cms-list-articles",
+        "cms-list-article-classes",
+        "cms-get-article",
+        "cms-update-article",
+        "cms-add-article-to-promote",
+        "ai-suggest-pagination",
         "ai-cancel",
     ] {
         assert!(permissions.contains(&json!(format!("allow-{command}"))));
@@ -124,8 +134,6 @@ fn android_import_permissions_only_cover_main_business_configuration() {
         "harvest-install-userscript",
         "harvest-select-source-tab",
         "harvest-open-devtools",
-        "ai-suggest-titles",
-        "ai-suggest-pagination",
     ] {
         assert!(!permissions.contains(&json!(format!("allow-{command}"))));
     }

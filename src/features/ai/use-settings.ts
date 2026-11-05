@@ -64,8 +64,11 @@ export function useAiSettings(active: boolean) {
       if (!mounted.current) return;
       await refresh();
       if (mounted.current && success) toast.success(success);
+      // 手机编辑层仅在写入、刷新都成功后返回，失败时保留表单。
+      return true;
     } catch (reason) {
       if (mounted.current) setError(aiErrorMessage(reason));
+      return false;
     } finally {
       lock.current = false;
       if (mounted.current) setBusy(false);

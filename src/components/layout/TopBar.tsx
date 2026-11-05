@@ -163,7 +163,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
           <DialogTitle>退出登录？</DialogTitle>
           <DialogDescription>
             {isAndroid()
-              ? "退出后需要重新登录，并会清除此设备尚未提交的素材草稿。"
+              ? "退出后需要重新登录，并会清除此设备尚未提交的素材和文章草稿。"
               : dirty
                 ? "当前有未保存修改，退出后将丢失。取消退出可返回保存修改。"
                 : "退出后需要重新登录才能进入工作区。"}

@@ -37,7 +37,7 @@ function Workspace() {
       contentScroll={
         pathname === "/channels" ||
         pathname.startsWith("/articles") ||
-        (isAndroid() && pathname === "/import")
+        (isAndroid() && ["/import", "/settings"].includes(pathname))
           ? "contained"
           : "page"
       }
