@@ -11,12 +11,14 @@ export function useDataTable<TData extends RowData>({
   preferences,
   getRowId,
   pinnedEnd = noPinnedColumns,
+  pinnedStart = noPinnedColumns,
 }: {
   data: TData[];
   columns: DataTableColumnDef<TData>[];
   preferences: ColumnPreferencesController;
   getRowId: (row: TData) => string;
   pinnedEnd?: string[];
+  pinnedStart?: string[];
 }) {
   return useTable({
     features: dataTableFeatures,
@@ -24,9 +26,9 @@ export function useDataTable<TData extends RowData>({
     columns,
     getRowId,
     state: {
-      columnVisibility: preferences.preferences.visibility,
+      columnVisibility: preferences.visibility,
       columnSizing: preferences.preferences.sizing,
-      columnPinning: { start: noPinnedColumns, end: pinnedEnd },
+      columnPinning: { start: pinnedStart, end: pinnedEnd },
     },
     onColumnVisibilityChange: preferences.setVisibility,
     onColumnSizingChange: preferences.setSizing,

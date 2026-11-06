@@ -98,26 +98,27 @@ export function articleImageUrl(value: string | null) {
 }
 
 const fields = [
-  ["id", "ID", 100],
+  ["id", "文章编号", 100],
   ["className", "分类", 140],
-  ["title", "标题", 340],
-  ["titlePic", "TitlePic", 160],
-  ["titlePic2", "TitlePic2", 160],
-  ["titlePic3", "TitlePic3", 160],
+  ["title", "新闻内容", 320],
+  ["titlePic", "配图", 256],
+  ["titlePic2", "第二张图", 112],
+  ["titlePic3", "第三张图", 112],
   ["writer", "作者", 130],
   ["pages", "分页数", 90],
-  ["comment", "Comment", 220],
-  ["tags", "Tags", 180],
-  ["nTags", "NTags", 180],
+  ["comment", "分发记录", 172],
+  ["tags", "标签", 180],
+  ["nTags", "扩展标签", 180],
   ["newsTime", "新闻时间", 180],
   ["sourceUrl", "来源链接", 240],
-  ["actions", "操作", 230],
+  ["actions", "操作", 192],
 ] as const;
 export const articleColumns = fields.map(([id, label, size]) => ({
   id,
   label,
   size,
-  minSize: id === "actions" ? 230 : 72,
+  minSize: id === "actions" ? 168 : id === "title" ? 240 : 72,
   maxSize: 800,
   enableHiding: id !== "actions",
+  defaultVisible: ["title", "titlePic", "comment", "actions"].includes(id),
 }));

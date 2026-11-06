@@ -46,17 +46,23 @@ it("设置页可直接打开 AI 标签，两个设置标签切换保留各自未
   await userEvent.click(
     await screen.findByRole("button", { name: /演示网关/ }),
   );
+  await userEvent.click(screen.getByRole("button", { name: "编辑提供商" }));
   change("显示名称", "尚未保存的网关");
+  await userEvent.click(screen.getByRole("button", { name: "关闭" }));
+  await userEvent.click(screen.getByRole("button", { name: "保留草稿并关闭" }));
   await userEvent.click(screen.getByRole("tab", { name: "提示词模板" }));
   await userEvent.click(
     await screen.findByRole("button", { name: /新闻标题优化/ }),
   );
   change("模板名称", "尚未保存的模板");
   await userEvent.click(screen.getByRole("tab", { name: "AI 模型" }));
+  await userEvent.click(screen.getByRole("button", { name: "编辑提供商" }));
   await waitFor(() =>
     expect(screen.getByRole("button", { name: "保存提供商" })).toBeEnabled(),
   );
   expect(screen.getByLabelText("显示名称")).toHaveValue("尚未保存的网关");
+  await userEvent.click(screen.getByRole("button", { name: "关闭" }));
+  await userEvent.click(screen.getByRole("button", { name: "保留草稿并关闭" }));
   await userEvent.click(screen.getByRole("tab", { name: "提示词模板" }));
   expect(screen.getByLabelText("模板名称")).toHaveValue("尚未保存的模板");
   expect(aiService.saveProvider).not.toHaveBeenCalled();

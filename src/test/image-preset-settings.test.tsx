@@ -16,6 +16,42 @@ import {
 } from "@/features/image-presets/model";
 import { chooseOption } from "./select-helpers";
 import { deferred } from "./cms-fixtures";
+import { DesktopSettingsContext } from "@/features/settings/desktop-state";
+
+it("紧凑图片预设保留独立保存、中文字段、锁定提示和失败草稿恢复", async () => {
+  const report = vi.fn();
+  render(
+    <DesktopSettingsContext.Provider value={{ report }}>
+      <ImagePresetSettings />
+    </DesktopSettingsContext.Provider>,
+  );
+  await select();
+  expect(screen.getByRole("button", { name: "保存图片预设" })).toHaveAttribute(
+    "form",
+    "settings-image-presets-form",
+  );
+  change("主图 宽（px）", "560");
+  change("主图 高（px）", "248");
+  await chooseOption(screen.getByLabelText("主图 输出格式"), "JPG / JPEG");
+  expect(screen.getByText("尺寸锁定 · 体积自由 · 格式锁定")).toBeVisible();
+  await select("B");
+  change("第二张图片 体积上限（KiB）", "79");
+  await select("A");
+  expect(screen.getByLabelText("主图 宽（px）")).toHaveValue(560);
+  vi.mocked(imagePresetsService.save).mockRejectedValueOnce(
+    new Error("隔离演示写入失败"),
+  );
+  await userEvent.click(screen.getByRole("button", { name: "保存图片预设" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("写入失败");
+  expect(screen.getByLabelText("主图 宽（px）")).toHaveValue(560);
+  await userEvent.click(screen.getByRole("button", { name: "保存图片预设" }));
+  await waitFor(() =>
+    expect(imagePresetsService.save).toHaveBeenCalledTimes(2),
+  );
+  await userEvent.click(screen.getByRole("button", { name: "清空 主图 预设" }));
+  expect(screen.getByLabelText("主图 宽（px）")).toHaveValue(null);
+  expect(report).toHaveBeenCalledWith("image-presets", true, false);
+});
 
 vi.mock("@/features/image-presets/service", () => ({
   imagePresetsService: { list: vi.fn(), save: vi.fn() },

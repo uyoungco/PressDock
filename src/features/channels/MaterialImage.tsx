@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ImageOff } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { promoteImages, imageByteSize, type ImageLease } from "./images";
 
 export function MaterialImage({
@@ -7,11 +8,13 @@ export function MaterialImage({
   compact = false,
   onPreview,
   label = "素材图片",
+  density = "default",
 }: {
   url: string | null;
   compact?: boolean;
   onPreview?: () => void;
   label?: string;
+  density?: "default" | "table" | "thumbnail";
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
@@ -67,13 +70,29 @@ export function MaterialImage({
   }, [url, near, retry]);
   const current = result?.url === url ? result : null;
   const image = current?.image;
-  const frame = compact ? "h-20 w-32" : "h-64 w-full";
+  const tableSize = density === "table";
+  const thumbnail = density === "thumbnail";
+  const frame = thumbnail
+    ? "h-10 w-[72px]"
+    : tableSize
+      ? "h-9 w-20"
+      : compact
+        ? "h-20 w-32"
+        : "h-64 w-full";
   return (
     // 标记图片与元信息，移动列表可压缩缩略图，详情仍保留实际尺寸和体积。
     <div
       ref={container}
       data-slot="material-image"
-      className={compact ? "w-32 shrink-0" : "min-w-0"}
+      className={
+        thumbnail
+          ? "article-thumbnail"
+          : tableSize
+            ? "min-w-20"
+            : compact
+              ? "w-32 shrink-0"
+              : "min-w-0"
+      }
     >
       {image ? (
         <button
@@ -86,6 +105,11 @@ export function MaterialImage({
           <img
             src={image.src}
             alt={label}
+            title={
+              thumbnail
+                ? `${image.width}×${image.height} · ${imageByteSize(image.byteSize)}`
+                : undefined
+            }
             className="size-full object-contain"
             onError={() => {
               image.release();
@@ -95,13 +119,26 @@ export function MaterialImage({
         </button>
       ) : (
         <div
-          className={`${frame} flex flex-col items-center justify-center gap-1 rounded-md border bg-muted/30 px-1 text-center text-xs text-muted-foreground`}
+          className={cn(
+            `${frame} flex flex-col items-center justify-center gap-1 rounded-md border bg-muted/30 px-1 text-center text-xs text-muted-foreground`,
+            (tableSize || thumbnail) &&
+              current?.error &&
+              "h-auto min-h-12 py-1",
+          )}
         >
-          <ImageOff className="size-4 shrink-0" />
-          <span>
+          {!tableSize && !thumbnail && <ImageOff className="size-4 shrink-0" />}
+          <span title={current?.error}>
             {!url
               ? "暂无图片"
-              : (current?.error ?? (near ? "正在加载图片…" : "等待加载图片"))}
+              : current?.error
+                ? tableSize || thumbnail
+                  ? "加载失败"
+                  : current.error
+                : tableSize
+                  ? "加载中…"
+                  : near
+                    ? "正在加载图片…"
+                    : "等待加载图片"}
           </span>
           {url && current?.error && (
             <button
@@ -117,11 +154,27 @@ export function MaterialImage({
       )}
       <div
         data-slot="material-image-meta"
+        hidden={thumbnail}
         aria-hidden={!image}
-        className="mt-1 space-y-0.5 text-xs leading-4 text-muted-foreground"
+        className={cn(
+          "mt-1 text-xs leading-4 text-muted-foreground",
+          tableSize
+            ? "whitespace-nowrap tabular-nums"
+            : "flex flex-col gap-0.5",
+        )}
       >
-        <p>{image ? imageByteSize(image.byteSize) : "\u00a0"}</p>
-        <p>{image ? `${image.width} × ${image.height} px` : "\u00a0"}</p>
+        {tableSize ? (
+          image ? (
+            `${image.width}×${image.height} · ${imageByteSize(image.byteSize)}`
+          ) : (
+            "\u00a0"
+          )
+        ) : (
+          <>
+            <p>{image ? imageByteSize(image.byteSize) : "\u00a0"}</p>
+            <p>{image ? `${image.width} × ${image.height} px` : "\u00a0"}</p>
+          </>
+        )}
       </div>
     </div>
   );

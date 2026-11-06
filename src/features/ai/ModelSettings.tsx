@@ -32,6 +32,8 @@ import {
   useSettingsDraft,
 } from "@/features/settings/mobile-state";
 import { isAndroid } from "@/lib/platform";
+import { useDesktopSettings } from "@/features/settings/desktop-state";
+import { SettingsEditorDialog } from "@/features/settings/SettingsEditorDialog";
 
 const blankProvider = (): SaveProviderRequest => ({
   id: "",
@@ -47,6 +49,8 @@ export function ModelSettings({ active }: { active: boolean }) {
   const { settings, loading, busy, error, run, refresh } =
     useAiSettings(active);
   const mobile = useMobileSettings();
+  const compact = !!useDesktopSettings();
+  const [providerOpen, setProviderOpen] = useState(false);
   const [localProvider, setLocalProvider] =
     useState<SaveProviderRequest | null>(null);
   const [localExisting, setExisting] = useState(false);
@@ -66,7 +70,10 @@ export function ModelSettings({ active }: { active: boolean }) {
       ? (providerDrafts[providerKey] ??
         (storedProvider ? { ...storedProvider, apiKey: "" } : null))
       : null
-    : localProvider;
+    : (localProvider ??
+      (compact && settings.providers[0]
+        ? { ...settings.providers[0], apiKey: "" }
+        : null));
   const model = mobile
     ? editor?.kind === "model"
       ? (modelDrafts[editor.id] ??
@@ -74,11 +81,20 @@ export function ModelSettings({ active }: { active: boolean }) {
         null)
       : null
     : localModel;
-  const existing = mobile ? providerKey !== "new-provider" : localExisting;
+  const existing = mobile
+    ? providerKey !== "new-provider"
+    : compact && !localProvider
+      ? true
+      : localExisting;
   // 手机按条目缓存草稿，避免选择另一提供商或返回列表时覆盖输入。
   function setProvider(next: SaveProviderRequest | null) {
     if (!mobile) {
       setLocalProvider(next);
+      if (compact && next)
+        setProviderDrafts((previous) => ({
+          ...previous,
+          [existing ? next.id : "new-provider"]: next,
+        }));
       return;
     }
     if (next) {
@@ -90,6 +106,8 @@ export function ModelSettings({ active }: { active: boolean }) {
   function setModel(next: AiModelConfig | null) {
     if (!mobile) {
       setLocalModel(next);
+      if (compact && next)
+        setModelDrafts((previous) => ({ ...previous, [next.id]: next }));
       return;
     }
     if (next) setModelDrafts((previous) => ({ ...previous, [next.id]: next }));
@@ -128,7 +146,30 @@ export function ModelSettings({ active }: { active: boolean }) {
     id: string;
     name: string;
   } | null>(null);
-  const savedProvider = settings.providers.find((p) => p.id === provider?.id);
+  const savedProvider =
+    settings.providers.find((p) => p.id === provider?.id) ??
+    (compact ? settings.providers[0] : undefined);
+  const providerDirty =
+    !!provider &&
+    (!existing
+      ? JSON.stringify(provider) !== JSON.stringify(blankProvider())
+      : !!provider.apiKey ||
+        !settings.providers.some((saved) => saved.id === provider.id) ||
+        (
+          ["id", "displayName", "baseUrl", "protocol", "compatibility"] as const
+        ).some(
+          (key) =>
+            JSON.stringify(provider[key]) !==
+            JSON.stringify(
+              settings.providers.find((saved) => saved.id === provider.id)?.[
+                key
+              ],
+            ),
+        ));
+  const modelDirty =
+    !!model &&
+    JSON.stringify(model) !==
+      JSON.stringify(settings.models.find((saved) => saved.id === model.id));
   // 新建但未保存的模型也留在列表，返回后可继续编辑同一份草稿。
   const models = [
     ...settings.models,
@@ -143,7 +184,7 @@ export function ModelSettings({ active }: { active: boolean }) {
     const next = settings.providers.find((p) => p.id === id);
     if (!next) return;
     if (!mobile)
-      setProvider(
+      setLocalProvider(
         providerDrafts[id] ?? {
           id: next.id,
           displayName: next.displayName,
@@ -171,9 +212,18 @@ export function ModelSettings({ active }: { active: boolean }) {
             createOnly: !existing,
           });
           await aiService.saveProvider(request);
-          if (!mobile) setProvider({ ...request, apiKey: "" });
+          if (!mobile && !compact) setProvider({ ...request, apiKey: "" });
           setExisting(true);
         }, "提供商已保存").then((saved) => {
+          if (saved && compact) {
+            setLocalProvider({ ...provider, apiKey: "" });
+            setProviderDrafts((previous) => {
+              const next = { ...previous };
+              delete next[existing ? provider.id : "new-provider"];
+              return next;
+            });
+            setProviderOpen(false);
+          }
           if (saved && mobile) {
             setProviderDrafts((previous) => {
               const next = { ...previous };
@@ -336,7 +386,10 @@ export function ModelSettings({ active }: { active: boolean }) {
           仅在服务商不接受该字段时关闭；关闭后由服务商决定响应保存策略。
         </p>
       </details>
-      <div hidden={!!mobile} className="flex flex-wrap justify-between gap-2">
+      <div
+        hidden={!!mobile || compact}
+        className="flex flex-wrap justify-between gap-2"
+      >
         <Button type="submit" disabled={disabled}>
           <KeyRound />
           {busy ? "正在处理…" : "保存提供商"}
@@ -369,8 +422,16 @@ export function ModelSettings({ active }: { active: boolean }) {
         event.preventDefault();
         void run(async () => {
           await aiService.saveModel(modelSchema.parse(model));
-          setModel(null);
+          if (!compact) setModel(null);
         }, "模型配置已保存").then((saved) => {
+          if (saved && compact) {
+            setLocalModel(null);
+            setModelDrafts((previous) => {
+              const next = { ...previous };
+              delete next[model.id];
+              return next;
+            });
+          }
           if (saved && mobile) {
             setModelDrafts((previous) => {
               const next = { ...previous };
@@ -455,7 +516,7 @@ export function ModelSettings({ active }: { active: boolean }) {
       <p className="text-xs text-muted-foreground">
         仅支持文本。可选参数只在填写后发送，模型须支持所选参数。
       </p>
-      <div hidden={!!mobile} className="flex gap-2">
+      <div hidden={!!mobile || compact} className="flex gap-2">
         <Button type="submit" disabled={disabled}>
           保存模型
         </Button>
@@ -471,33 +532,36 @@ export function ModelSettings({ active }: { active: boolean }) {
     </form>
   );
   return (
-    <div className="space-y-4">
+    <div className={compact ? "settings-models" : "space-y-4"}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          本机工作区共用模型配置，供标题优化及后续模块复用。
+          {compact
+            ? "本机工作区共用配置，供标题优化、文章分页和采集处理使用。"
+            : "本机工作区共用模型配置，供标题优化及后续模块复用。"}
         </p>
         <Button
           disabled={disabled}
           onClick={() => {
             // 再次新增会继续尚未保存的提供商，密钥仅保留于本组件内存。
-            setProvider(
-              mobile
+            (compact ? setLocalProvider : setProvider)(
+              mobile || compact
                 ? (providerDrafts["new-provider"] ?? blankProvider())
                 : blankProvider(),
             );
             setExisting(false);
             setModel(null);
             setCatalog([]);
+            if (compact) setProviderOpen(true);
             mobile?.openEditor({ kind: "provider", id: "new-provider" });
           }}
         >
           <Plus />
-          {mobile && providerDrafts["new-provider"]
+          {(mobile || compact) && providerDrafts["new-provider"]
             ? "继续新增提供商"
             : "新增提供商"}
         </Button>
       </div>
-      {error && !editor && (
+      {error && !editor && !(compact && (providerOpen || model)) && (
         <p role="alert" className="text-sm text-destructive">
           {error}
           <Button
@@ -519,7 +583,11 @@ export function ModelSettings({ active }: { active: boolean }) {
         </p>
       )}
       <div
-        className={`grid min-w-0 gap-4 ${mobile ? "" : "lg:grid-cols-[220px_minmax(0,1fr)]"}`}
+        className={
+          compact
+            ? "settings-model-layout"
+            : `grid min-w-0 gap-4 ${mobile ? "" : "lg:grid-cols-[220px_minmax(0,1fr)]"}`
+        }
       >
         <Card
           className="h-fit min-w-0 shadow-none"
@@ -537,7 +605,11 @@ export function ModelSettings({ active }: { active: boolean }) {
             {settings.providers.map((p) => (
               <Button
                 key={p.id}
-                variant={provider?.id === p.id ? "secondary" : "ghost"}
+                variant={
+                  (compact ? savedProvider?.id : provider?.id) === p.id
+                    ? "secondary"
+                    : "ghost"
+                }
                 className="h-auto w-full justify-start whitespace-normal py-3 text-left break-words"
                 disabled={disabled}
                 onClick={() => choose(p.id)}
@@ -552,7 +624,7 @@ export function ModelSettings({ active }: { active: boolean }) {
         </Card>
         {provider ? (
           <div className="min-w-0 space-y-4">
-            {!mobile && (
+            {!mobile && !compact && (
               <Card className="min-w-0 shadow-none">
                 <CardHeader>
                   <CardTitle>
@@ -566,17 +638,19 @@ export function ModelSettings({ active }: { active: boolean }) {
                 <CardContent>{providerForm}</CardContent>
               </Card>
             )}
-            {mobile && savedProvider && (
+            {(mobile || compact) && savedProvider && (
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-semibold">{savedProvider.displayName}</h2>
                 <Button
                   variant="outline"
                   disabled={disabled}
                   onClick={() =>
-                    mobile.openEditor({
-                      kind: "provider",
-                      id: savedProvider.id,
-                    })
+                    mobile
+                      ? mobile.openEditor({
+                          kind: "provider",
+                          id: savedProvider.id,
+                        })
+                      : (choose(savedProvider.id), setProviderOpen(true))
                   }
                 >
                   编辑提供商
@@ -594,6 +668,17 @@ export function ModelSettings({ active }: { active: boolean }) {
                 >
                   删除提供商
                 </Button>
+                {compact && (
+                  <div className="settings-provider-summary">
+                    <span>{savedProvider.baseUrl}</span>
+                    <span>
+                      {savedProvider.protocol === "responses"
+                        ? "Responses"
+                        : "Chat Completions"}{" "}
+                      · {savedProvider.hasApiKey ? "密钥已保存" : "未保存密钥"}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
             {savedProvider && (
@@ -690,6 +775,17 @@ export function ModelSettings({ active }: { active: boolean }) {
                           {m.modelId}
                         </p>
                       </div>
+                      {compact && (
+                        <div className="settings-model-capacity">
+                          <span>
+                            上下文{" "}
+                            {m.contextWindow?.toLocaleString() ?? "未设置"}
+                          </span>
+                          <span>
+                            输出 {m.maxOutputTokens?.toLocaleString() ?? "默认"}
+                          </span>
+                        </div>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"
@@ -736,7 +832,7 @@ export function ModelSettings({ active }: { active: boolean }) {
                       </Button>
                     </div>
                   ))}
-                  {!mobile && modelForm}
+                  {!mobile && !compact && modelForm}
                 </CardContent>
               </Card>
             )}
@@ -749,6 +845,48 @@ export function ModelSettings({ active }: { active: boolean }) {
           </Card>
         )}
       </div>
+      {compact && (
+        <>
+          <SettingsEditorDialog
+            open={active && providerOpen}
+            title={existing ? "编辑提供商" : "新增提供商"}
+            formId="settings-provider-form"
+            busy={disabled}
+            dirty={providerDirty}
+            error={error}
+            onClose={() => setProviderOpen(false)}
+            onDiscard={() => {
+              const id = existing ? provider?.id : "new-provider";
+              setProviderDrafts((previous) => {
+                const next = { ...previous };
+                if (id) delete next[id];
+                return next;
+              });
+              setLocalProvider(null);
+            }}
+          >
+            {providerForm}
+          </SettingsEditorDialog>
+          <SettingsEditorDialog
+            open={active && !!model}
+            title="编辑模型"
+            formId="settings-model-form"
+            busy={disabled}
+            dirty={modelDirty}
+            error={error}
+            onClose={() => setLocalModel(null)}
+            onDiscard={() => {
+              setModelDrafts((previous) => {
+                const next = { ...previous };
+                if (model) delete next[model.id];
+                return next;
+              });
+            }}
+          >
+            {modelForm}
+          </SettingsEditorDialog>
+        </>
+      )}
       {mobile && editor?.kind === "provider" && provider && (
         <MobileEditor
           title={existing ? "编辑提供商" : "新增提供商"}
@@ -807,7 +945,7 @@ export function ModelSettings({ active }: { active: boolean }) {
                       setProvider(null);
                       setModel(null);
                     } else if (model?.id === remove.id) setModel(null);
-                    if (mobile) {
+                    if (mobile || compact) {
                       setProviderDrafts((previous) =>
                         Object.fromEntries(
                           Object.entries(previous).filter(
@@ -827,7 +965,7 @@ export function ModelSettings({ active }: { active: boolean }) {
                         ),
                       );
                       if (remove.kind === "provider")
-                        mobile.selectProvider(null);
+                        mobile?.selectProvider(null);
                     }
                     setRemove(null);
                   }, "配置已删除");

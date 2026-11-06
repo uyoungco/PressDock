@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect } from "react";
+import { useDesktopSettings } from "./desktop-state";
 
 type Editor = { kind: "provider" | "model" | "template"; id: string };
 export const MobileSettingsContext = createContext<{
@@ -16,7 +17,8 @@ export const useMobileSettings = () => useContext(MobileSettingsContext);
 
 // 只向手机设置报告状态；表单及密钥始终留在原组件内存中。
 export function useSettingsDraft(key: string, dirty: boolean, busy = false) {
-  const report = useMobileSettings()?.report;
+  const desktop = useDesktopSettings();
+  const report = useMobileSettings()?.report ?? desktop?.report;
   useEffect(() => {
     report?.(key, dirty, busy);
     return () => report?.(key, false, false);

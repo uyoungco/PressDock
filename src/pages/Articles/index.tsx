@@ -5,8 +5,6 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -24,7 +22,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { DataTableColumnSettings } from "@/components/ui/data-table-column-settings";
-import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { useColumnPreferences } from "@/hooks/use-column-preferences";
 import { MaterialImage } from "@/features/channels/MaterialImage";
 import { ArticleTable } from "@/features/cms-articles/ArticleTable";
@@ -40,6 +37,8 @@ import {
   defaultQuery,
   readArticleQuery,
 } from "@/features/cms-articles/service";
+import { ArticleFilters } from "@/features/cms-articles/ArticleFilters";
+import { useArticleLayout } from "@/features/cms-articles/use-article-layout";
 import { useArticleActions } from "@/features/cms-articles/use-article-actions";
 import {
   articlePageSizes,
@@ -127,177 +126,53 @@ function ArticleResults({ view }: { view: ArticleView }) {
     if (articleQueryParams(query).toString() === key) refresh();
     else setParams(articleQueryParams(query));
   }
-  const authorVisible = view === "quality" || view === "review-1";
+  const { ref: workspace, layout } = useArticleLayout();
   const totalPages = page
     ? Math.max(1, Math.ceil(page.total / applied.pagesize))
     : applied.current;
   return (
     <>
-      <Card className="h-full min-h-0 min-w-0 flex-1 gap-0 overflow-hidden py-0 shadow-none">
-        <form
-          aria-label="文章筛选"
-          className="shrink-0 border-b p-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            submit({ ...draft, current: 1, pagesize: applied.pagesize });
+      <header className="article-page-heading">
+        <h1>
+          {
+            {
+              quality: "优质文章",
+              "review-1": "一级待审核文章",
+              "review-2": "二级待审核文章",
+              "review-3": "三级待审核文章",
+            }[view]
+          }
+        </h1>
+        <p>核对标题、配图与分页，继续编辑文章</p>
+      </header>
+      <Card
+        ref={workspace}
+        data-layout={layout}
+        className="articles-workspace h-full min-h-0 min-w-0 flex-1 gap-0 overflow-hidden py-0 shadow-none"
+      >
+        <ArticleFilters
+          view={view}
+          draft={draft}
+          onChange={setDraft}
+          onSubmit={() =>
+            submit({ ...draft, current: 1, pagesize: applied.pagesize })
+          }
+          onReset={() => {
+            const query = { ...defaultQuery(view), pagesize: applied.pagesize };
+            setDraft(query);
+            submit(query);
           }}
-        >
-          <fieldset disabled={actions.busy}>
-            <FieldGroup className="grid grid-cols-2 items-end gap-3 md:grid-cols-4 xl:grid-cols-6">
-              <Field>
-                <FieldLabel htmlFor="article-id">ID</FieldLabel>
-                <Input
-                  id="article-id"
-                  type="number"
-                  min={1}
-                  step={1}
-                  inputMode="numeric"
-                  value={draft.id ?? ""}
-                  onChange={(event) =>
-                    setDraft({
-                      ...draft,
-                      id: event.target.value
-                        ? Number(event.target.value)
-                        : null,
-                    })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="article-class">分类</FieldLabel>
-                <SearchableSelect
-                  id="article-class"
-                  value={draft.classid === null ? "" : String(draft.classid)}
-                  disabled={!!classesError || !classes.length}
-                  options={[
-                    { value: "", label: "全部分类" },
-                    ...classes.map((value) => ({
-                      value: String(value.id),
-                      label: value.name,
-                    })),
-                  ]}
-                  onValueChange={(value) =>
-                    setDraft({
-                      ...draft,
-                      classid: value ? Number(value) : null,
-                    })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="article-title">标题</FieldLabel>
-                <Input
-                  id="article-title"
-                  value={draft.title}
-                  onChange={(event) =>
-                    setDraft({ ...draft, title: event.target.value })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="article-start">开始日期</FieldLabel>
-                <Input
-                  id="article-start"
-                  type="date"
-                  value={draft.start}
-                  onChange={(event) =>
-                    setDraft({ ...draft, start: event.target.value })
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="article-end">结束日期</FieldLabel>
-                <Input
-                  id="article-end"
-                  type="date"
-                  value={draft.end}
-                  onChange={(event) =>
-                    setDraft({ ...draft, end: event.target.value })
-                  }
-                />
-              </Field>
-              {authorVisible && (
-                <Field>
-                  <FieldLabel htmlFor="article-author">作者</FieldLabel>
-                  <Input
-                    id="article-author"
-                    value={draft.author}
-                    onChange={(event) =>
-                      setDraft({ ...draft, author: event.target.value })
-                    }
-                  />
-                </Field>
-              )}
-              <div className="col-span-2 flex flex-wrap items-center gap-4">
-                {authorVisible && (
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={draft.editor}
-                      onChange={(event) =>
-                        setDraft({ ...draft, editor: event.target.checked })
-                      }
-                    />
-                    editor
-                  </label>
-                )}
-                {view === "quality" && (
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={draft.nubia}
-                      onChange={(event) =>
-                        setDraft({ ...draft, nubia: event.target.checked })
-                      }
-                    />
-                    努比亚
-                  </label>
-                )}
-                <Button type="submit" size="sm">
-                  搜索
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const query = {
-                      ...defaultQuery(view),
-                      pagesize: applied.pagesize,
-                    };
-                    setDraft(query);
-                    submit(query);
-                  }}
-                >
-                  重置
-                </Button>
-              </div>
-            </FieldGroup>
-          </fieldset>
-          {filterError && (
-            <p role="alert" className="mt-2 text-sm text-destructive">
-              {filterError}
-            </p>
-          )}
-          {classesError && (
-            <div
-              role="alert"
-              className="mt-2 flex items-center gap-2 text-sm text-destructive"
-            >
-              分类加载失败：{classesError}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => void classQuery.refetch()}
-              >
-                重试分类
-              </Button>
-            </div>
-          )}
-        </form>
+          locked={actions.busy}
+          classes={classes}
+          classesError={classesError}
+          retryClasses={() => void classQuery.refetch()}
+          error={filterError}
+        />
         {/* 与渠道素材页一致，列配置紧邻表格，并保留在列表滚动区域外。 */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:gap-3 md:px-4">
+        <div className="article-list-toolbar flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-2">
+          <span className="mr-auto text-xs text-muted-foreground">
+            {page ? `${page.total} 篇文章` : "文章记录"}
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -331,14 +206,14 @@ function ArticleResults({ view }: { view: ArticleView }) {
           }}
         >
           {loading ? (
-            <div className="space-y-3 p-4" aria-label="正在加载文章">
+            <div className="flex flex-col gap-3 p-4" aria-label="正在加载文章">
               <Skeleton className="h-12" />
               <Skeleton className="h-12" />
               <Skeleton className="h-12" />
             </div>
           ) : null}
           {error && (
-            <div role="alert" className="space-y-3 p-6">
+            <div role="alert" className="flex flex-col gap-3 p-6">
               <p className="text-destructive">{error}</p>
               <Button variant="outline" onClick={refresh}>
                 重试文章列表
@@ -348,6 +223,7 @@ function ArticleResults({ view }: { view: ArticleView }) {
           {page && (
             <ArticleTable
               rows={page.data}
+              layout={layout}
               preferences={preferences}
               view={view}
               busy={actions.busy}
@@ -431,7 +307,7 @@ function ArticleResults({ view }: { view: ArticleView }) {
           if (!open) setPreview(null);
         }}
       >
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="article-image-dialog">
           <DialogTitle>文章图片</DialogTitle>
           <DialogDescription>查看原图</DialogDescription>
           {preview && <MaterialImage url={preview} label="文章图片预览" />}

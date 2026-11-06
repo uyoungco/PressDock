@@ -3,6 +3,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { MaterialForm } from "@/features/channels/MaterialForm";
+import { blankInput } from "@/features/channels/edit-buffer";
 import {
   Select,
   SelectContent,
@@ -17,6 +20,106 @@ const options = [
   { value: "kook", label: "KOOK" },
   { value: "sports", label: "体育频道" },
 ];
+
+function SheetSelect() {
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  return (
+    <Sheet open>
+      <SheetContent ref={setContainer} aria-describedby={undefined}>
+        <SheetTitle>修改素材</SheetTitle>
+        <SearchableSelect
+          options={options}
+          value="news"
+          onValueChange={() => {}}
+          aria-label="渠道"
+          portalContainer={container}
+        />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+it.each(["mouse", "keyboard"])(
+  "抽屉内以 %s 打开时聚焦搜索框，不请求浏览器滚动",
+  async (method) => {
+    const focus = vi.spyOn(HTMLElement.prototype, "focus");
+    try {
+      render(<SheetSelect />);
+      const trigger = screen.getByLabelText("渠道");
+      if (method === "mouse") await userEvent.click(trigger);
+      else {
+        trigger.focus();
+        await userEvent.keyboard("{ArrowDown}");
+      }
+      const input = await screen.findByPlaceholderText("搜索选项…");
+      await waitFor(() => expect(input).toHaveFocus());
+      expect(input.closest('[data-slot="sheet-content"]')).not.toBeNull();
+      const inputCalls = focus.mock.calls.filter(
+        (_, index) => focus.mock.contexts[index] === input,
+      );
+      expect(inputCalls.length).toBeGreaterThan(0);
+      expect(inputCalls.every(([options]) => options?.preventScroll)).toBe(
+        true,
+      );
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() =>
+        expect(screen.queryByRole("listbox")).not.toBeInTheDocument(),
+      );
+      expect(trigger).toHaveFocus();
+    } finally {
+      focus.mockRestore();
+    }
+  },
+);
+
+it("触摸打开时保留菜单焦点，不自动聚焦搜索框", async () => {
+  render(<SheetSelect />);
+  const trigger = screen.getByLabelText("渠道");
+  await userEvent.pointer([
+    { keys: "[TouchA>]", target: trigger },
+    { keys: "[/TouchA]" },
+  ]);
+  const input = await screen.findByPlaceholderText("搜索选项…");
+  const popup = input.closest('[data-slot="combobox-content"]');
+  await waitFor(() => expect(popup).toHaveFocus());
+  expect(input).not.toHaveFocus();
+});
+
+it.each(["channel-sheet", "dialog"] as const)(
+  "%s 中 Esc 先收起渠道菜单并还原焦点，再次按下才关闭素材表单",
+  async (presentation) => {
+    const onClose = vi.fn();
+    render(
+      <MaterialForm
+        edit={{ base: null, input: { ...blankInput(), channel: "news" } }}
+        presentation={presentation}
+        channels={{
+          groups: [{ channel: "news", subchannels: ["头条"] }],
+          loading: false,
+          error: null,
+          retry() {},
+        }}
+        onChange={() => {}}
+        onSave={() => {}}
+        onClose={onClose}
+        busy={false}
+        onUploading={() => {}}
+        error={null}
+      />,
+    );
+    const trigger = document.getElementById("material-channel")!;
+    await userEvent.click(trigger);
+    await screen.findByPlaceholderText("搜索选项…");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument(),
+    );
+    expect(onClose).not.toHaveBeenCalled();
+    expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledOnce();
+  },
+);
 
 it("搜索按中文和英文大小写过滤，搜索及关闭不改变选中值", async () => {
   const onValueChange = vi.fn();

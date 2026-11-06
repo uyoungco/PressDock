@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
+import { AccountControls } from "@/components/layout/AccountControls";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -19,7 +20,10 @@ export function MobileLayout({
 }: PropsWithChildren<{ contentScroll?: "page" | "contained" }>) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex h-dvh min-w-0 flex-col overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+    <div
+      data-mobile-shell={isAndroid() || undefined}
+      className="flex h-dvh min-w-0 flex-col overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+    >
       <TopBar onMenu={() => setOpen(true)} />
       {isDemo() && (
         <div
@@ -30,7 +34,11 @@ export function MobileLayout({
         </div>
       )}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72 p-5">
+        <SheetContent
+          side="left"
+          data-slot="mobile-navigation"
+          className="w-72 p-5"
+        >
           <SheetTitle className="flex items-center gap-2">
             <Newspaper className="size-5" />
             PressDock
@@ -42,14 +50,19 @@ export function MobileLayout({
             </nav>
           </ScrollArea>
           {/* Android 将辅助状态移到导航内，避免列表底部常驻占位。 */}
-          {isAndroid() && <StatusBar />}
+          {isAndroid() && (
+            <>
+              <AccountControls mobile />
+              <StatusBar />
+            </>
+          )}
         </SheetContent>
       </Sheet>
       <main
         id="main-content"
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-muted/20",
-          contentScroll === "contained" && "p-2",
+          contentScroll === "contained" && !isAndroid() && "p-2",
         )}
       >
         {contentScroll === "contained" ? (

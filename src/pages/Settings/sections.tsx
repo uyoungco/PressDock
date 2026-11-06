@@ -19,6 +19,10 @@ import type { Theme } from "@/atoms/theme";
 import type { AppInfo } from "@/services/tauri/system";
 import type { AuthSession } from "@/types/cms";
 import { APP_NAME, APP_VERSION } from "@/constants/app";
+import { useDesktopSettings } from "@/features/settings/desktop-state";
+import { useAiSettings } from "@/features/ai/use-settings";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
 
 const themeOptions: { value: Theme; label: string }[] = [
   { value: "system", label: "跟随系统" },
@@ -33,6 +37,46 @@ export function GeneralSettings({
   theme: Theme;
   onThemeChange: (theme: Theme) => void;
 }) {
+  const compact = !!useDesktopSettings();
+  if (compact)
+    return (
+      <section className="settings-panel settings-general">
+        <header>
+          <h2>界面主题</h2>
+          <p>自动保存，重新打开应用后仍然生效。</p>
+        </header>
+        <ToggleGroup
+          type="single"
+          value={theme}
+          onValueChange={(value) => {
+            if (value) onThemeChange(value as Theme);
+          }}
+          aria-label="界面主题"
+          className="settings-theme-options"
+        >
+          {themeOptions.map((option) => (
+            <ToggleGroupItem
+              key={option.value}
+              value={option.value}
+              className="settings-theme-option"
+            >
+              <span
+                aria-hidden
+                className={`settings-theme-preview settings-theme-${option.value}`}
+              >
+                <i />
+                <i />
+                <i />
+              </span>
+              {option.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+        <p className="settings-note">
+          跟随系统会自动匹配电脑当前的浅色或深色外观。
+        </p>
+      </section>
+    );
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>
@@ -77,11 +121,115 @@ export function ServiceConnections({
   health,
   info,
   session,
+  onConfigureModels,
+  onConfigureTemplates,
 }: {
   health: string;
   info: AppInfo | null;
   session: AuthSession | null;
+  onConfigureModels?: () => void;
+  onConfigureTemplates?: () => void;
 }) {
+  const compact = !!useDesktopSettings();
+  const { settings, loading, error } = useAiSettings(compact);
+  if (compact)
+    return (
+      <section className="settings-panel settings-services">
+        <header>
+          <h2>服务连接</h2>
+          <p>本机服务、当前会话与已保存的 AI 配置。</p>
+        </header>
+        <div className="settings-service-row">
+          <Database aria-hidden />
+          <div>
+            <h3>本地服务</h3>
+            <p>
+              {info
+                ? `运行平台：${info.platform}`
+                : "应用数据目录 / pressdock.db"}
+            </p>
+          </div>
+          <span
+            role="status"
+            data-connection-state={
+              health === "Rust 与 SQLite 已就绪" ? "ready" : "idle"
+            }
+          >
+            {health}
+          </span>
+        </div>
+        <div className="settings-service-row">
+          <Plug aria-hidden />
+          <div>
+            <h3>CMS 连接</h3>
+            <p>
+              {session
+                ? `${session.user.nickname} · ${session.user.roles.join("、")}`
+                : "当前没有有效会话"}
+            </p>
+            <p>
+              {session?.persistent
+                ? "会话已安全保存，重启后验证恢复。"
+                : "会话仅本次运行有效。"}
+            </p>
+          </div>
+          <span data-connection-state={session ? "ready" : "idle"}>
+            {session ? "已登录" : "未登录"}
+          </span>
+        </div>
+        <div className="settings-service-row">
+          <Sparkles aria-hidden />
+          <div>
+            <h3>AI 服务</h3>
+            <p>
+              {error ??
+                (loading
+                  ? "正在读取配置…"
+                  : `${settings.providers.length} 个提供商 · ${settings.models.length} 个模型`)}
+            </p>
+            <p>已配置不代表已连通，请在 AI 模型中测试具体模型。</p>
+            <div className="settings-service-actions">
+              <Button
+                variant="link"
+                size="sm"
+                onClick={onConfigureModels}
+                disabled={!onConfigureModels}
+              >
+                配置模型
+              </Button>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={onConfigureTemplates}
+                disabled={!onConfigureTemplates}
+              >
+                编辑模板
+              </Button>
+            </div>
+          </div>
+          <span
+            data-connection-state={
+              error
+                ? "error"
+                : loading || !settings.providers.length
+                  ? "idle"
+                  : "configured"
+            }
+          >
+            {error
+              ? "读取失败"
+              : loading
+                ? "读取中"
+                : settings.providers.length
+                  ? "已配置"
+                  : "未配置"}
+          </span>
+        </div>
+        <p className="settings-note">
+          渠道素材支持查询、新增、修改、图片处理和排序。模型密钥由系统安全凭据库管理。
+        </p>
+      </section>
+    );
   return (
     <div className="grid min-w-0 gap-5 xl:grid-cols-2">
       <Card className="min-w-0 shadow-none">
@@ -161,6 +309,33 @@ export function ServiceConnections({
 }
 
 export function AboutApplication({ info }: { info: AppInfo | null }) {
+  const compact = !!useDesktopSettings();
+  if (compact)
+    return (
+      <section className="settings-panel settings-about">
+        <header>
+          <h2>{info?.name ?? APP_NAME}</h2>
+          <p>新闻编辑工作空间</p>
+        </header>
+        <dl>
+          <div>
+            <dt>版本</dt>
+            <dd>
+              v{info?.version ?? APP_VERSION}
+              {!info && " · 前端版本"}
+            </dd>
+          </div>
+          <div>
+            <dt>平台</dt>
+            <dd>{info?.platform ?? "正在读取…"}</dd>
+          </div>
+          <div>
+            <dt>工作方式</dt>
+            <dd>本地优先 · 原文保留 · 草稿独立</dd>
+          </div>
+        </dl>
+      </section>
+    );
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>

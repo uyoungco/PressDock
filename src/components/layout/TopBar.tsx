@@ -1,183 +1,166 @@
-import { isAndroid, isDemo } from "@/lib/platform";
-import { useState } from "react";
+import { isAndroid } from "@/lib/platform";
 import { useAtom } from "jotai";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Sun, Moon, Monitor, Settings, PanelLeft } from "lucide-react";
-import { themeAtom, type Theme } from "@/atoms/theme";
+import {
+  Search,
+  Settings,
+  PanelLeft,
+  UserRound,
+  ArrowLeft,
+  ChevronDown,
+} from "lucide-react";
 import { globalSearchAtom } from "@/atoms/app";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { navigation } from "./navigation";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { editorDirtyAtom } from "@/atoms/editor";
-import { useAuth } from "@/hooks/use-auth";
-import { authService } from "@/features/auth/service";
-import { toast } from "sonner";
-import { ServiceError } from "@/services/tauri/client";
+import { AccountControls } from "./AccountControls";
+import { settingsModules } from "@/features/settings/modules";
 import { cn } from "@/lib/utils";
 
 export function TopBar({ onMenu }: { onMenu: () => void }) {
-  const [theme, setTheme] = useAtom(themeAtom);
   const [search, setSearch] = useAtom(globalSearchAtom);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const auth = useAuth();
-  const [confirmLogout, setConfirmLogout] = useState(false);
-  const [dirty, setDirty] = useAtom(editorDirtyAtom);
-  async function logout() {
-    setConfirmLogout(false);
-    setDirty(false);
-    try {
-      const result = await authService.logout();
-      if (!result.credentialsCleared)
-        toast.error("已退出当前会话，但安全凭据未能禁用。请检查应用数据目录。");
-      else if (!isDemo() && !result.remoteSucceeded)
-        toast.warning("已退出本地会话，后台退出请求未成功。");
-    } catch (reason) {
-      if (reason instanceof ServiceError && reason.code === "SESSION_CHANGED")
-        return;
-      toast.error(
-        "已退出界面，但无法确认本地凭据清理结果，请重试退出或重启应用检查。",
-      );
-    }
-  }
+  const { pathname, search: query } = useLocation();
+  const android = isAndroid();
   const current = navigation
     .flatMap((item) => item.children ?? [item])
     .find((item) => pathname.startsWith(item.to));
-  const choices: { value: Theme; label: string; icon: typeof Sun }[] = [
-    { value: "light", label: "浅色", icon: Sun },
-    { value: "dark", label: "深色", icon: Moon },
-    { value: "system", label: "跟随系统", icon: Monitor },
-  ];
+  const settingsTab =
+    pathname === "/settings"
+      ? settingsModules.find(
+          ([id]) => id === new URLSearchParams(query).get("tab"),
+        )
+      : undefined;
+  const articleCategories = navigation.find(
+    (item) => item.to === "/articles",
+  )!.children!;
   return (
-    // Android 顶栏随紧凑按钮收为 48px，减少竖屏固定区域占用。
     <header
+      data-slot="workspace-topbar"
       className={cn(
         "flex h-14 shrink-0 items-center gap-3 border-b bg-background px-4",
-        isAndroid() && "h-12 px-3",
+        android && "h-12 gap-2 px-2",
       )}
     >
       <Button
         variant="ghost"
         size="icon"
-        onClick={onMenu}
-        aria-label="切换导航"
-      >
-        <PanelLeft className="size-4" />
-      </Button>
-      <span
-        className={
-          isAndroid()
-            ? "hidden"
-            : "hidden text-sm text-muted-foreground md:block"
+        onClick={
+          android && settingsTab
+            ? () => window.dispatchEvent(new Event("pressdock-settings-back"))
+            : onMenu
         }
+        aria-label={android && settingsTab ? "返回上一级" : "切换导航"}
       >
-        工作空间 <span className="px-2 text-border">/</span>{" "}
-        <span className="text-foreground">{current?.label ?? "PressDock"}</span>
-      </span>
-      {!isAndroid() && (
-        <form
-          className="relative ml-auto min-w-0 flex-1 sm:w-60 sm:flex-none"
-          onSubmit={(e) => {
-            e.preventDefault();
-            // 顶部搜索提交到当前文章类别；其他页面默认查询优质文章。
-            const target = /^\/articles\/(quality|review-[123])$/.test(pathname)
-              ? pathname
-              : "/articles/quality";
-            navigate(
-              `${target}?${new URLSearchParams({ title: search, current: "1", pagesize: "50" })}`,
-            );
-          }}
-        >
-          <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
-          <Input
-            aria-label="搜索文章"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜索文章，回车查看"
-            className="h-9 bg-muted/40 pl-9"
-          />
-        </form>
-      )}
-      {isAndroid() && (
-        <span className="mr-auto text-sm">{current?.label ?? "PressDock"}</span>
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="切换主题">
-            {theme === "dark" ? (
-              <Moon className="size-4" />
-            ) : theme === "system" ? (
-              <Monitor className="size-4" />
-            ) : (
-              <Sun className="size-4" />
+        {android && settingsTab ? <ArrowLeft /> : <PanelLeft />}
+      </Button>
+      {!android && (
+        <>
+          <span
+            className={cn(
+              pathname === "/channels"
+                ? "hidden min-w-0 truncate text-sm whitespace-nowrap text-muted-foreground lg:block"
+                : "hidden text-sm text-muted-foreground md:block",
             )}
+          >
+            工作空间 <span className="px-2 text-border">/</span>{" "}
+            <span className="text-foreground">
+              {current?.label ?? "PressDock"}
+            </span>
+          </span>
+          <form
+            className={cn(
+              "relative ml-auto min-w-0 flex-1 sm:w-60 sm:flex-none",
+              pathname === "/channels" &&
+                "sm:w-auto sm:flex-1 xl:w-60 xl:flex-none",
+            )}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const target = /^\/articles\/(quality|review-[123])$/.test(
+                pathname,
+              )
+                ? pathname
+                : "/articles/quality";
+              navigate(
+                `${target}?${new URLSearchParams({ title: search, current: "1", pagesize: "50" })}`,
+              );
+            }}
+          >
+            <Search className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground" />
+            <Input
+              aria-label="搜索文章"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="搜索文章，回车查看"
+              className="h-9 bg-muted/40 pl-9"
+            />
+          </form>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="打开设置"
+            onClick={() => navigate("/settings")}
+          >
+            <Settings />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {choices.map(({ value, label, icon: Icon }) => (
-            <DropdownMenuItem key={value} onSelect={() => setTheme(value)}>
-              <Icon className="size-4" />
-              {label}
-              {theme === value && " ✓"}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      {!isAndroid() && (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="打开设置"
-          onClick={() => navigate("/settings")}
-        >
-          <Settings className="size-4" />
-        </Button>
+          <AccountControls />
+        </>
       )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" aria-label="账号菜单">
-            {auth.session?.user.nickname}
+      {android && (
+        <>
+          {pathname.startsWith("/articles") ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  aria-label="选择文章类别"
+                  className="mr-auto min-w-0 px-2"
+                >
+                  <span className="truncate">
+                    {current?.label ?? "文章管理"}
+                  </span>
+                  <ChevronDown data-icon="inline-end" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuGroup>
+                  {articleCategories.map((item) => (
+                    <DropdownMenuItem
+                      key={item.to}
+                      onSelect={() => navigate(item.to)}
+                      aria-current={pathname === item.to ? "page" : undefined}
+                    >
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <h1 className="mr-auto min-w-0 truncate text-sm font-medium">
+              {settingsTab?.[1] ??
+                (pathname === "/channels"
+                  ? "渠道素材"
+                  : (current?.label ?? "PressDock"))}
+            </h1>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="账号与外观"
+            onClick={onMenu}
+          >
+            <UserRound />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => setConfirmLogout(true)}>
-            退出登录
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Dialog open={confirmLogout} onOpenChange={setConfirmLogout}>
-        <DialogContent>
-          <DialogTitle>退出登录？</DialogTitle>
-          <DialogDescription>
-            {isAndroid()
-              ? "退出后需要重新登录，并会清除此设备尚未提交的素材和文章草稿。"
-              : dirty
-                ? "当前有未保存修改，退出后将丢失。取消退出可返回保存修改。"
-                : "退出后需要重新登录才能进入工作区。"}
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmLogout(false)}>
-              取消
-            </Button>
-            <Button variant="destructive" onClick={() => void logout()}>
-              {dirty ? "放弃修改并退出" : "确认退出"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </>
+      )}
     </header>
   );
 }

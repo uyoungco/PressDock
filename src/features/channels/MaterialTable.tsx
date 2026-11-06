@@ -1,8 +1,21 @@
 import { createContext, useContext } from "react";
 import type { CellContext } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, Copy, GripVertical } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Copy,
+  GripVertical,
+  MoreHorizontal,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { DataTable } from "@/components/ui/data-table";
 import { useDataTable } from "@/hooks/use-data-table";
 import type { ColumnPreferencesController } from "@/hooks/use-column-preferences";
@@ -100,6 +113,7 @@ function MaterialCell({
       <MaterialImage
         url={row[field]}
         compact
+        density="table"
         label={field === "titlePic" ? "主图" : "第二张图片"}
         onPreview={() => onDetail(row)}
       />
@@ -108,7 +122,7 @@ function MaterialCell({
     return (
       <button
         role="link"
-        className="max-w-full truncate text-primary hover:underline"
+        className="max-w-full truncate text-primary tabular-nums hover:underline"
         onClick={() => void open(articleUrl(row.articleId)!)}
       >
         {row.articleId}
@@ -116,12 +130,34 @@ function MaterialCell({
     );
   if (field === "title")
     return (
-      <button
-        className="w-full text-left font-medium break-words hover:underline"
-        onClick={() => onDetail(row)}
-      >
-        {show(row.title)}
-      </button>
+      <div className="flex min-w-0 flex-col gap-1">
+        <button
+          className="line-clamp-2 w-full text-left font-medium break-words leading-5 hover:underline"
+          title={row.title ?? undefined}
+          onClick={() => onDetail(row)}
+        >
+          {show(row.title)}
+        </button>
+        <div className="flex flex-wrap items-center gap-x-1 text-xs leading-4 text-muted-foreground">
+          <span>{row.writer || "未署名"}</span>
+          {row.articleId !== null && (
+            <>
+              <span aria-hidden="true">·</span>
+              {articleUrl(row.articleId) ? (
+                <button
+                  role="link"
+                  className="tabular-nums hover:text-primary hover:underline"
+                  onClick={() => void open(articleUrl(row.articleId)!)}
+                >
+                  文章 {row.articleId}
+                </button>
+              ) : (
+                <span>文章 {row.articleId}</span>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     );
   if (field === "url" || field === "landUrl")
     return (
@@ -157,7 +193,7 @@ function MaterialCell({
       </p>
     );
   return (
-    <span className="block truncate" title={show(row[field])}>
+    <span className="block truncate tabular-nums" title={show(row[field])}>
       {show(sorting && field === "order" ? tableRow.index + 1 : row[field])}
     </span>
   );
@@ -166,15 +202,7 @@ function MaterialCell({
 function ActionsCell({ row: { original: row } }: MaterialCellContext) {
   const { busy, sorting, onDetail, onEdit, onDelete } = useMaterialContext();
   return (
-    <div className="flex">
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={`查看素材 ${row.id}`}
-        onClick={() => onDetail(row)}
-      >
-        详情
-      </Button>
+    <div className="flex gap-1">
       <Button
         variant="ghost"
         size="sm"
@@ -184,15 +212,31 @@ function ActionsCell({ row: { original: row } }: MaterialCellContext) {
       >
         编辑
       </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={`删除素材 ${row.id}`}
-        disabled={busy || sorting}
-        onClick={() => onDelete(row)}
-      >
-        删除
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`更多操作 素材 ${row.id}`}
+            disabled={busy || sorting}
+          >
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onSelect={() => onDetail(row)}>
+              素材详情
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={() => onDelete(row)}
+            >
+              删除素材
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
@@ -202,28 +246,37 @@ const columns: DataTableColumnDef<PromoteRecord>[] =
   materialColumnPreferences.map((config) => ({
     ...config,
     header: config.label,
-    meta: { label: config.label },
+    meta: { label: config.label, resizable: config.id !== "position" },
     cell:
-      config.id === "actions"
-        ? ActionsCell
-        : ({ row }) => (
-            <MaterialCell row={row} field={config.id as PromoteField} />
-          ),
+      config.id === "position"
+        ? ({ row }) => (
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {row.index + 1}
+            </span>
+          )
+        : config.id === "actions"
+          ? ActionsCell
+          : ({ row }) => (
+              <MaterialCell row={row} field={config.id as PromoteField} />
+            ),
   }));
-const sortingColumns: DataTableColumnDef<PromoteRecord>[] = [
-  {
-    id: "drag",
-    header: "拖动排序",
-    size: 144,
-    minSize: 144,
-    maxSize: 144,
-    enableHiding: false,
-    meta: { label: "拖动排序", resizable: false },
-    cell: SortCell,
-  },
-  ...columns,
-];
+const sortingColumns: DataTableColumnDef<PromoteRecord>[] = columns.map(
+  (column) =>
+    column.id === "position"
+      ? {
+          id: "position",
+          header: "拖动排序",
+          size: 144,
+          minSize: 144,
+          maxSize: 144,
+          enableHiding: false,
+          meta: { label: "拖动排序", resizable: false },
+          cell: SortCell,
+        }
+      : column,
+);
 const pinnedEnd = ["actions"];
+const pinnedStart = ["position", "title"];
 const getRowId = (row: PromoteRecord) => String(row.id);
 
 export function MaterialTable(props: MaterialTableProps) {
@@ -235,6 +288,7 @@ export function MaterialTable(props: MaterialTableProps) {
     preferences,
     getRowId,
     pinnedEnd,
+    pinnedStart,
   });
   return (
     <MaterialTableContext value={{ ...props, drag }}>
@@ -242,6 +296,8 @@ export function MaterialTable(props: MaterialTableProps) {
         table={table}
         aria-label="渠道素材列表"
         externalScroll
+        density="compact"
+        stretchColumnId="title"
         resizeDisabled={sorting || busy}
         emptyMessage="暂无符合条件的素材"
         getRowProps={({ original: row }) => drag.getRowProps(row.id)}

@@ -1,7 +1,27 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { Node } from "@tiptap/pm/model";
-import { InfoIcon } from "lucide-react";
+import {
+  InfoIcon,
+  BookOpen,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -21,6 +41,14 @@ import { aiErrorMessage } from "@/features/ai/use-settings";
 import { onClientInvalidated } from "@/services/tauri/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isAndroid } from "@/lib/platform";
+
+const shortViewportQuery = "(max-width: 767px) and (max-height: 520px)";
+const subscribeShortViewport = (notify: () => void) => {
+  const media = window.matchMedia(shortViewportQuery);
+  media.addEventListener("change", notify);
+  return () => media.removeEventListener("change", notify);
+};
+const readShortViewport = () => window.matchMedia(shortViewportQuery).matches;
 
 export function PaginationAssistant({
   doc,
@@ -45,6 +73,12 @@ export function PaginationAssistant({
   onClose: () => void;
   onAfterClose: () => void;
 }) {
+  const shortViewport = useSyncExternalStore(
+    subscribeShortViewport,
+    readShortViewport,
+    () => false,
+  );
+  const [configurationExpanded, setConfigurationExpanded] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [draft, setDraft] = useState<{
@@ -59,6 +93,7 @@ export function PaginationAssistant({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const controller = useRef<AbortController | null>(null);
+  const previewViewport = useRef<HTMLDivElement>(null);
   const latest = useRef({ doc, title, locked });
   const valid = useRef(true);
   useEffect(() => {
@@ -123,6 +158,9 @@ export function PaginationAssistant({
   );
   const nested = breaks.some((item) => item.nested);
   const previewing = !!draft && !stale;
+  useEffect(() => {
+    if (previewViewport.current) previewViewport.current.scrollTop = 0;
+  }, [index, candidate]);
   async function generate() {
     if (
       locked ||
@@ -262,6 +300,285 @@ export function PaginationAssistant({
       </Button>
     </>
   );
+  if (!isAndroid())
+    return (
+      <Dialog
+        open
+        onOpenChange={(open) => {
+          if (!open) close();
+        }}
+      >
+        <DialogContent
+          id="cms-pagination-assistant"
+          className="cms-rich-editor article-pagination-dialog"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            onAfterClose();
+          }}
+        >
+          <DialogHeader className="article-pagination-header">
+            <div>
+              <DialogTitle>
+                分页助手{" "}
+                {previewing && <Badge variant="secondary">初稿预览</Badge>}
+              </DialogTitle>
+              <DialogDescription className="truncate" title={title}>
+                {title}
+              </DialogDescription>
+            </div>
+            <div className="article-generation-controls">
+              {generationControls}
+            </div>
+          </DialogHeader>
+          <div className="article-pagination-status">
+            <div className="flex flex-wrap justify-between gap-2">
+              <span>
+                共 {pages.length} 页 ·{" "}
+                {pages.reduce((sum, page) => sum + page.characters, 0)} 字
+              </span>
+              <span className="text-muted-foreground">
+                应用初稿后仍需保存文章
+              </span>
+            </div>
+            {loading && <p role="status">正在读取默认分页配置…</p>}
+            {!loading && !configured && !error && (
+              <Alert className="article-pagination-configuration">
+                <InfoIcon />
+                <details
+                  className="col-start-2"
+                  open={!shortViewport || configurationExpanded}
+                  onToggle={(event) => {
+                    if (shortViewport)
+                      setConfigurationExpanded(event.currentTarget.open);
+                  }}
+                >
+                  <summary className="font-medium">需要配置 AI 分页</summary>
+                  <AlertDescription>
+                    <p>{configurationIssue}</p>
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      onClick={() => {
+                        close();
+                        navigate(
+                          "/settings?tab=ai-templates&purpose=pagination",
+                        );
+                      }}
+                    >
+                      配置默认分页模板
+                    </Button>
+                  </AlertDescription>
+                </details>
+              </Alert>
+            )}
+            {nested && (
+              <Alert>
+                <InfoIcon />
+                <AlertTitle>存在嵌套分页</AlertTitle>
+                <AlertDescription>
+                  保留现有正文和分页预览。请先在 HTML
+                  源码中调整为顶层分页，再使用分页调整。
+                </AlertDescription>
+              </Alert>
+            )}
+            {(error || stale) && (
+              <p role="alert" className="text-destructive">
+                {error || "正文已变化，分页初稿已失效，请重新生成。"}
+              </p>
+            )}
+            {previewing && (
+              <Alert>
+                <InfoIcon />
+                <AlertTitle>初稿尚未应用</AlertTitle>
+                <AlertDescription>
+                  {readPagination(doc).breaks.length
+                    ? "应用将替换全部现有分页；"
+                    : "应用后更新正文分页；"}
+                  可能在完整句末拆分长段，可一次撤销恢复。
+                  {draft?.oversized &&
+                    "存在不可拆内容，部分页面超过建议字数，请核对。"}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          <div className="article-pagination-grid">
+            <aside className="article-page-directory">
+              <div className="article-directory-caption">
+                正文页码<span>{pages.length} 页</span>
+              </div>
+              <ScrollArea orientation="both" className="min-h-0 flex-1">
+                <nav aria-label="正文页码">
+                  {pages.map((page, pageIndex) => (
+                    <Button
+                      type="button"
+                      key={pageIndex}
+                      variant={pageIndex === index ? "secondary" : "ghost"}
+                      className="article-page-option"
+                      aria-label={`第 ${pageIndex + 1} 页 · ${page.characters} 字`}
+                      aria-current={pageIndex === index ? "page" : undefined}
+                      onClick={() => setSelected(pageIndex)}
+                    >
+                      <span>
+                        <span>{String(pageIndex + 1).padStart(2, "0")}</span>
+                        <small>{page.characters} 字</small>
+                      </span>
+                      <span
+                        className="truncate"
+                        title={candidate.textBetween(page.from, page.to, " ")}
+                      >
+                        {candidate
+                          .textBetween(page.from, page.to, " ")
+                          .slice(0, 48) || "本页仅含图片或分隔内容"}
+                      </span>
+                    </Button>
+                  ))}
+                </nav>
+              </ScrollArea>
+              <div className="article-directory-footer">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    locked || busy || previewing || nested || !canInsert
+                  }
+                  onClick={onInsert}
+                >
+                  在当前段落后分页
+                </Button>
+                <p>按正文中的光标位置插入</p>
+              </div>
+            </aside>
+            <section className="article-page-preview">
+              <div className="article-preview-toolbar">
+                <p role="status">
+                  第 {index + 1} / {pages.length} 页 · {current.characters} 字
+                </p>
+                <div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="上一页"
+                    disabled={index === 0}
+                    onClick={() => setSelected(index - 1)}
+                  >
+                    <ChevronLeft />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="下一页"
+                    disabled={index === pages.length - 1}
+                    onClick={() => setSelected(index + 1)}
+                  >
+                    <ChevronRight />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={locked || previewing}
+                    onClick={() => onLocate(current.from)}
+                  >
+                    定位正文
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label="分页操作"
+                      >
+                        <MoreHorizontal />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          disabled={
+                            locked || busy || previewing || nested || !canInsert
+                          }
+                          onSelect={onInsert}
+                        >
+                          在当前段落后分页
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={
+                            locked ||
+                            busy ||
+                            previewing ||
+                            nested ||
+                            index === 0
+                          }
+                          onSelect={() => {
+                            onRemove(index - 1);
+                            setSelected(index - 1);
+                          }}
+                        >
+                          与上一页合并
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={
+                            locked ||
+                            busy ||
+                            previewing ||
+                            nested ||
+                            index >= breaks.length
+                          }
+                          onSelect={() => onRemove(index)}
+                        >
+                          删除当前页后分页点
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+              <ScrollArea
+                className="article-preview-scroll"
+                viewportRef={previewViewport}
+                viewportProps={{ tabIndex: 0, "aria-label": "逐页正文预览" }}
+              >
+                <div className="article-proof-sheet">
+                  <div className="article-proof-page">
+                    <BookOpen />第 {String(index + 1).padStart(2, "0")} 页
+                  </div>
+                  <div
+                    className="cms-editor-body cms-page-preview"
+                    aria-label={`第 ${index + 1} 页预览`}
+                    onClick={(event) => {
+                      if ((event.target as Element).closest("a"))
+                        event.preventDefault();
+                    }}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                </div>
+              </ScrollArea>
+            </section>
+          </div>
+          <DialogFooter className="article-pagination-footer">
+            <p>
+              {previewing ? "初稿尚未应用到正文" : "关闭会丢弃未应用的初稿"}
+            </p>
+            <div
+              className={cn(
+                "flex flex-wrap gap-2",
+                previewing && "article-draft-controls",
+              )}
+            >
+              {draftControls}
+              <Button type="button" variant="outline" onClick={close}>
+                关闭
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
   return (
     <Dialog
       open

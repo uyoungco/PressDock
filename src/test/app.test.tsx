@@ -103,14 +103,14 @@ describe("工作区", () => {
     await chooseOption(screen.getByLabelText("每页条数"), "500");
     expect(router.state.location.search).toContain("pagesize=500");
     await userEvent.click(screen.getByRole("link", { name: "系统设置" }));
-    await chooseOption(
-      await screen.findByLabelText("界面主题", {}, { timeout: 5000 }),
-      "深色",
+    await userEvent.click(await screen.findByRole("radio", { name: "深色" }));
+    expect(screen.getByRole("radio", { name: "深色" })).toHaveAttribute(
+      "aria-checked",
+      "true",
     );
-    expect(screen.getByLabelText("界面主题")).toHaveTextContent("深色");
     expect(localStorage.getItem("pressdock.theme")).toBe('"dark"');
     expect(document.documentElement).toHaveClass("dark");
-    await chooseOption(screen.getByLabelText("界面主题"), "浅色");
+    await userEvent.click(screen.getByRole("radio", { name: "浅色" }));
     expect(document.documentElement).not.toHaveClass("dark");
     router.dispose();
   });
@@ -137,13 +137,14 @@ describe("工作区", () => {
     expect(
       await screen.findByText("Rust 与 SQLite 已就绪"),
     ).toBeInTheDocument();
-    expect(screen.getByText("当前账号：editor · 角色：admin")).toBeVisible();
+    expect(screen.getByText("editor · admin")).toBeVisible();
     expect(screen.getByText("会话已安全保存，重启后验证恢复。")).toBeVisible();
-    expect(screen.getByText("可配置")).toBeVisible();
+    expect(await screen.findByText("未配置")).toBeVisible();
+    expect(screen.getByText(/已配置不代表已连通/)).toBeVisible();
     await userEvent.click(screen.getByRole("tab", { name: "关于应用" }));
     expect(
       screen.getByRole("tabpanel", { name: "关于应用" }),
-    ).toHaveTextContent("PressDock v0.1.0");
+    ).toHaveTextContent("v0.1.0");
     router.dispose();
   });
   it("设置默认展示常规模块，支持键盘导航且隐藏预设不参与焦点导航", async () => {
@@ -165,7 +166,12 @@ describe("工作区", () => {
     await user.tab();
     expect(screen.getByRole("tabpanel", { name: "常规设置" })).toHaveFocus();
     await user.tab();
-    expect(screen.getByLabelText("界面主题")).toHaveFocus();
+    expect(
+      within(screen.getByRole("tabpanel", { name: "常规设置" })).getByRole(
+        "radio",
+        { checked: true },
+      ),
+    ).toHaveFocus();
     general.focus();
     for (const name of [
       "采集与 AI 处理",
@@ -177,9 +183,11 @@ describe("工作区", () => {
     ]) {
       await user.keyboard("{ArrowRight}");
       expect(screen.getByRole("tab", { name })).toHaveFocus();
-      expect(screen.getByRole("tab", { name })).toHaveAttribute(
-        "aria-selected",
-        "true",
+      await waitFor(() =>
+        expect(screen.getByRole("tab", { name })).toHaveAttribute(
+          "aria-selected",
+          "true",
+        ),
       );
       expect(screen.getByRole("tabpanel", { name })).toBeVisible();
       expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
@@ -222,7 +230,7 @@ describe("工作区", () => {
     await chooseOption(screen.getByLabelText("预设渠道"), "B");
     await chooseOption(screen.getByLabelText("预设子渠道"), "轮播图");
     await chooseOption(screen.getByLabelText("复制来源"), "A / 轮播图");
-    fireEvent.change(screen.getByLabelText("TitlePic 体积上限（KiB）"), {
+    fireEvent.change(screen.getByLabelText("主图 体积上限（KiB）"), {
       target: { value: "100" },
     });
     await user.click(screen.getByRole("tab", { name: "服务连接" }));
@@ -231,7 +239,7 @@ describe("工作区", () => {
     expect(screen.getByLabelText("预设渠道")).toHaveTextContent("B");
     expect(screen.getByLabelText("预设子渠道")).toHaveTextContent("轮播图");
     expect(screen.getByLabelText("复制来源")).toHaveTextContent("A / 轮播图");
-    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+    expect(screen.getByLabelText("主图 体积上限（KiB）")).toHaveValue(100);
     expect(imagePresetsIpc.save).not.toHaveBeenCalled();
 
     const saving = deferred<ChannelImagePresets>();
@@ -249,7 +257,7 @@ describe("工作区", () => {
     await act(async () => saving.reject(new Error("磁盘写入失败")));
     await user.click(screen.getByRole("tab", { name: "图片预设" }));
     expect(screen.getByRole("alert")).toHaveTextContent("磁盘写入失败");
-    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+    expect(screen.getByLabelText("主图 体积上限（KiB）")).toHaveValue(100);
 
     const retry = deferred<ChannelImagePresets>();
     vi.mocked(imagePresetsIpc.save).mockReturnValueOnce(retry.promise);
@@ -264,7 +272,7 @@ describe("工作区", () => {
     await user.click(screen.getByRole("tab", { name: "图片预设" }));
     expect(screen.getByRole("button", { name: "保存图片预设" })).toBeEnabled();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("TitlePic 体积上限（KiB）")).toHaveValue(100);
+    expect(screen.getByLabelText("主图 体积上限（KiB）")).toHaveValue(100);
     expect(imagePresetsIpc.save).toHaveBeenCalledTimes(2);
     expect(imagePresetsIpc.list).toHaveBeenCalledTimes(1);
     expect(systemService.healthCheck).toHaveBeenCalledTimes(1);

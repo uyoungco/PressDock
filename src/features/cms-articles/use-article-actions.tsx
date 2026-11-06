@@ -228,6 +228,7 @@ export function useArticleActions(
       <>
         {edit?.kind === "edit" && (
           <EditorSheet
+            dirty={articleEditIsDirty(edit)}
             input={edit.input}
             classes={classes}
             classesError={classesError}
@@ -244,6 +245,7 @@ export function useArticleActions(
         )}
         {edit?.kind === "promote" && (
           <MaterialForm
+            presentation={isAndroid() ? "dialog" : "channel-sheet"}
             title={`添加到渠道素材 · 文章 ${edit.article.id}`}
             edit={{ base: null, input: edit.input }}
             onChange={(input) => change({ ...edit, input })}

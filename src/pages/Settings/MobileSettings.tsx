@@ -33,15 +33,7 @@ import {
   AboutApplication,
 } from "./sections";
 
-const modules = [
-  ["general", "常规设置"],
-  ["harvest", "采集与 AI 处理"],
-  ["image-presets", "图片预设"],
-  ["services", "服务连接"],
-  ["ai-models", "AI 模型"],
-  ["ai-templates", "提示词模板"],
-  ["about", "关于应用"],
-] as const;
+import { settingsModules as modules } from "@/features/settings/modules";
 type State = {
   settingsEditor?: NonNullable<
     ContextType<typeof MobileSettingsContext>
@@ -174,15 +166,24 @@ export default function MobileSettings({
         </header>
         {!tab && (
           <ScrollArea className="flex-1">
-            <nav aria-label="设置模块" className="flex flex-col gap-2">
-              {modules.map(([id, label]) => (
+            <nav
+              aria-label="设置模块"
+              className="mobile-settings-modules flex flex-col"
+            >
+              {modules.map(([id, label, description]) => (
                 <Button
                   key={id}
+                  aria-label={label}
                   variant="outline"
                   className="h-auto justify-between whitespace-normal py-4 text-left"
                   onClick={() => go(id)}
                 >
-                  {label}
+                  <span className="min-w-0 flex-1">
+                    <span className="block">{label}</span>
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                      {description}
+                    </span>
+                  </span>
                   <ChevronRight data-icon="inline-end" />
                 </Button>
               ))}

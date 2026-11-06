@@ -187,6 +187,20 @@ describe("Android 渠道样板", () => {
     );
     next.router.dispose();
   });
+  it("删除收在更多菜单中，取消确认不会调用删除服务", async () => {
+    const { router } = await setup();
+    expect(
+      screen.queryByRole("button", { name: "删除" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "素材 1 更多操作" }),
+    );
+    await userEvent.click(screen.getByRole("menuitem", { name: "删除素材" }));
+    const dialog = screen.getByRole("dialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: "取消" }));
+    expect(channelService.remove).not.toHaveBeenCalled();
+    router.dispose();
+  });
   it("当前页排序使用移动按钮，提交期间锁定并发送完整顺序", async () => {
     const { router } = await setup();
     await userEvent.click(screen.getByRole("button", { name: "排序" }));

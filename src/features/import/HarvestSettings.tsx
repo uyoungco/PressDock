@@ -37,6 +37,7 @@ import { importService } from "./service";
 import { isDesktop, ServiceError } from "@/services/tauri/client";
 import type { HarvestBridge } from "./contracts";
 import { isAndroid } from "@/lib/platform";
+import { useDesktopSettings } from "@/features/settings/desktop-state";
 
 const autosave = importService.settingsAutosave;
 function flushOnLeave() {
@@ -63,6 +64,7 @@ const switches = [
 ] as const;
 
 function UserscriptConnection({ active }: { active: boolean }) {
+  const compact = !!useDesktopSettings();
   const [connection, setConnection] = useState<HarvestBridge | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [installing, setInstalling] = useState(false);
@@ -100,13 +102,15 @@ function UserscriptConnection({ active }: { active: boolean }) {
       <FieldLegend variant="label">油猴一键导入</FieldLegend>
       <FieldContent>
         <FieldDescription>
-          安装脚本后，在百家号或 mbd.baidu.com 点击“导入
-          PressDock”，即可加入采集队列。
-          无需连接码或配对，保持软件运行并登录即可使用。
+          {compact
+            ? "在百家号或 mbd.baidu.com 一键加入采集队列。保持软件运行并登录，无需配对。"
+            : "安装脚本后，在百家号或 mbd.baidu.com 点击“导入 PressDock”，即可加入采集队列。无需连接码或配对，保持软件运行并登录即可使用。"}
         </FieldDescription>
-        <FieldDescription>
-          使用已保存的采集设置，最终结果在“素材导入”的采集记录中查看。
-        </FieldDescription>
+        {!compact && (
+          <FieldDescription>
+            使用已保存的采集设置，最终结果在“素材导入”的采集记录中查看。
+          </FieldDescription>
+        )}
         <p className="text-sm text-muted-foreground">
           {connection?.running
             ? "本机连接已就绪"
@@ -142,6 +146,7 @@ export function HarvestSettings({
   active: boolean;
   onConfigurePagination?: () => void;
 }) {
+  const compact = !!useDesktopSettings();
   const {
     form,
     days,
@@ -215,300 +220,355 @@ export function HarvestSettings({
     }
   }
   return (
-    <Card className="min-w-0 shadow-none">
+    <Card className={compact ? "settings-harvest" : "min-w-0 shadow-none"}>
       <CardHeader>
         <CardTitle>采集与 AI 处理</CardTitle>
         <CardDescription>
-          链接入队后采集并处理，正常任务提交
-          CMS，调试任务仅保存本地结果。已排队任务使用入队时保存的设置。
+          {compact
+            ? "修改后自动保存。已排队任务继续使用入队时的 AI 规则与开发者模式。"
+            : "链接入队后采集并处理，正常任务提交 CMS，调试任务仅保存本地结果。已排队任务使用入队时保存的设置。"}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <LoadState loading={loading && !form} error={error} />
-        {!isAndroid() && <UserscriptConnection active={active} />}
         {form && (
-          <FieldGroup>
-            {/* 获取配置沿用自动保存，隐藏 CDP 字段时保留用户已填写的地址。 */}
-            <FieldSet>
-              <FieldLegend variant="label">素材获取方式</FieldLegend>
-              <FieldGroup>
-                <Field>
-                  <ToggleGroup
-                    type="single"
-                    variant="outline"
-                    aria-label="素材获取方式"
-                    value={form.sourceMode}
-                    disabled={loading}
-                    onValueChange={(value) => {
-                      if (value === "webview" || value === "cdp")
-                        autosave.update({ sourceMode: value });
-                    }}
-                  >
-                    <ToggleGroupItem value="webview">
-                      内置 WebView
-                    </ToggleGroupItem>
-                    {!isAndroid() && (
-                      <ToggleGroupItem value="cdp">浏览器 CDP</ToggleGroupItem>
-                    )}
-                  </ToggleGroup>
+          <FieldGroup
+            className={compact ? "settings-harvest-columns" : undefined}
+          >
+            <div
+              className={
+                compact ? "settings-panel settings-harvest-source" : "contents"
+              }
+            >
+              {!isAndroid() && <UserscriptConnection active={active} />}
+              {/* 获取配置沿用自动保存，隐藏 CDP 字段时保留用户已填写的地址。 */}
+              <FieldSet>
+                <FieldLegend variant="label">素材获取方式</FieldLegend>
+                <FieldGroup>
+                  <Field>
+                    <ToggleGroup
+                      type="single"
+                      variant="outline"
+                      aria-label="素材获取方式"
+                      value={form.sourceMode}
+                      disabled={loading}
+                      onValueChange={(value) => {
+                        if (value === "webview" || value === "cdp")
+                          autosave.update({ sourceMode: value });
+                      }}
+                    >
+                      <ToggleGroupItem value="webview">
+                        内置 WebView
+                      </ToggleGroupItem>
+                      {!isAndroid() && (
+                        <ToggleGroupItem value="cdp">
+                          浏览器 CDP
+                        </ToggleGroupItem>
+                      )}
+                    </ToggleGroup>
+                    <FieldDescription>
+                      {isAndroid() ? (
+                        "手机使用 PC UA 加载来源页面。应用保持前台时执行，退到后台后需返回重试中断任务。"
+                      ) : (
+                        <>
+                          新任务使用入队时的获取方式；旧任务重试使用最新获取配置，AI
+                          规则和开发者模式保留原快照。
+                        </>
+                      )}
+                    </FieldDescription>
+                  </Field>
+                  {!isAndroid() && form.sourceMode === "cdp" && (
+                    <>
+                      <Field>
+                        <FieldLabel>连接的浏览器</FieldLabel>
+                        <ToggleGroup
+                          type="single"
+                          variant="outline"
+                          aria-label="连接的浏览器"
+                          value={form.cdpBrowser}
+                          disabled={loading}
+                          onValueChange={(value) => {
+                            if (value === "chrome" || value === "edge")
+                              autosave.update({ cdpBrowser: value });
+                          }}
+                        >
+                          <ToggleGroupItem value="chrome">
+                            Chrome
+                          </ToggleGroupItem>
+                          <ToggleGroupItem value="edge">
+                            Microsoft Edge
+                          </ToggleGroupItem>
+                        </ToggleGroup>
+                      </Field>
+                      <Field>
+                        <FieldLabel htmlFor="harvest-cdp-address">
+                          数据目录或 CDP 地址
+                        </FieldLabel>
+                        <Input
+                          id="harvest-cdp-address"
+                          value={form.cdpAddress ?? ""}
+                          maxLength={4096}
+                          disabled={loading}
+                          placeholder="留空自动发现已运行的浏览器"
+                          onChange={(event) =>
+                            autosave.update({
+                              cdpAddress: event.target.value || null,
+                            })
+                          }
+                        />
+                        <FieldDescription>
+                          支持浏览器数据目录、DevToolsActivePort
+                          文件、HTTP/HTTPS 调试入口及浏览器级 WS/WSS
+                          地址。优先读取已有文章标签页并复用登录状态。
+                        </FieldDescription>
+                      </Field>
+                      <details
+                        open={compact ? undefined : true}
+                        className={compact ? "settings-help" : undefined}
+                      >
+                        <summary hidden={!compact}>浏览器连接帮助</summary>
+                        <FieldContent>
+                          <FieldDescription>
+                            在{" "}
+                            {form.cdpBrowser === "chrome" ? "Chrome" : "Edge"}{" "}
+                            中打开{" "}
+                            <code>
+                              {form.cdpBrowser}://inspect/#remote-debugging
+                            </code>
+                            ，勾选“允许此浏览器实例进行远程调试”。保持浏览器打开，开始采集时在浏览器连接提示中点击“允许”。
+                          </FieldDescription>
+                          <FieldDescription>
+                            {form.cdpBrowser === "chrome"
+                              ? "Chrome 需为 144 或更新版本。"
+                              : ""}
+                            找不到选项时，请在{" "}
+                            <code>{form.cdpBrowser}://settings/help</code>{" "}
+                            更新浏览器。自动发现失败可填写自定义数据目录或调试地址后重试。
+                          </FieldDescription>
+                        </FieldContent>
+                      </details>
+                    </>
+                  )}
+                </FieldGroup>
+              </FieldSet>
+              <Field
+                orientation="horizontal"
+                data-disabled={modeSaving || loading}
+              >
+                <input
+                  id="harvest-developer-mode"
+                  type="checkbox"
+                  role="switch"
+                  className="mt-1 size-4 accent-primary"
+                  checked={form.developerMode}
+                  disabled={modeSaving || loading}
+                  onChange={(event) =>
+                    void setDeveloperMode(event.target.checked)
+                  }
+                />
+                <FieldContent>
+                  <FieldLabel htmlFor="harvest-developer-mode">
+                    {isAndroid() ? "仅处理，不提交 CMS" : "开发者模式"}
+                  </FieldLabel>
+                  {modeSaving && (
+                    <span
+                      role="status"
+                      className="text-xs text-muted-foreground"
+                    >
+                      正在保存开发者模式…
+                    </span>
+                  )}
                   <FieldDescription>
                     {isAndroid() ? (
-                      "手机使用 PC UA 加载来源页面。应用保持前台时执行，退到后台后需返回重试中断任务。"
+                      "开关即时保存。开启后仍会采集、格式化及调用启用的 AI，仅将结果保存在本机。"
                     ) : (
                       <>
-                        新任务使用入队时的获取方式；旧任务重试使用最新获取配置，AI
-                        规则和开发者模式保留原快照。
+                        开关即时保存，开启后按 F12 打开
+                        DevTools，逐步打印业务数据。仍调用 CMS 格式化，但不创建
+                        CMS 文章。
                       </>
                     )}
                   </FieldDescription>
-                </Field>
-                {!isAndroid() && form.sourceMode === "cdp" && (
-                  <>
-                    <Field>
-                      <FieldLabel>连接的浏览器</FieldLabel>
-                      <ToggleGroup
-                        type="single"
-                        variant="outline"
-                        aria-label="连接的浏览器"
-                        value={form.cdpBrowser}
-                        disabled={loading}
-                        onValueChange={(value) => {
-                          if (value === "chrome" || value === "edge")
-                            autosave.update({ cdpBrowser: value });
-                        }}
-                      >
-                        <ToggleGroupItem value="chrome">Chrome</ToggleGroupItem>
-                        <ToggleGroupItem value="edge">
-                          Microsoft Edge
-                        </ToggleGroupItem>
-                      </ToggleGroup>
-                    </Field>
-                    <Field>
-                      <FieldLabel htmlFor="harvest-cdp-address">
-                        数据目录或 CDP 地址
-                      </FieldLabel>
-                      <Input
-                        id="harvest-cdp-address"
-                        value={form.cdpAddress ?? ""}
-                        maxLength={4096}
-                        disabled={loading}
-                        placeholder="留空自动发现已运行的浏览器"
+                  <FieldDescription>
+                    仅影响开启后新入队的任务；已有正常任务仍会提交
+                    CMS。关闭后不会补交调试任务。
+                  </FieldDescription>
+                </FieldContent>
+              </Field>
+            </div>
+            <div
+              className={
+                compact ? "settings-panel settings-harvest-rules" : "contents"
+              }
+            >
+              <FieldSet>
+                <FieldLegend variant="label">AI 处理规则</FieldLegend>
+                <FieldGroup className="gap-4">
+                  {switches.map(([key, label, hint]) => (
+                    <Field key={key} orientation="horizontal">
+                      <input
+                        id={`harvest-${key}`}
+                        type="checkbox"
+                        role="switch"
+                        className="mt-1 size-4 accent-primary"
+                        checked={form[key]}
                         onChange={(event) =>
-                          autosave.update({
-                            cdpAddress: event.target.value || null,
-                          })
+                          autosave.update({ [key]: event.target.checked })
                         }
                       />
-                      <FieldDescription>
-                        支持浏览器数据目录、DevToolsActivePort 文件、HTTP/HTTPS
-                        调试入口及浏览器级 WS/WSS
-                        地址。优先读取已有文章标签页并复用登录状态。
-                      </FieldDescription>
+                      <FieldContent>
+                        <FieldLabel htmlFor={`harvest-${key}`}>
+                          {label}
+                        </FieldLabel>
+                        <FieldDescription>{hint}</FieldDescription>
+                      </FieldContent>
                     </Field>
-                    <FieldContent>
-                      <FieldDescription>
-                        在 {form.cdpBrowser === "chrome" ? "Chrome" : "Edge"}{" "}
-                        中打开{" "}
-                        <code>
-                          {form.cdpBrowser}://inspect/#remote-debugging
-                        </code>
-                        ，勾选“允许此浏览器实例进行远程调试”。保持浏览器打开，开始采集时在浏览器连接提示中点击“允许”。
-                      </FieldDescription>
-                      <FieldDescription>
-                        {form.cdpBrowser === "chrome"
-                          ? "Chrome 需为 144 或更新版本。"
-                          : ""}
-                        找不到选项时，请在{" "}
-                        <code>{form.cdpBrowser}://settings/help</code>{" "}
-                        更新浏览器。自动发现失败可填写自定义数据目录或调试地址后重试。
-                      </FieldDescription>
-                    </FieldContent>
-                  </>
-                )}
-              </FieldGroup>
-            </FieldSet>
-            <Field
-              orientation="horizontal"
-              data-disabled={modeSaving || loading}
-            >
-              <input
-                id="harvest-developer-mode"
-                type="checkbox"
-                role="switch"
-                className="mt-1 size-4 accent-primary"
-                checked={form.developerMode}
-                disabled={modeSaving || loading}
-                onChange={(event) =>
-                  void setDeveloperMode(event.target.checked)
-                }
-              />
-              <FieldContent>
-                <FieldLabel htmlFor="harvest-developer-mode">
-                  {isAndroid() ? "仅处理，不提交 CMS" : "开发者模式"}
-                </FieldLabel>
-                {modeSaving && (
-                  <span role="status" className="text-xs text-muted-foreground">
-                    正在保存开发者模式…
-                  </span>
-                )}
-                <FieldDescription>
-                  {isAndroid() ? (
-                    "开关即时保存。开启后仍会采集、格式化及调用启用的 AI，仅将结果保存在本机。"
-                  ) : (
-                    <>
-                      开关即时保存，开启后按 F12 打开
-                      DevTools，逐步打印业务数据。仍调用 CMS 格式化，但不创建
-                      CMS 文章。
-                    </>
+                  ))}
+                </FieldGroup>
+              </FieldSet>
+              <FieldSet>
+                <FieldLegend variant="label">共用分页助手配置</FieldLegend>
+                <FieldContent>
+                  {compact && (
+                    <div className="settings-pagination-chain">
+                      <span>
+                        {paginationTemplate?.name ?? "未设置默认模板"}
+                      </span>
+                      <span aria-hidden>→</span>
+                      <span>
+                        {paginationModel?.displayName ?? "未绑定模型"}
+                      </span>
+                      <span aria-hidden>→</span>
+                      <span>
+                        {paginationOptions
+                          ? `${paginationOptions.minChars} / ${paginationOptions.targetChars} / ${paginationOptions.maxChars} 字`
+                          : "未设置页长"}
+                      </span>
+                    </div>
                   )}
-                </FieldDescription>
-                <FieldDescription>
-                  仅影响开启后新入队的任务；已有正常任务仍会提交
-                  CMS。关闭后不会补交调试任务。
-                </FieldDescription>
-              </FieldContent>
-            </Field>
-            <FieldSet>
-              <FieldLegend variant="label">AI 处理规则</FieldLegend>
-              <FieldGroup className="gap-4">
-                {switches.map(([key, label, hint]) => (
-                  <Field key={key} orientation="horizontal">
-                    <input
-                      id={`harvest-${key}`}
-                      type="checkbox"
-                      role="switch"
-                      className="mt-1 size-4 accent-primary"
-                      checked={form[key]}
-                      onChange={(event) =>
-                        autosave.update({ [key]: event.target.checked })
-                      }
-                    />
-                    <FieldContent>
-                      <FieldLabel htmlFor={`harvest-${key}`}>
-                        {label}
-                      </FieldLabel>
-                      <FieldDescription>{hint}</FieldDescription>
-                    </FieldContent>
-                  </Field>
-                ))}
-              </FieldGroup>
-            </FieldSet>
-            <FieldSet>
-              <FieldLegend variant="label">共用分页助手配置</FieldLegend>
-              <FieldContent>
-                <FieldDescription>
-                  {paginationTemplate && paginationModel && paginationOptions
-                    ? `${paginationTemplate.name} · ${paginationModel.displayName} · 每页最少 ${paginationOptions.minChars}、目标 ${paginationOptions.targetChars}、最多 ${paginationOptions.maxChars} 字。`
-                    : "默认文章分页模板、绑定模型或页长尚未配置完整；开启后仍可导入，分页步骤会提示回退。"}
-                </FieldDescription>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={onConfigurePagination}
-                  disabled={!onConfigurePagination}
-                >
-                  配置默认分页模板
-                </Button>
-              </FieldContent>
-            </FieldSet>
-            <Field>
-              <FieldLabel htmlFor="harvest-model">元数据处理模型</FieldLabel>
-              <Select<string>
-                value={form.modelConfigId ?? ""}
-                items={[
-                  { value: "", label: "未配置（元数据保留后台结果）" },
-                  ...models.map((model) => ({
-                    value: model.id,
-                    label: model.displayName,
-                  })),
-                ]}
-                disabled={loading}
-                onValueChange={(value) => {
-                  if (value !== null)
-                    autosave.update({ modelConfigId: value || null });
-                }}
-              >
-                <SelectTrigger id="harvest-model" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="">
-                      未配置（元数据保留后台结果）
-                    </SelectItem>
-                    {models.map((model) => (
-                      <SelectItem key={model.id} value={model.id}>
-                        {model.displayName}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <FieldDescription>
-                用于分类、标签和摘要；AI
-                自动分页使用默认分页模板绑定的模型。所有 AI 项关闭时不发送 AI
-                请求。
-              </FieldDescription>
-            </Field>
-            <Field data-invalid={Boolean(retentionError)}>
-              <FieldLabel htmlFor="harvest-retention">
-                历史保留时间（天）
-              </FieldLabel>
-              <Input
-                id="harvest-retention"
-                inputMode="numeric"
-                value={days}
-                onChange={(event) => autosave.updateDays(event.target.value)}
-                placeholder="留空表示永久保留"
-                aria-invalid={Boolean(retentionError)}
-                aria-describedby={
-                  retentionError
-                    ? "harvest-retention-error harvest-retention-hint"
-                    : "harvest-retention-hint"
-                }
-                className="max-w-sm"
-              />
-              {retentionError && (
-                <FieldError id="harvest-retention-error">
-                  {retentionError}
-                </FieldError>
-              )}
-              <FieldDescription id="harvest-retention-hint">
-                包含启动当天，留空永久保留。保存后在下次启动时清理过期终态记录；未完成和提交结果待确认的任务保留。不删除
-                CMS 文章。
-              </FieldDescription>
-            </Field>
-            <p role="status" className="text-xs text-muted-foreground">
-              {status === "saving"
-                ? "正在保存…"
-                : status === "pending"
-                  ? "待保存"
-                  : status === "saved"
-                    ? "已保存"
-                    : status === "error"
-                      ? "保存失败"
-                      : "修改后自动保存"}
-              {" · 停止修改 500 毫秒后自动保存，新任务使用已保存的设置。"}
-            </p>
-            {saveError && (
-              <Alert variant="destructive">
-                <AlertTitle>采集设置保存失败</AlertTitle>
-                <AlertDescription>
-                  <p>{saveError}。修改已保留，请重试。</p>
+                  <FieldDescription>
+                    {compact &&
+                    paginationTemplate &&
+                    paginationModel &&
+                    paginationOptions
+                      ? "页长依次为最少、目标、最多字数。"
+                      : paginationTemplate &&
+                          paginationModel &&
+                          paginationOptions
+                        ? `${paginationTemplate.name} · ${paginationModel.displayName} · 每页最少 ${paginationOptions.minChars}、目标 ${paginationOptions.targetChars}、最多 ${paginationOptions.maxChars} 字。`
+                        : "默认文章分页模板、绑定模型或页长尚未配置完整；开启后仍可导入，分页步骤会提示回退。"}
+                  </FieldDescription>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="link"
                     size="sm"
-                    onClick={() => {
-                      void autosave.retry().catch(() => undefined);
-                    }}
+                    onClick={onConfigurePagination}
+                    disabled={!onConfigurePagination}
                   >
-                    重试
+                    配置默认分页模板
                   </Button>
-                </AlertDescription>
-              </Alert>
-            )}
+                </FieldContent>
+              </FieldSet>
+              <Field>
+                <FieldLabel htmlFor="harvest-model">元数据处理模型</FieldLabel>
+                <Select<string>
+                  value={form.modelConfigId ?? ""}
+                  items={[
+                    { value: "", label: "未配置（元数据保留后台结果）" },
+                    ...models.map((model) => ({
+                      value: model.id,
+                      label: model.displayName,
+                    })),
+                  ]}
+                  disabled={loading}
+                  onValueChange={(value) => {
+                    if (value !== null)
+                      autosave.update({ modelConfigId: value || null });
+                  }}
+                >
+                  <SelectTrigger id="harvest-model" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="">
+                        未配置（元数据保留后台结果）
+                      </SelectItem>
+                      {models.map((model) => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.displayName}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  用于分类、标签和摘要；AI
+                  自动分页使用默认分页模板绑定的模型。所有 AI 项关闭时不发送 AI
+                  请求。
+                </FieldDescription>
+              </Field>
+              <Field data-invalid={Boolean(retentionError)}>
+                <FieldLabel htmlFor="harvest-retention">
+                  历史保留时间（天）
+                </FieldLabel>
+                <Input
+                  id="harvest-retention"
+                  inputMode="numeric"
+                  value={days}
+                  onChange={(event) => autosave.updateDays(event.target.value)}
+                  placeholder="留空表示永久保留"
+                  aria-invalid={Boolean(retentionError)}
+                  aria-describedby={
+                    retentionError
+                      ? "harvest-retention-error harvest-retention-hint"
+                      : "harvest-retention-hint"
+                  }
+                  className="max-w-sm"
+                />
+                {retentionError && (
+                  <FieldError id="harvest-retention-error">
+                    {retentionError}
+                  </FieldError>
+                )}
+                <FieldDescription id="harvest-retention-hint">
+                  包含启动当天，留空永久保留。保存后在下次启动时清理过期终态记录；未完成和提交结果待确认的任务保留。不删除
+                  CMS 文章。
+                </FieldDescription>
+              </Field>
+            </div>
+            <div className={compact ? "settings-harvest-save" : "contents"}>
+              <p role="status" className="text-xs text-muted-foreground">
+                {status === "saving"
+                  ? "正在保存…"
+                  : status === "pending"
+                    ? "待保存"
+                    : status === "saved"
+                      ? "已保存"
+                      : status === "error"
+                        ? "保存失败"
+                        : "修改后自动保存"}
+                {" · 停止修改 500 毫秒后自动保存，新任务使用已保存的设置。"}
+              </p>
+              {saveError && (
+                <Alert variant="destructive">
+                  <AlertTitle>采集设置保存失败</AlertTitle>
+                  <AlertDescription>
+                    <p>{saveError}。修改已保留，请重试。</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        void autosave.retry().catch(() => undefined);
+                      }}
+                    >
+                      重试
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
           </FieldGroup>
         )}
       </CardContent>

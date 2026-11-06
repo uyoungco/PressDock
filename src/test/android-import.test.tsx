@@ -139,7 +139,7 @@ it("配置往返恢复内存链接，账号缓存重置清除草稿", async () =
   fireEvent.change(screen.getByLabelText("文章链接"), {
     target: { value: "https://baijiahao.baidu.com/s?id=demo" },
   });
-  fireEvent.click(screen.getByRole("link", { name: "系统设置" }));
+  fireEvent.click(screen.getByRole("link", { name: "采集设置" }));
   await screen.findByRole("heading", { name: "采集与 AI 处理" });
   fireEvent.click(screen.getByRole("button", { name: "返回上一级" }));
   fireEvent.click(screen.getByRole("button", { name: "返回上一级" }));

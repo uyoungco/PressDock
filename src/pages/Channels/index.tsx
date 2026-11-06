@@ -3,7 +3,7 @@ import { isAndroid } from "@/lib/platform";
 import { useChannelController } from "@/features/channels/use-channel-controller";
 import { MobileChannelView } from "@/features/channels/MobileChannelView";
 import { Navigate, useSearchParams } from "react-router-dom";
-import { Copy, RefreshCw, RotateCcw, Search } from "lucide-react";
+import { Copy, Plus, RefreshCw, RotateCcw, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MaterialImage } from "@/features/channels/MaterialImage";
@@ -255,302 +254,323 @@ function ChannelResults() {
     );
   return (
     <>
-      <Card className="h-full min-h-0 min-w-0 flex-1 gap-0 overflow-hidden py-0 shadow-none">
-        <form
-          aria-label="渠道素材筛选"
-          className="grid shrink-0 grid-cols-2 items-end gap-x-3 gap-y-2 border-b px-3 py-2 md:flex md:flex-wrap md:px-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            submit({ ...draft, current: 1, pagesize: applied.pagesize });
-          }}
-        >
-          <fieldset disabled={locked} className="contents">
-            <div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:min-w-36">
-              <label htmlFor="channel-filter">渠道</label>
-              <SearchableSelect
-                id="channel-filter"
-                aria-label="渠道"
-                className="h-7 w-full max-md:min-h-11"
-                value={draft.channel}
-                options={[
-                  { value: "", label: "全部渠道" },
-                  ...groups.map((group) => ({
-                    value: group.channel,
-                    label: group.channel,
-                  })),
-                ]}
-                searchPlaceholder="搜索渠道…"
-                disabled={locked || groupsLoading || !!groupsError}
-                onValueChange={(value) =>
-                  setDraft({
-                    ...draft,
-                    channel: value,
-                    subchannel: "",
-                  })
-                }
-              />
-            </div>
-            <div className="col-span-2 flex min-w-0 flex-col gap-1 text-xs text-muted-foreground md:w-[28rem] md:max-w-full">
-              <label htmlFor="subchannel-filter">子渠道</label>
-              <SearchableSelect
-                id="subchannel-filter"
-                aria-label="子渠道"
-                className="h-auto min-h-7 w-full py-1 max-md:min-h-11"
-                wrapLabels
-                value={draft.subchannel}
-                options={[
-                  { value: "", label: "全部子渠道" },
-                  ...subchannels.map((value) => ({ value, label: value })),
-                ]}
-                searchPlaceholder="搜索子渠道…"
-                disabled={
-                  locked || !draft.channel || groupsLoading || !!groupsError
-                }
-                onValueChange={(value) =>
-                  setDraft({ ...draft, subchannel: value })
-                }
-              />
-            </div>
-            <label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-              发布日期
-              <Input
-                aria-label="发布日期"
-                type="date"
-                value={draft.publishdate}
-                onChange={(event) =>
-                  setDraft({ ...draft, publishdate: event.target.value })
-                }
-                className="h-7 w-full min-w-0 md:w-40"
-              />
-            </label>
-            <div className="flex items-center gap-2">
-              <Button type="submit" size="sm">
-                <Search className="size-4" />
-                搜索
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const query = {
-                    channel: "",
-                    subchannel: "",
-                    publishdate: "",
-                    current: 1,
-                    pagesize: applied.pagesize,
-                  };
-                  setDraft(query);
-                  submit(query);
-                }}
-              >
-                <RotateCcw className="size-4" />
-                重置
-              </Button>
-            </div>
-          </fieldset>
-        </form>
-        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2 md:gap-3 md:px-4">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={locked || list.isFetching}
-            onClick={refresh}
-            aria-label="刷新渠道素材"
-            aria-busy={list.isFetching}
-          >
-            <RefreshCw
-              data-icon="inline-start"
-              className={cn(list.isFetching && "animate-spin")}
-            />
-            刷新
-          </Button>
-          <Button size="sm" disabled={locked} onClick={actions.create}>
-            新增
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={actions.busy || (!actions.sorting && !!sortReason)}
-            onClick={() =>
-              actions.sorting
-                ? void actions.saveOrder()
-                : matchingResult && actions.startSort(matchingResult.data)
-            }
-          >
-            {actions.busy && actions.sorting
-              ? "正在保存排序…"
-              : actions.sorting
-                ? "保存排序"
-                : "开始排序"}
-          </Button>
-          {actions.sorting ? (
-            <>
+      <section
+        data-channel-workspace
+        className="channel-workspace flex h-full min-h-0 min-w-0 flex-1 flex-col gap-3"
+      >
+        <header className="flex shrink-0 flex-wrap items-center justify-between gap-2">
+          <h1 className="text-[22px] font-medium leading-8 tracking-tight">
+            渠道素材
+          </h1>
+          <div className="flex items-center gap-2">
+            {actions.sorting && (
               <Button
                 variant="ghost"
-                size="sm"
                 disabled={actions.busy}
                 onClick={actions.cancelSort}
               >
                 取消排序
               </Button>
-              <span className="min-w-0 text-xs text-muted-foreground max-sm:basis-full">
-                仅当前页，排序值从 1 开始；拖动手柄或使用上移、下移按钮。
-              </span>
-            </>
-          ) : (
-            sortReason && (
-              <span className="min-w-0 text-xs text-muted-foreground max-sm:basis-full">
-                {sortReason}
-              </span>
-            )
-          )}
-          <div className="ml-auto">
-            <DataTableColumnSettings
-              controller={columnPreferences}
-              disabled={locked}
-            />
+            )}
+            <Button
+              variant={actions.sorting ? "default" : "outline"}
+              disabled={actions.busy || (!actions.sorting && !!sortReason)}
+              title={sortReason ?? undefined}
+              onClick={() =>
+                actions.sorting
+                  ? void actions.saveOrder()
+                  : matchingResult && actions.startSort(matchingResult.data)
+              }
+            >
+              {actions.busy && actions.sorting
+                ? "正在保存排序…"
+                : actions.sorting
+                  ? "保存排序"
+                  : "开始排序"}
+            </Button>
+            <Button disabled={locked} onClick={actions.create}>
+              <Plus data-icon="inline-start" />
+              新增素材
+            </Button>
           </div>
-        </div>
-        <ScrollArea
-          viewportRef={listViewport}
-          orientation="both"
-          className="flex-1"
-          viewportProps={{
-            role: "region",
-            "aria-label": "渠道素材内容",
-            tabIndex: 0,
-            className: "overscroll-contain",
-          }}
-        >
-          {groupsLoading && (
+        </header>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card">
+          <form
+            aria-label="渠道素材筛选"
+            className="flex shrink-0 flex-wrap items-center gap-2 border-b p-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submit({ ...draft, current: 1, pagesize: applied.pagesize });
+            }}
+          >
+            <fieldset disabled={locked} className="contents">
+              <div className="min-w-28 flex-[0_1_144px]">
+                <label className="sr-only" htmlFor="channel-filter">
+                  渠道
+                </label>
+                <SearchableSelect
+                  id="channel-filter"
+                  aria-label="渠道"
+                  className="h-8 w-full max-md:min-h-11"
+                  value={draft.channel}
+                  options={[
+                    { value: "", label: "全部渠道" },
+                    ...groups.map((group) => ({
+                      value: group.channel,
+                      label: group.channel,
+                    })),
+                  ]}
+                  searchPlaceholder="搜索渠道…"
+                  disabled={locked || groupsLoading || !!groupsError}
+                  onValueChange={(value) =>
+                    setDraft({
+                      ...draft,
+                      channel: value,
+                      subchannel: "",
+                    })
+                  }
+                />
+              </div>
+              <div className="min-w-40 flex-[0_1_256px]">
+                <label className="sr-only" htmlFor="subchannel-filter">
+                  子渠道
+                </label>
+                <SearchableSelect
+                  id="subchannel-filter"
+                  aria-label="子渠道"
+                  className="h-auto min-h-8 w-full py-1 max-md:min-h-11"
+                  wrapLabels
+                  value={draft.subchannel}
+                  options={[
+                    { value: "", label: "全部子渠道" },
+                    ...subchannels.map((value) => ({ value, label: value })),
+                  ]}
+                  searchPlaceholder="搜索子渠道…"
+                  disabled={
+                    locked || !draft.channel || groupsLoading || !!groupsError
+                  }
+                  onValueChange={(value) =>
+                    setDraft({ ...draft, subchannel: value })
+                  }
+                />
+              </div>
+              <label className="w-36 min-w-0">
+                <span className="sr-only">发布日期</span>
+                <Input
+                  aria-label="发布日期"
+                  type="date"
+                  value={draft.publishdate}
+                  onChange={(event) =>
+                    setDraft({ ...draft, publishdate: event.target.value })
+                  }
+                  className="h-8 w-full min-w-0"
+                />
+              </label>
+              <div className="flex items-center gap-1">
+                <Button type="submit" size="sm" className="h-8">
+                  <Search data-icon="inline-start" />
+                  搜索
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => {
+                    const query = {
+                      channel: "",
+                      subchannel: "",
+                      publishdate: "",
+                      current: 1,
+                      pagesize: applied.pagesize,
+                    };
+                    setDraft(query);
+                    submit(query);
+                  }}
+                >
+                  <RotateCcw data-icon="inline-start" />
+                  重置
+                </Button>
+              </div>
+            </fieldset>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
+                当前页 {matchingResult?.data.length ?? 0} 条
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={locked || list.isFetching}
+                onClick={refresh}
+                aria-label="刷新渠道素材"
+                aria-busy={list.isFetching}
+              >
+                <RefreshCw
+                  data-icon="inline-start"
+                  className={cn(list.isFetching && "animate-spin")}
+                />
+                刷新
+              </Button>
+              <DataTableColumnSettings
+                controller={columnPreferences}
+                disabled={locked}
+              />
+            </div>
+          </form>
+          {actions.sorting && (
             <p
               role="status"
-              className="border-b px-4 py-2 text-xs text-muted-foreground"
+              className="border-b bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
             >
-              正在加载渠道选项…
+              仅调整当前页，排序值从 1 开始；拖动手柄或使用上移、下移按钮
             </p>
           )}
-          {groupsError && (
-            <div
-              role="alert"
-              className="flex items-center gap-3 border-b p-4 text-sm text-destructive"
-            >
-              渠道选项加载失败：{groupsError}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void groupQuery.refetch()}
+          <ScrollArea
+            viewportRef={listViewport}
+            orientation="both"
+            className="flex-1"
+            viewportProps={{
+              role: "region",
+              "aria-label": "渠道素材内容",
+              tabIndex: 0,
+              className: "overscroll-contain",
+            }}
+          >
+            {groupsLoading && (
+              <p
+                role="status"
+                className="border-b px-4 py-2 text-xs text-muted-foreground"
               >
-                重试渠道选项
-              </Button>
-            </div>
-          )}
-          {loading ? (
-            <div aria-label="正在加载素材" className="space-y-3 p-4">
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-              <Skeleton className="h-12" />
-            </div>
-          ) : null}
-          {error && (
-            <div role="alert" className="space-y-3 p-6 text-sm">
-              <p className="text-destructive">{error}</p>
-              <Button variant="outline" onClick={refresh}>
-                重试素材列表
-              </Button>
-            </div>
-          )}
-          {matchingResult && (
-            <MaterialTable
-              preferences={columnPreferences}
-              rows={actions.sorted ?? matchingResult.data}
-              sorting={actions.sorting}
-              busy={actions.busy}
-              onMove={actions.move}
-              onDetail={setSelected}
-              onEdit={(row) => void actions.beginEdit(row)}
-              onDelete={actions.requestDelete}
-            />
-          )}
-        </ScrollArea>
-        <div
-          aria-label="素材分页"
-          className="flex shrink-0 flex-col gap-2 border-t px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:px-4"
-        >
-          <span>
-            第 {applied.current} 页
-            {matchingResult &&
-              !(
-                applied.publishdate &&
-                !applied.channel &&
-                !applied.subchannel
-              ) &&
-              ` · 服务端参考总数 ${matchingResult.total}`}
-          </span>
-          <div className="flex flex-wrap items-center justify-between gap-2 sm:ml-auto sm:gap-3">
-            <div className="flex items-center gap-2">
-              <label htmlFor="page-size-filter">每页条数</label>
-              <Select<PromoteQuery["pagesize"]>
-                disabled={locked}
-                items={pageSizes.map((value) => ({
-                  value,
-                  label: String(value),
-                }))}
-                value={applied.pagesize}
-                onValueChange={(value) => {
-                  if (value !== null)
-                    submit({
-                      ...applied,
-                      current: 1,
-                      pagesize: value,
-                    });
-                }}
+                正在加载渠道选项…
+              </p>
+            )}
+            {groupsError && (
+              <div
+                role="alert"
+                className="flex items-center gap-3 border-b p-4 text-sm text-destructive"
               >
-                <SelectTrigger
-                  id="page-size-filter"
-                  aria-label="每页条数"
+                渠道选项加载失败：{groupsError}
+                <Button
+                  variant="outline"
                   size="sm"
-                  className="min-w-16 max-md:min-h-11"
+                  onClick={() => void groupQuery.refetch()}
                 >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {pageSizes.map((size) => (
-                    <SelectItem key={size} value={size}>
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={locked || loading || applied.current <= 1}
-                onClick={() =>
-                  submit({ ...applied, current: applied.current - 1 })
-                }
-              >
-                上一页
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={
-                  locked || loading || !!error || !matchingResult || end
-                }
-                onClick={() =>
-                  submit({ ...applied, current: applied.current + 1 })
-                }
-              >
-                下一页
-              </Button>
+                  重试渠道选项
+                </Button>
+              </div>
+            )}
+            {loading ? (
+              <div aria-label="正在加载素材" className="space-y-3 p-4">
+                <Skeleton className="h-12" />
+                <Skeleton className="h-12" />
+                <Skeleton className="h-12" />
+              </div>
+            ) : null}
+            {error && (
+              <div role="alert" className="space-y-3 p-6 text-sm">
+                <p className="text-destructive">{error}</p>
+                <Button variant="outline" onClick={refresh}>
+                  重试素材列表
+                </Button>
+              </div>
+            )}
+            {matchingResult && (
+              <MaterialTable
+                preferences={columnPreferences}
+                rows={actions.sorted ?? matchingResult.data}
+                sorting={actions.sorting}
+                busy={actions.busy}
+                onMove={actions.move}
+                onDetail={setSelected}
+                onEdit={(row) => void actions.beginEdit(row)}
+                onDelete={actions.requestDelete}
+              />
+            )}
+          </ScrollArea>
+          <div
+            aria-label="素材分页"
+            className="flex shrink-0 flex-col gap-2 border-t px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:px-4"
+          >
+            {sortReason && (
+              <span className="min-w-0 truncate" title={sortReason}>
+                {sortReason}
+              </span>
+            )}
+            <span>
+              第 {applied.current} 页
+              {matchingResult &&
+                !(
+                  applied.publishdate &&
+                  !applied.channel &&
+                  !applied.subchannel
+                ) &&
+                ` · 服务端参考总数 ${matchingResult.total}`}
+            </span>
+            <div className="flex flex-wrap items-center justify-between gap-2 sm:ml-auto sm:gap-3">
+              <div className="flex items-center gap-2">
+                <label htmlFor="page-size-filter">每页条数</label>
+                <Select<PromoteQuery["pagesize"]>
+                  disabled={locked}
+                  items={pageSizes.map((value) => ({
+                    value,
+                    label: String(value),
+                  }))}
+                  value={applied.pagesize}
+                  onValueChange={(value) => {
+                    if (value !== null)
+                      submit({
+                        ...applied,
+                        current: 1,
+                        pagesize: value,
+                      });
+                  }}
+                >
+                  <SelectTrigger
+                    id="page-size-filter"
+                    aria-label="每页条数"
+                    size="sm"
+                    className="min-w-16 max-md:min-h-11"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pageSizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={locked || loading || applied.current <= 1}
+                  onClick={() =>
+                    submit({ ...applied, current: applied.current - 1 })
+                  }
+                >
+                  上一页
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    locked || loading || !!error || !matchingResult || end
+                  }
+                  onClick={() =>
+                    submit({ ...applied, current: applied.current + 1 })
+                  }
+                >
+                  下一页
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </Card>
+      </section>
       <MaterialDetail
         row={selected}
         onClose={() => setSelected(null)}

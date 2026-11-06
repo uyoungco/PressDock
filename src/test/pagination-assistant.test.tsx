@@ -259,7 +259,10 @@ it("输出上限错误保留已有分页与格式，允许手动重试", async (
   await generate();
   expect(await screen.findByRole("alert")).toHaveTextContent("包含推理消耗");
   expect(screen.getByText(/共 2 页/)).toBeVisible();
-  expect(screen.getByText("【演示数据】原来的第一页。").tagName).toBe("STRONG");
+  expect(
+    screen.getByText("【演示数据】原来的第一页。", { selector: "strong" })
+      .tagName,
+  ).toBe("STRONG");
   expect(original.toJSON()).toEqual(before);
   expect(p.onApply).not.toHaveBeenCalled();
   expect(aiService.paginate).toHaveBeenCalledTimes(1);
@@ -267,7 +270,7 @@ it("输出上限错误保留已有分页与格式，允许手动重试", async (
     screen.queryByRole("button", { name: "应用初稿" }),
   ).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole("button", { name: "下一页" }));
-  expect(screen.getByText("原来的第二页。")).toBeVisible();
+  expect(screen.getByText("原来的第二页。", { selector: "p" })).toBeVisible();
   await generate();
   await screen.findByText("初稿尚未应用");
   expect(aiService.paginate).toHaveBeenCalledTimes(2);

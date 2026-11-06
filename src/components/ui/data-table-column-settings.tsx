@@ -21,7 +21,7 @@ export function DataTableColumnSettings({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={disabled}>
+        <Button type="button" variant="outline" size="sm" disabled={disabled}>
           <Settings2 className="size-4" />
           列配置
         </Button>
@@ -33,7 +33,7 @@ export function DataTableColumnSettings({
             key={column.id}
             checked={
               column.enableHiding === false ||
-              controller.preferences.visibility[column.id] !== false
+              controller.visibility[column.id] !== false
             }
             disabled={disabled || column.enableHiding === false}
             onSelect={(event) => event.preventDefault()}

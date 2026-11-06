@@ -5,9 +5,11 @@ import type { DataTableFeatures } from "@/lib/data-table";
 export function DataTableResizeHandle<TData extends RowData>({
   column,
   disabled,
+  useRenderedSize = false,
 }: {
   column: Column<DataTableFeatures, TData>;
   disabled: boolean;
+  useRenderedSize?: boolean;
 }) {
   const drag = useRef<{ pointer: number; x: number; size: number } | null>(
     null,
@@ -38,7 +40,11 @@ export function DataTableResizeHandle<TData extends RowData>({
         drag.current = {
           pointer: event.pointerId,
           x: event.clientX,
-          size: column.getSize(),
+          size:
+            (useRenderedSize &&
+              event.currentTarget.parentElement?.getBoundingClientRect()
+                .width) ||
+            column.getSize(),
         };
         event.currentTarget.setPointerCapture?.(event.pointerId);
       }}
@@ -70,7 +76,10 @@ export function DataTableResizeHandle<TData extends RowData>({
           event.preventDefault();
           event.stopPropagation();
           resize(
-            column.getSize() +
+            ((useRenderedSize &&
+              event.currentTarget.parentElement?.getBoundingClientRect()
+                .width) ||
+              column.getSize()) +
               (event.key === "ArrowRight" ? 1 : -1) *
                 (event.shiftKey ? 50 : 10),
           );

@@ -133,6 +133,7 @@ it.each([true, false])(
     const form = screen.getByRole("dialog", {
       name: editing ? "修改素材" : "新增素材",
     });
+    expect(form).not.toHaveAttribute("data-channel-sheet");
     const imageDialog = await selectImage("TitlePic2");
     expect(form).not.toHaveAttribute("data-channel-dialog");
     expect(imageDialog).not.toHaveAttribute("data-channel-dialog");
@@ -142,9 +143,13 @@ it.each([true, false])(
       "轮播图",
       "titlePic2",
     );
-    expect(screen.getByLabelText("宽度 / px")).toBeDisabled();
-    expect(screen.getByLabelText(/图片格式/)).toBeDisabled();
-    expect(screen.getByLabelText(/文件体积上限/)).toBeDisabled();
+    expect(imageDialog).toHaveClass("channel-image-dialog");
+    expect(screen.getByLabelText("输出尺寸")).toHaveTextContent("280 × 124 px");
+    expect(screen.getByLabelText("图片格式")).toHaveTextContent("JPG / JPEG");
+    expect(screen.getByLabelText("体积上限")).toHaveTextContent("100 KiB");
+    expect(
+      screen.queryByRole("spinbutton", { name: "宽度 / px" }),
+    ).not.toBeInTheDocument();
     expect(
       within(form).getByRole("button", { name: "保存素材", hidden: true }),
     ).toBeDisabled();
@@ -178,6 +183,26 @@ it("无预设允许调整；取消与 Escape 仅关闭图片弹框并恢复输�
   await screen.findByRole("region", { name: "图片处理组件" });
   await userEvent.click(screen.getByRole("button", { name: "取消" }));
   await waitFor(() => expect(pic()).toHaveFocus());
+  expect(channelService.upload).not.toHaveBeenCalled();
+});
+
+it("桌面格式菜单留在图片弹框内部，格式修改参与实际处理", async () => {
+  render(<Harness />);
+  const dialog = await selectImage();
+  await screen.findByRole("region", { name: "图片处理组件" });
+  await userEvent.click(screen.getByRole("combobox", { name: "图片格式" }));
+  const webp = await screen.findByRole("option", { name: "WebP" });
+  expect(dialog.contains(webp)).toBe(true);
+  await userEvent.click(webp);
+  await userEvent.click(screen.getByRole("button", { name: "处理预览" }));
+  await waitFor(() =>
+    expect(imageService.process).toHaveBeenCalledWith(
+      file,
+      expect.objectContaining({ format: "webp" }),
+      {},
+      expect.any(AbortSignal),
+    ),
+  );
   expect(channelService.upload).not.toHaveBeenCalled();
 });
 

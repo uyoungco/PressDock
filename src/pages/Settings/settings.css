@@ -1,0 +1,803 @@
+/* 系统设置的桌面工作区；不改变 Android 分支或共享组件的默认密度。 */
+.settings-workspace,
+.settings-dialog {
+  --primary: #3659d9;
+  --primary-foreground: #fff;
+  --ring: #3659d9;
+  font-size: 13px;
+}
+.dark .settings-workspace,
+.dark .settings-dialog {
+  --primary: #9aafff;
+  --primary-foreground: #142456;
+  --ring: #9aafff;
+}
+.settings-workspace {
+  container: settings / inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+}
+.settings-page-header {
+  flex-shrink: 0;
+}
+.settings-page-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+}
+.settings-page-header p {
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.settings-tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+}
+.settings-tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+.settings-tab-list [data-slot="tabs-trigger"] {
+  flex: 0 0 auto;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.settings-tab-list [data-state="active"] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
+  box-shadow: none;
+}
+.settings-module-scroll {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.settings-module {
+  min-width: 0;
+  margin: 0;
+}
+.settings-module[hidden] {
+  display: none;
+}
+/* 普通配置块保持自然高度，低窗口通过工作区滚动，不能压缩后裁切控件。 */
+.settings-module > :not(.settings-templates):not(.settings-presets) {
+  flex-shrink: 0;
+}
+.settings-workspace [data-slot="button"],
+.settings-workspace [data-slot="input"],
+.settings-workspace [data-slot="select-trigger"],
+.settings-workspace [data-slot="toggle-group-item"],
+.settings-dialog [data-slot="button"],
+.settings-dialog [data-slot="input"],
+.settings-dialog [data-slot="select-trigger"] {
+  min-height: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+.settings-workspace [hidden],
+.settings-dialog [hidden] {
+  display: none;
+}
+.settings-workspace [data-slot="card"] {
+  border-radius: 8px;
+  --card-spacing: 16px;
+  box-shadow: none;
+}
+.settings-workspace [data-slot="card-header"] {
+  flex-shrink: 0;
+}
+.settings-workspace [data-slot="card-title"] {
+  font-size: 14px;
+}
+.settings-workspace [data-slot="card-description"],
+.settings-workspace [data-slot="field-description"] {
+  font-size: 12px;
+  line-height: 1.65;
+}
+.settings-workspace [data-slot="field-group"] {
+  gap: 12px;
+}
+.settings-workspace [data-slot="field"] {
+  gap: 6px;
+}
+.settings-workspace [data-slot="field-label"] {
+  font-size: 13px;
+}
+.settings-panel {
+  flex-shrink: 0;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.settings-panel > header {
+  margin-bottom: 16px;
+}
+.settings-panel h2,
+.settings-panel h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.settings-panel header p,
+.settings-note {
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.settings-general {
+  max-width: 840px;
+}
+.settings-theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: fit-content;
+}
+.settings-workspace .settings-theme-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 152px;
+  min-height: 116px;
+  height: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.settings-theme-option[data-state="on"] {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 5%, var(--card));
+}
+.settings-theme-preview {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 4px;
+  width: 120px;
+  height: 60px;
+  padding: 6px;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  background: #f8f9fb;
+}
+.settings-theme-preview i {
+  border-radius: 2px;
+  background: #e4e6eb;
+}
+.settings-theme-preview i:first-child {
+  grid-row: span 2;
+}
+.settings-theme-dark {
+  border-color: #42454d;
+  background: #22242a;
+}
+.settings-theme-dark i {
+  background: #41444d;
+}
+.settings-theme-system {
+  background: linear-gradient(90deg, #f8f9fb 50%, #22242a 50%);
+}
+.settings-general .settings-note {
+  margin-top: 16px;
+}
+.settings-services {
+  max-width: 1040px;
+}
+.settings-service-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+.settings-service-row > svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--muted-foreground);
+}
+.settings-service-row p {
+  margin-top: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.settings-service-row > span {
+  font-size: 12px;
+  text-align: right;
+  max-width: 240px;
+  overflow-wrap: anywhere;
+}
+.settings-service-row [data-connection-state]::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  margin-bottom: 1px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+.settings-service-row [data-connection-state="ready"]::before {
+  background: var(--success-foreground);
+}
+.settings-service-row [data-connection-state="configured"]::before {
+  background: var(--primary);
+}
+.settings-service-row [data-connection-state="error"]::before {
+  background: var(--destructive);
+}
+.settings-service-actions {
+  display: flex;
+  gap: 12px;
+}
+.settings-service-actions [data-slot="button"] {
+  padding-inline: 0;
+}
+.settings-about {
+  max-width: 840px;
+}
+.settings-about dl {
+  display: grid;
+  gap: 12px;
+}
+.settings-about dl > div {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 16px;
+}
+.settings-about dt {
+  color: var(--muted-foreground);
+}
+.settings-harvest {
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.settings-harvest > [data-slot="card-header"],
+.settings-harvest > [data-slot="card-content"] {
+  padding: 0;
+}
+.settings-harvest-columns {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px !important;
+}
+.settings-harvest-source,
+.settings-harvest-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.settings-harvest-source > :not(:first-child),
+.settings-harvest-rules > :not(:first-child) {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.settings-harvest [data-slot="field-legend"] {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.settings-harvest input[role="switch"] {
+  appearance: none;
+  width: 32px;
+  height: 20px;
+  flex-shrink: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--muted);
+  position: relative;
+  cursor: pointer;
+}
+.settings-harvest input[role="switch"]::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+}
+.settings-harvest input[role="switch"]:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.settings-harvest input[role="switch"]:checked::before {
+  left: 15px;
+  background: var(--primary-foreground);
+}
+.settings-harvest input[role="switch"]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.settings-help summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 12px;
+}
+.settings-help[open] summary {
+  margin-bottom: 8px;
+}
+.settings-harvest-save {
+  grid-column: 1 / -1;
+}
+.settings-models {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.settings-model-layout {
+  display: grid;
+  grid-template-columns: 192px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.settings-model-layout > [data-slot="card"] [data-slot="button"] {
+  height: auto;
+  min-height: 36px;
+  padding: 8px;
+}
+.settings-model-layout > div {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+.settings-model-layout > div > div:first-child:not([data-slot="card"]) {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.settings-provider-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.settings-model-capacity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.settings-pagination-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.settings-pagination-chain span:not([aria-hidden]) {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--muted);
+  overflow-wrap: anywhere;
+}
+.settings-editor-dialog {
+  display: flex !important;
+  flex-direction: column;
+  gap: 16px;
+  width: min(640px, calc(100vw - 32px)) !important;
+  max-width: 640px !important;
+  max-height: calc(100dvh - 32px);
+  padding: 20px;
+}
+.settings-editor-dialog > [data-slot="dialog-header"],
+.settings-editor-dialog > [data-slot="dialog-footer"] {
+  flex-shrink: 0;
+}
+.settings-dialog-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 4px;
+}
+.settings-dialog-body form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.settings-dialog-body form > * {
+  margin: 0;
+}
+.settings-dialog-body #settings-provider-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.settings-dialog-body #settings-provider-form > :nth-child(n + 3) {
+  grid-column: 1 / -1;
+}
+.settings-dialog-body [data-slot="field"] {
+  gap: 6px;
+}
+.settings-dialog-body [data-slot="field-label"] {
+  font-size: 13px;
+}
+.settings-dialog-error {
+  flex-shrink: 0;
+  max-height: 72px;
+  overflow: auto;
+  color: var(--destructive);
+  font-size: 13px;
+}
+.settings-editor-dialog > [data-slot="dialog-footer"] {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.settings-template-module {
+  height: 100%;
+  min-height: 0;
+}
+.settings-templates {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 12px;
+}
+.settings-templates > :not(.settings-template-layout) {
+  flex-shrink: 0;
+}
+.settings-template-layout {
+  display: grid;
+  grid-template-columns: 192px minmax(0, 1fr);
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+.settings-template-layout > [data-slot="card"] {
+  min-height: 0;
+}
+.settings-template-layout > [data-slot="card"]:first-child {
+  max-height: 100%;
+  overflow-y: auto;
+}
+.settings-template-layout > [data-slot="card"]:last-child {
+  height: 100%;
+}
+.settings-template-layout
+  > [data-slot="card"]:first-child
+  [data-slot="button"] {
+  min-height: 36px;
+  height: auto;
+  padding: 8px;
+}
+.settings-template-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.settings-template-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-height: 0;
+}
+.settings-template-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 248px;
+  grid-template-rows: auto auto minmax(100px, 1fr);
+  grid-template-areas: "name model" "system params" "user variables";
+  align-items: start;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px;
+}
+.settings-template-fields > :nth-child(1) {
+  grid-area: name;
+}
+.settings-template-fields > :nth-child(2) {
+  grid-area: model;
+}
+.settings-template-fields > :nth-child(3) {
+  grid-area: params;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.settings-template-form[data-purpose="title"]
+  .settings-template-fields
+  > :nth-child(3) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.settings-template-fields > :nth-child(4) {
+  grid-area: variables;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.settings-template-fields > :nth-child(5) {
+  grid-area: system;
+}
+.settings-template-fields > :nth-child(6) {
+  grid-area: user;
+  align-self: stretch;
+}
+.settings-template-fields textarea {
+  font-size: 13px;
+  line-height: 1.7;
+  resize: vertical;
+}
+.settings-template-fields > :nth-child(6) textarea {
+  flex: 1;
+  min-height: 140px;
+}
+.settings-template-fields > :nth-child(4) > p:first-child {
+  font-size: 12px;
+}
+.settings-template-fields > :nth-child(4) button {
+  padding: 0 8px;
+  font-family: monospace;
+  font-size: 11px;
+}
+.settings-save-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.settings-save-bar > label {
+  margin-right: auto;
+}
+.settings-save-bar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.settings-save-status {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.settings-presets-module {
+  height: 100%;
+  min-height: 0;
+}
+.settings-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+}
+.settings-preset-card {
+  flex: 1;
+  min-height: 0;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.settings-preset-card > [data-slot="card-header"] {
+  padding: 0;
+}
+.settings-preset-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px;
+}
+.settings-preset-body > * {
+  flex-shrink: 0;
+}
+.settings-preset-target {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.settings-preset-target > div:first-child {
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr);
+  gap: 12px;
+}
+.settings-preset-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.settings-preset-pair fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  background: var(--card);
+}
+.settings-preset-pair fieldset > * {
+  margin: 0;
+}
+.settings-field-code {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.settings-preset-lock-summary {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.settings-presets > .settings-save-bar {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.settings-presets > .settings-save-bar .settings-save-status {
+  margin-right: auto;
+}
+@container settings (max-width: 920px) {
+  .settings-harvest-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-template-fields {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas: "name" "model" "params" "system" "user" "variables";
+  }
+}
+@container settings (max-width: 620px) {
+  .settings-model-layout,
+  .settings-template-layout,
+  .settings-preset-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-model-capacity {
+    display: none;
+  }
+  .settings-template-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .settings-templates {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .settings-templates > div:first-child {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .settings-templates > div:first-child > p {
+    display: none;
+  }
+  .settings-templates > [data-slot="toggle-group"] {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .settings-templates > .settings-template-layout {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .settings-templates > [role="alert"],
+  .settings-templates > [role="status"] {
+    grid-column: 1 / -1;
+  }
+  .settings-template-layout > [data-slot="card"]:first-child {
+    flex-shrink: 0;
+    max-height: 60px;
+    padding-block: 8px;
+  }
+  .settings-template-layout
+    > [data-slot="card"]:first-child
+    [data-slot="card-header"] {
+    display: none;
+  }
+  .settings-template-layout > [data-slot="card"]:last-child {
+    flex: 1;
+    height: auto;
+  }
+  .settings-template-layout
+    > [data-slot="card"]:first-child
+    [data-slot="card-content"] {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .settings-template-layout
+    > [data-slot="card"]:first-child
+    [data-slot="button"] {
+    width: auto;
+  }
+  .settings-workspace [data-slot="button"],
+  .settings-workspace [data-slot="toggle-group-item"] {
+    min-height: 40px;
+    height: auto;
+  }
+  .settings-workspace .settings-theme-option {
+    width: 132px;
+  }
+  .settings-theme-preview {
+    width: 104px;
+  }
+  .settings-preset-target > div:first-child {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-service-row {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .settings-service-row > span {
+    grid-column: 2;
+    text-align: left;
+  }
+  .settings-tab-list [data-slot="tabs-trigger"] {
+    min-height: 40px;
+    padding-inline: 8px;
+  }
+}
+@media (max-height: 650px) {
+  .settings-template-layout
+    > [data-slot="card"]:last-child
+    > [data-slot="card-header"] {
+    gap: 0;
+  }
+  .settings-template-layout
+    > [data-slot="card"]:last-child
+    > [data-slot="card-header"]
+    [data-slot="card-description"] {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .settings-dialog-body #settings-provider-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-dialog [data-slot="button"],
+  .settings-dialog [data-slot="input"],
+  .settings-dialog [data-slot="select-trigger"] {
+    min-height: 40px;
+    height: auto;
+  }
+}

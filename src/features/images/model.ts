@@ -32,6 +32,9 @@ export interface ImageProcessorProps {
   preset?: ImageProcessorPreset;
   onConfirm: (result: ImageProcessorResult) => void;
   onCancel: () => void;
+  presentation?: "default" | "dialog";
+  confirmationHint?: string;
+  errorMessage?: string;
 }
 const base64Schema = z
   .string()

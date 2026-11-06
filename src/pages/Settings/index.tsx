@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import MobileSettings from "./MobileSettings";
 import { isAndroid } from "@/lib/platform";
 import { useAtom } from "jotai";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/common/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { DesktopSettingsProvider } from "@/features/settings/DesktopSettingsProvider";
+import "./settings.css";
 import { themeAtom } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
 import { isDesktop } from "@/services/tauri/client";
@@ -24,11 +24,32 @@ import {
 export default function Settings() {
   const android = isAndroid();
   const [params, setParams] = useSearchParams();
-  const [tab, setTab] = useState(() =>
-    ["ai-models", "ai-templates", "harvest"].includes(params.get("tab") ?? "")
-      ? params.get("tab")!
-      : "general",
-  );
+  const pendingSearch = useRef<string | null>(null);
+  useEffect(() => {
+    pendingSearch.current = null;
+  }, [params]);
+  const tab = [
+    "general",
+    "harvest",
+    "image-presets",
+    "services",
+    "ai-models",
+    "ai-templates",
+    "about",
+  ].includes(params.get("tab") ?? "")
+    ? params.get("tab")!
+    : "general";
+  const go = (nextTab: string, purpose?: string) => {
+    const next = new URLSearchParams(params);
+    next.set("tab", nextTab);
+    if (purpose) next.set("purpose", purpose);
+    // 标签的鼠标按下和焦点激活可能在同一帧通知两次；只写入一条历史。
+    const search = next.toString();
+    if (search === params.toString() || search === pendingSearch.current)
+      return;
+    pendingSearch.current = search;
+    setParams(next);
+  };
   const [theme, setTheme] = useAtom(themeAtom);
   const auth = useAuth();
   const [info, setInfo] = useState<AppInfo | null>(null);
@@ -58,7 +79,7 @@ export default function Settings() {
       active = false;
     };
   }, []);
-  // Android 使用独立导航外壳，桌面标签和原有尺寸继续保留。
+  // Android 保留独立导航与表单流程，紧凑工作区只在网页和桌面启用。
   if (android)
     return (
       <MobileSettings
@@ -71,18 +92,14 @@ export default function Settings() {
       />
     );
   return (
-    <div className="min-w-0">
-      <PageHeader
-        title="系统设置"
-        description="管理采集与 AI 处理、工作区外观、图片预设和 AI 模型。"
-        demo={false}
-      />
-      <Tabs value={tab} onValueChange={setTab} className="min-w-0 gap-5">
-        <ScrollArea
-          orientation="horizontal"
-          viewportProps={{ className: "pb-1" }}
-        >
-          <TabsList aria-label="设置模块" className="h-10! min-w-max">
+    <DesktopSettingsProvider key={auth.session?.user.userId}>
+      <section className="settings-workspace">
+        <header className="settings-page-header">
+          <h1>系统设置</h1>
+          <p>采集、模型与编辑规则，在本机工作区统一管理。</p>
+        </header>
+        <Tabs value={tab} onValueChange={go} className="settings-tabs">
+          <TabsList aria-label="设置模块" className="settings-tab-list">
             <TabsTrigger value="general" className="px-4">
               常规设置
             </TabsTrigger>
@@ -105,67 +122,70 @@ export default function Settings() {
               关于应用
             </TabsTrigger>
           </TabsList>
-        </ScrollArea>
-        <TabsContent value="general" className="min-w-0">
-          <GeneralSettings theme={theme} onThemeChange={setTheme} />
-        </TabsContent>
-        <TabsContent
-          value="harvest"
-          forceMount
-          hidden={tab !== "harvest"}
-          className="min-w-0"
-        >
-          <HarvestSettings
-            active={tab === "harvest"}
-            onConfigurePagination={() => {
-              setParams({ tab: "ai-templates", purpose: "pagination" });
-              setTab("ai-templates");
-            }}
-          />
-        </TabsContent>
-        <TabsContent
-          value="image-presets"
-          forceMount
-          hidden={tab !== "image-presets"}
-          className="min-w-0"
-        >
-          <ImagePresetSettings />
-        </TabsContent>
-        <TabsContent value="services" className="min-w-0">
-          <ServiceConnections
-            health={health}
-            info={info}
-            session={auth.session}
-          />
-        </TabsContent>
-        <TabsContent value="about" className="min-w-0">
-          <AboutApplication info={info} />
-        </TabsContent>
-        <TabsContent
-          value="ai-models"
-          forceMount
-          hidden={tab !== "ai-models"}
-          className="min-w-0"
-        >
-          <ModelSettings active={tab === "ai-models"} />
-        </TabsContent>
-        <TabsContent
-          value="ai-templates"
-          forceMount
-          hidden={tab !== "ai-templates"}
-          className="min-w-0"
-        >
-          <TemplateSettings
-            key={
-              params.get("purpose") === "pagination" ? "pagination" : "title"
-            }
-            active={tab === "ai-templates"}
-            initialPurpose={
-              params.get("purpose") === "pagination" ? "pagination" : "title"
-            }
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <div className="settings-module-scroll">
+            <TabsContent value="general" className="settings-module">
+              <GeneralSettings theme={theme} onThemeChange={setTheme} />
+            </TabsContent>
+            <TabsContent
+              value="harvest"
+              forceMount
+              hidden={tab !== "harvest"}
+              className="settings-module"
+            >
+              <HarvestSettings
+                active={tab === "harvest"}
+                onConfigurePagination={() => {
+                  go("ai-templates", "pagination");
+                }}
+              />
+            </TabsContent>
+            <TabsContent
+              value="image-presets"
+              forceMount
+              hidden={tab !== "image-presets"}
+              className="settings-module settings-presets-module"
+            >
+              <ImagePresetSettings />
+            </TabsContent>
+            <TabsContent value="services" className="settings-module">
+              <ServiceConnections
+                health={health}
+                info={info}
+                session={auth.session}
+                onConfigureModels={() => go("ai-models")}
+                onConfigureTemplates={() => go("ai-templates", "title")}
+              />
+            </TabsContent>
+            <TabsContent value="about" className="settings-module">
+              <AboutApplication info={info} />
+            </TabsContent>
+            <TabsContent
+              value="ai-models"
+              forceMount
+              hidden={tab !== "ai-models"}
+              className="settings-module"
+            >
+              <ModelSettings active={tab === "ai-models"} />
+            </TabsContent>
+            <TabsContent
+              value="ai-templates"
+              forceMount
+              hidden={tab !== "ai-templates"}
+              className="settings-module settings-template-module"
+            >
+              <TemplateSettings
+                active={tab === "ai-templates"}
+                onPurposeChange={(purpose) => go("ai-templates", purpose)}
+                initialPurpose={
+                  params.get("purpose") === "pagination"
+                    ? "pagination"
+                    : "title"
+                }
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </section>
+    </DesktopSettingsProvider>
   );
 }

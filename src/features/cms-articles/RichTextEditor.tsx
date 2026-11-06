@@ -1,7 +1,9 @@
 import { isAndroid } from "@/lib/platform";
 import { focusOverlayContent } from "@/lib/overlay-focus";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   EditorContent,
   useEditor,
@@ -101,7 +103,9 @@ export default function RichTextEditor({
   onChange,
   onUploading,
   onError,
+  presentation = "default",
 }: {
+  presentation?: "default" | "workspace";
   initialHtml: string;
   title: string;
   disabled: boolean;
@@ -109,6 +113,9 @@ export default function RichTextEditor({
   onUploading: (value: boolean) => void;
   onError: (message: string) => void;
 }) {
+  const mobile = useIsMobile();
+  const compactToolbar =
+    isAndroid() || (presentation === "workspace" && mobile);
   // 只在当前文章挂载时解析；父表单回传 newsText 不能覆盖选区或清空撤销历史。
   const [initial] = useState(() => {
     const prepared = prepareHtml(initialHtml);
@@ -565,6 +572,13 @@ export default function RichTextEditor({
     !editor || disabled || uploading || !validSession || !!compatibility;
   // 保护模式允许查看原始源码；上传、保存和失效会话仍禁止打开弹窗。
   const sourceLocked = !editor || disabled || uploading || !validSession;
+  const paginationSummary = useMemo(
+    () =>
+      presentation === "workspace" && state?.doc && !compatibility
+        ? readPagination(state.doc)
+        : null,
+    [presentation, state?.doc, compatibility],
+  );
   function openSource() {
     if (
       !isCurrent(work.current) ||
@@ -780,7 +794,12 @@ export default function RichTextEditor({
   }
   return (
     // 正文与元数据共用抽屉滚动视口，工具栏吸顶后紧贴抽屉标题。
-    <div className="cms-rich-editor min-w-0 rounded-md border">
+    <div
+      className={cn(
+        "cms-rich-editor min-w-0 rounded-md border",
+        presentation === "workspace" && "article-rich-workspace",
+      )}
+    >
       <div
         ref={toolbar}
         role="toolbar"
@@ -789,7 +808,7 @@ export default function RichTextEditor({
         className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-md border-b bg-popover p-1"
       >
         {/* 手机只常显高频操作，其余命令共用当前编辑器和选区。 */}
-        {isAndroid() ? (
+        {compactToolbar ? (
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -1168,27 +1187,48 @@ export default function RichTextEditor({
             void pasteImages(work.current, bookmark, "", "", [file]);
         }}
       />
-      {compatibility ? (
-        <div className="flex flex-col gap-3 p-3">
-          <Alert>
-            <InfoIcon />
-            <AlertTitle>正文已保护，暂不可编辑</AlertTitle>
-            <AlertDescription>
-              {compatibility}。标题等信息仍可修改并保存，原始正文保持不变。
-            </AlertDescription>
-          </Alert>
-          <div
-            className="cms-editor-body min-h-80"
-            aria-label="正文只读预览"
-            onClick={(event) => {
-              if ((event.target as Element).closest("a"))
-                event.preventDefault();
-            }}
-            dangerouslySetInnerHTML={{ __html: previewHtml(initial.original) }}
-          />
+      <div
+        className={
+          presentation === "workspace" ? "article-body-scroll" : undefined
+        }
+        role={presentation === "workspace" ? "region" : undefined}
+        aria-label={presentation === "workspace" ? "正文滚动区域" : undefined}
+        tabIndex={presentation === "workspace" ? 0 : undefined}
+      >
+        {compatibility ? (
+          <div className="flex flex-col gap-3 p-3">
+            <Alert>
+              <InfoIcon />
+              <AlertTitle>正文已保护，暂不可编辑</AlertTitle>
+              <AlertDescription>
+                {compatibility}。标题等信息仍可修改并保存，原始正文保持不变。
+              </AlertDescription>
+            </Alert>
+            <div
+              className="cms-editor-body min-h-80"
+              aria-label="正文只读预览"
+              onClick={(event) => {
+                if ((event.target as Element).closest("a"))
+                  event.preventDefault();
+              }}
+              dangerouslySetInnerHTML={{
+                __html: previewHtml(initial.original),
+              }}
+            />
+          </div>
+        ) : (
+          <EditorContent editor={editor} />
+        )}
+      </div>
+      {paginationSummary && (
+        <div className="article-body-meta">
+          {paginationSummary.pages.reduce(
+            (sum, page) => sum + page.characters,
+            0,
+          )}{" "}
+          字 · {paginationSummary.pages.length} 页
+          <span>分页按正文中的光标位置插入</span>
         </div>
-      ) : (
-        <EditorContent editor={editor} />
       )}
       {/* 每次打开持有独立初稿；关闭卸载时只清除未应用的临时状态。 */}
       {paginationOpen && state?.doc && !compatibility && (
@@ -1216,7 +1256,10 @@ export default function RichTextEditor({
       >
         <DialogContent
           data-article-dialog={isAndroid() ? "source" : undefined}
-          className="flex max-h-[85dvh] flex-col sm:max-w-4xl"
+          className={cn(
+            "flex max-h-[85dvh] flex-col sm:max-w-4xl",
+            !isAndroid() && "article-source-dialog",
+          )}
           onOpenAutoFocus={focusOverlayContent}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -1275,7 +1318,7 @@ export default function RichTextEditor({
             </Button>
             {!compatibility && (
               <Button type="button" disabled={locked} onClick={applySource}>
-                应用
+                {isAndroid() ? "应用" : "应用到正文"}
               </Button>
             )}
           </DialogFooter>
@@ -1292,6 +1335,7 @@ export default function RichTextEditor({
       >
         <DialogContent
           data-article-dialog={isAndroid() ? "link" : undefined}
+          className={!isAndroid() ? "article-link-dialog" : undefined}
           onOpenAutoFocus={focusOverlayContent}
           onCloseAutoFocus={(event) => {
             event.preventDefault();

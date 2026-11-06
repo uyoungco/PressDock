@@ -1,4 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "cn";
 import { isAndroid, isDemo } from "@/lib/platform";
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { Button } from "@/components/ui/button";
@@ -40,7 +42,10 @@ export function useMaterialImage(
   busy: boolean,
   onChange: (input: PromoteInput) => void,
   onWorking: (value: boolean) => void,
+  chineseLabels = isAndroid(),
 ) {
+  const mobile = useIsMobile();
+  const compact = !isAndroid() && !mobile;
   const [work, setWork] = useState<Work | null>(null);
   const [error, setError] = useState<string | null>(null);
   const generation = useRef(0);
@@ -186,17 +191,29 @@ export function useMaterialImage(
           </Button>
         </div>
       ) : work.preset ? (
-        <div className={isAndroid() ? "relative min-h-0 flex-1" : "relative"}>
+        <div
+          className={cn(
+            "relative",
+            (isAndroid() || compact) && "min-h-0 flex-1",
+          )}
+        >
           <div
             data-slot={isAndroid() ? "channel-image-editor" : undefined}
             inert={work.uploading}
-            className={isAndroid() ? "h-full min-h-0" : undefined}
+            className={isAndroid() || compact ? "h-full min-h-0" : undefined}
           >
             <ImageProcessor
               image={work.file}
               preset={work.preset}
               onConfirm={(result) => void confirm(result)}
               onCancel={close}
+              presentation={compact ? "dialog" : "default"}
+              confirmationHint={
+                isDemo()
+                  ? "确认后保存本机，保存素材后关联"
+                  : "确认后上传，保存素材后关联"
+              }
+              errorMessage={compact ? (work.error ?? undefined) : undefined}
             />
           </div>
           {work.uploading && (
@@ -218,7 +235,7 @@ export function useMaterialImage(
           </Button>
         </div>
       )}
-      {work.error && (
+      {work.error && !(compact && work.preset) && (
         <p
           role="alert"
           className={
@@ -230,6 +247,27 @@ export function useMaterialImage(
           {work.error}
         </p>
       )}
+    </>
+  );
+  const heading = (
+    <>
+      <DialogTitle>
+        处理{" "}
+        {work
+          ? chineseLabels
+            ? work.field === "titlePic"
+              ? "主图"
+              : "第二张图片"
+            : imageFieldLabels[work.field]
+          : "素材图片"}
+      </DialogTitle>
+      <DialogDescription>
+        {work?.channel || "未选择渠道"} / {work?.subChannel || "未选择子渠道"}
+        {!compact &&
+          (isDemo()
+            ? " · 演示：确认后存入本机，保存后关联演示素材。"
+            : " · 确认结果后上传，保存素材后才关联。已配置的参数锁定。")}
+      </DialogDescription>
     </>
   );
   return {
@@ -246,7 +284,10 @@ export function useMaterialImage(
       >
         <DialogContent
           data-channel-dialog={isAndroid() ? "image" : undefined}
-          className="flex max-h-[95dvh] flex-col overflow-hidden sm:max-w-6xl"
+          className={cn(
+            "flex max-h-[95dvh] flex-col overflow-hidden sm:max-w-6xl",
+            compact && "channel-image-dialog",
+          )}
           onInteractOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -260,25 +301,13 @@ export function useMaterialImage(
             }
           }}
         >
-          <DialogTitle>
-            处理{" "}
-            {work
-              ? isAndroid()
-                ? work.field === "titlePic"
-                  ? "主图"
-                  : "第二张图片"
-                : imageFieldLabels[work.field]
-              : "素材图片"}
-          </DialogTitle>
-          <DialogDescription>
-            {work?.channel || "未选择渠道"} /{" "}
-            {work?.subChannel || "未选择子渠道"} ·
-            {isDemo()
-              ? "演示：确认后存入本机，保存后关联演示素材。"
-              : "确认结果后上传，保存素材后才关联。已配置的参数锁定。"}
-          </DialogDescription>
-          {isAndroid() ? (
-            // 仅参数工作区滚动，避免外层 ScrollArea 带走底部操作。
+          {compact ? (
+            <div className="channel-image-dialog-heading">{heading}</div>
+          ) : (
+            heading
+          )}
+          {isAndroid() || compact ? (
+            // 桌面使用固定网格；Android 沿用内部工作区滚动与固定操作栏。
             <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
               {content}
             </div>

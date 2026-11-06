@@ -10,6 +10,31 @@ import type { HarvestSettings as Settings } from "@/features/import/contracts";
 import { aiSettings, paginationSettings } from "./ai-fixtures";
 import { deferred } from "./cms-fixtures";
 import { toast } from "sonner";
+import { DesktopSettingsContext } from "@/features/settings/desktop-state";
+
+it("紧凑采集布局展示模板到模型及页长关系，保留 500ms 自动保存和配置入口", async () => {
+  vi.mocked(aiService.load).mockResolvedValue(paginationSettings());
+  const configure = vi.fn();
+  render(
+    <DesktopSettingsContext.Provider value={{ report: vi.fn() }}>
+      <HarvestSettings active onConfigurePagination={configure} />
+    </DesktopSettingsContext.Provider>,
+  );
+  await tick(0);
+  expect(screen.getByText("演示分页模板")).toBeVisible();
+  expect(screen.getByText("演示文本模型")).toBeVisible();
+  expect(screen.getByText("100 / 240 / 400 字")).toBeVisible();
+  fireEvent.click(screen.getByLabelText("AI 判断分类"));
+  await tick(499);
+  expect(harvestIpc.saveSettings).not.toHaveBeenCalled();
+  await tick(1);
+  expect(persisted.autoClassify).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: "配置默认分页模板" }));
+  expect(configure).toHaveBeenCalledOnce();
+  fireEvent.click(screen.getByLabelText("开发者模式"));
+  await tick(0);
+  expect(harvestIpc.setDeveloperMode).toHaveBeenCalledWith(true);
+});
 
 vi.mock("@/services/tauri/harvest", () => ({
   harvestIpc: {

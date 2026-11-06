@@ -2,15 +2,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSetAtom } from "jotai";
 import { toast } from "sonner";
-import { RefreshCw, SlidersHorizontal, ArrowLeft } from "lucide-react";
+import {
+  RefreshCw,
+  SlidersHorizontal,
+  ArrowLeft,
+  MoreHorizontal,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -134,7 +139,10 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
       data-mobile-articles
       className="flex min-h-0 min-w-0 flex-1 flex-col gap-2"
     >
-      <header className="flex shrink-0 items-center gap-2">
+      <header
+        data-slot="mobile-article-toolbar"
+        className="flex shrink-0 items-center gap-2"
+      >
         <Button
           variant="outline"
           disabled={actions.busy}
@@ -147,13 +155,13 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
           {applied.title || "全部文章"}
         </p>
         <Button
-          variant="outline"
+          variant="ghost"
+          size="icon"
           aria-label="刷新文章列表"
           disabled={actions.busy || list.isFetching}
           onClick={refresh}
         >
           <RefreshCw data-icon="inline-start" />
-          刷新
         </Button>
       </header>
       {actions.savedDraft && (
@@ -538,56 +546,56 @@ function ArticleCard({
     }
   }
   return (
-    <Card className="min-w-0 gap-3 py-3">
-      <CardHeader className="gap-2 px-3">
-        <CardTitle>
+    <article
+      data-slot="mobile-article-item"
+      aria-label={row.title || "无标题文章"}
+    >
+      <div className="mobile-article-summary">
+        <div className="min-w-0">
           <button
-            className="w-full text-left leading-relaxed break-words text-primary"
+            className="mobile-article-title"
             onClick={() => void open(articleUrl(view, row.id))}
           >
             {row.title || "无标题文章"}
           </button>
-        </CardTitle>
-        <p className="text-xs text-muted-foreground">
-          #{row.id} · {row.className || "未分类"}
-        </p>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3 px-3">
-        <div className="flex min-w-0 gap-3">
-          <MaterialImage
-            compact
-            url={articleImageUrl(row.titlePic)}
-            label={`文章 ${row.id} 主图`}
-            onPreview={() => {
-              const url = articleImageUrl(row.titlePic);
-              if (url) onPreview(url);
-            }}
-          />
-          <dl className="flex min-w-0 flex-1 flex-col gap-1 text-sm break-words">
-            <div>
-              <dt className="inline text-muted-foreground">作者：</dt>
-              <dd className="inline">{row.writer || "—"}</dd>
-            </div>
-            <div>
-              <dt className="inline text-muted-foreground">时间：</dt>
-              <dd className="inline">{row.newsTime || "—"}</dd>
-            </div>
-            <div>
-              <dt className="inline text-muted-foreground">页数：</dt>
-              <dd className="inline">{row.pages ?? "—"}</dd>
-            </div>
-          </dl>
+          <p className="mobile-article-meta">
+            #{row.id} · {row.className || "未分类"} ·{" "}
+            {row.pages === null ? "分页未设置" : row.pages + " 页"}
+          </p>
+          <p className="mobile-article-meta">
+            {row.writer || "未署名"} ·{" "}
+            <time title={row.newsTime || undefined}>
+              {row.newsTime?.replace(
+                /^(\d{4}-)?(\d{2}-\d{2})[ T](\d{2}:\d{2}).*$/,
+                "$2 $3",
+              ) || "时间未设置"}
+            </time>
+          </p>
         </div>
+        <MaterialImage
+          compact
+          url={articleImageUrl(row.titlePic)}
+          label={`文章 ${row.id} 主图`}
+          onPreview={() => {
+            const url = articleImageUrl(row.titlePic);
+            if (url) onPreview(url);
+          }}
+        />
+      </div>
+      <div className="mobile-article-details">
         {expanded && (
           <div className="flex min-w-0 flex-col gap-3 text-sm break-words">
             <p>{row.smallText || "暂无摘要"}</p>
+            <p>
+              作者：{row.writer || "—"} · 时间：{row.newsTime || "—"}
+            </p>
             <div className="flex flex-wrap gap-3">
-              {[row.titlePic2, row.titlePic3].map((image, i) => (
+              {[row.titlePic, row.titlePic2, row.titlePic3].map((image, i) => (
                 <MaterialImage
                   key={i}
                   compact
                   url={articleImageUrl(image)}
-                  label={`文章 ${row.id} 图片 ${i + 2}`}
+                  label={`文章 ${row.id} 图片 ${i + 1}`}
                   onPreview={() => {
                     const url = articleImageUrl(image);
                     if (url) onPreview(url);
@@ -627,24 +635,41 @@ function ArticleCard({
             </Button>
           </div>
         )}
-      </CardContent>
-      <CardFooter className="flex flex-wrap gap-2 px-3">
+      </div>
+      <footer className="mobile-article-actions flex items-center gap-1">
         <Button variant="outline" disabled={busy} onClick={onEdit}>
           编辑
         </Button>
         {view === "quality" && (
           <Button variant="outline" disabled={busy} onClick={onPromote}>
-            添加到渠道素材
+            转渠道素材
           </Button>
         )}
-        <Button
-          variant="ghost"
-          aria-expanded={expanded}
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "收起" : "更多信息"}
-        </Button>
-      </CardFooter>
-    </Card>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`文章 ${row.id} 更多操作`}
+            >
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={() => setExpanded(!expanded)}>
+                {expanded ? "收起完整信息" : "查看完整信息"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={!row.sourceUrl}
+                onSelect={() => row.sourceUrl && void open(row.sourceUrl)}
+              >
+                打开来源
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </footer>
+    </article>
   );
 }

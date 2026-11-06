@@ -1,6 +1,6 @@
 import { isAndroid } from "@/lib/platform";
 import { focusOverlayContent } from "@/lib/overlay-focus";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PanelRight, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
 import { MaterialImage } from "@/features/channels/MaterialImage";
 import { articleService, articleImageUrl } from "./service";
+import { cn } from "@/lib/utils";
 import type { ArticleClass, ArticleUpdate } from "@/types/cms-article";
 const RichTextEditor = lazy(() => import("./RichTextEditor"));
 
@@ -44,7 +45,9 @@ export function EditorSheet({
   onUploading,
   error,
   onError,
+  dirty = false,
 }: {
+  dirty?: boolean;
   input: ArticleUpdate;
   classes: ArticleClass[];
   classesError: string | null;
@@ -58,7 +61,10 @@ export function EditorSheet({
   error: string | null;
   onError: (message: string) => void;
 }) {
-  const [tab, setTab] = useState("info");
+  const android = isAndroid();
+  const [tab, setTab] = useState(android ? "info" : "body");
+  const [infoHidden, setInfoHidden] = useState(false);
+  const pictureInputs = useRef<(HTMLInputElement | null)[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
   const infoViewport = useRef<HTMLDivElement>(null);
   const bodyViewport = useRef<HTMLDivElement>(null);
@@ -67,13 +73,13 @@ export function EditorSheet({
   useEffect(() => {
     if (!isAndroid()) return;
     const viewport =
-      tab === "info" ? infoViewport.current! : bodyViewport.current!;
+      tab === "info" ? infoViewport.current : bodyViewport.current;
     const position =
       tab === "info"
         ? scrollPositions.current.info
         : scrollPositions.current.body;
     const frame = requestAnimationFrame(() => {
-      viewport.scrollTop = position;
+      if (viewport) viewport.scrollTop = position;
     });
     return () => cancelAnimationFrame(frame);
   }, [tab]);
@@ -121,35 +127,39 @@ export function EditorSheet({
       onChange({ ...input, tags: [...input.tags, value] });
     setTag("");
   }
+  const titleField = (
+    <Field>
+      <FieldLabel htmlFor="cms-title">标题 *</FieldLabel>
+      <Input
+        id="cms-title"
+        value={input.title}
+        onChange={(event) => onChange({ ...input, title: event.target.value })}
+      />
+    </Field>
+  );
   const fields = (
     <fieldset disabled={locked}>
       <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="cms-title">标题 *</FieldLabel>
-          <Input
-            id="cms-title"
-            value={input.title}
-            onChange={(event) =>
-              onChange({ ...input, title: event.target.value })
-            }
-          />
-        </Field>
-        <FieldGroup className="grid gap-4 sm:grid-cols-3">
+        {android && titleField}
+        <FieldGroup className="article-picture-fields grid gap-4 sm:grid-cols-3">
           {(["titlePic", "titlePic2", "titlePic3"] as const).map(
             (field, index) => (
               <Field key={field}>
                 <FieldLabel htmlFor={`cms-${field}`}>
-                  {index ? `TitlePic${index + 1}` : "TitlePic *"}
+                  {android
+                    ? index
+                      ? `TitlePic${index + 1}`
+                      : "TitlePic *"
+                    : index
+                      ? `第${index === 1 ? "二" : "三"}张图`
+                      : "主图 *"}
                 </FieldLabel>
                 <MaterialImage
                   compact
+                  density={android ? "default" : "thumbnail"}
                   url={articleImageUrl(input[field])}
                   label={`文章图片 ${index + 1}`}
-                  onPreview={
-                    isAndroid()
-                      ? () => setPreview(articleImageUrl(input[field]))
-                      : undefined
-                  }
+                  onPreview={() => setPreview(articleImageUrl(input[field]))}
                 />
                 <Input
                   id={`cms-${field}`}
@@ -171,7 +181,21 @@ export function EditorSheet({
                     }
                   }}
                 />
+                {!android && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => pictureInputs.current[index]?.click()}
+                  >
+                    {input[field] ? "更换图片" : "上传图片"}
+                  </Button>
+                )}
                 <Input
+                  ref={(node) => {
+                    pictureInputs.current[index] = node;
+                  }}
+                  className={android ? undefined : "sr-only"}
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   aria-label={`上传文章图片 ${index + 1}`}
@@ -275,7 +299,7 @@ export function EditorSheet({
           />
         </Field>
         <Field>
-          <FieldLabel htmlFor="cms-source">来源 URL</FieldLabel>
+          <FieldLabel htmlFor="cms-source">来源链接</FieldLabel>
           <Input
             id="cms-source"
             value={input.sourceUrl}
@@ -288,15 +312,11 @@ export function EditorSheet({
     </fieldset>
   );
   const body = (
-    <div
-      className={
-        isAndroid() ? "flex flex-col gap-2" : "mt-6 flex flex-col gap-2"
-      }
-    >
-      <p className="text-sm font-medium">正文</p>
+    <div className={android ? "flex flex-col gap-2" : "article-writing-body"}>
       <Suspense fallback={<Skeleton className="h-80" />}>
         <RichTextEditor
           title={input.title}
+          presentation={android ? "default" : "workspace"}
           // 不同文章持有独立编辑器，避免复用旧文档及上传结果。
           key={input.id}
           initialHtml={input.newsText}
@@ -334,11 +354,19 @@ export function EditorSheet({
         data-article-dialog={isAndroid() ? "edit" : undefined}
         onOpenAutoFocus={focusOverlayContent}
         side="right"
-        className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-5xl"
-        showCloseButton={!locked && !isAndroid()}
+        className={cn(
+          "gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-5xl",
+          !android && "article-editor-sheet",
+        )}
+        showCloseButton={false}
         onInteractOutside={(event) => event.preventDefault()}
       >
-        <SheetHeader className="shrink-0 border-b pr-12">
+        <SheetHeader
+          className={cn(
+            "shrink-0 border-b",
+            !android && "article-editor-header",
+          )}
+        >
           <div className="flex items-center gap-2">
             {isAndroid() && (
               <Button
@@ -352,9 +380,38 @@ export function EditorSheet({
               </Button>
             )}
             <SheetTitle>编辑文章 · {input.id}</SheetTitle>
+            {!android && (
+              <div className="ml-auto flex items-center gap-2">
+                <Button
+                  className="article-info-toggle"
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  aria-expanded={!infoHidden}
+                  onClick={() => setInfoHidden(!infoHidden)}
+                >
+                  <PanelRight data-icon="inline-start" />
+                  文章信息
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="关闭文章编辑"
+                  disabled={locked}
+                  onClick={onClose}
+                >
+                  <X />
+                </Button>
+              </div>
+            )}
           </div>
           <SheetDescription>
-            保存修改到 CMS。正文保留原有图片和分页标记。
+            {android
+              ? "保存修改到 CMS。正文保留原有图片和分页标记。"
+              : dirty
+                ? "有未保存的修改，保存后写入 CMS"
+                : "当前编辑中的内容，保存后写入 CMS"}
           </SheetDescription>
         </SheetHeader>
         {isAndroid() ? (
@@ -372,10 +429,10 @@ export function EditorSheet({
               onValueChange={(value) => {
                 if (tab === "info")
                   scrollPositions.current.info =
-                    infoViewport.current!.scrollTop;
+                    infoViewport.current?.scrollTop ?? 0;
                 else
                   scrollPositions.current.body =
-                    bodyViewport.current!.scrollTop;
+                    bodyViewport.current?.scrollTop ?? 0;
                 setTab(value);
               }}
               className="min-h-0 flex-1 gap-0"
@@ -418,22 +475,86 @@ export function EditorSheet({
             </div>
           </form>
         ) : (
-          <ScrollArea className="flex-1">
-            <form
-              id="cms-article-edit"
-              className="p-4"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (!locked) onSave();
-              }}
+          <form
+            id="cms-article-edit"
+            className={cn(
+              "article-editor-form",
+              infoHidden && "article-info-hidden",
+              tab === "info" && "article-tab-info",
+            )}
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!locked) onSave();
+            }}
+          >
+            <Tabs
+              value={tab}
+              onValueChange={setTab}
+              className="article-editor-tabs"
             >
-              {fields}
-              {body}
+              <TabsList>
+                <TabsTrigger
+                  value="body"
+                  id="article-body-tab"
+                  aria-controls="article-body-panel"
+                >
+                  正文
+                </TabsTrigger>
+                <TabsTrigger
+                  value="info"
+                  id="article-info-tab"
+                  aria-controls="article-info-panel"
+                >
+                  文章信息
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="article-editor-columns">
+              <section
+                className="article-writing-pane"
+                role="tabpanel"
+                id="article-body-panel"
+                aria-labelledby="article-body-tab"
+              >
+                <fieldset className="article-title-field" disabled={locked}>
+                  {titleField}
+                </fieldset>
+                {body}
+              </section>
+              <ScrollArea
+                className="article-info"
+                role="tabpanel"
+                id="article-info-panel"
+                aria-labelledby="article-info-tab"
+                viewportRef={infoViewport}
+                viewportProps={{
+                  "aria-label": "文章信息",
+                  tabIndex: 0,
+                  className: "overscroll-contain",
+                }}
+              >
+                <div className="article-info-fields">
+                  <h3>文章信息</h3>
+                  {fields}
+                </div>
+              </ScrollArea>
+            </div>
+            <div className="article-save-error" aria-live="polite">
               {errorMessage}
-            </form>
-          </ScrollArea>
+            </div>
+          </form>
         )}
-        <SheetFooter className="shrink-0 flex-row justify-end border-t">
+        <SheetFooter
+          className={cn(
+            "shrink-0 flex-row justify-end border-t",
+            !android && "article-editor-footer",
+          )}
+        >
+          {!android && (
+            <p className="mr-auto text-xs text-muted-foreground">
+              {uploading ? "图片上传后仍需保存文章" : "保存不执行审核或发布"}
+            </p>
+          )}
           <Button variant="outline" disabled={locked} onClick={onClose}>
             取消
           </Button>
@@ -441,14 +562,17 @@ export function EditorSheet({
             {uploading ? "正在上传图片…" : busy ? "正在保存…" : "保存修改"}
           </Button>
         </SheetFooter>
-        {isAndroid() && (
+        {
           <Dialog
             open={!!preview}
             onOpenChange={(open) => {
               if (!open) setPreview(null);
             }}
           >
-            <DialogContent data-article-dialog="image">
+            <DialogContent
+              data-article-dialog={android ? "image" : undefined}
+              className={!android ? "article-image-dialog" : undefined}
+            >
               <DialogTitle>文章图片</DialogTitle>
               <DialogDescription>查看原图</DialogDescription>
               <ScrollArea className="flex-1">
@@ -463,7 +587,7 @@ export function EditorSheet({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        )}
+        }
       </SheetContent>
     </Sheet>
   );

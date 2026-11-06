@@ -56,6 +56,8 @@ export function SearchableSelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const composing = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
   // 已提交的历史筛选值可能已从最新配置中移除，仍需能够回显与重新选择。
   const items = useMemo(
     () =>
@@ -110,8 +112,20 @@ export function SearchableSelect({
         <ComboboxValue placeholder={placeholder} />
       </ComboboxTrigger>
       {/* 嵌入 Radix 弹层时将选项挂入其内容，保持焦点约束与可访问性。 */}
-      <ComboboxContent className={contentClassName} container={portalContainer}>
+      <ComboboxContent
+        ref={popupRef}
+        className={contentClassName}
+        container={portalContainer}
+        initialFocus={(interactionType) => {
+          // 触摸保持菜单聚焦，避免自动打开软键盘；其他方式可立即搜索。
+          if (interactionType === "touch") return popupRef.current;
+          // 菜单位于弹层内部，默认聚焦会滚动 overflow-hidden 的抽屉。
+          inputRef.current?.focus({ preventScroll: true });
+          return false;
+        }}
+      >
         <ComboboxInput
+          ref={inputRef}
           aria-label={searchPlaceholder}
           placeholder={searchPlaceholder}
           onCompositionStart={() => {

@@ -16,7 +16,8 @@ import {
   recordInput,
 } from "@/features/channels/edit-buffer";
 import { channelQueryMemory } from "@/features/channels/query-memory";
-import { materialColumns } from "@/features/channels/table-model";
+import { columnStorageKey } from "@/hooks/use-column-preferences";
+import { chooseOption } from "./select-helpers";
 import { imageService } from "@/features/images/service";
 import { imagePresetsIpc } from "@/services/tauri/image-presets";
 import { AppProviders } from "@/app/providers";
@@ -111,12 +112,52 @@ async function setup(path = full) {
   return router;
 }
 describe("渠道素材写操作", () => {
+  it("旧列偏好的显式显隐与列宽优先，恢复默认采用紧凑列", async () => {
+    localStorage.setItem(
+      columnStorageKey("channels"),
+      JSON.stringify({
+        version: 1,
+        visibility: { id: true, writer: true, titlePic2: false },
+        sizing: { title: 420 },
+      }),
+    );
+    const router = await setup();
+    expect(
+      screen.getByRole("columnheader", { name: "素材编号" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "作者" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "第二张图片" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("separator", { name: "调整 新闻内容 列宽" }),
+    ).toHaveAttribute("aria-valuenow", "420");
+    const requests = vi.mocked(channelService.list).mock.calls.length;
+    await userEvent.click(screen.getByRole("button", { name: "列配置" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: "恢复默认" }));
+    expect(
+      screen.queryByRole("columnheader", { name: "素材编号" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "第二张图片" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("separator", { name: "调整 新闻内容 列宽" }),
+    ).toHaveAttribute("aria-valuenow", "224");
+    expect(channelService.list).toHaveBeenCalledTimes(requests);
+    expect(localStorage.getItem(columnStorageKey("channels"))).not.toContain(
+      "渠道新闻",
+    );
+    router.dispose();
+  });
   it("列配置仅改变展示，排序期间锁定配置和列宽", async () => {
     const router = await setup();
     const requestCount = vi.mocked(channelService.list).mock.calls.length;
     await userEvent.click(screen.getByRole("button", { name: "列配置" }));
     expect(
-      screen.getByRole("menuitemcheckbox", { name: "标题" }),
+      screen.getByRole("menuitemcheckbox", { name: "新闻内容" }),
     ).toHaveAttribute("aria-disabled", "true");
     expect(
       screen.getByRole("menuitemcheckbox", { name: "操作" }),
@@ -124,21 +165,26 @@ describe("渠道素材写操作", () => {
     await userEvent.click(
       screen.getByRole("menuitemcheckbox", { name: "作者" }),
     );
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "作者" }),
+    );
     await userEvent.keyboard("{Escape}");
     expect(
       screen.queryByRole("columnheader", { name: "作者" }),
     ).not.toBeInTheDocument();
-    const resize = screen.getByRole("separator", { name: "调整 标题 列宽" });
+    const resize = screen.getByRole("separator", {
+      name: "调整 新闻内容 列宽",
+    });
     resize.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(resize).toHaveAttribute("aria-valuenow", "330");
+    expect(resize).toHaveAttribute("aria-valuenow", "234");
     expect(channelService.list).toHaveBeenCalledTimes(requestCount);
     expect(router.state.location.search).toContain("current=2");
     await userEvent.click(screen.getByRole("button", { name: "开始排序" }));
     expect(screen.getByRole("button", { name: "列配置" })).toBeDisabled();
     expect(resize).toHaveAttribute("aria-disabled", "true");
     fireEvent.keyDown(resize, { key: "ArrowRight" });
-    expect(resize).toHaveAttribute("aria-valuenow", "330");
+    expect(resize).toHaveAttribute("aria-valuenow", "234");
     expect(
       screen.queryByRole("separator", { name: "调整 拖动排序 列宽" }),
     ).not.toBeInTheDocument();
@@ -148,19 +194,21 @@ describe("渠道素材写操作", () => {
     expect(channelService.order).not.toHaveBeenCalled();
     router.dispose();
   });
-  it("列顺序对齐网页，文章编号和外链通过服务打开", async () => {
+  it("默认聚合新闻内容，额外字段按需显示，链接仍通过服务打开", async () => {
     const router = await setup();
     const headers = within(screen.getByRole("table"))
       .getAllByRole("columnheader")
       .map((e) => e.textContent);
-    expect(headers).toEqual([
-      ...materialColumns.map(([, name]) => name),
-      "操作",
-    ]);
-    await userEvent.click(screen.getByRole("link", { name: "101" }));
+    expect(headers).toEqual(["位置", "新闻内容", "主图", "第二张图片", "操作"]);
+    await userEvent.click(screen.getByRole("link", { name: "文章 101" }));
     expect(channelService.openLink).toHaveBeenCalledWith(
       "https://mini.jnnc.com/h/101.html?zn=mr",
     );
+    await userEvent.click(screen.getByRole("button", { name: "列配置" }));
+    await userEvent.click(
+      screen.getByRole("menuitemcheckbox", { name: "文章链接" }),
+    );
+    await userEvent.keyboard("{Escape}");
     await userEvent.click(
       screen.getAllByRole("link", { name: "https://example.com/news" })[0],
     );
@@ -202,7 +250,7 @@ describe("渠道素材写操作", () => {
     await userEvent.click(screen.getByRole("button", { name: "开始排序" }));
     expect(screen.getByRole("combobox", { name: "渠道" })).toBeDisabled();
     expect(screen.getByLabelText("每页条数")).toBeDisabled();
-    expect(screen.getByRole("button", { name: "新增" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "新增素材" })).toBeDisabled();
     const transfer = {
       setData: vi.fn(),
       setDragImage: vi.fn(),
@@ -231,7 +279,7 @@ describe("渠道素材写操作", () => {
     expect(channelService.order).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: "列配置" })).toBeDisabled();
     expect(
-      screen.getByRole("separator", { name: "调整 标题 列宽" }),
+      screen.getByRole("separator", { name: "调整 新闻内容 列宽" }),
     ).toHaveAttribute("aria-disabled", "true");
     expect(channelService.order).toHaveBeenCalledWith(
       {
@@ -309,32 +357,39 @@ describe("渠道素材写操作", () => {
   });
   it("新增独立初始化、必填校验、保存防重复及失败保留", async () => {
     const router = await setup();
-    await userEvent.click(screen.getByRole("button", { name: "新增" }));
-    await userEvent.click(screen.getByRole("button", { name: "保存素材" }));
+    await userEvent.click(screen.getByRole("button", { name: "新增素材" }));
+    const drawer = screen.getByRole("dialog", { name: "新增素材" });
+    expect(drawer).toHaveAttribute("data-channel-sheet");
+    expect(
+      [...drawer.querySelectorAll("legend")].map((node) => node.textContent),
+    ).toEqual(["标题与摘要", "配图", "目标渠道", "来源信息"]);
+    await userEvent.click(screen.getByRole("button", { name: "保存渠道素材" }));
     expect(channelService.create).not.toHaveBeenCalled();
-    await userEvent.type(screen.getByLabelText("* Channel"), "2345");
+    await chooseOption(screen.getByLabelText("* 渠道"), "KOOK");
     await userEvent.type(
-      screen.getByLabelText("* Title", { exact: true }),
+      screen.getByLabelText("* 标题", { exact: true }),
       "新标题",
     );
     await userEvent.type(
-      screen.getByLabelText("* TitlePic", { exact: true }),
+      screen.getByLabelText("* 主图地址", { exact: true }),
       "https://img.example/a.jpg",
     );
     const pending = deferred<{ succeeded: true }>();
     vi.mocked(channelService.create).mockReturnValueOnce(pending.promise);
-    await userEvent.dblClick(screen.getByRole("button", { name: "保存素材" }));
+    await userEvent.dblClick(
+      screen.getByRole("button", { name: "保存渠道素材" }),
+    );
     expect(channelService.create).toHaveBeenCalledTimes(1);
     await act(async () => pending.reject(new Error("结果未确认，请刷新核对")));
     expect(await screen.findByRole("alert")).toHaveTextContent("结果未确认");
-    expect(screen.getByLabelText("* Title", { exact: true })).toHaveValue(
+    expect(screen.getByLabelText("* 标题", { exact: true })).toHaveValue(
       "新标题",
     );
     await userEvent.click(screen.getByRole("button", { name: "取消" }));
     await userEvent.click(screen.getByRole("button", { name: "放弃修改" }));
-    await userEvent.click(screen.getByRole("button", { name: "新增" }));
-    expect(screen.getByLabelText("* Channel")).toHaveValue("");
-    expect(screen.getByLabelText("* Title", { exact: true })).toHaveValue("");
+    await userEvent.click(screen.getByRole("button", { name: "新增素材" }));
+    expect(screen.getByLabelText("* 渠道")).toHaveTextContent("选择渠道");
+    expect(screen.getByLabelText("* 标题", { exact: true })).toHaveValue("");
     router.dispose();
   });
   it("修改先获取详情，只覆盖表单字段，成功后刷新同一页", async () => {
@@ -347,12 +402,12 @@ describe("渠道素材写操作", () => {
     const router = await setup();
     await userEvent.click(screen.getByLabelText("编辑素材 1"));
     await screen.findByRole("dialog", { name: "修改素材" });
-    await userEvent.clear(screen.getByLabelText("* Title", { exact: true }));
+    await userEvent.clear(screen.getByLabelText("* 标题", { exact: true }));
     await userEvent.type(
-      screen.getByLabelText("* Title", { exact: true }),
+      screen.getByLabelText("* 标题", { exact: true }),
       "修改后标题",
     );
-    await userEvent.click(screen.getByRole("button", { name: "保存素材" }));
+    await userEvent.click(screen.getByRole("button", { name: "保存渠道素材" }));
     await waitFor(() =>
       expect(channelService.update).toHaveBeenCalledWith({
         ...base,
@@ -366,21 +421,21 @@ describe("渠道素材写操作", () => {
   });
   it("上传成功只回填对应地址，保存成功但刷新失败分别提示", async () => {
     const router = await setup();
-    await userEvent.click(screen.getByRole("button", { name: "新增" }));
-    await userEvent.type(screen.getByLabelText("* Channel"), "2345");
+    await userEvent.click(screen.getByRole("button", { name: "新增素材" }));
+    await chooseOption(screen.getByLabelText("* 渠道"), "KOOK");
     await userEvent.type(
-      screen.getByLabelText("* Title", { exact: true }),
+      screen.getByLabelText("* 标题", { exact: true }),
       "上传测试",
     );
     await userEvent.type(
-      screen.getByLabelText("* TitlePic", { exact: true }),
+      screen.getByLabelText("* 主图地址", { exact: true }),
       "https://img.example/main.png",
     );
     vi.mocked(channelService.upload).mockResolvedValueOnce({
       url: "https://img.example/second.png",
     });
     await userEvent.upload(
-      screen.getByLabelText("上传 TitlePic2", { exact: true }),
+      screen.getByLabelText("上传 第二张图片地址", { exact: true }),
       new File(["image"], "second.png", { type: "image/png" }),
     );
     await userEvent.click(
@@ -388,18 +443,18 @@ describe("渠道素材写操作", () => {
     );
     await userEvent.click(screen.getByRole("button", { name: "确认结果" }));
     await waitFor(() =>
-      expect(screen.getByRole("textbox", { name: "TitlePic2" })).toHaveValue(
-        "https://img.example/second.png",
-      ),
+      expect(
+        screen.getByRole("textbox", { name: "第二张图片地址" }),
+      ).toHaveValue("https://img.example/second.png"),
     );
-    expect(screen.getByLabelText("* TitlePic", { exact: true })).toHaveValue(
+    expect(screen.getByLabelText("* 主图地址", { exact: true })).toHaveValue(
       "https://img.example/main.png",
     );
     expect(channelService.create).not.toHaveBeenCalled();
     vi.mocked(channelService.list).mockRejectedValueOnce(
       new Error("刷新网络失败"),
     );
-    await userEvent.click(screen.getByRole("button", { name: "保存素材" }));
+    await userEvent.click(screen.getByRole("button", { name: "保存渠道素材" }));
     expect((await screen.findAllByText("素材已保存")).length).toBeGreaterThan(
       0,
     );
@@ -411,13 +466,15 @@ describe("渠道素材写操作", () => {
   });
   it("删除取消无请求，删除末页后回退并更新记忆", async () => {
     const router = await setup();
-    await userEvent.click(screen.getByLabelText("删除素材 1"));
+    await userEvent.click(screen.getByLabelText("更多操作 素材 1"));
+    await userEvent.click(screen.getByRole("menuitem", { name: "删除素材" }));
     await userEvent.click(screen.getByRole("button", { name: "取消" }));
     expect(channelService.remove).not.toHaveBeenCalled();
     vi.mocked(channelService.list).mockImplementation(async (q) =>
       materialPage(q.current === 2 ? 0 : 2, q.current, q.pagesize),
     );
-    await userEvent.click(screen.getByLabelText("删除素材 1"));
+    await userEvent.click(screen.getByLabelText("更多操作 素材 1"));
+    await userEvent.click(screen.getByRole("menuitem", { name: "删除素材" }));
     await userEvent.click(screen.getByRole("button", { name: "确认删除" }));
     await waitFor(() =>
       expect(
@@ -429,13 +486,13 @@ describe("渠道素材写操作", () => {
   });
   it("上传失败可重试，等待期间不能保存，取消后旧上传不回填", async () => {
     const router = await setup();
-    await userEvent.click(screen.getByRole("button", { name: "新增" }));
+    await userEvent.click(screen.getByRole("button", { name: "新增素材" }));
     const file = new File(["image"], "test.png", { type: "image/png" });
     vi.mocked(channelService.upload).mockRejectedValueOnce(
       new Error("上传失败"),
     );
     await userEvent.upload(
-      screen.getByLabelText("上传 TitlePic", { exact: true }),
+      screen.getByLabelText("上传 主图地址", { exact: true }),
       file,
     );
     await userEvent.click(
@@ -447,7 +504,7 @@ describe("渠道素材写操作", () => {
     const pending = deferred<{ url: string }>();
     vi.mocked(channelService.upload).mockReturnValueOnce(pending.promise);
     await userEvent.upload(
-      screen.getByLabelText("上传 TitlePic", { exact: true }),
+      screen.getByLabelText("上传 主图地址", { exact: true }),
       file,
     );
     await userEvent.click(
@@ -455,16 +512,16 @@ describe("渠道素材写操作", () => {
     );
     await userEvent.click(screen.getByRole("button", { name: "确认结果" }));
     expect(
-      screen.getByRole("button", { name: "保存素材", hidden: true }),
+      screen.getByRole("button", { name: "保存渠道素材", hidden: true }),
     ).toBeDisabled();
     await userEvent.click(screen.getByRole("button", { name: "取消回填" }));
-    expect(screen.getByRole("button", { name: "保存素材" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "保存渠道素材" })).toBeEnabled();
     await userEvent.click(screen.getByRole("button", { name: "取消" }));
-    await userEvent.click(screen.getByRole("button", { name: "新增" }));
+    await userEvent.click(screen.getByRole("button", { name: "新增素材" }));
     await act(async () =>
       pending.resolve({ url: "https://img.example/late.png" }),
     );
-    expect(screen.getByLabelText("* TitlePic", { exact: true })).toHaveValue(
+    expect(screen.getByLabelText("* 主图地址", { exact: true })).toHaveValue(
       "",
     );
     expect(channelService.create).not.toHaveBeenCalled();
@@ -480,7 +537,7 @@ describe("渠道素材写操作", () => {
       input: { ...recordInput(base), title: "未保存标题" },
     });
     const router = await setup();
-    expect(screen.getByLabelText("* Title", { exact: true })).toHaveValue(
+    expect(screen.getByLabelText("* 标题", { exact: true })).toHaveValue(
       "未保存标题",
     );
     await act(async () => {

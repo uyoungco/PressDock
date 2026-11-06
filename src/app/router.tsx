@@ -36,8 +36,9 @@ function Workspace() {
     <Layout
       contentScroll={
         pathname === "/channels" ||
+        pathname === "/import" ||
         pathname.startsWith("/articles") ||
-        (isAndroid() && ["/import", "/settings"].includes(pathname))
+        pathname === "/settings"
           ? "contained"
           : "page"
       }

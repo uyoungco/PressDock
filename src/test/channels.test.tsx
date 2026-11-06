@@ -247,7 +247,7 @@ describe("渠道素材筛选、分页和详情", () => {
   it("详情显示摘要、空值和图片占位，正文按纯文本渲染", async () => {
     const router = setup();
     await screen.findByText("渠道新闻 1");
-    await userEvent.click(screen.getByRole("button", { name: "查看素材 1" }));
+    await userEvent.click(screen.getByRole("button", { name: "渠道新闻 1" }));
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
     expect(
       within(screen.getByRole("dialog")).getByText(
@@ -280,7 +280,7 @@ describe("渠道素材筛选、分页和详情", () => {
     });
   });
 
-  it("标题下显示双图和实际元信息，点击图片打开共用详情", async () => {
+  it("双图以紧凑元信息显示，点击图片打开共用详情", async () => {
     vi.mocked(promoteImages.acquire).mockImplementation(async (url) => ({
       src: `blob:${url}`,
       width: 281,
@@ -300,8 +300,7 @@ describe("渠道素材筛选、分页和详情", () => {
       ],
     });
     const router = setup();
-    expect(await screen.findAllByText("281 × 125 px")).toHaveLength(2);
-    expect(screen.getAllByText("38.2 KB")).toHaveLength(2);
+    expect(await screen.findAllByText("281×125 · 38.2 KB")).toHaveLength(2);
     expect(screen.getAllByRole("img")).toHaveLength(2);
     await userEvent.click(screen.getByRole("button", { name: "预览主图" }));
     expect(await screen.findByRole("dialog")).toBeInTheDocument();

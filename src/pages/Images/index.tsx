@@ -33,14 +33,18 @@ export default function Images() {
   }
   return (
     <>
-      {(!isAndroid() || !file) && (
+      {!isAndroid() && (
         <PageHeader
           demo={false}
           title="图片处理"
           description="裁剪取景、控制文件体积，转换为 JPG、PNG 或 WebP。"
         />
       )}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
+      <div
+        data-slot="image-picker"
+        data-loaded={!!file}
+        className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4"
+      >
         <div className="flex items-center gap-3">
           <ImagePlus className="size-5 text-muted-foreground" />
           <div>
@@ -113,7 +117,14 @@ export default function Images() {
           )}
         </div>
       ) : (
-        <div className="flex min-h-96 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-8 text-center">
+        <div
+          data-slot="image-empty"
+          className={
+            isAndroid()
+              ? "flex min-h-40 flex-1 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-6 text-center"
+              : "flex min-h-96 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-8 text-center"
+          }
+        >
           <ImagePlus className="mb-4 size-12 stroke-1 text-muted-foreground" />
           <h2 className="text-base font-medium">选择一张图片开始处理</h2>
           <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">

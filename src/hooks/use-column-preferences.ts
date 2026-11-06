@@ -17,6 +17,7 @@ export interface PreferenceColumn {
   minSize: number;
   maxSize: number;
   enableHiding?: boolean;
+  defaultVisible?: boolean;
 }
 export interface ColumnPreferences {
   version: 1;
@@ -101,6 +102,13 @@ export function useColumnPreferences(
   return {
     columns,
     preferences,
+    visibility: Object.fromEntries(
+      columns.map((column) => [
+        column.id,
+        column.enableHiding === false ||
+          (preferences.visibility[column.id] ?? column.defaultVisible ?? true),
+      ]),
+    ),
     setVisibility(updater: Updater<Record<string, boolean>>) {
       setPreferences((previous) =>
         normalizeColumnPreferences(

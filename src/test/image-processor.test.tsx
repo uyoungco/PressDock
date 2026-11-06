@@ -44,7 +44,10 @@ beforeEach(() => {
     lossy: true,
   });
 });
-async function editor(preset: ImageProcessorPreset = {}) {
+async function editor(
+  preset: ImageProcessorPreset = {},
+  presentation: "default" | "dialog" = "default",
+) {
   const onConfirm = vi.fn(),
     onCancel = vi.fn();
   const view = render(
@@ -53,6 +56,7 @@ async function editor(preset: ImageProcessorPreset = {}) {
       preset={preset}
       onConfirm={onConfirm}
       onCancel={onCancel}
+      presentation={presentation}
     />,
   );
   await screen.findByRole("region", { name: "图片处理组件" });
@@ -92,6 +96,126 @@ it("逐项锁定预设，重置保留锁定且裁剪框仍可调整", async () =
     expect.anything(),
     expect.any(AbortSignal),
   );
+});
+
+it.each(Array.from({ length: 8 }, (_, mask) => mask))(
+  "桌面弹框按项切换只读与可编辑控件（锁定组合 %s）",
+  async (mask) => {
+    const preset: ImageProcessorPreset = {
+      ...(mask & 1 ? { format: "jpeg" as const } : {}),
+      ...(mask & 2 ? { size: { width: 560, height: 248 } } : {}),
+      ...(mask & 4 ? { maxBytes: 79 * 1024 } : {}),
+    };
+    await editor(preset, "dialog");
+    if (preset.format)
+      expect(screen.getByLabelText("图片格式")).toHaveTextContent("JPG / JPEG");
+    else
+      expect(screen.getByRole("combobox", { name: "图片格式" })).toBeEnabled();
+    if (preset.size) {
+      expect(screen.getByLabelText("输出尺寸")).toHaveTextContent(
+        "560 × 248 px",
+      );
+      expect(
+        screen.queryByRole("spinbutton", { name: "宽度 / px" }),
+      ).not.toBeInTheDocument();
+    } else
+      expect(
+        screen.getByRole("checkbox", { name: "指定输出宽高" }),
+      ).toBeEnabled();
+    if (preset.maxBytes !== undefined)
+      expect(screen.getByLabelText("体积上限")).toHaveTextContent("79 KiB");
+    else
+      expect(
+        screen.getByRole("spinbutton", { name: "文件体积上限" }),
+      ).toBeEnabled();
+  },
+);
+
+it("桌面弹框自由调整格式、尺寸和体积，修改后旧预览失效", async () => {
+  await editor({}, "dialog");
+  await chooseOption(screen.getByLabelText("图片格式"), "WebP");
+  fireEvent.click(screen.getByLabelText("指定输出宽高"));
+  fireEvent.change(screen.getByLabelText("宽度 / px"), {
+    target: { value: "560" },
+  });
+  fireEvent.change(screen.getByLabelText("高度 / px"), {
+    target: { value: "248" },
+  });
+  fireEvent.change(screen.getByLabelText("文件体积上限"), {
+    target: { value: "79" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "处理预览" }));
+  await screen.findByAltText("实际编码后的图片");
+  expect(imageService.process).toHaveBeenLastCalledWith(
+    file,
+    expect.objectContaining({
+      format: "webp",
+      size: { width: 560, height: 248 },
+      maxBytes: 79 * 1024,
+    }),
+    {},
+    expect.any(AbortSignal),
+  );
+  fireEvent.click(screen.getByLabelText("指定输出宽高"));
+  fireEvent.click(screen.getByLabelText("启用裁剪"));
+  fireEvent.change(screen.getByLabelText("文件体积上限"), {
+    target: { value: "" },
+  });
+  expect(screen.getByRole("button", { name: "确认结果" })).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "处理预览" }));
+  await waitFor(() =>
+    expect(imageService.process).toHaveBeenLastCalledWith(
+      file,
+      expect.objectContaining({
+        size: undefined,
+        maxBytes: undefined,
+        crop: { x: 0, y: 0, width: 1, height: 1 },
+      }),
+      {},
+      expect.any(AbortSignal),
+    ),
+  );
+});
+
+it("桌面画布平移不改变裁剪提交参数；适应窗口后重新居中", async () => {
+  await editor({ size: { width: 560, height: 248 } }, "dialog");
+  const canvas = screen.getByRole("region", { name: "图片裁剪工作区" });
+  fireEvent.click(screen.getByRole("button", { name: "100%" }));
+  fireEvent.keyDown(canvas, { key: "ArrowRight" });
+  expect(canvas.firstElementChild).toHaveStyle({
+    transform: "translate(calc(-50% + -24px), calc(-50% + 0px))",
+  });
+  fireEvent.click(screen.getByRole("button", { name: "适应窗口" }));
+  expect(canvas.firstElementChild).toHaveStyle({
+    transform: "translate(calc(-50% + 0px), calc(-50% + 0px))",
+  });
+  fireEvent.click(screen.getByRole("button", { name: "处理预览" }));
+  await waitFor(() =>
+    expect(imageService.process).toHaveBeenCalledWith(
+      file,
+      expect.objectContaining({
+        crop: {
+          x: 0,
+          y: expect.closeTo((1 - 1200 / (560 / 248) / 800) / 2),
+          width: 1,
+          height: expect.closeTo(1200 / (560 / 248) / 800),
+        },
+      }),
+      expect.anything(),
+      expect.any(AbortSignal),
+    ),
+  );
+});
+
+it("桌面错误状态保留全部错误详情且允许重试", async () => {
+  const message = "编码失败：" + "具体失败原因。".repeat(50);
+  vi.mocked(imageService.process).mockRejectedValueOnce(new Error(message));
+  await editor({}, "dialog");
+  fireEvent.click(screen.getByRole("button", { name: "处理预览" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent(message);
+  fireEvent.click(screen.getByRole("button", { name: "查看完整错误" }));
+  const details = await screen.findByRole("dialog", { name: "图片操作失败" });
+  expect(details).toHaveTextContent(message);
 });
 
 it("未指定尺寸时默认不裁剪，缩放查看不改变提交参数", async () => {

@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import {
+  RefreshCw,
+  SlidersHorizontal,
+  Plus,
+  MoreHorizontal,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -44,14 +56,17 @@ export function MobileChannelView({
     c.setDraft(c.applied);
   };
   return (
-    <section className="flex min-h-0 flex-1 flex-col" aria-label="渠道素材管理">
+    <section
+      className="flex min-h-0 flex-1 flex-col [&_[data-slot=button]]:min-h-11!"
+      aria-label="渠道素材管理"
+    >
       <div
         data-slot="mobile-channel-toolbar"
         className="flex shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2"
       >
         {c.actions.hasRetainedDraft && (
           <Button
-            className="h-9 w-full"
+            className="h-11 w-full"
             variant="secondary"
             onClick={c.actions.resumeDraft}
           >
@@ -78,12 +93,14 @@ export function MobileChannelView({
         ) : (
           <>
             <Button
+              variant="outline"
               disabled={c.locked}
               onClick={() => {
                 c.setDraft(c.applied);
                 setFilterOpen(true);
               }}
             >
+              <SlidersHorizontal data-icon="inline-start" />
               筛选{" "}
               {[
                 c.applied.channel,
@@ -92,14 +109,19 @@ export function MobileChannelView({
               ].filter(Boolean).length || ""}
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
+              size="icon"
+              aria-label="刷新素材列表"
               disabled={c.locked || c.list.isFetching}
               onClick={c.refresh}
             >
-              {c.list.isFetching ? "刷新中…" : "刷新"}
+              <RefreshCw
+                data-icon="inline-start"
+                className={c.list.isFetching ? "animate-spin" : undefined}
+              />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               title={c.sortReason || undefined}
               aria-describedby={c.sortReason ? "mobile-sort-reason" : undefined}
               disabled={c.actions.busy || !!c.sortReason}
@@ -117,6 +139,7 @@ export function MobileChannelView({
               disabled={c.locked}
               onClick={c.actions.create}
             >
+              <Plus data-icon="inline-start" />
               新增
             </Button>
           </>
@@ -126,20 +149,12 @@ export function MobileChannelView({
         ) && (
           <div
             data-slot="mobile-channel-conditions"
-            className="flex w-full flex-wrap gap-1"
+            className="mobile-condition-summary w-full truncate"
             aria-label="已应用条件"
           >
             {[c.applied.channel, c.applied.subchannel, c.applied.publishdate]
               .filter(Boolean)
-              .map((v) => (
-                <Badge
-                  key={v}
-                  variant="secondary"
-                  className="max-w-full whitespace-normal break-words"
-                >
-                  {v}
-                </Badge>
-              ))}
+              .join(" · ")}
           </div>
         )}
       </div>
@@ -180,10 +195,11 @@ export function MobileChannelView({
               data-material-id={row.id}
               data-slot="mobile-channel-item"
               className="flex flex-col gap-3 p-3"
+              data-selected={c.selected?.id === row.id || undefined}
             >
               <button
                 type="button"
-                className="min-h-9 text-left font-medium leading-relaxed"
+                className="min-h-11! text-left font-medium leading-relaxed"
                 onClick={() => c.setSelected(row)}
                 disabled={c.locked}
               >
@@ -191,7 +207,7 @@ export function MobileChannelView({
               </button>
               <div
                 data-slot="mobile-material-images"
-                className="flex flex-wrap gap-2"
+                className="flex flex-wrap gap-2 [&_[data-slot=material-image]>div:first-child:has(button)]:h-auto! [&_[data-slot=material-image]>div:first-child:has(button)]:min-h-20"
               >
                 <MaterialImage
                   compact
@@ -223,7 +239,7 @@ export function MobileChannelView({
                   <>
                     <span>第 {i + 1} 位</span>
                     <Button
-                      className="h-9"
+                      className="h-11"
                       variant="outline"
                       disabled={c.actions.busy || i === 0}
                       onClick={() => c.actions.move(row.id, rows[i - 1].id)}
@@ -231,7 +247,7 @@ export function MobileChannelView({
                       上移
                     </Button>
                     <Button
-                      className="h-9"
+                      className="h-11"
                       variant="outline"
                       disabled={c.actions.busy || i === rows.length - 1}
                       onClick={() => c.actions.move(row.id, rows[i + 1].id)}
@@ -242,21 +258,35 @@ export function MobileChannelView({
                 ) : (
                   <>
                     <Button
-                      className="h-9"
-                      variant="outline"
+                      className="h-11"
+                      variant="ghost"
                       disabled={c.locked}
                       onClick={() => void c.actions.beginEdit(row)}
                     >
                       编辑
                     </Button>
-                    <Button
-                      className="h-9"
-                      variant="ghost"
-                      disabled={c.locked}
-                      onClick={() => c.actions.requestDelete(row)}
-                    >
-                      删除
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`素材 ${row.id} 更多操作`}
+                          disabled={c.locked}
+                        >
+                          <MoreHorizontal />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={() => c.actions.requestDelete(row)}
+                          >
+                            删除素材
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </>
                 )}
               </div>
@@ -266,14 +296,14 @@ export function MobileChannelView({
       </div>
       <div
         data-slot="mobile-pagination"
-        className="flex shrink-0 items-center justify-between gap-2 border-t px-3 py-1.5"
+        className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-3 py-2"
         aria-label="素材分页"
       >
-        <label className="flex items-center gap-1 text-xs">
+        <label className="flex min-w-0 flex-wrap items-center gap-2 text-xs">
           第 {c.applied.current} 页
           <select
             aria-label="每页条数"
-            className="h-8 rounded-md border bg-background px-1"
+            className="h-11! min-h-11! min-w-0 max-w-full rounded-md border bg-background px-1"
             value={c.applied.pagesize}
             disabled={c.locked}
             onChange={(e) =>
@@ -291,10 +321,10 @@ export function MobileChannelView({
             ))}
           </select>
         </label>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <Button
             size="sm"
-            className="h-8"
+            className="h-11"
             variant="outline"
             disabled={c.locked || c.loading || c.applied.current <= 1}
             onClick={() =>
@@ -305,7 +335,7 @@ export function MobileChannelView({
           </Button>
           <Button
             size="sm"
-            className="h-8"
+            className="h-11"
             variant="outline"
             disabled={
               c.locked || c.loading || !!c.error || !c.matchingResult || c.end
@@ -327,7 +357,7 @@ export function MobileChannelView({
         <SheetContent
           side="bottom"
           data-mobile-fullscreen
-          className="flex max-h-[90dvh] flex-col overflow-hidden rounded-t-xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+          className="flex max-h-[90dvh] flex-col overflow-hidden rounded-t-xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))] [&_button]:min-h-11! [&_input]:min-h-11! [&_[data-slot=sheet-close]]:min-w-11!"
           onEscapeKeyDown={(e) => {
             if (selection) {
               e.preventDefault();
@@ -337,7 +367,7 @@ export function MobileChannelView({
           }}
         >
           {/* 标题和底部操作固定，选项及表单仅在中间区域滚动。 */}
-          <div className="flex shrink-0 flex-col gap-2 pr-8">
+          <div className="flex shrink-0 flex-col gap-2 pr-12">
             <SheetTitle>
               {selection
                 ? `选择${selection === "channel" ? "渠道" : "子渠道"}`
@@ -351,7 +381,7 @@ export function MobileChannelView({
             <>
               <Button
                 variant="outline"
-                className="h-9"
+                className="h-11"
                 onClick={() => {
                   setSelection(null);
                   setSearch("");
@@ -362,7 +392,7 @@ export function MobileChannelView({
               <Input
                 aria-label="搜索选项"
                 placeholder={`搜索${selection === "channel" ? "渠道" : "子渠道"}名称`}
-                className="h-10 shrink-0"
+                className="h-11 shrink-0"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -379,7 +409,7 @@ export function MobileChannelView({
                     variant={
                       c.draft[selection] === value ? "secondary" : "ghost"
                     }
-                    className="h-auto min-h-10 justify-start whitespace-normal text-left"
+                    className="h-auto min-h-11 justify-start whitespace-normal text-left"
                     onClick={() => {
                       c.setDraft({
                         ...c.draft,
@@ -403,7 +433,7 @@ export function MobileChannelView({
                   <Field>
                     <FieldLabel>渠道</FieldLabel>
                     <Button
-                      className="h-auto min-h-10 justify-start whitespace-normal text-left"
+                      className="h-auto min-h-11 justify-start whitespace-normal text-left"
                       variant="outline"
                       disabled={c.groupsLoading || !!c.groupsError}
                       onClick={() => setSelection("channel")}
@@ -414,7 +444,7 @@ export function MobileChannelView({
                   <Field>
                     <FieldLabel>子渠道</FieldLabel>
                     <Button
-                      className="h-auto min-h-10 justify-start whitespace-normal text-left"
+                      className="h-auto min-h-11 justify-start whitespace-normal text-left"
                       variant="outline"
                       disabled={
                         !c.draft.channel || c.groupsLoading || !!c.groupsError
@@ -431,7 +461,7 @@ export function MobileChannelView({
                     <Input
                       id="mobile-publish-date"
                       type="date"
-                      className="h-10"
+                      className="h-11"
                       value={c.draft.publishdate}
                       onChange={(e) =>
                         c.setDraft({ ...c.draft, publishdate: e.target.value })
@@ -443,7 +473,7 @@ export function MobileChannelView({
               <div className="flex shrink-0 gap-2 border-t pt-3">
                 <Button
                   variant="outline"
-                  className="h-10 flex-1"
+                  className="h-11 flex-1"
                   onClick={() =>
                     c.setDraft({
                       ...c.applied,
@@ -457,7 +487,7 @@ export function MobileChannelView({
                   清空
                 </Button>
                 <Button
-                  className="h-10 flex-1"
+                  className="h-11 flex-1"
                   onClick={() => {
                     c.submit({ ...c.draft, current: 1 });
                     setFilterOpen(false);

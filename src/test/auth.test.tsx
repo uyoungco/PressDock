@@ -255,9 +255,11 @@ describe("登录和工作区认证", () => {
     vi.mocked(cmsIpc.channels).mockResolvedValue([]);
     vi.mocked(cmsIpc.list).mockResolvedValue(materialPage());
     const router = renderRoute("/channels?current=1&pagesize=30");
-    await userEvent.click(await screen.findByRole("button", { name: "新增" }));
+    await userEvent.click(
+      await screen.findByRole("button", { name: "新增素材" }),
+    );
     await userEvent.type(
-      screen.getByLabelText("* Title", { exact: true }),
+      screen.getByLabelText("* 标题", { exact: true }),
       "内存中的素材表单",
     );
     vi.mocked(invoke).mockRejectedValueOnce({
@@ -273,9 +275,9 @@ describe("登录和工作区认证", () => {
       screen.getByLabelText("密码", { exact: true }),
       "secret{Enter}",
     );
-    expect(
-      await screen.findByLabelText("* Title", { exact: true }),
-    ).toHaveValue("内存中的素材表单");
+    expect(await screen.findByLabelText("* 标题", { exact: true })).toHaveValue(
+      "内存中的素材表单",
+    );
     await act(async () => {
       await authService.logout();
     });

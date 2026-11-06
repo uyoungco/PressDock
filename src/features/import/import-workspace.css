@@ -1,0 +1,162 @@
+/* 素材导入页的局部校样色，不改变全局主题或 Android 入口。 */
+.import-workspace {
+  --primary: #3658cf;
+  --primary-foreground: #fff;
+  --ring: #3658cf;
+  --import-warning: #8c5e15;
+  --import-positive: #27744d;
+  font-size: 13px;
+}
+.dark .import-workspace {
+  --primary: #9ab8ff;
+  --primary-foreground: #17213a;
+  --ring: #9ab8ff;
+  --import-warning: #d9b26e;
+  --import-positive: #76cba0;
+}
+.import-workspace [data-slot="button"] {
+  transition-property: color, background-color, border-color, box-shadow;
+}
+.import-composer-field {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+}
+.import-composer-help {
+  grid-column: 2 / -1;
+}
+.import-toolbar {
+  min-height: 48px;
+}
+.import-attention-count {
+  color: var(--import-warning);
+}
+.import-workspace [data-slot="data-table"] table {
+  font-size: 13px;
+  line-height: 20px;
+}
+.import-workspace [data-slot="data-table"] th {
+  height: 32px;
+  padding: 4px 16px;
+  font-weight: 400;
+}
+.import-workspace [data-slot="data-table"] td {
+  height: 60px;
+  padding: 8px 16px;
+}
+.import-workspace [data-slot="data-table"] th:last-child {
+  text-align: right;
+}
+.import-title:hover {
+  color: var(--primary);
+}
+.import-status {
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.import-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+.import-status-note {
+  margin-inline-start: 12px;
+  line-height: 16px;
+  overflow-wrap: anywhere;
+}
+.import-workspace [data-import-status="running"] .import-status {
+  color: var(--primary);
+}
+.import-workspace
+  :is(
+    [data-import-status="waitingUser"],
+    [data-import-status="waitingLogin"],
+    [data-import-status="submissionUnknown"]
+  )
+  .import-status {
+  color: var(--import-warning);
+}
+.import-workspace
+  :is([data-import-status="failed"], [data-import-status="interrupted"])
+  .import-status {
+  color: var(--destructive);
+}
+.import-workspace [data-import-status="succeeded"] .import-status {
+  color: var(--import-positive);
+}
+.import-workspace
+  :is(
+    [data-import-status="queued"],
+    [data-import-status="cancelled"],
+    [data-import-status="debugCompleted"]
+  )
+  .import-status {
+  color: var(--muted-foreground);
+}
+.import-workspace tr[data-needs-attention="true"] td:first-child,
+.import-cards [data-needs-attention="true"] {
+  box-shadow: inset 3px 0
+    color-mix(in srgb, var(--import-warning) 65%, transparent);
+}
+.import-workspace tr[data-job-status="failed"] td:first-child,
+.import-cards [data-job-status="failed"] {
+  box-shadow: inset 3px 0
+    color-mix(in srgb, var(--destructive) 65%, transparent);
+}
+.import-actions [data-slot="button"] {
+  min-height: 28px;
+}
+.import-workspace[data-import-layout="cards"] .import-composer-field {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.import-workspace[data-import-layout="cards"] .import-composer-field > label,
+.import-workspace[data-import-layout="cards"] .import-composer-help {
+  grid-column: 1 / -1;
+}
+.import-workspace[data-import-layout="cards"] .import-composer {
+  padding: 12px;
+}
+.import-workspace[data-import-layout="cards"]
+  .import-composer
+  :is(input, button) {
+  height: 44px;
+}
+.import-workspace[data-import-layout="cards"] .import-toolbar {
+  padding: 12px;
+}
+.import-workspace[data-import-layout="cards"] .import-tools {
+  flex: 1 0 100%;
+}
+.import-workspace[data-import-layout="cards"] .import-tools input {
+  min-width: 0;
+  flex: 1;
+  height: 40px;
+}
+.import-workspace[data-import-layout="cards"] .import-tools button {
+  width: 40px;
+  height: 40px;
+}
+.import-workspace[data-import-layout="cards"] .import-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.import-workspace[data-import-layout="cards"] .import-actions {
+  justify-content: flex-start;
+}
+.import-workspace[data-import-layout="cards"] .import-actions button {
+  min-height: 40px;
+}
+.import-workspace[data-import-layout="cards"]
+  .import-actions
+  button[aria-haspopup="menu"] {
+  min-width: 40px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .import-workspace [data-slot="button"] {
+    transition: none;
+  }
+}

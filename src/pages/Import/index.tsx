@@ -9,27 +9,26 @@ import {
 } from "react";
 import {
   Download,
-  Link2,
   LoaderCircle,
   RefreshCw,
   Settings2,
+  MoreHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FlexRender } from "@tanstack/react-table";
 import { isAndroid } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/common/PageHeader";
 import { LoadState } from "@/components/common/LoadState";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import {
   Field,
@@ -40,7 +39,6 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
-import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
   DialogContent,
@@ -49,10 +47,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useDataTable } from "@/hooks/use-data-table";
-import {
-  useColumnPreferences,
-  type PreferenceColumn,
-} from "@/hooks/use-column-preferences";
+import { useColumnPreferences } from "@/hooks/use-column-preferences";
 import { useAtom, useAtomValue } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
@@ -73,33 +68,15 @@ import {
   type HarvestAction,
 } from "@/features/import/contracts";
 import { importUrlSchema } from "@/types/article";
+import { importColumns as columnPreferences } from "@/features/import/table-model";
+import {
+  ImportTitle,
+  ImportStatus,
+  ImportActions,
+} from "@/features/import/ImportRecord";
+import { DesktopImportWorkspace } from "@/features/import/DesktopImportWorkspace";
+import { useImportLayout } from "@/features/import/use-import-layout";
 
-const columnPreferences: PreferenceColumn[] = [
-  {
-    id: "title",
-    label: "标题",
-    size: 600,
-    minSize: 240,
-    maxSize: 1400,
-    enableHiding: false,
-  },
-  {
-    id: "status",
-    label: "状态",
-    size: 340,
-    minSize: 240,
-    maxSize: 640,
-    enableHiding: false,
-  },
-  {
-    id: "actions",
-    label: "操作",
-    size: 280,
-    minSize: 180,
-    maxSize: 640,
-    enableHiding: false,
-  },
-];
 const pinnedEnd = ["actions"];
 const statusVariants: Record<
   HarvestJob["status"],
@@ -122,6 +99,7 @@ const message = (reason: unknown) =>
 
 export default function ImportPage() {
   const android = isAndroid();
+  const { ref: workspaceRef, layout } = useImportLayout(!android);
   const userId = useQueryUser();
   const client = useQueryClient();
   const [desktopUrl, setDesktopUrl] = useState("");
@@ -212,30 +190,49 @@ export default function ImportPage() {
     },
     [client, userId],
   );
-  const columns = useMemo<DataTableColumnDef<HarvestJob>[]>(
-    () => [
+  const columns = useMemo<DataTableColumnDef<HarvestJob>[]>(() => {
+    if (!android)
+      return [
+        {
+          ...columnPreferences[0],
+          header: "新闻内容",
+          meta: { label: "新闻内容" },
+          cell: ({ row: { original: job } }) => <ImportTitle job={job} />,
+        },
+        {
+          ...columnPreferences[1],
+          size: layout === "wide" ? 248 : 208,
+          header: "状态",
+          meta: { label: "状态" },
+          cell: ({ row: { original: job } }) => <ImportStatus job={job} />,
+        },
+        {
+          ...columnPreferences[2],
+          size: layout === "wide" ? 272 : 232,
+          header: "操作",
+          meta: { label: "操作" },
+          cell: ({ row: { original: job } }) => (
+            <ImportActions
+              job={job}
+              disabled={busyId !== null}
+              onAction={act}
+              onSelect={(selected) => {
+                setSelectedTarget(null);
+                setSelectingId(selected.id);
+              }}
+              onConfirm={(selected, action) =>
+                setConfirm({ job: selected, action })
+              }
+            />
+          ),
+        },
+      ];
+    return [
       {
         ...columnPreferences[0],
         header: "标题",
         meta: { label: "标题" },
-        cell: ({ row: { original: job } }) => (
-          <a
-            href={job.url}
-            className={cn(
-              "block text-left font-medium hover:underline",
-              android ? "break-all" : "truncate",
-            )}
-            title={job.title || job.url}
-            onClick={(event) => {
-              event.preventDefault();
-              void importService
-                .openSource(job.url)
-                .catch((reason) => toast.error(message(reason)));
-            }}
-          >
-            {job.title || job.url}
-          </a>
-        ),
+        cell: ({ row: { original: job } }) => <ImportTitle job={job} />,
       },
       {
         ...columnPreferences[1],
@@ -335,14 +332,28 @@ export default function ImportPage() {
               "cancelled",
               "interrupted",
             ].includes(job.status) && (
-              <Button
-                variant="outline"
-                size="xs"
-                disabled={busyId === job.id}
-                onClick={() => setConfirm({ job, action: "delete" })}
-              >
-                删除
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`${job.title || job.url}，更多操作`}
+                    disabled={busyId !== null}
+                  >
+                    <MoreHorizontal />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={() => setConfirm({ job, action: "delete" })}
+                    >
+                      删除记录
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             {job.status === "submissionUnknown" && (
               <>
@@ -371,9 +382,8 @@ export default function ImportPage() {
           </div>
         ),
       },
-    ],
-    [act, busyId, android],
-  );
+    ];
+  }, [act, busyId, android, layout]);
   const table = useDataTable({
     data: jobs,
     columns,
@@ -431,12 +441,15 @@ export default function ImportPage() {
           data-slot="mobile-import"
           className="flex min-h-0 min-w-0 flex-1 flex-col gap-2"
         >
-          <div className="flex shrink-0 items-center justify-between gap-2">
-            <h1 className="text-lg font-semibold">素材导入</h1>
+          <div
+            data-slot="mobile-import-heading"
+            className="flex shrink-0 items-center justify-between gap-2"
+          >
+            <p className="text-sm text-muted-foreground">从来源文章开始</p>
             <Button asChild variant="outline" size="sm">
               <Link to="/settings?tab=harvest&returnTo=import">
                 <Settings2 data-icon="inline-start" />
-                系统设置
+                采集设置
               </Link>
             </Button>
           </div>
@@ -554,8 +567,12 @@ export default function ImportPage() {
               </p>
             )}
             {table.getRowModel().rows.map((row) => (
-              <Card key={row.id} className="shrink-0 gap-0 py-0 shadow-none">
-                <CardContent className="flex min-w-0 flex-col gap-3 p-3">
+              <div
+                key={row.id}
+                data-slot="mobile-import-record"
+                className="shrink-0"
+              >
+                <div className="flex min-w-0 flex-col gap-3 p-3">
                   <article
                     aria-label={row.original.title || row.original.url}
                     className="flex min-w-0 flex-col gap-3"
@@ -566,132 +583,33 @@ export default function ImportPage() {
                       </div>
                     ))}
                   </article>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </section>
       ) : (
         <>
-          <PageHeader
-            title="素材导入"
-            description="提交文章链接，后台采集并处理；调试任务仅保存本地，正常任务添加到 CMS。"
-            demo={false}
+          <DesktopImportWorkspace
+            workspaceRef={workspaceRef}
+            layout={layout}
+            table={table}
+            jobs={jobs}
+            inputRef={input}
+            url={url}
+            onUrlChange={setUrl}
+            onSubmit={submit}
+            busy={busy}
+            inputError={inputError}
+            date={date}
+            onDateChange={setDate}
+            onRefresh={refresh}
+            fetching={list.isFetching}
+            loading={loading}
+            error={error}
+            notificationError={notificationError}
+            maintenanceWarning={maintenanceWarning}
           />
-          <div className="flex flex-col gap-5">
-            <Card className="shadow-none">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Link2 />
-                  通过链接采集
-                </CardTitle>
-                <CardDescription>
-                  支持百家号与
-                  mbd.baidu.com。入队后可继续输入，离开页面任务仍会执行。
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={submit} className="flex flex-col gap-3">
-                  <label htmlFor="article-url" className="text-sm font-medium">
-                    文章链接
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    <Input
-                      ref={input}
-                      id="article-url"
-                      type="url"
-                      value={url}
-                      onChange={(event) => setUrl(event.target.value)}
-                      placeholder="粘贴文章链接，按回车开始采集"
-                      required
-                      disabled={busy}
-                      aria-invalid={!!inputError}
-                      aria-describedby={inputError ? "import-error" : undefined}
-                      className="min-w-60 flex-1"
-                    />
-                    <Button type="submit" disabled={busy}>
-                      {busy ? (
-                        <LoaderCircle
-                          data-icon="inline-start"
-                          className="animate-spin"
-                        />
-                      ) : (
-                        <Download data-icon="inline-start" />
-                      )}
-                      {busy ? "正在入队…" : "开始采集"}
-                    </Button>
-                  </div>
-                  {inputError && (
-                    <p
-                      id="import-error"
-                      role="alert"
-                      className="text-sm text-destructive"
-                    >
-                      {inputError}
-                    </p>
-                  )}
-                </form>
-              </CardContent>
-            </Card>
-            <Card className="min-w-0 shadow-none">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-col gap-1">
-                  <CardTitle>采集记录</CardTitle>
-                  <CardDescription>
-                    默认显示当天。点击标题打开原文，完成后直接添加到 CMS。
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <label htmlFor="harvest-date" className="sr-only">
-                    采集日期
-                  </label>
-                  <Input
-                    id="harvest-date"
-                    type="date"
-                    value={date}
-                    onChange={(event) => {
-                      if (event.target.value) setDate(event.target.value);
-                    }}
-                    className="w-40"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="刷新采集记录"
-                    onClick={refresh}
-                    disabled={list.isFetching}
-                    aria-busy={list.isFetching}
-                  >
-                    <RefreshCw
-                      className={cn(list.isFetching && "animate-spin")}
-                    />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="flex min-w-0 flex-col gap-3">
-                <LoadState loading={loading} error={error} retry={refresh} />
-                {notificationError && (
-                  <p role="alert" className="text-sm text-muted-foreground">
-                    {notificationError}
-                  </p>
-                )}
-                {maintenanceWarning && (
-                  <p role="alert" className="text-sm text-muted-foreground">
-                    启动历史清理未完成：{maintenanceWarning}
-                  </p>
-                )}
-                <DataTable
-                  table={table}
-                  aria-label="采集记录"
-                  emptyMessage={
-                    date === localCollectionDate()
-                      ? "今天暂无采集记录"
-                      : "该日期暂无采集记录"
-                  }
-                />
-              </CardContent>
-            </Card>
-          </div>
         </>
       )}
       <Dialog

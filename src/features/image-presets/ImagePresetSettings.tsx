@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { isAndroid } from "@/lib/platform";
 import { useSettingsDraft } from "@/features/settings/mobile-state";
+import { useDesktopSettings } from "@/features/settings/desktop-state";
 import { CopyIcon, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SearchableSelect } from "@/components/common/SearchableSelect";
@@ -52,9 +53,13 @@ const toDraft = (preset: ImageProcessorPreset): Draft => ({
   maxKiB: preset.maxBytes === undefined ? "" : String(preset.maxBytes / 1024),
   format: preset.format ?? "",
 });
-function fromDraft(draft: Draft, field: MaterialImageField) {
+function fromDraft(
+  draft: Draft,
+  field: MaterialImageField,
+  label: string = imageFieldLabels[field],
+) {
   if (!!draft.width.trim() !== !!draft.height.trim())
-    throw new Error(`${imageFieldLabels[field]} 的宽、高必须成对填写`);
+    throw new Error(`${label} 的宽、高必须成对填写`);
   const parsed = imagePresetSchema.safeParse({
     size: draft.width.trim()
       ? { width: Number(draft.width), height: Number(draft.height) }
@@ -66,7 +71,7 @@ function fromDraft(draft: Draft, field: MaterialImageField) {
   });
   if (!parsed.success)
     throw new Error(
-      `${imageFieldLabels[field]}：宽高须为正整数，单边不超过 16384 px、总像素不超过 2400 万；体积上限须大于零且不超过 20480 KiB`,
+      `${label}：宽高须为正整数，单边不超过 16384 px、总像素不超过 2400 万；体积上限须大于零且不超过 20480 KiB`,
     );
   return parsed.data;
 }
@@ -79,6 +84,10 @@ const formats = [
 
 export function ImagePresetSettings() {
   const android = isAndroid();
+  const compact = !!useDesktopSettings();
+  const labels = compact
+    ? { titlePic: "主图", titlePic2: "第二张图片" }
+    : imageFieldLabels;
   const [groups, setGroups] = useState<ChannelGroup[]>([]);
   const [configs, setConfigs] = useState<ChannelImagePresets[]>([]);
   const [channel, setChannel] = useState("");
@@ -126,29 +135,26 @@ export function ImagePresetSettings() {
     };
   }, [retry]);
   // 设置分项切换保留 drafts；仅真实改动触发离页提醒，保存成功仍由原逻辑清理。
-  useSettingsDraft(
-    "image-presets",
-    Object.entries(drafts).some(([entryKey, value]) => {
-      const [savedChannel, savedSubChannel] = JSON.parse(entryKey) as [
-        string,
-        string,
-      ];
-      const saved =
-        configs.find(
-          (entry) =>
-            entry.channel === savedChannel &&
-            entry.subChannel === savedSubChannel,
-        ) ?? emptyPresets(savedChannel, savedSubChannel);
-      return (
-        JSON.stringify(value) !==
-        JSON.stringify({
-          titlePic: toDraft(saved.titlePic),
-          titlePic2: toDraft(saved.titlePic2),
-        })
-      );
-    }),
-    saving,
-  );
+  const dirty = Object.entries(drafts).some(([entryKey, value]) => {
+    const [savedChannel, savedSubChannel] = JSON.parse(entryKey) as [
+      string,
+      string,
+    ];
+    const saved =
+      configs.find(
+        (entry) =>
+          entry.channel === savedChannel &&
+          entry.subChannel === savedSubChannel,
+      ) ?? emptyPresets(savedChannel, savedSubChannel);
+    return (
+      JSON.stringify(value) !==
+      JSON.stringify({
+        titlePic: toDraft(saved.titlePic),
+        titlePic2: toDraft(saved.titlePic2),
+      })
+    );
+  });
+  useSettingsDraft("image-presets", dirty, saving);
   const key = JSON.stringify([channel, subChannel]);
   const config =
     configs.find(
@@ -208,8 +214,8 @@ export function ImagePresetSettings() {
       const request = {
         channel,
         subChannel,
-        titlePic: fromDraft(draft.titlePic, "titlePic"),
-        titlePic2: fromDraft(draft.titlePic2, "titlePic2"),
+        titlePic: fromDraft(draft.titlePic, "titlePic", labels.titlePic),
+        titlePic2: fromDraft(draft.titlePic2, "titlePic2", labels.titlePic2),
       };
       savingGate.current = true;
       setSaving(true);
@@ -242,97 +248,104 @@ export function ImagePresetSettings() {
     }
   }
   const content = (
-    <Card className="min-w-0 shadow-none xl:col-span-2">
+    <Card
+      className={
+        compact ? "settings-preset-card" : "min-w-0 shadow-none xl:col-span-2"
+      }
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <ImageIcon className="size-4" />
           子渠道图片预设
         </CardTitle>
         <CardDescription>
-          TitlePic、TitlePic2
-          分别设置。已配置项在图片处理时锁定，留空项可自行调整。本机工作区共用，重启后保留。
+          {compact
+            ? "已填写的参数在图片处理中锁定；留空项可自由调整。保存后生效。"
+            : "TitlePic、TitlePic2 分别设置。已配置项在图片处理时锁定，留空项可自行调整。本机工作区共用，重启后保留。"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)]">
-          <div className="grid min-w-0 gap-2">
-            <label htmlFor="preset-channel">预设渠道</label>
-            <SearchableSelect
-              id="preset-channel"
-              aria-label="预设渠道"
-              options={channelNames.map((value) => ({ value, label: value }))}
-              value={channel}
-              onValueChange={(value) => {
-                setChannel(value);
-                setSubChannel("");
-                setCopySourceKey("");
-                setError(null);
-              }}
-              disabled={disabled}
-              searchPlaceholder="搜索预设渠道…"
-              className="h-auto min-h-8 w-full py-1.5"
-              wrapLabels
-            />
-          </div>
-          <div className="grid min-w-0 gap-2">
-            <label htmlFor="preset-subchannel">预设子渠道</label>
-            <SearchableSelect
-              id="preset-subchannel"
-              aria-label="预设子渠道"
-              options={subChannels.map((value) => ({ value, label: value }))}
-              value={subChannel}
-              onValueChange={(value) => {
-                setSubChannel(value);
-                setCopySourceKey("");
-                setError(null);
-              }}
-              disabled={disabled || !channel}
-              searchPlaceholder="搜索预设子渠道…"
-              className="h-auto min-h-8 w-full py-1.5"
-              wrapLabels
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+      <CardContent className={compact ? "settings-preset-body" : "space-y-4"}>
+        <div className={compact ? "settings-preset-target" : "contents"}>
+          <div className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)]">
             <div className="grid min-w-0 gap-2">
-              <label htmlFor="preset-copy-source">复制来源</label>
+              <label htmlFor="preset-channel">预设渠道</label>
               <SearchableSelect
-                id="preset-copy-source"
-                aria-label="复制来源"
-                aria-describedby="preset-copy-hint"
-                options={copySources.map((entry) => ({
-                  value: JSON.stringify([entry.channel, entry.subChannel]),
-                  label: `${entry.channel} / ${entry.subChannel}`,
-                }))}
-                value={copySource ? copySourceKey : ""}
-                onValueChange={setCopySourceKey}
-                disabled={copyDisabled || copySources.length === 0}
-                placeholder={
-                  !channel || !subChannel
-                    ? "请先选择目标子渠道"
-                    : copySources.length === 0
-                      ? "暂无其他已保存预设"
-                      : "请选择已保存的预设"
-                }
-                searchPlaceholder="搜索来源渠道或子渠道…"
+                id="preset-channel"
+                aria-label="预设渠道"
+                options={channelNames.map((value) => ({ value, label: value }))}
+                value={channel}
+                onValueChange={(value) => {
+                  setChannel(value);
+                  setSubChannel("");
+                  setCopySourceKey("");
+                  setError(null);
+                }}
+                disabled={disabled}
+                searchPlaceholder="搜索预设渠道…"
                 className="h-auto min-h-8 w-full py-1.5"
                 wrapLabels
               />
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={copyDisabled || !copySource}
-              onClick={copyPresets}
-            >
-              <CopyIcon className="size-4" />
-              复制预设
-            </Button>
+            <div className="grid min-w-0 gap-2">
+              <label htmlFor="preset-subchannel">预设子渠道</label>
+              <SearchableSelect
+                id="preset-subchannel"
+                aria-label="预设子渠道"
+                options={subChannels.map((value) => ({ value, label: value }))}
+                value={subChannel}
+                onValueChange={(value) => {
+                  setSubChannel(value);
+                  setCopySourceKey("");
+                  setError(null);
+                }}
+                disabled={disabled || !channel}
+                searchPlaceholder="搜索预设子渠道…"
+                className="h-auto min-h-8 w-full py-1.5"
+                wrapLabels
+              />
+            </div>
           </div>
-          <p id="preset-copy-hint" className="text-xs text-muted-foreground">
-            复制将替换当前表单，保存后生效
-          </p>
+          <div className="space-y-2">
+            <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="grid min-w-0 gap-2">
+                <label htmlFor="preset-copy-source">复制来源</label>
+                <SearchableSelect
+                  id="preset-copy-source"
+                  aria-label="复制来源"
+                  aria-describedby="preset-copy-hint"
+                  options={copySources.map((entry) => ({
+                    value: JSON.stringify([entry.channel, entry.subChannel]),
+                    label: `${entry.channel} / ${entry.subChannel}`,
+                  }))}
+                  value={copySource ? copySourceKey : ""}
+                  onValueChange={setCopySourceKey}
+                  disabled={copyDisabled || copySources.length === 0}
+                  placeholder={
+                    !channel || !subChannel
+                      ? "请先选择目标子渠道"
+                      : copySources.length === 0
+                        ? "暂无其他已保存预设"
+                        : "请选择已保存的预设"
+                  }
+                  searchPlaceholder="搜索来源渠道或子渠道…"
+                  className="h-auto min-h-8 w-full py-1.5"
+                  wrapLabels
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={copyDisabled || !copySource}
+                onClick={copyPresets}
+              >
+                <CopyIcon className="size-4" />
+                复制预设
+              </Button>
+            </div>
+            <p id="preset-copy-hint" className="text-xs text-muted-foreground">
+              复制将替换当前表单，保存后生效
+            </p>
+          </div>
         </div>
         {loading && <p role="status">正在读取图片预设…</p>}
         {groupsError && (
@@ -359,7 +372,11 @@ export function ImagePresetSettings() {
             className="space-y-4"
             noValidate
           >
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div
+              className={
+                compact ? "settings-preset-pair" : "grid gap-4 lg:grid-cols-2"
+              }
+            >
               {imageFields.map((field) => (
                 <fieldset
                   key={field}
@@ -367,7 +384,12 @@ export function ImagePresetSettings() {
                   className="space-y-3 rounded-lg border p-4"
                 >
                   <legend className="px-1 font-medium">
-                    {imageFieldLabels[field]}
+                    {labels[field]}
+                    {compact && (
+                      <span className="settings-field-code">
+                        {imageFieldLabels[field]}
+                      </span>
+                    )}
                   </legend>
                   <div className="grid grid-cols-2 gap-3">
                     {(["width", "height"] as const).map((dimension) => (
@@ -377,7 +399,7 @@ export function ImagePresetSettings() {
                         </label>
                         <Input
                           id={`${field}-${dimension}`}
-                          aria-label={`${imageFieldLabels[field]} ${dimension === "width" ? "宽" : "高"}（px）`}
+                          aria-label={`${labels[field]} ${dimension === "width" ? "宽" : "高"}（px）`}
                           type="number"
                           min="1"
                           max="16384"
@@ -398,7 +420,7 @@ export function ImagePresetSettings() {
                     <label htmlFor={`${field}-bytes`}>体积上限（KiB）</label>
                     <Input
                       id={`${field}-bytes`}
-                      aria-label={`${imageFieldLabels[field]} 体积上限（KiB）`}
+                      aria-label={`${labels[field]} 体积上限（KiB）`}
                       type="number"
                       min="0"
                       max="20480"
@@ -429,7 +451,7 @@ export function ImagePresetSettings() {
                     >
                       <SelectTrigger
                         id={`${field}-format`}
-                        aria-label={`${imageFieldLabels[field]} 输出格式`}
+                        aria-label={`${labels[field]} 输出格式`}
                         className="w-full"
                       >
                         <SelectValue />
@@ -448,8 +470,19 @@ export function ImagePresetSettings() {
                     variant="outline"
                     onClick={() => change(field, blank())}
                   >
-                    清空 {imageFieldLabels[field]} 预设
+                    清空 {labels[field]} 预设
                   </Button>
+                  {compact && (
+                    <p className="settings-preset-lock-summary">
+                      {[
+                        draft[field].width && draft[field].height
+                          ? "尺寸锁定"
+                          : "尺寸自由",
+                        draft[field].maxKiB ? "体积受限" : "体积自由",
+                        draft[field].format ? "格式锁定" : "格式自由",
+                      ].join(" · ")}
+                    </p>
+                  )}
                 </fieldset>
               ))}
             </div>
@@ -457,7 +490,7 @@ export function ImagePresetSettings() {
               清空后点击保存才生效。尺寸单边最多 16384 px，总像素最多 2400
               万，体积上限最多 20480 KiB。
             </p>
-            {!android && (
+            {!android && !compact && (
               <Button type="submit" disabled={disabled}>
                 {saving ? "正在保存预设…" : "保存图片预设"}
               </Button>
@@ -473,7 +506,23 @@ export function ImagePresetSettings() {
     </Card>
   );
   // 手机保存操作移出滚动正文；桌面继续使用原来的卡片及表单按钮。
-  return android ? (
+  return compact ? (
+    <div className="settings-presets">
+      {content}
+      <div className="settings-save-bar">
+        <span className="settings-save-status">
+          {dirty ? "未保存修改" : "保存后生效"}
+        </span>
+        <Button
+          type="submit"
+          form="settings-image-presets-form"
+          disabled={disabled || !channel || !subChannel}
+        >
+          {saving ? "正在保存预设…" : "保存图片预设"}
+        </Button>
+      </div>
+    </div>
+  ) : android ? (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <ScrollArea
         className="flex-1"

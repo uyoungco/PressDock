@@ -24,6 +24,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { onClientInvalidated } from "@/services/tauri/client";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  CompactImageEditor,
+  type EditableImageSettings,
+} from "./CompactImageEditor";
+import { ImageCanvas } from "./ImageCanvas";
 import { blobFromBase64, imageService } from "./service";
 import {
   MAX_IMAGE_SIZE,
@@ -81,6 +87,9 @@ export function ImageProcessor({
   preset = {},
   onConfirm,
   onCancel,
+  presentation = "default",
+  confirmationHint,
+  errorMessage,
 }: ImageProcessorProps) {
   const key = JSON.stringify(preset);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -128,7 +137,13 @@ export function ImageProcessor({
   const current = loaded?.image === image && loaded.key === key ? loaded : null;
   if (!current?.info || !current.preset)
     return (
-      <div className="flex min-h-96 flex-col items-center justify-center gap-4 rounded-xl border bg-card p-8">
+      <div
+        className={
+          presentation === "dialog"
+            ? "image-dialog-loading"
+            : "flex min-h-96 flex-col items-center justify-center gap-4 rounded-xl border bg-card p-8"
+        }
+      >
         {current?.error ? (
           <>
             <ImageIcon className="size-9 text-muted-foreground" />
@@ -156,6 +171,9 @@ export function ImageProcessor({
       preset={current.preset}
       onConfirm={onConfirm}
       onCancel={cancel}
+      presentation={presentation}
+      confirmationHint={confirmationHint}
+      errorMessage={errorMessage}
     />
   );
 }
@@ -166,10 +184,14 @@ function ProcessorEditor({
   preset,
   onConfirm,
   onCancel,
+  presentation,
+  confirmationHint,
+  errorMessage,
 }: ImageProcessorProps & {
   info: ImageInspection;
   preset: ImageProcessorPreset;
 }) {
+  const compact = presentation === "dialog";
   const instanceId = useId();
   const preview = useMemo(
     () => blobFromBase64(info.previewBase64, "image/png"),
@@ -224,14 +246,14 @@ function ProcessorEditor({
     });
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [compact]);
   const shown = resultView && processed ? processed.result : info;
   const fit = Math.max(
     0.01,
     Math.min(
       (bounds.width - 48) / shown.width,
       (bounds.height - 48) / shown.height,
-      1,
+      compact ? 8 : 1,
     ),
   );
   const scale = zoom ?? fit;
@@ -275,6 +297,31 @@ function ProcessorEditor({
     const w = Number(axis === "width" ? value : width),
       h = Number(axis === "height" ? value : height);
     if (w > 0 && h > 0) setCrop(initialCrop(info.width, info.height, w / h));
+  }
+  function changeSettings(change: Partial<EditableImageSettings>) {
+    invalidate();
+    if (change.format !== undefined) setFormat(change.format);
+    if (change.maxKiB !== undefined) setMaxKiB(change.maxKiB);
+    if (change.quality !== undefined) setQuality(change.quality);
+    if (change.width !== undefined) setWidth(change.width);
+    if (change.height !== undefined) setHeight(change.height);
+    if (change.resize !== undefined) {
+      setResize(change.resize);
+      if (change.resize) setCropping(true);
+    }
+    if (change.cropping !== undefined) {
+      setCropping(change.cropping);
+      setCrop(initialCrop(info.width, info.height));
+    }
+    if (
+      change.width !== undefined ||
+      change.height !== undefined ||
+      change.resize
+    ) {
+      const w = Number(change.width ?? width),
+        h = Number(change.height ?? height);
+      if (w > 0 && h > 0) setCrop(initialCrop(info.width, info.height, w / h));
+    }
   }
   async function process() {
     if (operation.current) return;
@@ -340,6 +387,150 @@ function ProcessorEditor({
   }
   const upscaled =
     resize && Number(width) > info.width * (cropping ? crop.width / 100 : 1);
+  const picture =
+    resultView && resultUrl ? (
+      <img
+        src={resultUrl}
+        alt="实际编码后的图片"
+        className="image-transparency block max-w-none"
+        style={{ width: shown.width * scale, height: shown.height * scale }}
+        draggable={false}
+      />
+    ) : originalUrl ? (
+      <ReactCrop
+        crop={cropping ? crop : undefined}
+        aspect={aspect}
+        disabled={busy || !cropping}
+        keepSelection
+        ruleOfThirds
+        onChange={(_, percent) => {
+          invalidate();
+          setCrop(percent);
+        }}
+        ariaLabels={{
+          cropArea: "裁剪选区",
+          nwDragHandle: "左上裁剪手柄",
+          nDragHandle: "上方裁剪手柄",
+          neDragHandle: "右上裁剪手柄",
+          eDragHandle: "右侧裁剪手柄",
+          seDragHandle: "右下裁剪手柄",
+          sDragHandle: "下方裁剪手柄",
+          swDragHandle: "左下裁剪手柄",
+          wDragHandle: "左侧裁剪手柄",
+        }}
+      >
+        <img
+          src={originalUrl}
+          alt="待裁剪的原图"
+          className="image-transparency block max-w-none"
+          style={{ width: info.width * scale, height: info.height * scale }}
+          draggable={false}
+        />
+      </ReactCrop>
+    ) : (
+      <LoaderCircle className="size-6 animate-spin text-white" />
+    );
+  if (compact)
+    return (
+      <CompactImageEditor
+        image={image}
+        info={info}
+        preset={preset}
+        settings={{ format, width, height, resize, cropping, maxKiB, quality }}
+        processed={processed}
+        busy={busy}
+        error={errorMessage ?? error}
+        upscaled={upscaled}
+        confirmationHint={confirmationHint}
+        onChange={changeSettings}
+        onProcess={() => void process()}
+        onConfirm={() => {
+          if (processed && !busy) onConfirm(processed.result);
+        }}
+        onCancel={() => {
+          invalidate();
+          onCancel();
+        }}
+        onReset={reset}
+        preview={
+          <div className="image-dialog-preview">
+            <div className="image-dialog-preview-top">
+              <ToggleGroup
+                type="single"
+                size="sm"
+                value={resultView ? "result" : "original"}
+                aria-label="图片预览模式"
+                onValueChange={(value) => {
+                  if (value) {
+                    setResultView(value === "result");
+                    setZoom(null);
+                  }
+                }}
+              >
+                <ToggleGroupItem value="original">原图 / 裁剪</ToggleGroupItem>
+                <ToggleGroupItem value="result" disabled={!processed}>
+                  处理结果
+                </ToggleGroupItem>
+              </ToggleGroup>
+              <span className="image-dialog-zoom-value">
+                {Math.round(scale * 100)}%
+              </span>
+            </div>
+            <div
+              data-slot="image-canvas"
+              className="image-dialog-canvas-container"
+            >
+              <ImageCanvas
+                viewportRef={viewport}
+                width={shown.width * scale}
+                height={shown.height * scale}
+                bounds={bounds}
+                viewKey={`${resultView}-${scale}`}
+              >
+                {picture}
+              </ImageCanvas>
+            </div>
+            <div className="image-dialog-viewer-footer">
+              <div>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="缩小查看"
+                  onClick={() => setZoom(Math.max(0.01, scale / 1.25))}
+                >
+                  <ZoomOut />
+                </Button>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="放大查看"
+                  onClick={() => setZoom(Math.min(8, scale * 1.25))}
+                >
+                  <ZoomIn />
+                </Button>
+                <Button
+                  size="sm"
+                  variant={zoom === null ? "secondary" : "ghost"}
+                  onClick={() => setZoom(null)}
+                >
+                  适应窗口
+                </Button>
+                <Button
+                  size="sm"
+                  variant={zoom === 1 ? "secondary" : "ghost"}
+                  onClick={() => setZoom(1)}
+                >
+                  100%
+                </Button>
+              </div>
+              <span>
+                {shown.width} × {shown.height} px
+              </span>
+            </div>
+          </div>
+        }
+      />
+    );
   const lockedLabel = (
     <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-normal text-muted-foreground">
       <LockKeyhole className="size-3" />
@@ -413,54 +604,7 @@ function ProcessorEditor({
               }}
             >
               <div className="grid min-h-full min-w-full w-max place-items-center p-6">
-                {resultView && resultUrl ? (
-                  <img
-                    src={resultUrl}
-                    alt="实际编码后的图片"
-                    className="image-transparency block max-w-none"
-                    style={{
-                      width: shown.width * scale,
-                      height: shown.height * scale,
-                    }}
-                    draggable={false}
-                  />
-                ) : originalUrl ? (
-                  <ReactCrop
-                    crop={cropping ? crop : undefined}
-                    aspect={aspect}
-                    disabled={busy || !cropping}
-                    keepSelection
-                    ruleOfThirds
-                    onChange={(_, percent) => {
-                      invalidate();
-                      setCrop(percent);
-                    }}
-                    ariaLabels={{
-                      cropArea: "裁剪选区",
-                      nwDragHandle: "左上裁剪手柄",
-                      nDragHandle: "上方裁剪手柄",
-                      neDragHandle: "右上裁剪手柄",
-                      eDragHandle: "右侧裁剪手柄",
-                      seDragHandle: "右下裁剪手柄",
-                      sDragHandle: "下方裁剪手柄",
-                      swDragHandle: "左下裁剪手柄",
-                      wDragHandle: "左侧裁剪手柄",
-                    }}
-                  >
-                    <img
-                      src={originalUrl}
-                      alt="待裁剪的原图"
-                      className="image-transparency block max-w-none"
-                      style={{
-                        width: info.width * scale,
-                        height: info.height * scale,
-                      }}
-                      draggable={false}
-                    />
-                  </ReactCrop>
-                ) : (
-                  <LoaderCircle className="size-6 animate-spin text-white" />
-                )}
+                {picture}
               </div>
             </ScrollArea>
           </div>

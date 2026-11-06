@@ -1,4 +1,5 @@
 import { isAndroid, isDemo } from "@/lib/platform";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { channelDraftService } from "./draft-service";
 import { useEffect, useRef, useState } from "react";
 import { useBeforeUnload, useBlocker } from "react-router-dom";
@@ -46,6 +47,7 @@ export function useChannelActions(
     retry: () => void;
   },
 ) {
+  const mobile = useIsMobile();
   const user = useAuth().session?.user.userId ?? 0;
   const client = useQueryClient();
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
@@ -400,6 +402,7 @@ export function useChannelActions(
         {edit && (
           <MaterialForm
             key={edit.base?.id ?? "new"}
+            presentation={!isAndroid() && !mobile ? "channel-sheet" : "dialog"}
             edit={edit}
             onChange={change}
             onClose={requestClose}
@@ -408,7 +411,7 @@ export function useChannelActions(
             onUploading={setUploading}
             error={editError}
             draftStatus={draftStatus}
-            channels={isAndroid() ? channels : undefined}
+            channels={isAndroid() || !mobile ? channels : undefined}
           />
         )}
         <Dialog
