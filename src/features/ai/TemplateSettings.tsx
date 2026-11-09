@@ -67,6 +67,7 @@ export function TemplateSettings({
   const { settings, loading, busy, error, run, refresh } =
     useAiSettings(active);
   const mobile = useMobileSettings();
+  const baselines = useRef<Record<string, PromptTemplate | undefined>>({});
   const compact = !!useDesktopSettings();
   const [localPurpose, setPurpose] = useState<PromptTemplate["purpose"]>(
     purposeOnly ?? initialPurpose,
@@ -98,6 +99,10 @@ export function TemplateSettings({
       : localDraft;
   // 手机缓存按模板 ID 保存，返回列表、切换用途或模块都不丢失未保存输入。
   function setDraft(next: PromptTemplate | null) {
+    if (next && !(next.id in baselines.current))
+      baselines.current[next.id] = settings.templates.find(
+        (t) => t.id === next.id,
+      );
     if (compact) {
       if (next) {
         setMobileDrafts((previous) => ({ ...previous, [next.id]: next }));
@@ -183,8 +188,18 @@ export function TemplateSettings({
       onSubmit={(event) => {
         event.preventDefault();
         void run(async () => {
-          await aiService.saveTemplate(templateSchema.parse(draft));
+          await aiService.saveTemplate(
+            templateSchema.parse(draft),
+            draft.id in baselines.current
+              ? baselines.current[draft.id]
+              : settings.templates.find((t) => t.id === draft.id),
+          );
+          delete baselines.current[draft.id];
         }, "提示词模板已保存").then((saved) => {
+          if (saved && !mobile && !compact)
+            setLocalDraft(
+              saved.templates.find((t) => t.id === draft.id) ?? null,
+            );
           if (saved && (mobile || compact)) {
             setMobileDrafts((previous) => {
               const next = { ...previous };

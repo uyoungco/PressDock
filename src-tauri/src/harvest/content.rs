@@ -1,9 +1,6 @@
 //! 移植旧 HTML 格式化和 AI 元数据规则；正文与模型返回的元数据保持分离。
 use super::*;
-use crate::{
-    ai::{AiModelConfig, AiService},
-    database::Database,
-};
+use crate::ai::{AiService, ExecutionSnapshot};
 use scraper::{ElementRef, Html, Node};
 use serde_json::{Value, json};
 use std::time::Duration;
@@ -87,8 +84,7 @@ pub(super) fn with_breaks(html: &str) -> String {
 
 pub(super) async fn generate(
     ai: &AiService,
-    db: &Database,
-    model: &AiModelConfig,
+    snapshot: &ExecutionSnapshot,
     system: &str,
     user: &str,
     task: crate::ai::GenerationTask<'_>,
@@ -96,7 +92,7 @@ pub(super) async fn generate(
     // 沿用原采集任务 60 秒请求期限，不改变手动标题优化的 120 秒客户端默认值。
     tokio::time::timeout(
         Duration::from_secs(60),
-        ai.generate_for_task(db, model, system, user, task),
+        ai.generate_snapshot(snapshot, system, user, task),
     )
     .await
     .map_err(|error| {
@@ -104,7 +100,7 @@ pub(super) async fn generate(
             crate::error::Diagnostic::error(
                 "ai.harvest.timeout",
                 &error,
-                json!({"timeoutMs":60000,"model":model.model_id}),
+                json!({"timeoutMs":60000,"model":snapshot.model.model_id}),
             ),
         )
     })?
@@ -116,10 +112,9 @@ pub(super) async fn metadata(
     options: &Options,
     raw: &RawArticle,
     article: &mut FormattedArticle,
-    model: &AiModelConfig,
+    snapshot: &ExecutionSnapshot,
 ) -> Result<(), HarvestError> {
     use tauri::Manager;
-    let db = app.state::<Database>();
     let cms = app.state::<crate::cms::CmsService>();
     let ai = app.state::<AiService>();
     let mut fields = Vec::new();
@@ -196,15 +191,14 @@ pub(super) async fn metadata(
         app,
         "metadata.request",
         "input",
-        || json!({"model":model.model_id,"system":system,"user":user}),
+        || json!({"model":snapshot.model.model_id,"system":system,"user":user}),
     );
     let observe = |response: &Value| {
         context.trace(app, "metadata.response", "output", || response.clone());
     };
     let text = generate(
         &ai,
-        &db,
-        model,
+        snapshot,
         &system,
         &user,
         crate::ai::GenerationTask::Metadata(&observe),

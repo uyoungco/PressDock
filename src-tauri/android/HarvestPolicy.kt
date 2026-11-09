@@ -22,7 +22,7 @@ internal object HarvestPolicy {
     }.getOrDefault(false)
 
     fun reference(value: String): String {
-        require(value.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")))
+        require(value.matches(Regex("(?:sync-secret-|sync-payload-)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")))
         return value
     }
 }

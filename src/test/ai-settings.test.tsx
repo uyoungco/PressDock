@@ -77,6 +77,9 @@ it("提供商保存留空密钥保留旧值，隐藏标签后表单仍保留", a
   expect(screen.getByLabelText("提供商标识")).toBeDisabled();
   expect(screen.getByLabelText("API 密钥")).toHaveValue("");
   change("显示名称", "新的网关名称");
+  const refreshed = aiSettings();
+  refreshed.providers[0].baseUrl = "https://demo-later.example/v1";
+  vi.mocked(aiService.load).mockResolvedValue(refreshed);
   view.rerender(<ModelSettings active={false} />);
   view.rerender(<ModelSettings active />);
   await waitFor(() =>
@@ -90,6 +93,11 @@ it("提供商保存留空密钥保留旧值，隐藏标签后表单仍保留", a
         id: "demo-gateway",
         apiKey: null,
         displayName: "新的网关名称",
+      }),
+      expect.objectContaining({
+        id: "demo-gateway",
+        displayName: "演示网关",
+        baseUrl: aiSettings().providers[0].baseUrl,
       }),
     ),
   );
@@ -116,6 +124,7 @@ it("拉取失败后仍可手填模型，可选参数留空为 null", async () =>
         maxOutputTokens: null,
         reasoningEffort: null,
       }),
+      undefined,
     ),
   );
 });
@@ -165,6 +174,7 @@ it("模板支持绑定、变量插入、复制和默认标记，标签切换保�
         modelConfigId: "model-2",
         isDefault: true,
       }),
+      undefined,
     ),
   );
   expect(vi.mocked(aiService.saveTemplate).mock.calls[0][0].id).not.toBe(
@@ -201,6 +211,7 @@ it("分页模板独立显示、编辑页长和变量，保存时保留用途", a
         paginationOptions: { minChars: 100, targetChars: 260, maxChars: 400 },
         isDefault: true,
       }),
+      expect.objectContaining({ purpose: "pagination" }),
     ),
   );
   change("用户提示词", "{{content}}");

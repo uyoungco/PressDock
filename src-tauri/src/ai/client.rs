@@ -490,9 +490,50 @@ impl AiService {
         task: GenerationTask<'_>,
     ) -> Result<String, AiError> {
         let (provider, secret) = self.provider(db, &model.provider_id).await?;
-        let (path, body) = generation_request(&provider, model, system, user, task);
+        self.generate_resolved(&provider, secret, model, system, user, task)
+            .await
+    }
+
+    pub(crate) async fn generate_snapshot(
+        &self,
+        snapshot: &ExecutionSnapshot,
+        system: &str,
+        user: &str,
+        task: GenerationTask<'_>,
+    ) -> Result<String, AiError> {
+        let secret = if let Some(reference) = snapshot.credential_ref.clone() {
+            let vault = self.vault.clone();
+            Some(
+                tokio::task::spawn_blocking(move || vault.load(&reference))
+                    .await
+                    .map_err(|_| AiError::new("AI_CREDENTIAL_STORE", "凭据读取失败"))??,
+            )
+        } else {
+            None
+        };
+        self.generate_resolved(
+            &snapshot.provider,
+            secret,
+            &snapshot.model,
+            system,
+            user,
+            task,
+        )
+        .await
+    }
+
+    async fn generate_resolved(
+        &self,
+        provider: &AiProviderConfig,
+        secret: Option<String>,
+        model: &AiModelConfig,
+        system: &str,
+        user: &str,
+        task: GenerationTask<'_>,
+    ) -> Result<String, AiError> {
+        let (path, body) = generation_request(provider, model, system, user, task);
         let value = self
-            .request(&provider, secret.as_deref(), Method::POST, path, Some(body))
+            .request(provider, secret.as_deref(), Method::POST, path, Some(body))
             .await?;
         // 在完成状态/截断校验之前交给采集日志观察器，保留失败时已收到的业务响应。
         // 不交出 provider、密钥或请求头，普通标题调用不注册观察器。

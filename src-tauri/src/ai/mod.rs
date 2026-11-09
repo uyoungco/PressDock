@@ -1,5 +1,7 @@
 mod client;
-mod credentials;
+mod execution;
+pub(crate) use execution::ExecutionSnapshot;
+pub(crate) mod credentials;
 pub mod models;
 mod pagination;
 pub(crate) mod pagination_plan;

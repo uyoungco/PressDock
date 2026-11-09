@@ -6,6 +6,7 @@ mod error;
 mod harvest;
 mod imaging;
 mod platform;
+pub mod settings_sync;
 mod system;
 mod window_policy;
 use tauri::Manager;
@@ -42,6 +43,7 @@ pub fn run() {
                 tauri::async_runtime::block_on(cms::demo::DemoCms::new(database.pool.clone()))?;
             app.manage(database);
             app.manage(ai::AiService::new()?);
+            app.manage(settings_sync::runtime::SettingsSync::new()?);
             let cms = cms::CmsService::new(&directory)?;
             #[cfg(feature = "android-demo")]
             let cms = cms.with_demo(demo);
@@ -71,9 +73,16 @@ pub fn run() {
             }
             #[cfg(any(desktop, target_os = "android"))]
             harvest::start(app.handle().clone());
+            #[cfg(not(feature = "android-demo"))]
+            settings_sync::runtime::start_background(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            commands::settings_sync_start,
+            commands::settings_sync_status,
+            commands::settings_sync_wake,
+            commands::settings_sync_resolve,
+            commands::ai_clear_provider_secret,
             commands::harvest_set_developer_mode,
             commands::harvest_open_devtools,
             commands::harvest_load_settings,

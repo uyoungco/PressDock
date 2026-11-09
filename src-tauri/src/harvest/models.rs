@@ -39,6 +39,8 @@ pub struct Options {
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct JobOptions {
+    #[serde(default)]
+    pub metadata_snapshot: Option<crate::ai::ExecutionSnapshot>,
     #[serde(flatten)]
     pub processing: Options,
     #[serde(default)]

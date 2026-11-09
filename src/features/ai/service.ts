@@ -67,6 +67,7 @@ export const aiService = {
   saveModel: aiIpc.saveModel,
   saveTemplate: aiIpc.saveTemplate,
   remove: aiIpc.remove,
+  clearSecret: aiIpc.clearSecret,
   listModels: (providerId: string, signal?: AbortSignal) =>
     operation((id) => aiIpc.listModels(id, providerId), signal),
   testModel: (modelConfigId: string, signal?: AbortSignal) =>

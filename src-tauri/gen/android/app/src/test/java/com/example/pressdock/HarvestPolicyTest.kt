@@ -30,4 +30,19 @@ class HarvestPolicyTest {
         assertTrue(runCatching { AiSecretEnvelope.decode(first, encrypted, key) }.isFailure)
         assertTrue(runCatching { HarvestPolicy.reference("../cms-session") }.isFailure)
     }
+
+    @Test fun synchronizedCredentialsUseSafeVersionedReferences() {
+        val id = "5f3e3406-f3e5-435c-aa72-a4721daa0a00"
+        val key = KeyGenerator.getInstance("AES").apply { init(256) }.generateKey()
+        listOf(id, "sync-secret-$id", "sync-payload-$id").forEach { reference ->
+            assertEquals(reference, HarvestPolicy.reference(reference))
+            val envelope = AiSecretEnvelope.encode(reference, "演示同步凭据", key)
+            assertEquals("演示同步凭据", AiSecretEnvelope.decode(reference, envelope, key))
+            val other = if (reference.startsWith("sync-secret-")) "sync-payload-$id" else "sync-secret-$id"
+            assertTrue(runCatching { AiSecretEnvelope.decode(other, envelope, key) }.isFailure)
+        }
+        listOf("../sync-secret-$id", "unknown-$id", "sync-secret-../$id", "sync-payload-$id/extra").forEach {
+            assertTrue(runCatching { HarvestPolicy.reference(it) }.isFailure)
+        }
+    }
 }

@@ -488,11 +488,13 @@ async fn process(
         };
         let needs_ai = options.auto_classify || options.auto_summary || options.auto_tags;
         let model = if needs_ai {
-            let settings = db.ai_settings().await?;
-            settings
-                .models
-                .into_iter()
-                .find(|model| Some(&model.id) == options.model_config_id.as_ref())
+            if let Some(snapshot) = &stored.options.metadata_snapshot {
+                Some(snapshot.clone())
+            } else if let Some(id) = &options.model_config_id {
+                db.ai_execution_snapshot(id).await?
+            } else {
+                None
+            }
         } else {
             None
         };

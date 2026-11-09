@@ -15,8 +15,8 @@ import { channelService } from "@/features/channels/service";
 
 export const imagePresetsService = {
   list: () => imagePresetsIpc.list(),
-  save: (request: ChannelImagePresets) =>
-    imagePresetsIpc.save(channelImagePresetsSchema.parse(request)),
+  save: (request: ChannelImagePresets, baseline?: ChannelImagePresets) =>
+    imagePresetsIpc.save(channelImagePresetsSchema.parse(request), baseline),
   resolve: async (
     channel: string,
     subChannel: string,

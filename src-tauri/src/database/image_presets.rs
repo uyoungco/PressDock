@@ -50,7 +50,7 @@ pub struct ChannelImagePresets {
 }
 
 impl ChannelImagePresets {
-    fn validate(&self) -> Result<(), AppError> {
+    pub(crate) fn validate(&self) -> Result<(), AppError> {
         if self.channel.trim().is_empty() || self.sub_channel.trim().is_empty() {
             return Err(AppError::Validation("请选择渠道和子渠道".into()));
         }

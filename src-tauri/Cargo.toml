@@ -49,6 +49,7 @@ futures-util = { version = "0.3.34", features = ["sink"] }
 hyper = { version = "1", features = ["server", "http1"] }
 hyper-util = { version = "0.1", features = ["tokio"] }
 http-body-util = "0.1"
+aes-gcm = "0.10.3"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 keyring = "4.2.0"

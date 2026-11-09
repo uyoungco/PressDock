@@ -31,6 +31,8 @@ npm run tauri dev
 - 可折叠桌面导航、移动抽屉布局、Hash 路由、浅色 / 深色 / 跟随系统，主题与导航偏好持久化。
 - 类型化 IPC、Rust 应用信息及数据库健康检查、统一 Toast 错误反馈。
 - SQLx 迁移、原始素材与草稿分表、历史列表读取、重复启动不覆盖既有稿件。
+- Cloudflare Workers + D1 全局设置：登录后冷启动读取一次，保存字段差量并加密持久补传，AI 密钥落入原生安全凭据库；主题、历史保留天数和采集来源方式等本机偏好不上传。正式库已由指定电脑初始化，其他客户端不自动导入旧设置。永久拒绝时可确认保留待传副本，完全退出后重启采用云端配置。实测范围与待验项目见[交付与验收记录](docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md)。
+- Android 启动读取失败已增加 CMS 鉴权的有界重试，以及使用缓存时的显式“重试读取”入口；错误码、原证书覆盖安装和真机验证见[修复记录](docs/android-settings-startup-fix-2026-11-07.md)。
 - 前端与 Rust 测试、ESLint、Prettier、Windows/macOS CI。
 
 ## 核心目录
@@ -49,6 +51,7 @@ src-tauri/
   capabilities/ migrations/
   src/{commands,database,cms,ai,harvest,system,imaging}/
 scripts/                   本地工具链适配
+workers/settings-sync/     独立 Cloudflare 配置服务、D1 迁移与检查
 docs/                      架构、开发、Android 计划
 .github/workflows/         跨平台 CI
 ```

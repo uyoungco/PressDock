@@ -312,6 +312,16 @@ async fn harvest_pagination_snapshot_survives_restart_and_uses_its_bound_model()
     template.system_prompt = "LATER 【演示数据】不影响已入队任务。".into();
     template.pagination_options.as_mut().unwrap().target_chars = 300;
     db.ai_save_template(&template).await.unwrap();
+    let mut changed_model = db.ai_settings().await.unwrap().models.remove(0);
+    changed_model.model_id = "demo-later-model".into();
+    changed_model.max_output_tokens = Some(1234);
+    db.ai_save_model(&changed_model).await.unwrap();
+    sqlx::query(
+        "UPDATE ai_providers SET base_url='https://later-demo.invalid' WHERE id='demo-provider'",
+    )
+    .execute(&db.pool)
+    .await
+    .unwrap();
     db.pool.close().await;
     let db = Database::open(&db_path).await.unwrap();
     assert!(

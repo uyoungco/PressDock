@@ -50,18 +50,21 @@ pub async fn harvest_load_settings(
 #[tauri::command]
 pub async fn harvest_save_settings(
     request: Settings,
+    baseline: Option<Settings>,
     app: AppHandle,
     database: State<'_, Database>,
     cms: State<'_, CmsService>,
     ai: State<'_, AiService>,
+    sync: State<'_, crate::settings_sync::runtime::SettingsSync>,
 ) -> Result<(), CommandError> {
     let generation = cms.authorize().await?;
     let _lock = ai.operations.lock().await;
     cms.ensure_generation(generation).await?;
     #[cfg(target_os = "android")]
     ensure_mobile_source(&request.options)?;
-    database.harvest_save_settings(&request).await?;
-    crate::window_policy::sync(&app, request.options.developer_mode);
+    let developer_mode = request.options.developer_mode;
+    sync.harvest(&database, request, baseline).await?;
+    crate::window_policy::sync(&app, developer_mode);
     cms.ensure_generation(generation).await?;
     Ok(())
 }

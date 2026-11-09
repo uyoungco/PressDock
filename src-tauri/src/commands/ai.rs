@@ -1,3 +1,4 @@
+use crate::settings_sync::{Provider, runtime::SettingsSync};
 use crate::{ai::*, cms::CmsService, database::Database, error::CommandError};
 use tauri::State;
 
@@ -17,12 +18,16 @@ pub async fn ai_load_settings(
 #[tauri::command]
 pub async fn ai_save_provider(
     request: SaveProviderRequest,
+    baseline: Option<Provider>,
     database: State<'_, Database>,
     ai: State<'_, AiService>,
     cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
 ) -> Result<(), CommandError> {
     let generation = cms.authorize().await?;
-    ai.save_provider(&database, request).await?;
+    let _lock = ai.operations.lock().await;
+    cms.ensure_generation(generation).await?;
+    sync.provider(&database, request, baseline).await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }
@@ -30,14 +35,16 @@ pub async fn ai_save_provider(
 #[tauri::command]
 pub async fn ai_save_model(
     request: AiModelConfig,
+    baseline: Option<AiModelConfig>,
     database: State<'_, Database>,
     ai: State<'_, AiService>,
     cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
 ) -> Result<(), CommandError> {
     let generation = cms.authorize().await?;
     let _lock = ai.operations.lock().await;
     cms.ensure_generation(generation).await?;
-    database.ai_save_model(&request).await?;
+    sync.model(&database, request, baseline).await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }
@@ -45,14 +52,16 @@ pub async fn ai_save_model(
 #[tauri::command]
 pub async fn ai_save_template(
     request: PromptTemplate,
+    baseline: Option<PromptTemplate>,
     database: State<'_, Database>,
     ai: State<'_, AiService>,
     cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
 ) -> Result<(), CommandError> {
     let generation = cms.authorize().await?;
     let _lock = ai.operations.lock().await;
     cms.ensure_generation(generation).await?;
-    database.ai_save_template(&request).await?;
+    sync.template(&database, request, baseline).await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }
@@ -64,9 +73,28 @@ pub async fn ai_delete_config(
     database: State<'_, Database>,
     ai: State<'_, AiService>,
     cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
 ) -> Result<(), CommandError> {
     let generation = cms.authorize().await?;
-    ai.delete_config(&database, &kind, &id).await?;
+    let _lock = ai.operations.lock().await;
+    cms.ensure_generation(generation).await?;
+    sync.remove(&database, &kind, &id).await?;
+    cms.ensure_generation(generation).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn ai_clear_provider_secret(
+    id: String,
+    database: State<'_, Database>,
+    ai: State<'_, AiService>,
+    cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
+) -> Result<(), CommandError> {
+    let generation = cms.authorize().await?;
+    let _lock = ai.operations.lock().await;
+    cms.ensure_generation(generation).await?;
+    sync.clear_provider_secret(&database, id).await?;
     cms.ensure_generation(generation).await?;
     Ok(())
 }

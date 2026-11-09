@@ -129,6 +129,26 @@ pub struct CommandError {
     message: String,
 }
 
+impl From<crate::settings_sync::local::SyncError> for CommandError {
+    fn from(error: crate::settings_sync::local::SyncError) -> Self {
+        let message = match error.code {
+            "AUTH_EXPIRED" => "登录已失效，请重新登录",
+            "SYNC_NOT_READY" => "全局配置尚未就绪，请先重试读取云端配置",
+            "RECOVERY_NOT_AVAILABLE" => "当前没有可恢复的永久拒绝操作，请刷新同步状态",
+            "SYNC_CREDENTIAL_STORE" => "系统安全凭据库不可用，本次配置未保存，请修复后重试",
+            "REFERENCE_NOT_FOUND" => "配置仍被引用，或所引用的配置已不存在，请解除引用后重试",
+            "ENTITY_NOT_FOUND" => "此配置已被删除，请重新打开设置",
+            "VALIDATION_FAILED" => "配置参数不合法，请检查输入",
+            "DUPLICATE_ENTITY" => "配置标识已存在，请使用新的标识",
+            _ => "全局配置保存失败，本次修改未生效，请重试",
+        };
+        Self {
+            code: error.code,
+            message: message.into(),
+        }
+    }
+}
+
 impl From<crate::ai::AiError> for CommandError {
     fn from(error: crate::ai::AiError) -> Self {
         Self {

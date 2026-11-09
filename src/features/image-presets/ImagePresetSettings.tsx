@@ -102,6 +102,7 @@ export function ImagePresetSettings() {
   const [retry, setRetry] = useState(0);
   const mounted = useRef(true);
   const savingGate = useRef(false);
+  const baselines = useRef<Record<string, ChannelImagePresets>>({});
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -191,6 +192,10 @@ export function ImagePresetSettings() {
   const copyDisabled = disabled || !channel || !subChannel;
   function copyPresets() {
     if (copyDisabled || savingGate.current || !copySource) return;
+    baselines.current[key] ??=
+      configs.find(
+        (p) => p.channel === channel && p.subChannel === subChannel,
+      ) ?? emptyPresets(channel, subChannel);
     setDrafts((previous) => ({
       ...previous,
       [key]: {
@@ -202,6 +207,10 @@ export function ImagePresetSettings() {
     toast.success("预设已填入，请保存");
   }
   function change(field: MaterialImageField, next: Draft) {
+    baselines.current[key] ??=
+      configs.find(
+        (p) => p.channel === channel && p.subChannel === subChannel,
+      ) ?? emptyPresets(channel, subChannel);
     setDrafts((previous) => ({
       ...previous,
       [key]: { ...draft, [field]: next },
@@ -220,7 +229,15 @@ export function ImagePresetSettings() {
       savingGate.current = true;
       setSaving(true);
       setError(null);
-      const saved = await imagePresetsService.save(request);
+      const saved = await imagePresetsService.save(
+        request,
+        baselines.current[key] ??
+          configs.find(
+            (p) => p.channel === channel && p.subChannel === subChannel,
+          ) ??
+          emptyPresets(channel, subChannel),
+      );
+      delete baselines.current[key];
       if (!mounted.current) return;
       setConfigs((previous) => [
         ...previous.filter(

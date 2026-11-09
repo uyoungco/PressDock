@@ -6,6 +6,7 @@ import { useAtom } from "jotai";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DesktopSettingsProvider } from "@/features/settings/DesktopSettingsProvider";
+import { ConfigSyncStatus } from "@/features/settings-sync/ConfigBoundary";
 import "./settings.css";
 import { themeAtom } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
@@ -96,8 +97,9 @@ export default function Settings() {
       <section className="settings-workspace">
         <header className="settings-page-header">
           <h1>系统设置</h1>
-          <p>采集、模型与编辑规则，在本机工作区统一管理。</p>
+          <p>模型与编辑规则在各设备共用，本机偏好独立保存。</p>
         </header>
+        <ConfigSyncStatus />
         <Tabs value={tab} onValueChange={go} className="settings-tabs">
           <TabsList aria-label="设置模块" className="settings-tab-list">
             <TabsTrigger value="general" className="px-4">

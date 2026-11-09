@@ -101,7 +101,7 @@ function saveReady(): Promise<void> {
       writing = request;
       publish();
       try {
-        await harvestIpc.saveSettings(request);
+        await harvestIpc.saveSettings(request, confirmed ?? undefined);
         ensureEpoch(generation);
         confirmed = request;
         saved = true;

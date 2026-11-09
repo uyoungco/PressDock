@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-settings-sync-resolve"
+description = "Enables the settings_sync_resolve command without any pre-configured scope."
+commands.allow = ["settings_sync_resolve"]
+
+[[permission]]
+identifier = "deny-settings-sync-resolve"
+description = "Denies the settings_sync_resolve command without any pre-configured scope."
+commands.deny = ["settings_sync_resolve"]

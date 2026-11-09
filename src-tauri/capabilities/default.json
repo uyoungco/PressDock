@@ -4,6 +4,11 @@
   "description": "Capability for the main window",
   "windows": ["main"],
   "permissions": [
+    "allow-settings-sync-start",
+    "allow-settings-sync-status",
+    "allow-settings-sync-wake",
+    "allow-settings-sync-resolve",
+    "allow-ai-clear-provider-secret",
     "allow-harvest-set-developer-mode",
     "allow-harvest-open-devtools",
     "allow-harvest-load-settings",

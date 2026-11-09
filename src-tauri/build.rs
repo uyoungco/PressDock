@@ -13,6 +13,11 @@ fn main() {
         tauri_build::Attributes::new()
             .windows_attributes(tauri_build::WindowsAttributes::new_without_app_manifest())
             .app_manifest(tauri_build::AppManifest::new().commands(&[
+                "settings_sync_start",
+                "settings_sync_status",
+                "settings_sync_wake",
+                "settings_sync_resolve",
+                "ai_clear_provider_secret",
                 "harvest_set_developer_mode",
                 "harvest_open_devtools",
                 "harvest_load_settings",

@@ -8,6 +8,7 @@ mod cms;
 mod cms;
 mod image_presets;
 mod images;
+mod settings_sync;
 mod system;
 pub use ai::*;
 pub use articles::*;
@@ -15,6 +16,7 @@ pub use channel_drafts::*;
 pub use cms::*;
 pub use image_presets::*;
 pub use images::*;
+pub use settings_sync::*;
 pub use system::*;
 
 mod harvest;

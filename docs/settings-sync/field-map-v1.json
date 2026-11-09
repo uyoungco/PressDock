@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "groups": {
+    "AiProviderConfig": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "id": "providers[].id",
+        "displayName": "providers[].displayName",
+        "baseUrl": "providers[].baseUrl",
+        "protocol": "providers[].protocol",
+        "compatibility": "providers[].compatibility",
+        "hasApiKey": "derived: 本机安全凭据是否可用，不写入云快照"
+      }
+    },
+    "SaveProviderRequest": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "id": "providers[].id",
+        "displayName": "providers[].displayName",
+        "baseUrl": "providers[].baseUrl",
+        "protocol": "providers[].protocol",
+        "compatibility": "providers[].compatibility",
+        "apiKey": "secret: setSecret / clearSecret；现有留空保留语义由适配器表达为不生成修改",
+        "createOnly": "local: 保存动作校验，不属于配置"
+      }
+    },
+    "Compatibility": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "maxTokensField": "providers[].compatibility.maxTokensField",
+        "systemRole": "providers[].compatibility.systemRole",
+        "sendStore": "providers[].compatibility.sendStore"
+      }
+    },
+    "AiModelConfig": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "id": "models[].id",
+        "providerId": "models[].providerId",
+        "modelId": "models[].modelId",
+        "displayName": "models[].displayName",
+        "contextWindow": "models[].contextWindow",
+        "maxOutputTokens": "models[].maxOutputTokens",
+        "reasoningEffort": "models[].reasoningEffort"
+      }
+    },
+    "PromptTemplate": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "id": "templates[].id",
+        "purpose": "templates[].purpose",
+        "name": "templates[].name",
+        "systemPrompt": "templates[].systemPrompt",
+        "userPrompt": "templates[].userPrompt",
+        "modelConfigId": "templates[].modelConfigId",
+        "candidateCount": "templates[].candidateCount",
+        "maxLength": "templates[].maxLength",
+        "paginationOptions": "templates[].paginationOptions",
+        "isDefault": "derived: defaults.titleTemplateId / defaults.paginationTemplateId"
+      }
+    },
+    "PaginationOptions": {
+      "source": "src-tauri/src/ai/models.rs",
+      "fields": {
+        "minChars": "templates[].paginationOptions.minChars",
+        "targetChars": "templates[].paginationOptions.targetChars",
+        "maxChars": "templates[].paginationOptions.maxChars"
+      }
+    },
+    "ChannelImagePresets": {
+      "source": "src-tauri/src/database/image_presets.rs",
+      "fields": {
+        "channel": "imagePresets[].channel",
+        "subChannel": "imagePresets[].subChannel",
+        "titlePic": "imagePresets[field=titlePic]",
+        "titlePic2": "imagePresets[field=titlePic2]"
+      }
+    },
+    "ImagePreset": {
+      "source": "src-tauri/src/database/image_presets.rs",
+      "fields": {
+        "size": "imagePresets[].size",
+        "maxBytes": "imagePresets[].maxBytes",
+        "format": "imagePresets[].format"
+      }
+    },
+    "Size": {
+      "source": "src-tauri/src/imaging/mod.rs",
+      "fields": {
+        "width": "imagePresets[].size.width",
+        "height": "imagePresets[].size.height"
+      }
+    },
+    "HarvestSettings": {
+      "source": "src-tauri/src/harvest/models.rs",
+      "fields": {
+        "sourceMode": "local: 采集方式",
+        "cdpBrowser": "local: 浏览器",
+        "cdpAddress": "local: CDP 地址或浏览器目录",
+        "developerMode": "local: 开发者模式",
+        "retentionDays": "local: 历史保留天数",
+        "autoClassify": "harvest.autoClassify",
+        "autoTags": "harvest.autoTags",
+        "autoSummary": "harvest.autoSummary",
+        "aiAutoPaginate": "harvest.aiAutoPaginate",
+        "modelConfigId": "harvest.modelConfigId"
+      }
+    }
+  },
+  "localOnly": [
+    { "source": "src/atoms/theme.ts", "scope": "主题" },
+    {
+      "source": "src/components/ui/data-table-column-settings.tsx",
+      "scope": "列宽、显隐、排序及布局偏好"
+    },
+    {
+      "source": "src/features/settings/desktop-state.ts",
+      "scope": "导航、设置会话及未提交编辑草稿"
+    },
+    { "source": "src-tauri/src/cms", "scope": "CMS 凭据和会话" },
+    {
+      "source": "src-tauri/src/harvest/models.rs",
+      "scope": "采集任务、来源会话和任务配置快照"
+    },
+    {
+      "source": "src-tauri/src/database/models.rs",
+      "scope": "原始素材、正文与编辑草稿"
+    }
+  ]
+}

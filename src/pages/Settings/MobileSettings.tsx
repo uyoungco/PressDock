@@ -34,6 +34,7 @@ import {
 } from "./sections";
 
 import { settingsModules as modules } from "@/features/settings/modules";
+import { ConfigSyncStatus } from "@/features/settings-sync/ConfigBoundary";
 type State = {
   settingsEditor?: NonNullable<
     ContextType<typeof MobileSettingsContext>
@@ -164,6 +165,7 @@ export default function MobileSettings({
             {modules.find(([id]) => id === tab)?.[1] ?? "系统设置"}
           </h1>
         </header>
+        <ConfigSyncStatus />
         {!tab && (
           <ScrollArea className="flex-1">
             <nav

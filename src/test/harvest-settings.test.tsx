@@ -116,6 +116,7 @@ it("首次加载不保存，移除按钮；连续修改在最后一次修改 500
   await tick(1);
   expect(harvestIpc.saveSettings).toHaveBeenCalledExactlyOnceWith(
     expect.objectContaining({ autoClassify: true, retentionDays: 30 }),
+    expect.objectContaining({ autoClassify: false }),
   );
   expect(screen.getByRole("status")).toHaveTextContent("已保存");
   expect(toast.success).not.toHaveBeenCalled();
@@ -269,6 +270,7 @@ it("模型选择与规则使用同一个防抖批次，读取设置提前补存"
   await importService.settings();
   expect(harvestIpc.saveSettings).toHaveBeenCalledExactlyOnceWith(
     expect.objectContaining({ modelConfigId: "model-1", aiAutoPaginate: true }),
+    expect.objectContaining({ aiAutoPaginate: false }),
   );
 });
 

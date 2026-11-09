@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-settings-sync-status"
+description = "Enables the settings_sync_status command without any pre-configured scope."
+commands.allow = ["settings_sync_status"]
+
+[[permission]]
+identifier = "deny-settings-sync-status"
+description = "Denies the settings_sync_status command without any pre-configured scope."
+commands.deny = ["settings_sync_status"]

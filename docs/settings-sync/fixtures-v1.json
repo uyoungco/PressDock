@@ -1,0 +1,5718 @@
+{
+  "demo": true,
+  "description": "仅协议验收演示数据，不包含真实账号或密钥",
+  "base": {
+    "schemaVersion": 1,
+    "revision": 7,
+    "config": {
+      "providers": [
+        {
+          "id": "demo-provider",
+          "displayName": "演示提供商",
+          "baseUrl": "https://api.example.com/v1",
+          "protocol": "chatCompletions",
+          "compatibility": {
+            "maxTokensField": "max_completion_tokens",
+            "systemRole": "system",
+            "sendStore": true
+          }
+        }
+      ],
+      "models": [
+        {
+          "id": "demo-model",
+          "providerId": "demo-provider",
+          "modelId": "demo-model-id",
+          "displayName": "演示模型",
+          "contextWindow": 32000,
+          "maxOutputTokens": 4000,
+          "reasoningEffort": null
+        }
+      ],
+      "templates": [
+        {
+          "id": "demo-title",
+          "purpose": "title",
+          "name": "演示标题模板",
+          "systemPrompt": "演示指令",
+          "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+          "modelConfigId": "demo-model",
+          "candidateCount": 5,
+          "maxLength": 30,
+          "paginationOptions": null
+        },
+        {
+          "id": "demo-pagination",
+          "purpose": "pagination",
+          "name": "演示分页模板",
+          "systemPrompt": "演示指令",
+          "userPrompt": "{{title}} {{blocks}}",
+          "modelConfigId": "demo-model",
+          "candidateCount": 5,
+          "maxLength": 30,
+          "paginationOptions": {
+            "minChars": 100,
+            "targetChars": 240,
+            "maxChars": 400
+          }
+        }
+      ],
+      "imagePresets": [
+        {
+          "channel": "演示/渠道",
+          "subChannel": "演示~子渠道",
+          "field": "titlePic",
+          "size": {
+            "width": 280,
+            "height": 124
+          },
+          "maxBytes": 102400,
+          "format": "webp"
+        }
+      ],
+      "defaults": {
+        "titleTemplateId": "demo-title",
+        "paginationTemplateId": "demo-pagination"
+      },
+      "harvest": {
+        "autoClassify": false,
+        "autoTags": true,
+        "autoSummary": true,
+        "aiAutoPaginate": false,
+        "modelConfigId": "demo-model"
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "valid full snapshot",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "unsupported schema",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 2,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "UNSUPPORTED_VERSION"
+    },
+    {
+      "name": "reject local theme",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          },
+          "theme": "dark"
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject local retention",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model",
+            "retentionDays": 30
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject CDP settings",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model",
+            "cdpAddress": "http://localhost:9222"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject plaintext key in provider",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              },
+              "apiKey": "DEMO-ONLY-SECRET"
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject hasApiKey in cloud snapshot",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              },
+              "hasApiKey": true
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject legacy isDefault flag",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null,
+              "isDefault": true
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "unknown config collection",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          },
+          "drafts": []
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject unsafe provider URL",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "http://remote.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject URL query secret",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com?key=DEMO-ONLY",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "reject trailing query delimiter",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com?",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "allow loopback HTTP",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "http://127.0.0.1:8080/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "http://127.0.0.1:8080/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "duplicate model pair",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            },
+            {
+              "id": "demo-duplicate",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "DUPLICATE_ENTITY"
+    },
+    {
+      "name": "missing provider reference",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "missing",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "missing template model reference",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "missing",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "default purpose mismatch",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-pagination",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "unknown template variable",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{unknown}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "unclosed template variable",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "pagination without options",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "pagination options invalid on title too",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 300,
+                "targetChars": 200,
+                "maxChars": 400
+              }
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "image max pixels",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 5000,
+                "height": 5000
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "image unknown size field",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124,
+                "extra": true
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "duplicate tuple remains unambiguous",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            },
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "DUPLICATE_ENTITY"
+    },
+    {
+      "name": "nullable model overrides",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": null,
+              "maxOutputTokens": null,
+              "reasoningEffort": "high"
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": null,
+              "maxOutputTokens": null,
+              "reasoningEffort": "high"
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "only edit model name",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "displayName",
+            "value": "演示新名称"
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示新名称",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "explicit null clears optional token limit",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "maxOutputTokens",
+            "value": null
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": null,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "different fields in same model merge",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "contextWindow",
+            "value": 2000
+          },
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "maxOutputTokens",
+            "value": 1000
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 2000,
+              "maxOutputTokens": 1000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "nested compatibility field only",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "provider",
+              "id": "demo-provider"
+            },
+            "field": "compatibility.sendStore",
+            "value": false
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": false
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "unknown modification path",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "provider",
+              "id": "demo-provider"
+            },
+            "field": "__proto__.polluted",
+            "value": true
+          }
+        ]
+      },
+      "expectedCode": "UNKNOWN_FIELD"
+    },
+    {
+      "name": "immutable model owner",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "providerId",
+            "value": "other"
+          }
+        ]
+      },
+      "expectedCode": "UNKNOWN_FIELD"
+    },
+    {
+      "name": "immutable template purpose",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "template",
+              "id": "demo-title"
+            },
+            "field": "purpose",
+            "value": "pagination"
+          }
+        ]
+      },
+      "expectedCode": "UNKNOWN_FIELD"
+    },
+    {
+      "name": "reject local field update",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "harvest"
+            },
+            "field": "developerMode",
+            "value": true
+          }
+        ]
+      },
+      "expectedCode": "UNKNOWN_FIELD"
+    },
+    {
+      "name": "reject duplicate field in batch",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "displayName",
+            "value": "A"
+          },
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "displayName",
+            "value": "B"
+          }
+        ]
+      },
+      "expectedCode": "DUPLICATE_CHANGE"
+    },
+    {
+      "name": "token range invalid",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "maxOutputTokens",
+            "value": 0
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "output greater than context",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            },
+            "field": "maxOutputTokens",
+            "value": 40000
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "missing reference after patch",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "harvest"
+            },
+            "field": "modelConfigId",
+            "value": "missing"
+          }
+        ]
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "delete referenced model",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "delete",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            }
+          }
+        ]
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "delete default template without clearing",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "delete",
+            "target": {
+              "entity": "template",
+              "id": "demo-title"
+            }
+          }
+        ]
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "clear default and delete atomically",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "defaults"
+            },
+            "field": "titleTemplateId",
+            "value": null
+          },
+          {
+            "type": "delete",
+            "target": {
+              "entity": "template",
+              "id": "demo-title"
+            }
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": null,
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "remove provider model and references atomically",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "template",
+              "id": "demo-title"
+            },
+            "field": "modelConfigId",
+            "value": null
+          },
+          {
+            "type": "set",
+            "target": {
+              "entity": "template",
+              "id": "demo-pagination"
+            },
+            "field": "modelConfigId",
+            "value": null
+          },
+          {
+            "type": "set",
+            "target": {
+              "entity": "harvest"
+            },
+            "field": "modelConfigId",
+            "value": null
+          },
+          {
+            "type": "delete",
+            "target": {
+              "entity": "model",
+              "id": "demo-model"
+            }
+          },
+          {
+            "type": "delete",
+            "target": {
+              "entity": "provider",
+              "id": "demo-provider"
+            }
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [],
+          "models": [],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": null,
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": null,
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": null
+          }
+        }
+      }
+    },
+    {
+      "name": "no upsert for missing entity",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "model",
+              "id": "missing"
+            },
+            "field": "displayName",
+            "value": "演示"
+          }
+        ]
+      },
+      "expectedCode": "ENTITY_NOT_FOUND"
+    },
+    {
+      "name": "duplicate create is not update",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "create",
+            "entity": "model",
+            "value": {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          }
+        ]
+      },
+      "expectedCode": "DUPLICATE_ENTITY"
+    },
+    {
+      "name": "new model explicit create",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "create",
+            "entity": "model",
+            "value": {
+              "id": "demo-new",
+              "providerId": "demo-provider",
+              "modelId": "new-demo-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            },
+            {
+              "id": "demo-new",
+              "providerId": "demo-provider",
+              "modelId": "new-demo-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "tombstone prevents ID reuse",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "create",
+            "entity": "model",
+            "value": {
+              "id": "demo-deleted",
+              "providerId": "demo-provider",
+              "modelId": "new-demo-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          }
+        ]
+      },
+      "expectedCode": "ENTITY_DELETED",
+      "deletedKeys": ["[\"model\",\"demo-deleted\"]"]
+    },
+    {
+      "name": "Unicode tuple image clear maxBytes",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "set",
+            "target": {
+              "entity": "imagePreset",
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic"
+            },
+            "field": "maxBytes",
+            "value": null
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": null,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "explicit image record deletion",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "delete",
+            "target": {
+              "entity": "imagePreset",
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic"
+            }
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "secret replacement at 8192 UTF-8 bytes never in snapshot",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中a"
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "secret clear distinct from unchanged",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 8,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "secret null is invalid use clearSecret",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": null
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "secret whitespace invalid",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": "   "
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "secret Unicode byte overflow",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": "中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中"
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "secret control character invalid",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY\nKEY"
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "secret missing provider",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "missing"
+          }
+        ]
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "secret duplicate change",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          },
+          {
+            "type": "setSecret",
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY"
+          }
+        ]
+      },
+      "expectedCode": "DUPLICATE_CHANGE"
+    },
+    {
+      "name": "empty changes invalid",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": []
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "unknown action invalid",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "upsert",
+            "entity": "provider",
+            "value": {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          }
+        ]
+      },
+      "expectedCode": "UNKNOWN_FIELD"
+    },
+    {
+      "name": "invalid operation UUID",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "not-uuid",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "invalid sequence",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 0,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "unsafe sequence",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 9007199254740992,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          }
+        ]
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "unsupported operation version",
+      "kind": "operation",
+      "input": {
+        "schemaVersion": 2,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "changes": [
+          {
+            "type": "clearSecret",
+            "providerId": "demo-provider"
+          }
+        ]
+      },
+      "expectedCode": "UNSUPPORTED_VERSION"
+    },
+    {
+      "name": "initialize all providers and keys",
+      "kind": "initialize",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-NOT-A-REAL-KEY"
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-NOT-A-REAL-KEY"
+          }
+        ]
+      }
+    },
+    {
+      "name": "initialize no secret is explicit null",
+      "kind": "initialize",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": null
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "initialize missing secret entry rejected",
+      "kind": "initialize",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": []
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "initialize cannot carry revision",
+      "kind": "initialize",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-NOT-A-REAL-KEY"
+          }
+        ],
+        "revision": 7
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "native-only bootstrap complete",
+      "kind": "bootstrap",
+      "input": {
+        "snapshot": {
+          "schemaVersion": 1,
+          "revision": 7,
+          "config": {
+            "providers": [
+              {
+                "id": "demo-provider",
+                "displayName": "演示提供商",
+                "baseUrl": "https://api.example.com/v1",
+                "protocol": "chatCompletions",
+                "compatibility": {
+                  "maxTokensField": "max_completion_tokens",
+                  "systemRole": "system",
+                  "sendStore": true
+                }
+              }
+            ],
+            "models": [
+              {
+                "id": "demo-model",
+                "providerId": "demo-provider",
+                "modelId": "demo-model-id",
+                "displayName": "演示模型",
+                "contextWindow": 32000,
+                "maxOutputTokens": 4000,
+                "reasoningEffort": null
+              }
+            ],
+            "templates": [
+              {
+                "id": "demo-title",
+                "purpose": "title",
+                "name": "演示标题模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": null
+              },
+              {
+                "id": "demo-pagination",
+                "purpose": "pagination",
+                "name": "演示分页模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{blocks}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": {
+                  "minChars": 100,
+                  "targetChars": 240,
+                  "maxChars": 400
+                }
+              }
+            ],
+            "imagePresets": [
+              {
+                "channel": "演示/渠道",
+                "subChannel": "演示~子渠道",
+                "field": "titlePic",
+                "size": {
+                  "width": 280,
+                  "height": 124
+                },
+                "maxBytes": 102400,
+                "format": "webp"
+              }
+            ],
+            "defaults": {
+              "titleTemplateId": "demo-title",
+              "paginationTemplateId": "demo-pagination"
+            },
+            "harvest": {
+              "autoClassify": false,
+              "autoTags": true,
+              "autoSummary": true,
+              "aiAutoPaginate": false,
+              "modelConfigId": "demo-model"
+            }
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-NOT-A-REAL-KEY"
+          }
+        ]
+      },
+      "expectedCode": null,
+      "expected": {
+        "snapshot": {
+          "schemaVersion": 1,
+          "revision": 7,
+          "config": {
+            "providers": [
+              {
+                "id": "demo-provider",
+                "displayName": "演示提供商",
+                "baseUrl": "https://api.example.com/v1",
+                "protocol": "chatCompletions",
+                "compatibility": {
+                  "maxTokensField": "max_completion_tokens",
+                  "systemRole": "system",
+                  "sendStore": true
+                }
+              }
+            ],
+            "models": [
+              {
+                "id": "demo-model",
+                "providerId": "demo-provider",
+                "modelId": "demo-model-id",
+                "displayName": "演示模型",
+                "contextWindow": 32000,
+                "maxOutputTokens": 4000,
+                "reasoningEffort": null
+              }
+            ],
+            "templates": [
+              {
+                "id": "demo-title",
+                "purpose": "title",
+                "name": "演示标题模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": null
+              },
+              {
+                "id": "demo-pagination",
+                "purpose": "pagination",
+                "name": "演示分页模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{blocks}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": {
+                  "minChars": 100,
+                  "targetChars": 240,
+                  "maxChars": 400
+                }
+              }
+            ],
+            "imagePresets": [
+              {
+                "channel": "演示/渠道",
+                "subChannel": "演示~子渠道",
+                "field": "titlePic",
+                "size": {
+                  "width": 280,
+                  "height": 124
+                },
+                "maxBytes": 102400,
+                "format": "webp"
+              }
+            ],
+            "defaults": {
+              "titleTemplateId": "demo-title",
+              "paginationTemplateId": "demo-pagination"
+            },
+            "harvest": {
+              "autoClassify": false,
+              "autoTags": true,
+              "autoSummary": true,
+              "aiAutoPaginate": false,
+              "modelConfigId": "demo-model"
+            }
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "demo-provider",
+            "value": "DEMO-ONLY-NOT-A-REAL-KEY"
+          }
+        ]
+      }
+    },
+    {
+      "name": "bootstrap cannot silently omit keys",
+      "kind": "bootstrap",
+      "input": {
+        "snapshot": {
+          "schemaVersion": 1,
+          "revision": 7,
+          "config": {
+            "providers": [
+              {
+                "id": "demo-provider",
+                "displayName": "演示提供商",
+                "baseUrl": "https://api.example.com/v1",
+                "protocol": "chatCompletions",
+                "compatibility": {
+                  "maxTokensField": "max_completion_tokens",
+                  "systemRole": "system",
+                  "sendStore": true
+                }
+              }
+            ],
+            "models": [
+              {
+                "id": "demo-model",
+                "providerId": "demo-provider",
+                "modelId": "demo-model-id",
+                "displayName": "演示模型",
+                "contextWindow": 32000,
+                "maxOutputTokens": 4000,
+                "reasoningEffort": null
+              }
+            ],
+            "templates": [
+              {
+                "id": "demo-title",
+                "purpose": "title",
+                "name": "演示标题模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": null
+              },
+              {
+                "id": "demo-pagination",
+                "purpose": "pagination",
+                "name": "演示分页模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{blocks}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": {
+                  "minChars": 100,
+                  "targetChars": 240,
+                  "maxChars": 400
+                }
+              }
+            ],
+            "imagePresets": [
+              {
+                "channel": "演示/渠道",
+                "subChannel": "演示~子渠道",
+                "field": "titlePic",
+                "size": {
+                  "width": 280,
+                  "height": 124
+                },
+                "maxBytes": 102400,
+                "format": "webp"
+              }
+            ],
+            "defaults": {
+              "titleTemplateId": "demo-title",
+              "paginationTemplateId": "demo-pagination"
+            },
+            "harvest": {
+              "autoClassify": false,
+              "autoTags": true,
+              "autoSummary": true,
+              "aiAutoPaginate": false,
+              "modelConfigId": "demo-model"
+            }
+          }
+        },
+        "secrets": []
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "bootstrap rejects foreign provider secret",
+      "kind": "bootstrap",
+      "input": {
+        "snapshot": {
+          "schemaVersion": 1,
+          "revision": 7,
+          "config": {
+            "providers": [
+              {
+                "id": "demo-provider",
+                "displayName": "演示提供商",
+                "baseUrl": "https://api.example.com/v1",
+                "protocol": "chatCompletions",
+                "compatibility": {
+                  "maxTokensField": "max_completion_tokens",
+                  "systemRole": "system",
+                  "sendStore": true
+                }
+              }
+            ],
+            "models": [
+              {
+                "id": "demo-model",
+                "providerId": "demo-provider",
+                "modelId": "demo-model-id",
+                "displayName": "演示模型",
+                "contextWindow": 32000,
+                "maxOutputTokens": 4000,
+                "reasoningEffort": null
+              }
+            ],
+            "templates": [
+              {
+                "id": "demo-title",
+                "purpose": "title",
+                "name": "演示标题模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": null
+              },
+              {
+                "id": "demo-pagination",
+                "purpose": "pagination",
+                "name": "演示分页模板",
+                "systemPrompt": "演示指令",
+                "userPrompt": "{{title}} {{blocks}}",
+                "modelConfigId": "demo-model",
+                "candidateCount": 5,
+                "maxLength": 30,
+                "paginationOptions": {
+                  "minChars": 100,
+                  "targetChars": 240,
+                  "maxChars": 400
+                }
+              }
+            ],
+            "imagePresets": [
+              {
+                "channel": "演示/渠道",
+                "subChannel": "演示~子渠道",
+                "field": "titlePic",
+                "size": {
+                  "width": 280,
+                  "height": 124
+                },
+                "maxBytes": 102400,
+                "format": "webp"
+              }
+            ],
+            "defaults": {
+              "titleTemplateId": "demo-title",
+              "paginationTemplateId": "demo-pagination"
+            },
+            "harvest": {
+              "autoClassify": false,
+              "autoTags": true,
+              "autoSummary": true,
+              "aiAutoPaginate": false,
+              "modelConfigId": "demo-model"
+            }
+          }
+        },
+        "secrets": [
+          {
+            "providerId": "missing",
+            "value": "DEMO-ONLY"
+          }
+        ]
+      },
+      "expectedCode": "REFERENCE_NOT_FOUND"
+    },
+    {
+      "name": "invalid JSON is sanitized",
+      "kind": "snapshot",
+      "raw": "{\"DEMO-ONLY\":",
+      "expectedCode": "INVALID_DOCUMENT"
+    },
+    {
+      "name": "unpaired Unicode surrogate rejected",
+      "kind": "snapshot",
+      "raw": "{\"schemaVersion\":1,\"revision\":7,\"config\":\"\\ud800\"}",
+      "expectedCode": "INVALID_DOCUMENT"
+    },
+    {
+      "name": "integral JSON float normalizes equally",
+      "kind": "snapshot",
+      "raw": "{\"schemaVersion\":1,\"revision\":7.0,\"config\":{\"providers\":[{\"id\":\"demo-provider\",\"displayName\":\"演示提供商\",\"baseUrl\":\"https://api.example.com/v1\",\"protocol\":\"chatCompletions\",\"compatibility\":{\"maxTokensField\":\"max_completion_tokens\",\"systemRole\":\"system\",\"sendStore\":true}}],\"models\":[{\"id\":\"demo-model\",\"providerId\":\"demo-provider\",\"modelId\":\"demo-model-id\",\"displayName\":\"演示模型\",\"contextWindow\":32000,\"maxOutputTokens\":4000,\"reasoningEffort\":null}],\"templates\":[{\"id\":\"demo-title\",\"purpose\":\"title\",\"name\":\"演示标题模板\",\"systemPrompt\":\"演示指令\",\"userPrompt\":\"{{title}} {{content}} {{count}} {{max_length}} {{requirements}}\",\"modelConfigId\":\"demo-model\",\"candidateCount\":5,\"maxLength\":30,\"paginationOptions\":null},{\"id\":\"demo-pagination\",\"purpose\":\"pagination\",\"name\":\"演示分页模板\",\"systemPrompt\":\"演示指令\",\"userPrompt\":\"{{title}} {{blocks}}\",\"modelConfigId\":\"demo-model\",\"candidateCount\":5,\"maxLength\":30,\"paginationOptions\":{\"minChars\":100,\"targetChars\":240,\"maxChars\":400}}],\"imagePresets\":[{\"channel\":\"演示/渠道\",\"subChannel\":\"演示~子渠道\",\"field\":\"titlePic\",\"size\":{\"width\":280,\"height\":124},\"maxBytes\":102400,\"format\":\"webp\"}],\"defaults\":{\"titleTemplateId\":\"demo-title\",\"paginationTemplateId\":\"demo-pagination\"},\"harvest\":{\"autoClassify\":false,\"autoTags\":true,\"autoSummary\":true,\"aiAutoPaginate\":false,\"modelConfigId\":\"demo-model\"}}}",
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "Unicode whitespace matches native",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "BOM is not native Unicode White_Space",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "﻿",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "﻿",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{content}} {{count}} {{max_length}} {{requirements}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "template variable Unicode whitespace",
+      "kind": "snapshot",
+      "input": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "revision": 7,
+        "config": {
+          "providers": [
+            {
+              "id": "demo-provider",
+              "displayName": "演示提供商",
+              "baseUrl": "https://api.example.com/v1",
+              "protocol": "chatCompletions",
+              "compatibility": {
+                "maxTokensField": "max_completion_tokens",
+                "systemRole": "system",
+                "sendStore": true
+              }
+            }
+          ],
+          "models": [
+            {
+              "id": "demo-model",
+              "providerId": "demo-provider",
+              "modelId": "demo-model-id",
+              "displayName": "演示模型",
+              "contextWindow": 32000,
+              "maxOutputTokens": 4000,
+              "reasoningEffort": null
+            }
+          ],
+          "templates": [
+            {
+              "id": "demo-title",
+              "purpose": "title",
+              "name": "演示标题模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": null
+            },
+            {
+              "id": "demo-pagination",
+              "purpose": "pagination",
+              "name": "演示分页模板",
+              "systemPrompt": "演示指令",
+              "userPrompt": "{{title}} {{blocks}}",
+              "modelConfigId": "demo-model",
+              "candidateCount": 5,
+              "maxLength": 30,
+              "paginationOptions": {
+                "minChars": 100,
+                "targetChars": 240,
+                "maxChars": 400
+              }
+            }
+          ],
+          "imagePresets": [
+            {
+              "channel": "演示/渠道",
+              "subChannel": "演示~子渠道",
+              "field": "titlePic",
+              "size": {
+                "width": 280,
+                "height": 124
+              },
+              "maxBytes": 102400,
+              "format": "webp"
+            }
+          ],
+          "defaults": {
+            "titleTemplateId": "demo-title",
+            "paginationTemplateId": "demo-pagination"
+          },
+          "harvest": {
+            "autoClassify": false,
+            "autoTags": true,
+            "autoSummary": true,
+            "aiAutoPaginate": false,
+            "modelConfigId": "demo-model"
+          }
+        }
+      }
+    },
+    {
+      "name": "nonfinite JSON number rejected",
+      "kind": "snapshot",
+      "raw": "{\"schemaVersion\":1,\"revision\":1e999,\"config\":{}}",
+      "expectedCode": "INVALID_DOCUMENT"
+    },
+    {
+      "name": "stable receipt with original operation identity",
+      "kind": "receipt",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "revision": 8
+      },
+      "expectedCode": null,
+      "expected": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "revision": 8
+      }
+    },
+    {
+      "name": "receipt cannot echo secrets",
+      "kind": "receipt",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "revision": 8,
+        "apiKey": "DEMO-ONLY"
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "receipt unsafe revision rejected",
+      "kind": "receipt",
+      "input": {
+        "schemaVersion": 1,
+        "operationId": "00000000-0000-4000-8000-000000000001",
+        "deviceId": "00000000-0000-4000-8000-000000000002",
+        "sequence": 1,
+        "revision": 9007199254740992
+      },
+      "expectedCode": "VALIDATION_FAILED"
+    },
+    {
+      "name": "UTF-8 BOM is not JSON content",
+      "kind": "snapshot",
+      "raw": "﻿{\"schemaVersion\":1,\"revision\":7,\"config\":{\"providers\":[{\"id\":\"demo-provider\",\"displayName\":\"演示提供商\",\"baseUrl\":\"https://api.example.com/v1\",\"protocol\":\"chatCompletions\",\"compatibility\":{\"maxTokensField\":\"max_completion_tokens\",\"systemRole\":\"system\",\"sendStore\":true}}],\"models\":[{\"id\":\"demo-model\",\"providerId\":\"demo-provider\",\"modelId\":\"demo-model-id\",\"displayName\":\"演示模型\",\"contextWindow\":32000,\"maxOutputTokens\":4000,\"reasoningEffort\":null}],\"templates\":[{\"id\":\"demo-title\",\"purpose\":\"title\",\"name\":\"演示标题模板\",\"systemPrompt\":\"演示指令\",\"userPrompt\":\"{{title}} {{content}} {{count}} {{max_length}} {{requirements}}\",\"modelConfigId\":\"demo-model\",\"candidateCount\":5,\"maxLength\":30,\"paginationOptions\":null},{\"id\":\"demo-pagination\",\"purpose\":\"pagination\",\"name\":\"演示分页模板\",\"systemPrompt\":\"演示指令\",\"userPrompt\":\"{{title}} {{blocks}}\",\"modelConfigId\":\"demo-model\",\"candidateCount\":5,\"maxLength\":30,\"paginationOptions\":{\"minChars\":100,\"targetChars\":240,\"maxChars\":400}}],\"imagePresets\":[{\"channel\":\"演示/渠道\",\"subChannel\":\"演示~子渠道\",\"field\":\"titlePic\",\"size\":{\"width\":280,\"height\":124},\"maxBytes\":102400,\"format\":\"webp\"}],\"defaults\":{\"titleTemplateId\":\"demo-title\",\"paginationTemplateId\":\"demo-pagination\"},\"harvest\":{\"autoClassify\":false,\"autoTags\":true,\"autoSummary\":true,\"aiAutoPaginate\":false,\"modelConfigId\":\"demo-model\"}}}",
+      "expectedCode": "INVALID_DOCUMENT"
+    },
+    {
+      "name": "excess nesting rejected before validation",
+      "kind": "snapshot",
+      "raw": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "expectedCode": "INVALID_DOCUMENT"
+    }
+  ]
+}

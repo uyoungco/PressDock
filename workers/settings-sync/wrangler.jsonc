@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "pressdock-settings-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-06",
+  "send_metrics": false,
+  "account_id": "227d58ddf76b97d47968d3443e1aa726",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": { "SETTINGS_ENVIRONMENT": "development" },
+  "observability": {
+    "enabled": false,
+    "logs": { "enabled": false, "invocation_logs": false },
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pressdock-settings-dev",
+      "database_id": "84b54ef9-7393-4de9-b5b5-03579e42f050",
+      "migrations_dir": "migrations",
+    },
+  ],
+}

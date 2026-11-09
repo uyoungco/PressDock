@@ -62,10 +62,10 @@ export function useAiSettings(active: boolean) {
     try {
       await work(current.signal);
       if (!mounted.current) return;
-      await refresh();
+      const saved = await refresh();
       if (mounted.current && success) toast.success(success);
       // 手机编辑层仅在写入、刷新都成功后返回，失败时保留表单。
-      return true;
+      return saved;
     } catch (reason) {
       if (mounted.current) setError(aiErrorMessage(reason));
       return false;

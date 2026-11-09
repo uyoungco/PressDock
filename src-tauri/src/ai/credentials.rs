@@ -1,12 +1,12 @@
 use super::AiError;
 
-pub(super) trait AiVault: Send + Sync {
+pub(crate) trait AiVault: Send + Sync {
     fn load(&self, reference: &str) -> Result<String, AiError>;
     fn save(&self, reference: &str, secret: &str) -> Result<(), AiError>;
     fn clear(&self, reference: &str) -> Result<(), AiError>;
 }
 
-pub(super) struct NativeAiVault;
+pub(crate) struct NativeAiVault;
 
 fn failure() -> AiError {
     AiError::new(

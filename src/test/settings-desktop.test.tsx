@@ -85,6 +85,7 @@ it("模型默认展示已保存摘要，编辑弹框失败保留输入、请求�
       displayName: "新的演示网关",
       createOnly: false,
     }),
+    expect.objectContaining({ id: "demo-gateway" }),
   );
   expect(within(dialog).getByRole("button", { name: "关闭" })).toBeDisabled();
   fireEvent.submit(document.getElementById("settings-provider-form")!);
@@ -209,6 +210,7 @@ it("变量插入最近聚焦的光标，保存一个模板不会清掉其他模�
         id: "template-2",
         systemPrompt: "简{{title}}洁",
       }),
+      expect.objectContaining({ id: "template-2" }),
     ),
   );
   await waitFor(() =>

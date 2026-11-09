@@ -138,7 +138,7 @@ impl Database {
         }
         let normalized = source_url(&request.url)?.to_string();
         let options = self.harvest_settings().await?.options;
-        let pagination_snapshot = if options.ai_auto_paginate {
+        let mut pagination_snapshot = if options.ai_auto_paginate {
             // 快照只包含模板内容和绑定 ID；不读取或保存密钥。配置存储错误不能当作配置缺失。
             self.ai_settings()
                 .await?
@@ -149,7 +149,23 @@ impl Database {
         } else {
             None
         };
+        if let Some(snapshot) = &mut pagination_snapshot {
+            snapshot.execution = self
+                .ai_execution_snapshot(&snapshot.model_config_id)
+                .await?;
+        }
+        let metadata_snapshot =
+            if options.auto_classify || options.auto_tags || options.auto_summary {
+                if let Some(id) = &options.model_config_id {
+                    self.ai_execution_snapshot(id).await?
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
         let job_options = JobOptions {
+            metadata_snapshot,
             processing: options.clone(),
             pagination_snapshot,
         };

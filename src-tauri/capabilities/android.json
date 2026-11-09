@@ -4,6 +4,11 @@
   "platforms": ["android"],
   "windows": ["main"],
   "permissions": [
+    "allow-settings-sync-start",
+    "allow-settings-sync-status",
+    "allow-settings-sync-wake",
+    "allow-settings-sync-resolve",
+    "allow-ai-clear-provider-secret",
     "core:event:allow-listen",
     "core:event:allow-unlisten",
     "allow-get-app-info",

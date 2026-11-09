@@ -24,9 +24,10 @@ export const harvestIpc = {
     }),
   openDevtools: () => invokeCommand("harvest_open_devtools", z.null()),
   settings: () => invokeCommand("harvest_load_settings", harvestSettingsSchema),
-  saveSettings: (request: HarvestSettings) =>
+  saveSettings: (request: HarvestSettings, baseline?: HarvestSettings) =>
     invokeCommand("harvest_save_settings", z.null(), {
       request: harvestSettingsSchema.parse(request),
+      baseline: baseline ? harvestSettingsSchema.parse(baseline) : null,
     }),
   list: (date: string) =>
     invokeCommand("harvest_list_jobs", harvestListSchema, { date }),

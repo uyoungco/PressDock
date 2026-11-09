@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus, Trash2, FlaskConical, Download, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import {
   modelSchema,
   saveProviderSchema,
   type AiModelConfig,
+  type AiProviderConfig,
   type SaveProviderRequest,
 } from "./contracts";
 import { AiChoice, AiField } from "./fields";
@@ -49,6 +50,10 @@ export function ModelSettings({ active }: { active: boolean }) {
   const { settings, loading, busy, error, run, refresh } =
     useAiSettings(active);
   const mobile = useMobileSettings();
+  const providerBaselines = useRef<
+    Record<string, AiProviderConfig | undefined>
+  >({});
+  const modelBaselines = useRef<Record<string, AiModelConfig | undefined>>({});
   const compact = !!useDesktopSettings();
   const [providerOpen, setProviderOpen] = useState(false);
   const [localProvider, setLocalProvider] =
@@ -88,6 +93,10 @@ export function ModelSettings({ active }: { active: boolean }) {
       : localExisting;
   // 手机按条目缓存草稿，避免选择另一提供商或返回列表时覆盖输入。
   function setProvider(next: SaveProviderRequest | null) {
+    if (next && !(next.id in providerBaselines.current))
+      providerBaselines.current[next.id] = settings.providers.find(
+        (p) => p.id === next.id,
+      );
     if (!mobile) {
       setLocalProvider(next);
       if (compact && next)
@@ -104,6 +113,10 @@ export function ModelSettings({ active }: { active: boolean }) {
     }
   }
   function setModel(next: AiModelConfig | null) {
+    if (next && !(next.id in modelBaselines.current))
+      modelBaselines.current[next.id] = settings.models.find(
+        (m) => m.id === next.id,
+      );
     if (!mobile) {
       setLocalModel(next);
       if (compact && next)
@@ -211,12 +224,20 @@ export function ModelSettings({ active }: { active: boolean }) {
             apiKey: provider.apiKey || null,
             createOnly: !existing,
           });
-          await aiService.saveProvider(request);
-          if (!mobile && !compact) setProvider({ ...request, apiKey: "" });
+          await aiService.saveProvider(
+            request,
+            request.id in providerBaselines.current
+              ? providerBaselines.current[request.id]
+              : settings.providers.find((p) => p.id === request.id),
+          );
+          delete providerBaselines.current[request.id];
           setExisting(true);
         }, "提供商已保存").then((saved) => {
+          if (saved && !mobile) {
+            const current = saved.providers.find((p) => p.id === provider.id);
+            setLocalProvider(current ? { ...current, apiKey: "" } : null);
+          }
           if (saved && compact) {
-            setLocalProvider({ ...provider, apiKey: "" });
             setProviderDrafts((previous) => {
               const next = { ...previous };
               delete next[existing ? provider.id : "new-provider"];
@@ -296,8 +317,8 @@ export function ModelSettings({ active }: { active: boolean }) {
         label="API 密钥"
         hint={
           savedProvider?.hasApiKey
-            ? "已保存到系统凭据库；留空保留原密钥，填写可替换。"
-            : "密钥保存到系统凭据库；本地免密服务可留空。"
+            ? "已保存到系统凭据库并自动上报；留空保留，填写可替换。"
+            : "密钥将加密同步到各设备；本地免密服务可留空。"
         }
       >
         <Input
@@ -311,6 +332,21 @@ export function ModelSettings({ active }: { active: boolean }) {
           }
           onChange={(e) => setProvider({ ...provider, apiKey: e.target.value })}
         />
+        {savedProvider?.hasApiKey && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={disabled}
+            onClick={() =>
+              void run(async () => {
+                await aiService.clearSecret(provider.id);
+              }, "密钥已在本机清除，等待上报")
+            }
+          >
+            清除已保存密钥
+          </Button>
+        )}
       </AiField>
       <details className="space-y-4 rounded-lg border p-3">
         <summary className="cursor-pointer text-sm font-medium">
@@ -421,7 +457,13 @@ export function ModelSettings({ active }: { active: boolean }) {
       onSubmit={(event) => {
         event.preventDefault();
         void run(async () => {
-          await aiService.saveModel(modelSchema.parse(model));
+          await aiService.saveModel(
+            modelSchema.parse(model),
+            model.id in modelBaselines.current
+              ? modelBaselines.current[model.id]
+              : settings.models.find((m) => m.id === model.id),
+          );
+          delete modelBaselines.current[model.id];
           if (!compact) setModel(null);
         }, "模型配置已保存").then((saved) => {
           if (saved && compact) {

@@ -19,6 +19,16 @@ import {
   recordInput,
 } from "@/features/channels/edit-buffer";
 import { material } from "./cms-fixtures";
+vi.mock("@/services/tauri/settings-sync", async () => {
+  const { readySyncStatus } = await import("./settings-sync-fixtures");
+  return {
+    settingsSyncIpc: {
+      start: vi.fn(async () => readySyncStatus),
+      status: vi.fn(async () => readySyncStatus),
+      wake: vi.fn(async () => null),
+    },
+  };
+});
 
 vi.mock("@/services/tauri/cms", () => ({
   cmsIpc: {

@@ -8,6 +8,7 @@ import {
   suggestionRequestSchema,
   suggestionResultSchema,
   type SaveProviderRequest,
+  type AiProviderConfig,
   type AiModelConfig,
   type PromptTemplate,
   type TitleSuggestionRequest,
@@ -18,20 +19,33 @@ import {
 
 export const aiIpc = {
   load: () => invokeCommand("ai_load_settings", settingsSchema),
-  saveProvider: (request: SaveProviderRequest) =>
+  saveProvider: (request: SaveProviderRequest, baseline?: AiProviderConfig) =>
     invokeCommand("ai_save_provider", z.null(), {
       request: saveProviderSchema.parse(request),
+      baseline: baseline
+        ? {
+            id: baseline.id,
+            displayName: baseline.displayName,
+            baseUrl: baseline.baseUrl,
+            protocol: baseline.protocol,
+            compatibility: baseline.compatibility,
+          }
+        : null,
     }),
-  saveModel: (request: AiModelConfig) =>
+  saveModel: (request: AiModelConfig, baseline?: AiModelConfig) =>
     invokeCommand("ai_save_model", z.null(), {
       request: modelSchema.parse(request),
+      baseline: baseline ? modelSchema.parse(baseline) : null,
     }),
-  saveTemplate: (request: PromptTemplate) =>
+  saveTemplate: (request: PromptTemplate, baseline?: PromptTemplate) =>
     invokeCommand("ai_save_template", z.null(), {
       request: templateSchema.parse(request),
+      baseline: baseline ? templateSchema.parse(baseline) : null,
     }),
   remove: (kind: "provider" | "model" | "template", id: string) =>
     invokeCommand("ai_delete_config", z.null(), { kind, id }),
+  clearSecret: (id: string) =>
+    invokeCommand("ai_clear_provider_secret", z.null(), { id }),
   listModels: (jobId: string, providerId: string) =>
     invokeCommand("ai_list_models", z.string().array(), { jobId, providerId }),
   testModel: (jobId: string, modelConfigId: string) =>

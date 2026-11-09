@@ -398,6 +398,23 @@ impl CmsService {
         Ok(())
     }
 
+    pub(crate) async fn settings_authorization(&self) -> Result<(u64, String), CmsError> {
+        let (generation, credential) = self.snapshot().await?;
+        self.ensure_generation(generation).await?;
+        Ok((generation, credential.access_token))
+    }
+
+    pub(crate) async fn settings_generation_guard(
+        &self,
+        generation: u64,
+    ) -> Result<impl Drop + '_, CmsError> {
+        let state = self.state.lock().await;
+        if state.generation != generation || state.session.is_none() {
+            return Err(CmsError::new("SESSION_CHANGED", "登录状态已变化，请重试"));
+        }
+        Ok(state)
+    }
+
     async fn snapshot(&self) -> Result<(u64, Credential), CmsError> {
         let state = self.state.lock().await;
         let credential = state.credential.clone().ok_or_else(CmsError::expired)?;

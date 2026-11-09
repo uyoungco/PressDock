@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RequireSession, SessionBoundary } from "@/features/auth/components";
 import { useDeveloperTools } from "@/features/import/use-developer-tools";
 import { useAndroidShell } from "./android-shell";
+import { ConfigBoundary } from "@/features/settings-sync/ConfigBoundary";
 const Login = lazy(() => import("@/pages/Login"));
 const Channels = lazy(() => import("@/pages/Channels"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -87,7 +88,9 @@ export const routes = [
       {
         element: (
           <RequireSession>
-            <Workspace />
+            <ConfigBoundary>
+              <Workspace />
+            </ConfigBoundary>
           </RequireSession>
         ),
         children: [

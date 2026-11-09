@@ -10,8 +10,9 @@ export const imagePresetsIpc = {
       "list_channel_image_presets",
       channelImagePresetsSchema.array(),
     ),
-  save: (request: ChannelImagePresets) =>
+  save: (request: ChannelImagePresets, baseline?: ChannelImagePresets) =>
     invokeCommand("save_channel_image_presets", channelImagePresetsSchema, {
       request: channelImagePresetsSchema.parse(request),
+      baseline: baseline ? channelImagePresetsSchema.parse(baseline) : null,
     }),
 };

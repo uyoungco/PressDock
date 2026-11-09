@@ -87,16 +87,19 @@ it("两个字段独立配置，KiB 转为字节并保留部分预设", async () 
   await chooseOption(screen.getByLabelText("TitlePic2 输出格式"), "WebP");
   await userEvent.click(screen.getByRole("button", { name: "保存图片预设" }));
   await waitFor(() =>
-    expect(imagePresetsService.save).toHaveBeenCalledWith({
-      channel: "A",
-      subChannel: "轮播图",
-      titlePic: {
-        size: { width: 280, height: 124 },
-        maxBytes: 102912,
-        format: "jpeg",
+    expect(imagePresetsService.save).toHaveBeenCalledWith(
+      {
+        channel: "A",
+        subChannel: "轮播图",
+        titlePic: {
+          size: { width: 280, height: 124 },
+          maxBytes: 102912,
+          format: "jpeg",
+        },
+        titlePic2: { size: undefined, maxBytes: undefined, format: "webp" },
       },
-      titlePic2: { size: undefined, maxBytes: undefined, format: "webp" },
-    }),
+      expect.objectContaining({ channel: "A", subChannel: "轮播图" }),
+    ),
   );
 });
 
@@ -155,6 +158,10 @@ it("同名子渠道跨渠道隔离，历史预设仍可编辑且单独清空", a
         subChannel: "历史子渠道",
         titlePic: {},
         titlePic2: expect.objectContaining({ format: "webp" }),
+      }),
+      expect.objectContaining({
+        channel: "历史渠道",
+        subChannel: "历史子渠道",
       }),
     ),
   );
@@ -242,10 +249,13 @@ it("跨渠道搜索并复制两套完整预设，手动保存失败后可重试"
   await waitFor(() =>
     expect(imagePresetsService.save).toHaveBeenCalledTimes(2),
   );
-  expect(imagePresetsService.save).toHaveBeenLastCalledWith({
-    ...source,
-    channel: "B",
-  });
+  expect(imagePresetsService.save).toHaveBeenLastCalledWith(
+    {
+      ...source,
+      channel: "B",
+    },
+    expect.objectContaining({ channel: "B", subChannel: "轮播图" }),
+  );
 });
 
 it("只复制已保存值，部分预设和空值完整替换目标且草稿互相独立", async () => {
