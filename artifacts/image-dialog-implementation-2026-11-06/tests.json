@@ -1,0 +1,3091 @@
+{
+  "numTotalTestSuites": 47,
+  "numPassedTestSuites": 47,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 252,
+  "numPassedTests": 252,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1793933884240,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 rich：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "rich：分块及内容格式与迁移前 V9 一致",
+          "duration": 33.50630000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 short：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "short：分块及内容格式与迁移前 V9 一致",
+          "duration": 1.701100000000224,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 protected：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "protected：分块及内容格式与迁移前 V9 一致",
+          "duration": 15.11259999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 caption-gap：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "caption-gap：分块及内容格式与迁移前 V9 一致",
+          "duration": 4.841300000000047,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 quotes：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "quotes：分块及内容格式与迁移前 V9 一致",
+          "duration": 3.9067999999997483,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 brackets：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "brackets：分块及内容格式与迁移前 V9 一致",
+          "duration": 4.450600000000122,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 images：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "images：分块及内容格式与迁移前 V9 一致",
+          "duration": 2.029199999999946,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 tail：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "tail：分块及内容格式与迁移前 V9 一致",
+          "duration": 2.9197000000003754,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 atomic：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "atomic：分块及内容格式与迁移前 V9 一致",
+          "duration": 6.286200000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 hard-break：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "hard-break：分块及内容格式与迁移前 V9 一致",
+          "duration": 5.258899999999812,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 whitespace：分块及内容格式与迁移前 V9 一致",
+          "status": "passed",
+          "title": "whitespace：分块及内容格式与迁移前 V9 一致",
+          "duration": 3.5652000000000044,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用 Rust 分页计划的编辑器适配"],
+          "fullName": "共用 Rust 分页计划的编辑器适配 空文及嵌套分页拒绝；未知、乱序、重复、末块分页点拒绝",
+          "status": "passed",
+          "title": "空文及嵌套分页拒绝；未知、乱序、重复、末块分页点拒绝",
+          "duration": 5.077700000000277,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933961906,
+      "endTime": 1793933961995.0776,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/ai-pagination.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "边界和模板变量校验与后端一致，网关字段通过类型化契约",
+          "status": "passed",
+          "title": "边界和模板变量校验与后端一致，网关字段通过类型化契约",
+          "duration": 6.896600000000035,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "空输入不调用模型，返回结果核对任务及模型",
+          "status": "passed",
+          "title": "空输入不调用模型，返回结果核对任务及模型",
+          "duration": 3.7993999999998778,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "关闭取消及登录变化都取消原生任务并拒绝迟到结果",
+          "status": "passed",
+          "title": "关闭取消及登录变化都取消原生任务并拒绝迟到结果",
+          "duration": 2.2355999999999767,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "网络错误仅尝试一次，预先取消不启动请求",
+          "status": "passed",
+          "title": "网络错误仅尝试一次，预先取消不启动请求",
+          "duration": 0.7780999999999949,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "分页服务核对任务身份、语义编号并取消迟到结果",
+          "status": "passed",
+          "title": "分页服务核对任务身份、语义编号并取消迟到结果",
+          "duration": 2.569500000000062,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933964176,
+      "endTime": 1793933964191.5696,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/ai-service.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "设置页可直接打开 AI 标签，两个设置标签切换保留各自未保存编辑",
+          "status": "passed",
+          "title": "设置页可直接打开 AI 标签，两个设置标签切换保留各自未保存编辑",
+          "duration": 1037.0519,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "提供商保存留空密钥保留旧值，隐藏标签后表单仍保留",
+          "status": "passed",
+          "title": "提供商保存留空密钥保留旧值，隐藏标签后表单仍保留",
+          "duration": 310.09040000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "拉取失败后仍可手填模型，可选参数留空为 null",
+          "status": "passed",
+          "title": "拉取失败后仍可手填模型，可选参数留空为 null",
+          "duration": 434.9288999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "模型测试期间阻止重复操作，关闭页面会取消模型测试",
+          "status": "passed",
+          "title": "模型测试期间阻止重复操作，关闭页面会取消模型测试",
+          "duration": 215.5634,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "模板支持绑定、变量插入、复制和默认标记，标签切换保留编辑",
+          "status": "passed",
+          "title": "模板支持绑定、变量插入、复制和默认标记，标签切换保留编辑",
+          "duration": 702.5248000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "未知模板变量阻止保存，失败保留输入",
+          "status": "passed",
+          "title": "未知模板变量阻止保存，失败保留输入",
+          "duration": 191.3699999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "分页模板独立显示、编辑页长和变量，保存时保留用途",
+          "status": "passed",
+          "title": "分页模板独立显示、编辑页长和变量，保存时保留用途",
+          "duration": 322.3546000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933931537,
+      "endTime": 1793933934751.3545,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/ai-settings.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "首次打开仅生成一次，临时参数不自动请求，采用回填并恢复焦点",
+          "status": "passed",
+          "title": "首次打开仅生成一次，临时参数不自动请求，采用回填并恢复焦点",
+          "duration": 897.8757,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 标题弹框打开和取消均不激活输入框，关闭后回到优化按钮",
+          "status": "passed",
+          "title": "Android 标题弹框打开和取消均不激活输入框，关闭后回到优化按钮",
+          "duration": 248.3505,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "关闭会取消，旧结果不会污染重新打开的弹窗",
+          "status": "passed",
+          "title": "关闭会取消，旧结果不会污染重新打开的弹窗",
+          "duration": 205.44439999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "失败可手动重试，无默认模板时不擅自调用其他模型",
+          "status": "passed",
+          "title": "失败可手动重试，无默认模板时不擅自调用其他模型",
+          "duration": 262.5131000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "未配置时显示设置入口，点击可到指定设置标签",
+          "status": "passed",
+          "title": "未配置时显示设置入口，点击可到指定设置标签",
+          "duration": 122.95760000000064,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "内置模板首次绑定模型前不发送请求，即使已有可用模型",
+          "status": "passed",
+          "title": "内置模板首次绑定模型前不发送请求，即使已有可用模型",
+          "duration": 96.20030000000042,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "渠道素材使用当前 Title 和 SmallText，采用不保存素材",
+          "status": "passed",
+          "title": "渠道素材使用当前 Title 和 SmallText，采用不保存素材",
+          "duration": 219.5572999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933942613,
+      "endTime": 1793933944666.5574,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/ai-title.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Android 渠道样板"],
+          "fullName": "Android 渠道样板 进入素材编辑不激活输入框，仍可用 Tab 或手动点击输入",
+          "status": "passed",
+          "title": "进入素材编辑不激活输入框，仍可用 Tab 或手动点击输入",
+          "duration": 872.6481000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Android 渠道样板"],
+          "fullName": "Android 渠道样板 筛选草案取消不查询，换渠道清子渠道，应用后才查询",
+          "status": "passed",
+          "title": "筛选草案取消不查询，换渠道清子渠道，应用后才查询",
+          "duration": 724.3239999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Android 渠道样板"],
+          "fullName": "Android 渠道样板 草稿读取失败可重试，恢复后自动保存并可保留返回",
+          "status": "passed",
+          "title": "草稿读取失败可重试，恢复后自动保存并可保留返回",
+          "duration": 1168.2039999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Android 渠道样板"],
+          "fullName": "Android 渠道样板 从详情和编辑返回保留列表位置，重新进入页面也恢复",
+          "status": "passed",
+          "title": "从详情和编辑返回保留列表位置，重新进入页面也恢复",
+          "duration": 462.1844000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Android 渠道样板"],
+          "fullName": "Android 渠道样板 当前页排序使用移动按钮，提交期间锁定并发送完整顺序",
+          "status": "passed",
+          "title": "当前页排序使用移动按钮，提交期间锁定并发送完整顺序",
+          "duration": 296.4886000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933926146,
+      "endTime": 1793933929669.4885,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/android-channels.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "演示入口不索取真实凭据，只进入固定的本机账号",
+          "status": "passed",
+          "title": "演示入口不索取真实凭据，只进入固定的本机账号",
+          "duration": 103.84010000000035,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "演示标识与正式登录入口由构建开关隔离",
+          "status": "passed",
+          "title": "演示标识与正式登录入口由构建开关隔离",
+          "duration": 32.01279999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933959393,
+      "endTime": 1793933959529.0127,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/android-demo.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 开启状态订阅，卡片保留验证与取消操作，离开页面后仍接收更新",
+          "status": "passed",
+          "title": "Android 开启状态订阅，卡片保留验证与取消操作，离开页面后仍接收更新",
+          "duration": 270.2628999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "配置往返恢复内存链接，账号缓存重置清除草稿",
+          "status": "passed",
+          "title": "配置往返恢复内存链接，账号缓存重置清除草稿",
+          "duration": 223.7554,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 完整设置保留采集深链接，不访问油猴桥接，分页入口定位对应用途",
+          "status": "passed",
+          "title": "Android 完整设置保留采集深链接，不访问油猴桥接，分页入口定位对应用途",
+          "duration": 158.47960000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "提交结果待确认须显式核对；标记未添加不会自动重试",
+          "status": "passed",
+          "title": "提交结果待确认须显式核对；标记未添加不会自动重试",
+          "duration": 118.60319999999956,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "入队请求未完成时连续提交只创建一个请求，失败保留链接并允许重试",
+          "status": "passed",
+          "title": "入队请求未完成时连续提交只创建一个请求，失败保留链接并允许重试",
+          "duration": 88.02420000000029,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面继续使用三列表格及全部设置模块",
+          "status": "passed",
+          "title": "桌面继续使用三列表格及全部设置模块",
+          "duration": 145.54329999999982,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933947560,
+      "endTime": 1793933948564.5432,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/android-import.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 文章分类导航与每页条数可选择，主题选择继续持久化",
+          "status": "passed",
+          "title": "文章分类导航与每页条数可选择，主题选择继续持久化",
+          "duration": 2640.7298000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 渲染工作台并能切换路由",
+          "status": "passed",
+          "title": "渲染工作台并能切换路由",
+          "duration": 844.3722000000007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 设置默认展示常规模块，支持键盘导航且隐藏预设不参与焦点导航",
+          "status": "passed",
+          "title": "设置默认展示常规模块，支持键盘导航且隐藏预设不参与焦点导航",
+          "duration": 1340.4930999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 切换设置标签保留预设草稿和复制来源，隐藏期间保存失败可重试并完成",
+          "status": "passed",
+          "title": "切换设置标签保留预设草稿和复制来源，隐藏期间保存失败可重试并完成",
+          "duration": 2349.121299999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 服务检查失败切换标签后仍显示错误，关于应用使用前端版本",
+          "status": "passed",
+          "title": "服务检查失败切换标签后仍显示错误，关于应用使用前端版本",
+          "duration": 461.0066999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 未知路由回到工作台",
+          "status": "passed",
+          "title": "未知路由回到工作台",
+          "duration": 37.86369999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["工作区"],
+          "fullName": "工作区 Jotai 主题和导航持久化，编辑状态由 atom 派生",
+          "status": "passed",
+          "title": "Jotai 主题和导航持久化，编辑状态由 atom 派生",
+          "duration": 1.3724999999994907,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933902589,
+      "endTime": 1793933910264.3726,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/app.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["文章模型与业务边界"],
+          "fullName": "文章模型与业务边界 拒绝非 HTTP 来源",
+          "status": "passed",
+          "title": "拒绝非 HTTP 来源",
+          "duration": 3.0003999999998996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["文章模型与业务边界"],
+          "fullName": "文章模型与业务边界 发布未配置时明确失败，演示导入不冒充网页采集",
+          "status": "passed",
+          "title": "发布未配置时明确失败，演示导入不冒充网页采集",
+          "duration": 5.023400000000038,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["文章模型与业务边界"],
+          "fullName": "文章模型与业务边界 统计只计算符合状态和日期的稿件",
+          "status": "passed",
+          "title": "统计只计算符合状态和日期的稿件",
+          "duration": 1.0563999999999396,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933966248,
+      "endTime": 1793933966258.0564,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/articles.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 未登录保护整个工作区并保留完整目标查询",
+          "status": "passed",
+          "title": "未登录保护整个工作区并保留完整目标查询",
+          "duration": 481.8033000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 恢复完成前不渲染工作区，网络异常可重试且不退出",
+          "status": "passed",
+          "title": "恢复完成前不渲染工作区，网络异常可重试且不退出",
+          "duration": 491.7440999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 账号密码必填，密码显隐，Enter 提交不裁剪密码",
+          "status": "passed",
+          "title": "账号密码必填，密码显隐，Enter 提交不裁剪密码",
+          "duration": 1297.3048,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 错误密码展示服务提示，提交期间阻止重复",
+          "status": "passed",
+          "title": "错误密码展示服务提示，提交期间阻止重复",
+          "duration": 421.6166000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 浏览器仅预览登录，不能进入工作区",
+          "status": "passed",
+          "title": "浏览器仅预览登录，不能进入工作区",
+          "duration": 34.389500000000226,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 取消退出无请求，远程退出失败仍离开工作区",
+          "status": "passed",
+          "title": "取消退出无请求，远程退出失败仍离开工作区",
+          "duration": 684.0563000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 退出后的旧恢复结果不重新登录，编辑缓冲按用户清理",
+          "status": "passed",
+          "title": "退出后的旧恢复结果不重新登录，编辑缓冲按用户清理",
+          "duration": 0.8618999999998778,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 回跳只允许完整站内业务路由",
+          "status": "passed",
+          "title": "回跳只允许完整站内业务路由",
+          "duration": 0.6482000000005428,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 素材排序在失效后取消，同账号登录重新查询服务端顺序",
+          "status": "passed",
+          "title": "素材排序在失效后取消，同账号登录重新查询服务端顺序",
+          "duration": 1239.719,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 素材表单在失效后同账号恢复，显式退出清理",
+          "status": "passed",
+          "title": "素材表单在失效后同账号恢复，显式退出清理",
+          "duration": 1338.058500000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 筛选记忆跨失效后同账号登录保留，更换账号或显式退出清空",
+          "status": "passed",
+          "title": "筛选记忆跨失效后同账号登录保留，更换账号或显式退出清空",
+          "duration": 2.82300000000032,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933916843,
+      "endTime": 1793933922836.823,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/auth.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 工作台和发布使用的本地文章查询在页面间复用，刷新失败保留数据",
+          "status": "passed",
+          "title": "工作台和发布使用的本地文章查询在页面间复用，刷新失败保留数据",
+          "duration": 141.6869999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 缓存超过五分钟仍保留，聚焦和网络恢复不发起请求",
+          "status": "passed",
+          "title": "缓存超过五分钟仍保留，聚焦和网络恢复不发起请求",
+          "duration": 37.44230000000016,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 渠道分页往返直接命中缓存，显式刷新只更新当前页",
+          "status": "passed",
+          "title": "渠道分页往返直接命中缓存，显式刷新只更新当前页",
+          "duration": 962.3795,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 四类文章独立恢复已提交查询，共享分类缓存",
+          "status": "passed",
+          "title": "四类文章独立恢复已提交查询，共享分类缓存",
+          "duration": 179.33359999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 后台事件在离开列表后仍失效缓存，返回时读取新快照",
+          "status": "passed",
+          "title": "后台事件在离开列表后仍失效缓存，返回时读取新快照",
+          "duration": 66.34850000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 采集日期和快照在返回时恢复，事件通知与写后刷新合并",
+          "status": "passed",
+          "title": "采集日期和快照在返回时恢复，事件通知与写后刷新合并",
+          "duration": 57.40520000000015,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 刷新期间发生多次采集变化，串行补读一次并保留最新快照",
+          "status": "passed",
+          "title": "刷新期间发生多次采集变化，串行补读一次并保留最新快照",
+          "duration": 82.88689999999951,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 当天视图在离开页面跨日后跟随今天，历史日期不跳转",
+          "status": "passed",
+          "title": "当天视图在离开页面跨日后跟随今天，历史日期不跳转",
+          "duration": 49.70220000000063,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["业务列表缓存"],
+          "fullName": "业务列表缓存 暂停后保留筛选，换号或显式退出清空缓存，旧响应无法回填",
+          "status": "passed",
+          "title": "暂停后保留筛选，换号或显式退出清空缓存，旧响应无法回填",
+          "duration": 28.57880000000023,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933942980,
+      "endTime": 1793933944585.5789,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/business-query.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "草稿串行写入使用输入快照，退出后丢弃旧账号排队写入",
+          "status": "passed",
+          "title": "草稿串行写入使用输入快照，退出后丢弃旧账号排队写入",
+          "duration": 66.17429999999968,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933961730,
+      "endTime": 1793933961796.1743,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channel-draft-service.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "实际解码后编码上传，只读取一次文件并释放临时 URL",
+          "status": "passed",
+          "title": "实际解码后编码上传，只读取一次文件并释放临时 URL",
+          "duration": 9.551600000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "空文件、超限及非图片不进入解码；解码失败也释放 URL",
+          "status": "passed",
+          "title": "空文件、超限及非图片不进入解码；解码失败也释放 URL",
+          "duration": 2.181400000000167,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933965997,
+      "endTime": 1793933966009.1814,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channel-upload.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 旧列偏好的显式显隐与列宽优先，恢复默认采用紧凑列",
+          "status": "passed",
+          "title": "旧列偏好的显式显隐与列宽优先，恢复默认采用紧凑列",
+          "duration": 646.7133999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 列配置仅改变展示，排序期间锁定配置和列宽",
+          "status": "passed",
+          "title": "列配置仅改变展示，排序期间锁定配置和列宽",
+          "duration": 860.2921999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 默认聚合新闻内容，额外字段按需显示，链接仍通过服务打开",
+          "status": "passed",
+          "title": "默认聚合新闻内容，额外字段按需显示，链接仍通过服务打开",
+          "duration": 522.4125000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：subchannel=轮播图&publishdate=2026-10-21",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：subchannel=轮播图&publishdate=2026-10-21",
+          "duration": 118.79680000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：channel=KOOK&publishdate=2026-10-21",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：channel=KOOK&publishdate=2026-10-21",
+          "duration": 145.54129999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：channel=KOOK&subchannel=轮播图",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：channel=KOOK&subchannel=轮播图",
+          "duration": 138.76519999999982,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 未提交条件禁止排序，当前页不足两条禁止排序",
+          "status": "passed",
+          "title": "未提交条件禁止排序，当前页不足两条禁止排序",
+          "duration": 558.6770999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 原生拖放只提交当前页，排序失败保留并可重试，期间锁定操作",
+          "status": "passed",
+          "title": "原生拖放只提交当前页，排序失败保留并可重试，期间锁定操作",
+          "duration": 693.3076000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 键盘移动后取消恢复原顺序，离开可取消或放弃排序",
+          "status": "passed",
+          "title": "键盘移动后取消恢复原顺序，离开可取消或放弃排序",
+          "duration": 615.3284999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 WebView 未启动 HTML5 拖放时，按指针落点移动，轻点不排序",
+          "status": "passed",
+          "title": "WebView 未启动 HTML5 拖放时，按指针落点移动，轻点不排序",
+          "duration": 236.49679999999898,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 新增独立初始化、必填校验、保存防重复及失败保留",
+          "status": "passed",
+          "title": "新增独立初始化、必填校验、保存防重复及失败保留",
+          "duration": 2284.379200000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 修改先获取详情，只覆盖表单字段，成功后刷新同一页",
+          "status": "passed",
+          "title": "修改先获取详情，只覆盖表单字段，成功后刷新同一页",
+          "duration": 771.4309000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 上传成功只回填对应地址，保存成功但刷新失败分别提示",
+          "status": "passed",
+          "title": "上传成功只回填对应地址，保存成功但刷新失败分别提示",
+          "duration": 2306.8279,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 删除取消无请求，删除末页后回退并更新记忆",
+          "status": "passed",
+          "title": "删除取消无请求，删除末页后回退并更新记忆",
+          "duration": 829.4904000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 上传失败可重试，等待期间不能保存，取消后旧上传不回填",
+          "status": "passed",
+          "title": "上传失败可重试，等待期间不能保存，取消后旧上传不回填",
+          "duration": 2233.5652999999984,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 同账号恢复表单缓冲，离开确认丢弃",
+          "status": "passed",
+          "title": "同账号恢复表单缓冲，离开确认丢弃",
+          "duration": 607.1977999999981,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933889023,
+      "endTime": 1793933902592.1978,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channel-writes.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 分页和提交新筛选后重置实际列表视口的纵向位置",
+          "status": "passed",
+          "title": "分页和提交新筛选后重置实际列表视口的纵向位置",
+          "duration": 1065.0933999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值",
+          "status": "passed",
+          "title": "两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值",
+          "duration": 870.7856999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 初始并行取数，选择条件不查询，搜索才提交并回到第一页",
+          "status": "passed",
+          "title": "初始并行取数，选择条件不查询，搜索才提交并回到第一页",
+          "duration": 1225.9038,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 重置清空日期和两级渠道，并保留每页条数",
+          "status": "passed",
+          "title": "重置清空日期和两级渠道，并保留每页条数",
+          "duration": 241.38580000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 每页条数变化回到第一页，保留已提交条件",
+          "status": "passed",
+          "title": "每页条数变化回到第一页，保留已提交条件",
+          "duration": 345.97549999999956,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 单独日期查询隐藏失真总数，短页阻止继续翻页",
+          "status": "passed",
+          "title": "单独日期查询隐藏失真总数，短页阻止继续翻页",
+          "duration": 110.29870000000028,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 下一页为空保留上一页，不按错误总数继续请求",
+          "status": "passed",
+          "title": "下一页为空保留上一页，不按错误总数继续请求",
+          "duration": 582.1501000000007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 最新请求优先，旧响应无法覆盖新结果",
+          "status": "passed",
+          "title": "最新请求优先，旧响应无法覆盖新结果",
+          "duration": 415.3031000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 渠道配置和列表可独立失败、重试",
+          "status": "passed",
+          "title": "渠道配置和列表可独立失败、重试",
+          "duration": 255.60829999999896,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 详情显示摘要、空值和图片占位，正文按纯文本渲染",
+          "status": "passed",
+          "title": "详情显示摘要、空值和图片占位，正文按纯文本渲染",
+          "duration": 247.73459999999977,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 非法链接筛选恢复默认值",
+          "status": "passed",
+          "title": "非法链接筛选恢复默认值",
+          "duration": 0.8153000000002066,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 双图以紧凑元信息显示，点击图片打开共用详情",
+          "status": "passed",
+          "title": "双图以紧凑元信息显示，点击图片打开共用详情",
+          "duration": 258.77000000000044,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 离开返回恢复已提交条件和页码，丢弃未搜索修改且不先请求默认页",
+          "status": "passed",
+          "title": "离开返回恢复已提交条件和页码，丢弃未搜索修改且不先请求默认页",
+          "duration": 421.8194000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 显式 URL 优先，前进后退更新记忆，重置也可在返回时恢复",
+          "status": "passed",
+          "title": "显式 URL 优先，前进后退更新记忆，重置也可在返回时恢复",
+          "duration": 488.3181999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 首次默认查询也写入地址，后退可以恢复默认条件",
+          "status": "passed",
+          "title": "首次默认查询也写入地址，后退可以恢复默认条件",
+          "duration": 542.375,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933905951,
+      "endTime": 1793933913023.375,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channels.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 空状态不被宽表格挤出视口，仍可配置与恢复默认",
+          "status": "passed",
+          "title": "空状态不被宽表格挤出视口，仍可配置与恢复默认",
+          "duration": 399.4079999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 dashboard 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "status": "passed",
+          "title": "dashboard 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "duration": 551.6094000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 articles 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "status": "passed",
+          "title": "articles 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "duration": 469.0800000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 publish 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "status": "passed",
+          "title": "publish 的显隐和列宽可在重新挂载后恢复，并能恢复默认",
+          "duration": 496.15740000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 三个文章页面与渠道页面分别保存偏好",
+          "status": "passed",
+          "title": "三个文章页面与渠道页面分别保存偏好",
+          "duration": 248.2413000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 无效的持久化内容安全回退：not json",
+          "status": "passed",
+          "title": "无效的持久化内容安全回退：not json",
+          "duration": 30.833300000000236,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 无效的持久化内容安全回退：{\"version\":2,\"visibility\":{\"source\":false}}",
+          "status": "passed",
+          "title": "无效的持久化内容安全回退：{\"version\":2,\"visibility\":{\"source\":false}}",
+          "duration": 30.6863000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 无效的持久化内容安全回退：null",
+          "status": "passed",
+          "title": "无效的持久化内容安全回退：null",
+          "duration": 29.982100000000173,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 恢复时忽略未知列、强制显示必需列并约束宽度",
+          "status": "passed",
+          "title": "恢复时忽略未知列、强制显示必需列并约束宽度",
+          "duration": 67.52979999999934,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 指针拖动、边界限制、取消及键盘重置均可用",
+          "status": "passed",
+          "title": "指针拖动、边界限制、取消及键盘重置均可用",
+          "duration": 167.26890000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["Dice UI Data Table 列配置"],
+          "fullName": "Dice UI Data Table 列配置 存储读写异常时仍可在内存中调整和重置",
+          "status": "passed",
+          "title": "存储读写异常时仍可在内存中调整和重置",
+          "duration": 388.4901,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933932428,
+      "endTime": 1793933935307.49,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/data-table.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 Backspace 从相邻正文直接删除分页，保留段落和图文格式",
+          "status": "passed",
+          "title": "Backspace 从相邻正文直接删除分页，保留段落和图文格式",
+          "duration": 65.8403000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 Delete 从相邻正文直接删除分页，保留段落和图文格式",
+          "status": "passed",
+          "title": "Delete 从相邻正文直接删除分页，保留段落和图文格式",
+          "duration": 17.61319999999978,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 node 选区涉及分页标记时完整删除，不留下残片",
+          "status": "passed",
+          "title": "node 选区涉及分页标记时完整删除，不留下残片",
+          "duration": 14.808100000000195,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 text 选区涉及分页标记时完整删除，不留下残片",
+          "status": "passed",
+          "title": "text 选区涉及分页标记时完整删除，不留下残片",
+          "duration": 12.83560000000034,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 partial 选区涉及分页标记时完整删除，不留下残片",
+          "status": "passed",
+          "title": "partial 选区涉及分页标记时完整删除，不留下残片",
+          "duration": 12.122600000000148,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 点击按钮不删除当前其他选区，编辑移动分页后仍删除正确位置并更新页码",
+          "status": "passed",
+          "title": "点击按钮不删除当前其他选区，编辑移动分页后仍删除正确位置并更新页码",
+          "duration": 74.8099000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 连续分页删除后光标落在正文，每次删除都可单独撤销/重做且与输入隔离",
+          "status": "passed",
+          "title": "连续分页删除后光标落在正文，每次删除都可单独撤销/重做且与输入隔离",
+          "duration": 52.28369999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 文首、文末或仅有分页也可删除：<p>[!--empirenews.page--]</p><p><a href=\"https://example.com/\">第二页。</a><img src=\"https://example.com/demo.png\" alt=\"演示图片\" width=\"120\"></p>",
+          "status": "passed",
+          "title": "文首、文末或仅有分页也可删除：<p>[!--empirenews.page--]</p><p><a href=\"https://example.com/\">第二页。</a><img src=\"https://example.com/demo.png\" alt=\"演示图片\" width=\"120\"></p>",
+          "duration": 10.522399999999834,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 文首、文末或仅有分页也可删除：<p style=\"text-align: center\"><strong>【演示数据】第一页。</strong></p><p>[!--empirenews.page--]</p>",
+          "status": "passed",
+          "title": "文首、文末或仅有分页也可删除：<p style=\"text-align: center\"><strong>【演示数据】第一页。</strong></p><p>[!--empirenews.page--]</p>",
+          "duration": 8.305299999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 文首、文末或仅有分页也可删除：<p>[!--empirenews.page--]</p>",
+          "status": "passed",
+          "title": "文首、文末或仅有分页也可删除：<p>[!--empirenews.page--]</p>",
+          "duration": 11.730799999999817,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 普通文字选区与普通段落边界的 Backspace 保持默认行为",
+          "status": "passed",
+          "title": "普通文字选区与普通段落边界的 Backspace 保持默认行为",
+          "duration": 16.227800000000116,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 普通文字选区与普通段落边界的 Delete 保持默认行为",
+          "status": "passed",
+          "title": "普通文字选区与普通段落边界的 Delete 保持默认行为",
+          "duration": 10.427900000000136,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 相邻引用中的正文边界可删除顶层分页，引用结构保持完整",
+          "status": "passed",
+          "title": "相邻引用中的正文边界可删除顶层分页，引用结构保持完整",
+          "duration": 8.625500000000102,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 装饰与按钮不进入序列化正文，编辑器只读切换即时禁用按钮和删除逻辑",
+          "status": "passed",
+          "title": "装饰与按钮不进入序列化正文，编辑器只读切换即时禁用按钮和删除逻辑",
+          "duration": 12.92890000000034,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["分页整行删除"],
+          "fullName": "分页整行删除 嵌套分页继续保护，按钮和键盘均不能破坏或展开标记",
+          "status": "passed",
+          "title": "嵌套分页继续保护，按钮和键盘均不能破坏或展开标记",
+          "duration": 19.685500000000047,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "表单删除仅回传正文，一次撤销恢复原始 HTML 字节，重做删除",
+          "status": "passed",
+          "title": "表单删除仅回传正文，一次撤销恢复原始 HTML 字节，重做删除",
+          "duration": 473.12710000000015,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "表单禁用和会话失效时分页按钮不可删除",
+          "status": "passed",
+          "title": "表单禁用和会话失效时分页按钮不可删除",
+          "duration": 202.19140000000016,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "不兼容正文进入保护模式，不出现可编辑分页按钮",
+          "status": "passed",
+          "title": "不兼容正文进入保护模式，不出现可编辑分页按钮",
+          "duration": 103.10529999999972,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933947259,
+      "endTime": 1793933948387.1052,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/editor-page-break.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "首次加载不保存，移除按钮；连续修改在最后一次修改 500 毫秒后合并保存",
+          "status": "passed",
+          "title": "首次加载不保存，移除按钮；连续修改在最后一次修改 500 毫秒后合并保存",
+          "duration": 292.0972999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "替换旧规则，AI 自动分页默认关闭且独立于元数据模型；显示共用配置及入口",
+          "status": "passed",
+          "title": "替换旧规则，AI 自动分页默认关闭且独立于元数据模型；显示共用配置及入口",
+          "duration": 99.36920000000009,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "改回已保存值取消待保存；保留天数校验暂停整批保存，修正后恢复",
+          "status": "passed",
+          "title": "改回已保存值取消待保存；保留天数校验暂停整批保存，修正后恢复",
+          "duration": 225.8191999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "保存期间继续修改不锁表单，旧结果不覆盖新输入，并串行补存最新值",
+          "status": "passed",
+          "title": "保存期间继续修改不锁表单，旧结果不覆盖新输入，并串行补存最新值",
+          "duration": 42.754199999999855,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "进行中的保存完成后，后续修改仍等待自身的 500 毫秒，改回旧值也会补存",
+          "status": "passed",
+          "title": "进行中的保存完成后，后续修改仍等待自身的 500 毫秒，改回旧值也会补存",
+          "duration": 0.8659999999999854,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "切换标签和卸载立即补存，重新读取可恢复持久设置",
+          "status": "passed",
+          "title": "切换标签和卸载立即补存，重新读取可恢复持久设置",
+          "duration": 48.52129999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "失败保留输入、停止自动重试；点击重试保存最新输入",
+          "status": "passed",
+          "title": "失败保留输入、停止自动重试；点击重试保存最新输入",
+          "duration": 57.14419999999973,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "保存失败后离开再返回仍保留表单，重试成功清除错误",
+          "status": "passed",
+          "title": "保存失败后离开再返回仍保留表单，重试成功清除错误",
+          "duration": 61.229699999999866,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "模型选择与规则使用同一个防抖批次，读取设置提前补存",
+          "status": "passed",
+          "title": "模型选择与规则使用同一个防抖批次，读取设置提前补存",
+          "duration": 0.9819000000002234,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "开发者模式即时保存，不顺带提交等待防抖的修改，后续完整写入保留最新模式",
+          "status": "passed",
+          "title": "开发者模式即时保存，不顺带提交等待防抖的修改，后续完整写入保留最新模式",
+          "duration": 1.5124000000000706,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "完整保存与模式切换串行；模式保存失败不改变勾选或阻止其他设置保存",
+          "status": "passed",
+          "title": "完整保存与模式切换串行；模式保存失败不改变勾选或阻止其他设置保存",
+          "duration": 1.8141999999998006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "创建采集任务等待补存；保存失败阻止入队",
+          "status": "passed",
+          "title": "创建采集任务等待补存；保存失败阻止入队",
+          "duration": 1.0295999999998457,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "会话失效取消定时及尚未发出的排队写入，迟到结果不污染下一会话",
+          "status": "passed",
+          "title": "会话失效取消定时及尚未发出的排队写入，迟到结果不污染下一会话",
+          "duration": 0.7203000000004067,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933951012,
+      "endTime": 1793933951846.7202,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/harvest-settings.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "两个字段独立配置，KiB 转为字节并保留部分预设",
+          "status": "passed",
+          "title": "两个字段独立配置，KiB 转为字节并保留部分预设",
+          "duration": 1317.6277999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "宽高成对校验、资源边界和失败后重试",
+          "status": "passed",
+          "title": "宽高成对校验、资源边界和失败后重试",
+          "duration": 759.5740999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "同名子渠道跨渠道隔离，历史预设仍可编辑且单独清空",
+          "status": "passed",
+          "title": "同名子渠道跨渠道隔离，历史预设仍可编辑且单独清空",
+          "duration": 1460.5987999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "读取失败禁止编辑，重试恢复；保存中阻止重复提交和切换渠道",
+          "status": "passed",
+          "title": "读取失败禁止编辑，重试恢复；保存中阻止重复提交和切换渠道",
+          "duration": 553.1093000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "跨渠道搜索并复制两套完整预设，手动保存失败后可重试",
+          "status": "passed",
+          "title": "跨渠道搜索并复制两套完整预设，手动保存失败后可重试",
+          "duration": 989.9682000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "只复制已保存值，部分预设和空值完整替换目标且草稿互相独立",
+          "status": "passed",
+          "title": "只复制已保存值，部分预设和空值完整替换目标且草稿互相独立",
+          "duration": 1951.824199999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "来源排除当前子渠道、空配置及未保存草稿，切换目标清空来源",
+          "status": "passed",
+          "title": "来源排除当前子渠道、空配置及未保存草稿，切换目标清空来源",
+          "duration": 1702.1869000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "无可用来源时禁止复制，未保存的新配置不能作为来源",
+          "status": "passed",
+          "title": "无可用来源时禁止复制，未保存的新配置不能作为来源",
+          "duration": 870.1656999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "加载和保存期间锁定复制，保存后配置可作为其他子渠道的来源",
+          "status": "passed",
+          "title": "加载和保存期间锁定复制，保存后配置可作为其他子渠道的来源",
+          "duration": 1501.268,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933888552,
+      "endTime": 1793933899658.268,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/image-preset-settings.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "按完整渠道、子渠道及图片字段匹配，每次操作重新读取",
+          "status": "passed",
+          "title": "按完整渠道、子渠道及图片字段匹配，每次操作重新读取",
+          "duration": 4.117999999999938,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "保存前验证参数，无效请求不进入 IPC",
+          "status": "passed",
+          "title": "保存前验证参数，无效请求不进入 IPC",
+          "duration": 2.936999999999898,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "上传前复核结果尺寸、体积和 MIME，拒绝不符合预设的结果",
+          "status": "passed",
+          "title": "上传前复核结果尺寸、体积和 MIME，拒绝不符合预设的结果",
+          "duration": 1.963799999999992,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933968086,
+      "endTime": 1793933968094.9639,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/image-presets-service.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "使用原始字节和规范化裁剪参数，返回真实 File 与精确元信息",
+          "status": "passed",
+          "title": "使用原始字节和规范化裁剪参数，返回真实 File 与精确元信息",
+          "duration": 7.664099999999962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "预设不匹配和非法预设在调用 IPC 前被拒绝",
+          "status": "passed",
+          "title": "预设不匹配和非法预设在调用 IPC 前被拒绝",
+          "duration": 1.4510000000000218,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "拒绝体积、尺寸、格式或字节计数不符的结果",
+          "status": "passed",
+          "title": "拒绝体积、尺寸、格式或字节计数不符的结果",
+          "duration": 2.7876000000001113,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "空文件和过大的源文件不进入原生处理",
+          "status": "passed",
+          "title": "空文件和过大的源文件不进入原生处理",
+          "duration": 0.6154999999998836,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "取消或会话失效时取消原生任务并丢弃延迟结果",
+          "status": "passed",
+          "title": "取消或会话失效时取消原生任务并丢弃延迟结果",
+          "duration": 2.7357999999999265,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "导出透传取消结果，失败不伪装为保存成功",
+          "status": "passed",
+          "title": "导出透传取消结果，失败不伪装为保存成功",
+          "duration": 1.2208999999998014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933963969,
+      "endTime": 1793933963985.221,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/image-processing-service.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "逐项锁定预设，重置保留锁定且裁剪框仍可调整",
+          "status": "passed",
+          "title": "逐项锁定预设，重置保留锁定且裁剪框仍可调整",
+          "duration": 311.61709999999994,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 0）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 0）",
+          "duration": 56.82290000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 1）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 1）",
+          "duration": 47.41260000000011,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 2）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 2）",
+          "duration": 59.460599999999886,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 3）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 3）",
+          "duration": 48.42540000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 4）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 4）",
+          "duration": 47.41800000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 5）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 5）",
+          "duration": 44.73939999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 6）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 6）",
+          "duration": 40.679999999999836,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框按项切换只读与可编辑控件（锁定组合 7）",
+          "status": "passed",
+          "title": "桌面弹框按项切换只读与可编辑控件（锁定组合 7）",
+          "duration": 37.98180000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面弹框自由调整格式、尺寸和体积，修改后旧预览失效",
+          "status": "passed",
+          "title": "桌面弹框自由调整格式、尺寸和体积，修改后旧预览失效",
+          "duration": 428.8263999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面画布平移不改变裁剪提交参数；适应窗口后重新居中",
+          "status": "passed",
+          "title": "桌面画布平移不改变裁剪提交参数；适应窗口后重新居中",
+          "duration": 120.09920000000011,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面错误状态保留全部错误详情且允许重试",
+          "status": "passed",
+          "title": "桌面错误状态保留全部错误详情且允许重试",
+          "duration": 114.01859999999942,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "未指定尺寸时默认不裁剪，缩放查看不改变提交参数",
+          "status": "passed",
+          "title": "未指定尺寸时默认不裁剪，缩放查看不改变提交参数",
+          "duration": 80.6880999999994,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "单个预设不锁定其他设置；参数变化使确认结果失效",
+          "status": "passed",
+          "title": "单个预设不锁定其他设置；参数变化使确认结果失效",
+          "duration": 106.6815000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "格式下拉显示中文映射，变更格式使旧结果失效并提交实际格式",
+          "status": "passed",
+          "title": "格式下拉显示中文映射，变更格式使旧结果失效并提交实际格式",
+          "duration": 304.84859999999935,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "超限错误明确展示且禁止确认；取消处理不会回填旧结果",
+          "status": "passed",
+          "title": "超限错误明确展示且禁止确认；取消处理不会回填旧结果",
+          "duration": 108.42489999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "切换图片和会话失效会丢弃结果并释放预览 URL",
+          "status": "passed",
+          "title": "切换图片和会话失效会丢弃结果并释放预览 URL",
+          "duration": 98.02579999999944,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "无效预设不读取图片",
+          "status": "passed",
+          "title": "无效预设不读取图片",
+          "duration": 15.123600000000806,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "读取阶段取消立即终止检查，即使父组件暂未卸载也不回填",
+          "status": "passed",
+          "title": "读取阶段取消立即终止检查，即使父组件暂未卸载也不回填",
+          "duration": 19.580799999999726,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933937586,
+      "endTime": 1793933939676.5808,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/image-processor.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "系统对话框取消不显示成功；实际保存成功才通知完成",
+          "status": "passed",
+          "title": "系统对话框取消不显示成功；实际保存成功才通知完成",
+          "duration": 164.6938,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "取消导出及页面卸载会终止导出会话",
+          "status": "passed",
+          "title": "取消导出及页面卸载会终止导出会话",
+          "duration": 25.81919999999991,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933956722,
+      "endTime": 1793933956912.819,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/images-page.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["IPC 会话边界"],
+          "fullName": "IPC 会话边界 401 对应统一失效通知，403 不退出",
+          "status": "passed",
+          "title": "401 对应统一失效通知，403 不退出",
+          "duration": 4.888099999999895,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 会话边界"],
+          "fullName": "IPC 会话边界 会话切换后的旧成功和旧失效响应均不影响当前会话",
+          "status": "passed",
+          "title": "会话切换后的旧成功和旧失效响应均不影响当前会话",
+          "duration": 0.641399999999976,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 权限拒绝转换为中文提示：Command ai_suggest_pagination not allowed by ACL",
+          "status": "passed",
+          "title": "权限拒绝转换为中文提示：Command ai_suggest_pagination not allowed by ACL",
+          "duration": 0.7681999999999789,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 权限拒绝转换为中文提示：ai_suggest_pagination not allowed on any window/webview/URL context",
+          "status": "passed",
+          "title": "权限拒绝转换为中文提示：ai_suggest_pagination not allowed on any window/webview/URL context",
+          "duration": 0.4413999999999305,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 权限拒绝转换为中文提示：ai_suggest_pagination not allowed. Permissions associated with this command: allow-ai-suggest-pagination",
+          "status": "passed",
+          "title": "权限拒绝转换为中文提示：ai_suggest_pagination not allowed. Permissions associated with this command: allow-ai-suggest-pagination",
+          "duration": 0.3059000000000651,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 命令不可用转换为中文提示：Command ai_suggest_pagination not found",
+          "status": "passed",
+          "title": "命令不可用转换为中文提示：Command ai_suggest_pagination not found",
+          "duration": 0.43260000000009313,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 命令不可用转换为中文提示：unknown command ai_suggest_pagination",
+          "status": "passed",
+          "title": "命令不可用转换为中文提示：unknown command ai_suggest_pagination",
+          "duration": 0.39469999999982974,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["IPC 字符串错误"],
+          "fullName": "IPC 字符串错误 未知字符串不回显原始错误或敏感信息",
+          "status": "passed",
+          "title": "未知字符串不回显原始错误或敏感信息",
+          "duration": 0.5298999999999978,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933968306,
+      "endTime": 1793933968314.5298,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/ipc-session.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 原生拖动影像使用整行及按下偏移，接管后不重复触发指针移动",
+          "status": "passed",
+          "title": "原生拖动影像使用整行及按下偏移，接管后不重复触发指针移动",
+          "duration": 79.37760000000026,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 轻点不移动，超过阈值整行跟随，松手命中时移动且恢复样式和捕获",
+          "status": "passed",
+          "title": "轻点不移动，超过阈值整行跟随，松手命中时移动且恢复样式和捕获",
+          "duration": 27.6904999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 pointercancel 清理整行预览且不调整顺序",
+          "status": "passed",
+          "title": "pointercancel 清理整行预览且不调整顺序",
+          "duration": 22.782200000000103,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 lostpointercapture 清理整行预览且不调整顺序",
+          "status": "passed",
+          "title": "lostpointercapture 清理整行预览且不调整顺序",
+          "duration": 20.019900000000234,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 其他指针不能移动或结束当前手势",
+          "status": "passed",
+          "title": "其他指针不能移动或结束当前手势",
+          "duration": 25.85640000000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 outside 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 outside 时恢复原行且不排序",
+          "duration": 16.818100000000413,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 foreign 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 foreign 时恢复原行且不排序",
+          "duration": 17.68119999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 self 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 self 时恢复原行且不排序",
+          "duration": 17.878000000000156,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 busy 变化时清理拖动状态",
+          "status": "passed",
+          "title": "busy 变化时清理拖动状态",
+          "duration": 36.053300000000036,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 sorting 变化时清理拖动状态",
+          "status": "passed",
+          "title": "sorting 变化时清理拖动状态",
+          "duration": 28.783699999999953,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 records 变化时清理拖动状态",
+          "status": "passed",
+          "title": "records 变化时清理拖动状态",
+          "duration": 26.7511999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 unmount 变化时清理拖动状态",
+          "status": "passed",
+          "title": "unmount 变化时清理拖动状态",
+          "duration": 16.352800000000116,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 取消原生拖动后不接受迟到的放下事件",
+          "status": "passed",
+          "title": "取消原生拖动后不接受迟到的放下事件",
+          "duration": 16.79840000000013,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 进入保存状态后禁用手柄并拒绝尚未完成的原生放下事件",
+          "status": "passed",
+          "title": "进入保存状态后禁用手柄并拒绝尚未完成的原生放下事件",
+          "duration": 30.185399999999845,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933951110,
+      "endTime": 1793933951493.1853,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/material-drag.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "新增和修改均传入锁定预设，仅上传处理结果，回填正确字段（修改=true）",
+          "status": "passed",
+          "title": "新增和修改均传入锁定预设，仅上传处理结果，回填正确字段（修改=true）",
+          "duration": 1000.7679999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "新增和修改均传入锁定预设，仅上传处理结果，回填正确字段（修改=false）",
+          "status": "passed",
+          "title": "新增和修改均传入锁定预设，仅上传处理结果，回填正确字段（修改=false）",
+          "duration": 474.4521999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "无预设允许调整；取消与 Escape 仅关闭图片弹框并恢复输入框焦点",
+          "status": "passed",
+          "title": "无预设允许调整；取消与 Escape 仅关闭图片弹框并恢复输入框焦点",
+          "duration": 477.5691999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "桌面格式菜单留在图片弹框内部，格式修改参与实际处理",
+          "status": "passed",
+          "title": "桌面格式菜单留在图片弹框内部，格式修改参与实际处理",
+          "duration": 788.0622000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 主图地址 处理返回编辑后保留内容，但不自动激活输入框",
+          "status": "passed",
+          "title": "Android 主图地址 处理返回编辑后保留内容，但不自动激活输入框",
+          "duration": 1394.1440000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 第二张图片地址 处理返回编辑后保留内容，但不自动激活输入框",
+          "status": "passed",
+          "title": "Android 第二张图片地址 处理返回编辑后保留内容，但不自动激活输入框",
+          "duration": 1127.2866000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "粘贴仅在 TitlePic 获得焦点时触发，并取第一张图",
+          "status": "passed",
+          "title": "粘贴仅在 TitlePic 获得焦点时触发，并取第一张图",
+          "duration": 111.46709999999985,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "粘贴仅在 TitlePic2 获得焦点时触发，并取第一张图",
+          "status": "passed",
+          "title": "粘贴仅在 TitlePic2 获得焦点时触发，并取第一张图",
+          "duration": 140.16729999999916,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "纯文本照常粘贴，不支持的图片明确报错且不上传",
+          "status": "passed",
+          "title": "纯文本照常粘贴，不支持的图片明确报错且不上传",
+          "duration": 124.99799999999959,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "读取预设失败不能绕过，可重试；上传失败保留结果，可手动重试",
+          "status": "passed",
+          "title": "读取预设失败不能绕过，可重试；上传失败保留结果，可手动重试",
+          "duration": 505.27080000000024,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "上传期间取消后丢弃旧回调，重复确认不重复上传",
+          "status": "passed",
+          "title": "上传期间取消后丢弃旧回调，重复确认不重复上传",
+          "duration": 436.2608,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "上传期间卸载后丢弃旧回调，重复确认不重复上传",
+          "status": "passed",
+          "title": "上传期间卸载后丢弃旧回调，重复确认不重复上传",
+          "duration": 380.16699999999946,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "上传期间会话失效后丢弃旧回调，重复确认不重复上传",
+          "status": "passed",
+          "title": "上传期间会话失效后丢弃旧回调，重复确认不重复上传",
+          "duration": 407.96290000000045,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "取消预设读取后，旧预设不打开新弹框",
+          "status": "passed",
+          "title": "取消预设读取后，旧预设不打开新弹框",
+          "duration": 181.8657000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933913662,
+      "endTime": 1793933921211.8657,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/material-images.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "设置编辑打开时聚焦容器，输入框支持手动点击和 Tab 导航",
+          "status": "passed",
+          "title": "设置编辑打开时聚焦容器，输入框支持手动点击和 Tab 导航",
+          "duration": 360.9285,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933953905,
+      "endTime": 1793933954265.9285,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/mobile-editor-focus.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "Android 源码与链接编辑不自动激活输入，关闭后不重新激活正文",
+          "status": "passed",
+          "title": "Android 源码与链接编辑不自动激活输入，关闭后不重新激活正文",
+          "duration": 762.0798999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "隐藏配置选择并使用默认分页模板绑定的模型；生成预览后显式应用",
+          "status": "passed",
+          "title": "隐藏配置选择并使用默认分页模板绑定的模型；生成预览后显式应用",
+          "duration": 264.88139999999976,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "卸载取消请求并丢弃迟到结果，重新打开读取最新默认配置",
+          "status": "passed",
+          "title": "卸载取消请求并丢弃迟到结果，重新打开读取最新默认配置",
+          "duration": 238.2898,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "取消、关闭和登录变化均丢弃响应，正文变化使预览失效",
+          "status": "passed",
+          "title": "取消、关闭和登录变化均丢弃响应，正文变化使预览失效",
+          "duration": 538.2066999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "缺少默认模板时显示原因与设置入口，不请求 AI",
+          "status": "passed",
+          "title": "缺少默认模板时显示原因与设置入口，不请求 AI",
+          "duration": 156.44540000000052,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "缺少绑定模型时显示原因与设置入口，不请求 AI",
+          "status": "passed",
+          "title": "缺少绑定模型时显示原因与设置入口，不请求 AI",
+          "duration": 170.65390000000025,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "缺少已删除模型时显示原因与设置入口，不请求 AI",
+          "status": "passed",
+          "title": "缺少已删除模型时显示原因与设置入口，不请求 AI",
+          "duration": 173.00830000000042,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "请求错误保留正文和分页，不自动重试",
+          "status": "passed",
+          "title": "请求错误保留正文和分页，不自动重试",
+          "duration": 178.6234000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "输出上限错误保留已有分页与格式，允许手动重试",
+          "status": "passed",
+          "title": "输出上限错误保留已有分页与格式，允许手动重试",
+          "duration": 384.39450000000033,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "分页定位恢复正文焦点后触发选区滚动，不修改正文",
+          "status": "passed",
+          "title": "分页定位恢复正文焦点后触发选区滚动，不修改正文",
+          "duration": 516.4685,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "编辑器应用分页只更新本地正文，一次撤销恢复原始 HTML",
+          "status": "passed",
+          "title": "编辑器应用分页只更新本地正文，一次撤销恢复原始 HTML",
+          "duration": 888.21,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933924142,
+      "endTime": 1793933928413.21,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/pagination-assistant.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["图片缓存和资源生命周期"],
+          "fullName": "图片缓存和资源生命周期 重复 URL 合并下载与解码，释放最后一个引用才撤销预览 URL",
+          "status": "passed",
+          "title": "重复 URL 合并下载与解码，释放最后一个引用才撤销预览 URL",
+          "duration": 6.223700000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["图片缓存和资源生命周期"],
+          "fullName": "图片缓存和资源生命周期 最多四个并发，排队请求共享结果",
+          "status": "passed",
+          "title": "最多四个并发，排队请求共享结果",
+          "duration": 57.516999999999825,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["图片缓存和资源生命周期"],
+          "fullName": "图片缓存和资源生命周期 按实际字节 LRU 淘汰，退出清理活动 URL 与旧响应",
+          "status": "passed",
+          "title": "按实际字节 LRU 淘汰，退出清理活动 URL 与旧响应",
+          "duration": 2.0399999999999636,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["图片缓存和资源生命周期"],
+          "fullName": "图片缓存和资源生命周期 完整性、解码和超限失败不进入缓存，可单图重试",
+          "status": "passed",
+          "title": "完整性、解码和超限失败不进入缓存，可单图重试",
+          "duration": 1.9083999999998014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用图片组件"],
+          "fullName": "共用图片组件 空图片不请求，失败可重试，使用解码尺寸和真实大小",
+          "status": "passed",
+          "title": "空图片不请求，失败可重试，使用解码尺寸和真实大小",
+          "duration": 190.5722999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用图片组件"],
+          "fullName": "共用图片组件 接近可视区域才加载，会话变化丢弃旧结果",
+          "status": "passed",
+          "title": "接近可视区域才加载，会话变化丢弃旧结果",
+          "duration": 6.432299999999941,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["共用图片组件"],
+          "fullName": "共用图片组件 切换图片地址后旧响应不会覆盖新图，并释放迟到的引用",
+          "status": "passed",
+          "title": "切换图片地址后旧响应不会覆盖新图，并释放迟到的引用",
+          "duration": 17.06939999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933954073,
+      "endTime": 1793933954355.0693,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/promote-images.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "根节点引用与滚动视口独立，视口支持命名、焦点和滚动事件",
+          "status": "passed",
+          "title": "根节点引用与滚动视口独立，视口支持命名、焦点和滚动事件",
+          "duration": 117.48759999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933959231,
+      "endTime": 1793933959348.4875,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/scroll-area.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "搜索按中文和英文大小写过滤，搜索及关闭不改变选中值",
+          "status": "passed",
+          "title": "搜索按中文和英文大小写过滤，搜索及关闭不改变选中值",
+          "duration": 672.3325,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "无匹配项有明确提示，点击外部或按 Tab 离开不会提交选择",
+          "status": "passed",
+          "title": "无匹配项有明确提示，点击外部或按 Tab 离开不会提交选择",
+          "duration": 426.5147000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "方向键和 Enter 选择选项，支持全部项的空字符串且不提交外层表单",
+          "status": "passed",
+          "title": "方向键和 Enter 选择选项，支持全部项的空字符串且不提交外层表单",
+          "duration": 389.18550000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "中文输入法确认期间 Enter 不选择选项或提交表单",
+          "status": "passed",
+          "title": "中文输入法确认期间 Enter 不选择选项或提交表单",
+          "duration": 154.75930000000017,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "禁用时关闭已有弹层，恢复后搜索清空；历史值仍可回显",
+          "status": "passed",
+          "title": "禁用时关闭已有弹层，恢复后搜索清空；历史值仍可回显",
+          "duration": 349.08860000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "普通 Select 显示映射标签并在禁用时收起弹层",
+          "status": "passed",
+          "title": "普通 Select 显示映射标签并在禁用时收起弹层",
+          "duration": 120.16550000000007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933937859,
+      "endTime": 1793933939971.1655,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/select.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "垂直 Tabs 将方向传给 Radix，并通过上下方向键切换面板",
+          "status": "passed",
+          "title": "垂直 Tabs 将方向传给 Radix，并通过上下方向键切换面板",
+          "duration": 253.61149999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793933956575,
+      "endTime": 1793933956828.6116,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/tabs.test.tsx"
+    }
+  ]
+}

@@ -1,0 +1,335 @@
+{
+  "date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "source": "uncommitted-worktree",
+  "allEightStepsAccepted": true,
+  "acceptanceScope": {
+    "requestedPlatforms": ["Windows"],
+    "userDecision": "没有 mac 不进行测试了，测试 Windows 就可以",
+    "macOSTesting": "out-of-scope-not-tested",
+    "additionalThreePlatformMatrix": "out-of-scope-not-tested",
+    "previousAndroidEvidenceRetained": true,
+    "s8_02": "two-independent-Windows-native-processes-and-third-process-cold-read",
+    "accountDecision": "本轮只测现有账号，跨账号不纳入验收",
+    "realAccountsRequired": 1,
+    "crossAccountTesting": "out-of-scope-not-tested",
+    "naturalExpiryDecision": "本轮采用已有鉴权证据，自然过期留作后续补验",
+    "naturalExpiryTesting": "deferred-not-tested"
+  },
+  "production": {
+    "origin": "https://pressdock-settings.uyoung.co",
+    "workerVersion": "93e4e081-547e-458e-ac0c-cab6daf20834",
+    "d1Migration": "0001_settings.sql",
+    "revision": 17,
+    "operations": 17,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "originalConfigurationRestored": true,
+    "initializationRepeatedWithoutUpload": true
+  },
+  "development": {
+    "workerVersion": "3f62ffba-3659-430f-832e-1be414b16dce",
+    "distinctFieldMergeRounds": 20,
+    "lastAcceptedWriteRounds": 20,
+    "lateIdempotentRetryRounds": 20,
+    "invalidReferenceAtomic": true,
+    "nativeSharedCrudSecretDefaultsAndHarvestProbe": true,
+    "originalDemoSettingsRestored": true,
+    "localPreferenceUploads": 0,
+    "revision": 108,
+    "windowsNativeThreeProcessConcurrency": true
+  },
+  "checks": {
+    "frontend": {
+      "passed": 296,
+      "failed": 0,
+      "files": 37
+    },
+    "rust": {
+      "passed": 100,
+      "failed": 0,
+      "ignored": 12
+    },
+    "windowsNativeCrossProcessIgnoredTestExplicitlyRun": true,
+    "windowsNativeInitializationFaultIgnoredTestExplicitlyRun": true,
+    "worker": {
+      "passed": 113,
+      "failed": 0
+    },
+    "scripts": {
+      "passed": 9,
+      "failed": 0
+    },
+    "androidJvm": {
+      "passed": 4,
+      "failed": 0
+    },
+    "eslint": true,
+    "prettier": true,
+    "cargoFmt": true,
+    "cargoClippyAllTargetsWarningsDenied": true,
+    "frontendProductionBuild": true,
+    "workerTypecheck": true,
+    "workerDevelopmentDryRun": true,
+    "workerProductionDryRun": true,
+    "windowsTauriBuild": true,
+    "androidReleaseBuildAndOriginalSignatureUpdate": true,
+    "gitDiffCheck": true,
+    "windowsCdpAndroidWebViewIgnoredTestExplicitlyRun": true,
+    "androidRecoveryDemoProvisionIgnoredTestExplicitlyRun": true,
+    "windowsIsolatedNsisInstallerUpgradeAndRollback": true,
+    "runningNativeHarvestExplicitTest": {
+      "passed": false,
+      "attempt": 2,
+      "errorCode": "PROBE_HARVEST_TIMEOUT",
+      "originalFailureRetained": true,
+      "cmsArticleWrites": 0
+    },
+    "windowsPostCloudCommitInitializationIgnoredTestExplicitlyRun": true,
+    "androidIsolatedReleaseUpgradeAndBackupRollback": true,
+    "runningNativeHarvestContinuationExplicitTest": {
+      "passed": true,
+      "sourceVerificationCompleted": true,
+      "firstTaskAttempts": 2,
+      "newTaskAttempts": 1,
+      "oldSummarySnapshot": true,
+      "newSummarySnapshot": false,
+      "oldTaskOptionsAndPreparedResultUnchanged": true,
+      "cmsArticleWrites": 0
+    },
+    "windowsNativeThreeProcessConcurrencyExplicitTest": true,
+    "windowsRecoveryFixtureExplicitlyPrepared": true,
+    "windowsNativeRecoveryDialogAndColdRestart": true
+  },
+  "windows": {
+    "nativeCredentialStoreAndCrossProcessQueue": true,
+    "archivedRecoveryDecryptableAcrossProcesses": true,
+    "missingDedicatedSourceCredentialStopsInitialization": true,
+    "frozenInitializationSurvivesForcedChildProcessExit": true,
+    "credentialProcessLockReleasedAfterForcedChildProcessExit": true,
+    "dedicatedNativeTestCredentialsCleaned": true,
+    "freshIsolatedClientDownloadedCredentialsAndAiSucceeded": true,
+    "packagedProcessColdStart": {
+      "activeGenerationInstalled": true,
+      "localRecoveryMigrationInstalled": true,
+      "downloadedGenerationChangedSincePreviousProcess": true,
+      "cloudRevision": 17,
+      "pending": 0,
+      "originalModelNameRestored": true,
+      "originals": 321,
+      "drafts": 4,
+      "harvestJobs": 318,
+      "businessContentsAndJobStatesUnchanged": true,
+      "sharedConfigurationUnchanged": true,
+      "localHarvestSettingsUnchanged": true,
+      "diagnostics": {
+        "readRequests": 1,
+        "successfulReads": 1,
+        "writeRequests": 0,
+        "pending": 0
+      }
+    },
+    "uiAutomation": "restored-official-computer-use-missing-runtime-temp-directories",
+    "isolatedLegacyBackupRestoreAndReupgrade": {
+      "passed": true,
+      "legacyMigration": 9,
+      "reupgradedMigration": 12,
+      "originalAndDraftContentsUnchanged": true,
+      "jobStatesUnchanged": true,
+      "legacyNativeCredentialReadable": true,
+      "cloudRevisionAfterReupgrade": 5,
+      "dedicatedTestCredentialsCleaned": true,
+      "productionInstallationReplaced": false
+    },
+    "isolatedNsisInstallerUpgradeAndRollback": {
+      "passed": true,
+      "legacyVersion": "0.1.0",
+      "upgradeVersion": "0.1.1",
+      "rollbackVersion": "0.1.0",
+      "migrationVersions": [9, 12, 9],
+      "originals": 321,
+      "drafts": 4,
+      "harvestJobs": 318,
+      "contentsAndJobStatesUnchanged": true,
+      "cloudRevisionAfterUpgrade": 9,
+      "legacyNativeCredentialReadable": true,
+      "dedicatedTestCredentialsCleaned": true,
+      "productionInstallationReplaced": false,
+      "testProductRemoved": false,
+      "cleanupDeferredByAutomaticApproval": true
+    },
+    "runningHarvestAcceptance": {
+      "accepted": true,
+      "manualVerificationPending": false,
+      "firstTaskAttempts": 2,
+      "newTaskAttempts": 1,
+      "secondTaskEnqueued": true,
+      "bothTasksProcessingOnlyCompleted": true,
+      "originalSharedConfigurationRestored": true,
+      "testProcessRetained": false,
+      "testDataArchived": true,
+      "originalTimeoutTestStillFailed": true
+    },
+    "cloudInitializationCommitSurvivesForcedChildProcessExit": true,
+    "initializationOriginalBytesAndOperationIdRetried": true,
+    "pendingHarvestCredentialsRetained": false,
+    "threeProcessConcurrentFieldsAndColdRead": {
+      "passed": true,
+      "developmentRevision": 108,
+      "distinctNativeProcesses": 3,
+      "distinctDeviceIds": 3,
+      "readsAfterTwoSaves": [1, 1],
+      "thirdProcessColdReads": 1,
+      "originalDevelopmentConfigurationRestored": true
+    },
+    "rejectedQueueDialog": {
+      "accepted": true,
+      "fixturePrepared": true,
+      "isolatedInstallation": true,
+      "pending": 0,
+      "errorCode": "ENTITY_NOT_FOUND",
+      "nativeBackgroundUploadAttempts": 1,
+      "cloudRevisionAfterRestore": 17,
+      "manualCancelPending": false,
+      "testProcessRelaunchedAfterObservedExit": true,
+      "originalQueueAndCiphertextRetainedBeforeRelaunch": true,
+      "cancelPreservedQueueAndCiphertext": true,
+      "confirmationPreservedRecoveryCopy": true,
+      "coldRestartAdoptedCloudWithoutReplay": true,
+      "readRequestsAfterRestart": 1,
+      "successfulReadsAfterRestart": 1,
+      "writeRequestsAfterRestart": 0,
+      "recoveryCredentialsIntentionallyRetained": true,
+      "testProcessStopped": true
+    },
+    "formalApplicationTemporarilyStoppedForIsolatedRecoveryTest": false,
+    "formalApplicationRestoredAfterRecoveryAcceptance": true
+  },
+  "android": {
+    "deviceModel": "ONEPLUS_A5000",
+    "architecture": "arm64-v8a",
+    "uninstalledOrDataCleared": false,
+    "nativeKeystore": true,
+    "coldStartOnline": {
+      "readRequests": 1,
+      "successfulReads": 1,
+      "writeRequests": 0,
+      "pending": 0
+    },
+    "backgroundReturnAdditionalSnapshotReads": 0,
+    "savedChangeVisibleToWindowsNativeClient": true,
+    "downloadedCredentialsAndAiSucceeded": true,
+    "offlineSave": {
+      "pending": 1,
+      "networkErrorReported": true
+    },
+    "afterOfflineProcessRestartAndNetworkRecovery": {
+      "readRequests": 1,
+      "successfulReads": 0,
+      "writeAttempts": 3,
+      "pending": 0,
+      "serverRevision": 4
+    },
+    "afterRestoreOriginalName": {
+      "readRequests": 1,
+      "successfulReads": 0,
+      "writeAttempts": 4,
+      "pending": 0,
+      "serverRevision": 5
+    },
+    "offlineCmsLoginRecoveryRequiresNetworkAndExplicitRetry": true,
+    "wifiAndMobileDataRestored": true,
+    "signingCertificateSha256": "32b9c534237ed6e9a3c188bb0c8f4a86bb61d277f7bf2cbd0868e9627108265d",
+    "recoveryBuildColdStartVerified": true,
+    "recoveryBuildBackgroundReturnAdditionalReads": 0,
+    "sharedRuleFromWindowsCdpClient": {
+      "passed": true,
+      "sourceModePreserved": "webview",
+      "changedAfterColdStart": true,
+      "originalSummaryRuleRestored": true,
+      "readRequests": 1,
+      "successfulReads": 1,
+      "writeRequests": 0,
+      "pending": 0
+    },
+    "rejectedQueueRecovery": {
+      "passed": true,
+      "errorCode": "ENTITY_NOT_FOUND",
+      "cancelPreservedPending": true,
+      "archiveWithoutAdditionalReads": true,
+      "restartedWithoutReplayingArchivedRequest": true,
+      "finalPending": 0,
+      "originalModelPresent": true,
+      "demoModelAbsent": true,
+      "recoveryCopyIntentionallyRetained": true
+    },
+    "isolatedReleaseUpgradeAndBackupRollback": {
+      "passed": true,
+      "packageName": "com.example.pressdock.rollbackqa",
+      "legacyMigration": 9,
+      "upgradeMigration": 12,
+      "rollbackMigration": 9,
+      "originals": 5,
+      "drafts": 5,
+      "jobs": 1,
+      "businessAndSettingsHashesUnchanged": true,
+      "privateBackupRestoredByteForByte": true,
+      "originalKeystoreCredentialReadableAfterRollback": true,
+      "debuggable": false,
+      "networkPermission": false,
+      "productionPackageUnchanged": true,
+      "uninstalled": false,
+      "dataCleared": false,
+      "downgradeFlagUsed": false,
+      "rollbackUsesHigherVersionCodeOldCodePackage": true
+    }
+  },
+  "explicitAiConnectionTests": {
+    "windows": 1,
+    "android": 2
+  },
+  "cmsWritesDuringVerification": 0,
+  "gitPushes": 0,
+  "artifacts": [
+    {
+      "path": "artifacts/PressDock-0.1.0-android-release-arm64.apk",
+      "sha256": "EFB764E8AE9C12E20E46377A027B3796A626CBB54C68A56C3707B2886DAA8B77"
+    },
+    {
+      "path": "src-tauri/target/release/bundle/nsis/PressDock_0.1.0_x64-setup.exe",
+      "sha256": "F9845EEC7D6BEF62D3FFAB21A25326B640E9DB6EAEE3EA6F5DC147ED5B2D7B77"
+    },
+    {
+      "path": "src-tauri/target/release/bundle/msi/PressDock_0.1.0_x64_en-US.msi",
+      "sha256": "B801C0DFEDF6AE6C492F42FB8A8F170EE39BC183987687037E55272BDFC422B2"
+    }
+  ],
+  "notAccepted": [],
+  "knownLimitations": [
+    "recovery copies are retained in the original installation without a browsing, export or selective replay interface",
+    "fully offline cold start remains gated by existing CMS login recovery",
+    "isolated Windows installer test product and test release files retained because automatic approval rejected combined uninstallation and deletion; test process stopped and application data archived"
+  ],
+  "localMigrations": [
+    "0010_settings_sync",
+    "0011_harvest_execution_snapshots",
+    "0012_settings_sync_recovery"
+  ],
+  "initializationFaultEnvironment": {
+    "worker": "pressdock-settings-init-qa-20261107",
+    "databaseId": "4f4df926-95d8-4e04-8c1e-0f5ec7364122",
+    "revision": 1,
+    "operations": 1,
+    "demoDataOnly": true,
+    "retainedForReview": true
+  },
+  "deferredChecks": [
+    {
+      "check": "naturally expired CMS session end-to-end",
+      "status": "not-tested",
+      "blocksCurrentAcceptance": false,
+      "userDecision": "本轮采用已有鉴权证据，自然过期留作后续补验"
+    }
+  ],
+  "acceptanceMatrix": "acceptance-matrix.json"
+}

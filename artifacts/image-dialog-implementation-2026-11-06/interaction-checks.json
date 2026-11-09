@@ -1,0 +1,42 @@
+{
+  "pan": {
+    "panChanged": true,
+    "cropUnchanged": true,
+    "start": {
+      "transform": "translate(calc(-50% + 0px), calc(-50% + 0px))",
+      "crop": "top: 0%; left: 9.8368%; width: 80.3264%; height: 100%;",
+      "rect": {
+        "x": 24,
+        "y": 204,
+        "width": 670,
+        "height": 396,
+        "top": 204,
+        "right": 694,
+        "bottom": 600,
+        "left": 24
+      }
+    },
+    "end": {
+      "transform": "translate(calc(-50% + 70px), calc(-50% + 0px))",
+      "crop": "top: 0%; left: 9.8368%; width: 80.3264%; height: 100%;"
+    }
+  },
+  "preview": {
+    "result": "原图506 × 180 · 13.1 KiB处理结果560 × 248 · 9.3 KiB",
+    "confirmationEnabled": true
+  },
+  "upload": {
+    "error": "隔离演示：上传及 CMS 写操作已阻断，未修改线上素材",
+    "resultStillVisible": true,
+    "width": "560",
+    "mainAddress": "",
+    "footerVisible": true
+  },
+  "cancel": {
+    "dialogClosed": true,
+    "focusRestored": true
+  },
+  "errorDetails": {
+    "fullErrorVisible": true
+  }
+}

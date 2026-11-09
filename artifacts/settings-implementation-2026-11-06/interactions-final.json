@@ -1,0 +1,126 @@
+{
+  "checks": [
+    {
+      "name": "打开时焦点在弹框容器",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "Tab 焦点保持在弹框内",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "Responses 隐藏 Chat 专用兼容项",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "提供商失败保留输入",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "关闭后焦点返回编辑入口",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "重开恢复提供商草稿",
+      "pass": true,
+      "round": 13
+    },
+    {
+      "name": "模型测试失败就地反馈",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "目录失败仍能手动添加",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "切用途保留新模板",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "原模板草稿独立保留",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "变量替换最近焦点的选区",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "跨模块保留草稿",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "模板失败保留输入",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "删除取消不发请求",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "预设选择器打开无位移",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "预设失败保留输入",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "目标子渠道草稿隔离",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "复制读取已保存的来源",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "切回目标恢复失败草稿",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "取消离开保留设置",
+      "pass": true,
+      "round": 15
+    },
+    {
+      "name": "业务草稿未写入 localStorage",
+      "pass": true,
+      "round": 15
+    }
+  ],
+  "blocked": [
+    {
+      "command": "ai_save_provider"
+    },
+    {
+      "command": "ai_test_model"
+    },
+    {
+      "command": "ai_list_models"
+    },
+    {
+      "command": "ai_save_template"
+    },
+    {
+      "command": "save_channel_image_presets"
+    }
+  ]
+}

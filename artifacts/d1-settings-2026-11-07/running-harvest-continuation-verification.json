@@ -1,0 +1,82 @@
+{
+  "case": "S8-04",
+  "accepted": true,
+  "environment": "Isolated Windows native release; real source WebView, real AI and production settings service",
+  "sourceUrl": "https://baijiahao.baidu.com/s?id=1881087775499169707",
+  "priorController": {
+    "passed": false,
+    "errorCode": "PROBE_HARVEST_TIMEOUT",
+    "originalResultRetained": true,
+    "configurationChangedWhileFirstTaskRunning": true,
+    "firstAttemptHadNoFormattedOrPreparedResult": true
+  },
+  "manualSourceVerificationCompleted": true,
+  "explicitSourceRetryObserved": true,
+  "nativeContinuation": {
+    "aiRequestsMayHaveExecuted": true,
+    "check": "windows-real-harvest-after-manual-source-verification",
+    "cmsArticleWrites": 0,
+    "first": {
+      "attempts": 2,
+      "autoSummarySnapshot": true,
+      "cmsArticleIdPresent": false,
+      "jobId": "27c85871-5e98-4876-9f3a-3021e541323f",
+      "metadataExecutionSnapshotPresent": true,
+      "paginationSnapshotPresent": true,
+      "preparedResultPresent": true,
+      "processingOnly": true,
+      "status": "debugCompleted",
+      "submissionIntentRecorded": false,
+      "summaryChangedFromFormatter": true,
+      "warningCount": 0
+    },
+    "firstAttemptHadNoFormattedOrPreparedResult": true,
+    "firstJobSnapshotAndPreparedResultUnchanged": true,
+    "firstTaskHadExplicitSourceRetry": true,
+    "passed": true,
+    "priorControllerTimedOut": true,
+    "second": {
+      "attempts": 1,
+      "autoSummarySnapshot": false,
+      "cmsArticleIdPresent": false,
+      "jobId": "378dfe90-1ed1-4d7d-8459-f2d00e9de55c",
+      "metadataExecutionSnapshotPresent": true,
+      "paginationSnapshotPresent": true,
+      "preparedResultPresent": true,
+      "processingOnly": true,
+      "status": "debugCompleted",
+      "submissionIntentRecorded": false,
+      "summaryChangedFromFormatter": false,
+      "warningCount": 0
+    },
+    "secondJobCreatedAfterNativeColdRestart": true
+  },
+  "originalSharedConfigurationRestored": true,
+  "production": {
+    "revision": 15,
+    "operations": 15,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "autoSummary": 1
+  },
+  "dedicatedNativeCredentialsCleaned": 3,
+  "testProcessStopped": true,
+  "testApplicationDataArchived": true,
+  "formalWindowsColdStart": {
+    "passed": true,
+    "check": "formal-windows-native-cold-start-after-source-verification",
+    "cloudRevision": 15,
+    "pending": 0,
+    "downloadedGenerationChangedSincePreviousProcess": true,
+    "dataPreserved": true,
+    "modelConfigurationRestored": true,
+    "counts": {
+      "originals": 321,
+      "drafts": 4,
+      "jobs": 318
+    }
+  },
+  "cmsArticleWrites": 0,
+  "scope": "Initial running-task mutation observation plus explicit post-verification continuation and native cold restart. The original timeout test remains failed; the first task completed after a user source retry (2 attempts), and the new task completed in 1 attempt. Old task options/prepared bytes were unchanged across restart.",
+  "networkRequestCountLimitation": "AI execution is evidenced by native processing and changed summary. No exact HTTP request count is claimed; task attempts/checkpoints and immutable completed result are checked."
+}

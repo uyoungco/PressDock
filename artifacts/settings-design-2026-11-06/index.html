@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>系统设置 · 紧凑版设计提案</title>
+    <link rel="stylesheet" href="./design.css" />
+  </head>
+  <body>
+    <div class="proposal">
+      <span>设计提案 · 演示数据</span
+      ><span>所有操作仅在内存演示，未连接 CMS / AI</span>
+    </div>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-icon">▤</span
+          ><b>PressDock<span class="brand-dot">.</span></b>
+        </div>
+        <p class="nav-label">编辑工作空间</p>
+        <nav aria-label="主导航">
+          <span>工作台</span><span>渠道素材管理</span><span>素材导入</span
+          ><span>文章管理</span><span>图片处理</span><span>发布管理</span
+          ><span class="selected">系统设置</span>
+        </nav>
+        <div class="sidebar-bottom">
+          本地优先
+          <p>素材与草稿独立保存，专注每一次编辑</p>
+        </div>
+      </aside>
+      <header class="topbar">
+        <button id="sidebar-toggle" class="icon-button" aria-label="切换导航">
+          ☰</button
+        ><span>工作空间 <i>/</i> <strong>系统设置</strong></span
+        ><span class="account">隔离演示账号</span>
+      </header>
+      <main>
+        <div class="page-head">
+          <div>
+            <h1>系统设置</h1>
+            <p>配置采集、图片与 AI 编辑工具</p>
+          </div>
+          <span class="scope">本机工作区共用</span>
+        </div>
+        <nav class="tabs" role="tablist" aria-label="设置模块"></nav>
+        <div class="settings-container">
+          <section id="workspace" aria-live="off"></section>
+        </div>
+      </main>
+      <footer class="app-footer">
+        <span><span class="dot"></span> 本地工作区 · SQLite</span
+        ><span>PressDock · 设计预览</span>
+      </footer>
+    </div>
+    <dialog id="editor" aria-labelledby="dialog-title">
+      <header>
+        <div>
+          <h2 id="dialog-title"></h2>
+          <p id="dialog-hint"></p>
+        </div>
+        <button class="icon-button" id="dialog-close" aria-label="关闭编辑">
+          ×
+        </button>
+      </header>
+      <form id="editor-form">
+        <div id="dialog-fields" class="dialog-fields"></div>
+        <div id="dialog-error" class="error" role="alert" hidden></div>
+        <footer>
+          <span class="muted">仅演示，不写入真实配置</span>
+          <div class="actions">
+            <button type="button" id="dialog-cancel">取消</button
+            ><button class="primary" id="dialog-save" type="submit">
+              保存
+            </button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+    <script src="./prototype.js"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-06",
+  "scope": "文章管理紧凑列表、编辑工作区、分页助手及关联浮层",
+  "checks": [
+    { "command": "npm run lint", "exitCode": 0 },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "files": 34,
+      "tests": 276,
+      "durationSeconds": 28.97,
+      "execution": "独立运行"
+    },
+    {
+      "command": "node --test scripts/pagination-eval.test.mjs",
+      "exitCode": 0,
+      "tests": 4
+    },
+    {
+      "command": "node --test scripts/build-android.test.mjs",
+      "exitCode": 0,
+      "tests": 5
+    },
+    { "command": "npm run build", "exitCode": 0 },
+    { "command": "npm run format:check", "exitCode": 0 },
+    { "command": "git diff --check", "exitCode": 0 }
+  ],
+  "earlierConcurrentTestRun": {
+    "exitCode": 1,
+    "failures": [
+      "app.test.tsx：文章分类导航与每页条数可选择，主题选择继续持久化，5000ms 超时",
+      "channel-writes.test.tsx：上传成功只回填对应地址，保存成功但刷新失败分别提示，5000ms 超时"
+    ],
+    "resolution": "停止并行构建后独立重跑 npm test，276 项全部通过；未增加超时阈值"
+  },
+  "browser": {
+    "tool": "Ego",
+    "widths": [1440, 1280, 1024, 768, 390],
+    "pageHorizontalOverflow": 0,
+    "shortViewport": { "width": 390, "height": 400, "previewHeight": 132 },
+    "android": "390×844 浏览器平台分支，非真机",
+    "liveCmsWrites": false,
+    "liveAiRequests": false,
+    "taskSpaceFinished": true
+  },
+  "knownBoundary": "跨全局 768px 导航断点仍可能重挂载文章路由；内部正文／信息页签及 1100px 重排保留编辑器实例"
+}

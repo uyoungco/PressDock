@@ -1,0 +1,202 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "documentWidth": 1440,
+    "panel": {
+      "height": 89,
+      "top": 280.375,
+      "bottom": 369.375
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 807,
+      "bottom": 856
+    },
+    "workspace": {
+      "client": 632,
+      "scroll": 632
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 1440,
+    "height": 600,
+    "documentWidth": 1440,
+    "panel": {
+      "height": 89,
+      "top": 280.375,
+      "bottom": 369.375
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 507,
+      "bottom": 556
+    },
+    "workspace": {
+      "client": 332,
+      "scroll": 622
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "documentWidth": 1280,
+    "panel": {
+      "height": 89,
+      "top": 280.375,
+      "bottom": 369.375
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 627,
+      "bottom": 676
+    },
+    "workspace": {
+      "client": 452,
+      "scroll": 622
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 1024,
+    "height": 600,
+    "documentWidth": 1024,
+    "panel": {
+      "height": 89,
+      "top": 280.375,
+      "bottom": 369.375
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 507,
+      "bottom": 556
+    },
+    "workspace": {
+      "client": 332,
+      "scroll": 622
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 768,
+    "height": 600,
+    "documentWidth": 768,
+    "panel": {
+      "height": 156,
+      "top": 320.375,
+      "bottom": 476.375
+    },
+    "control": {
+      "top": 360.375,
+      "bottom": 392.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 507,
+      "bottom": 556
+    },
+    "workspace": {
+      "client": 292,
+      "scroll": 1029
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "documentWidth": 390,
+    "panel": {
+      "height": 148,
+      "top": 300.375,
+      "bottom": 448.375
+    },
+    "control": {
+      "top": 336.375,
+      "bottom": 368.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 751,
+      "bottom": 808
+    },
+    "workspace": {
+      "client": 564,
+      "scroll": 1064
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 390,
+    "height": 600,
+    "documentWidth": 390,
+    "panel": {
+      "height": 148,
+      "top": 300.375,
+      "bottom": 448.375
+    },
+    "control": {
+      "top": 336.375,
+      "bottom": 368.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 507,
+      "bottom": 564
+    },
+    "workspace": {
+      "client": 320,
+      "scroll": 1064
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  },
+  {
+    "width": 1024,
+    "height": 480,
+    "documentWidth": 1024,
+    "panel": {
+      "height": 89,
+      "top": 280.375,
+      "bottom": 369.375
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375
+    },
+    "clipped": [],
+    "footer": {
+      "top": 387,
+      "bottom": 436
+    },
+    "workspace": {
+      "client": 212,
+      "scroll": 622
+    },
+    "controlsClickable": true,
+    "saveWorks": true
+  }
+]

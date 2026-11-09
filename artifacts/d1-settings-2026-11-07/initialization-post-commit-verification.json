@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-07",
+  "scope": "Real isolated Cloudflare Worker/D1; Windows native credentials and actual initialization function; only the owned child process was forcibly terminated after cloud commit and before local receipt persistence",
+  "aiRequests": 0,
+  "check": "windows-native-post-cloud-commit-forced-exit",
+  "cloudCommitConfirmedBeforeForcedExit": true,
+  "cloudRevisionAfterRetry": 1,
+  "cmsWrites": 0,
+  "dedicatedNativeCredentialsCleaned": true,
+  "isolatedCloudOrigin": "https://pressdock-settings-init-qa-20261107.i9543.workers.dev",
+  "localReceiptAbsentAtForcedExit": true,
+  "localReceiptPersistedAfterRetry": true,
+  "originalRequestRecoveredByteForByte": true,
+  "passed": true,
+  "pendingInitializationPayloads": 0,
+  "realCmsAuthentication": true,
+  "recoveredOriginalOperationId": true,
+  "thirdInitializeSkippedUpload": true,
+  "resources": {
+    "name": "pressdock-settings-init-qa-20261107",
+    "databaseId": "4f4df926-95d8-4e04-8c1e-0f5ec7364122",
+    "origin": "https://pressdock-settings-init-qa-20261107.i9543.workers.dev",
+    "workerVersion": "b6c0c4b9-034d-4973-8747-682b6c93a214",
+    "isolatedFromExistingDevelopmentAndProduction": true
+  },
+  "before": {
+    "revision": 0,
+    "initialized": 0,
+    "operations": 0,
+    "encryptedSecrets": 0
+  },
+  "after": {
+    "revision": 1,
+    "initialized": 1,
+    "operations": 1,
+    "devices": 1,
+    "encryptedSecrets": 1,
+    "realActors": 1,
+    "minAppliedRevision": 1,
+    "maxAppliedRevision": 1,
+    "configContainsDemoSecret": 0,
+    "ciphertextContainsDemoSecret": 0
+  },
+  "dataClassification": "Dedicated DEMO configuration and DEMO AI key; real existing CMS authentication, no production configuration imported",
+  "formalOrExistingDevelopmentDatabaseReset": false,
+  "workerLoggingEnabled": false,
+  "temporaryCloudResourcesRetainedForReview": true
+}

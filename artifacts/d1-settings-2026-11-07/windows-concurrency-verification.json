@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-07",
+  "platform": "Windows",
+  "acceptanceCase": "S8-02",
+  "client": "three independent native Rust test processes using the actual SettingsSync, SQLx and Windows credential store",
+  "frontendInteractionIncluded": false,
+  "developmentWorker": "pressdock-settings-dev",
+  "dedicatedNativeCredentialsCleaned": true,
+  "developmentRevision": 108,
+  "evidence": {
+    "aiRequests": 0,
+    "check": "windows-native-three-process-merge-and-cold-read",
+    "cmsWrites": 0,
+    "demoDevelopmentEnvironmentOnly": true,
+    "differentFieldsOnSameModelMerged": true,
+    "distinctDeviceIds": 3,
+    "distinctProcesses": 3,
+    "firstConcurrentReceipts": [
+      {
+        "accepted": true,
+        "pending": 0,
+        "readRequests": 1,
+        "revision": 104,
+        "writeRequests": 1
+      },
+      {
+        "accepted": true,
+        "pending": 0,
+        "readRequests": 1,
+        "revision": 105,
+        "writeRequests": 1
+      }
+    ],
+    "firstTwoProcessesReadsAfterTwoSavesEach": [1, 1],
+    "orderedSameFieldReceipts": [
+      {
+        "accepted": true,
+        "pending": 0,
+        "readRequests": 1,
+        "revision": 106,
+        "writeRequests": 2
+      },
+      {
+        "accepted": true,
+        "pending": 0,
+        "readRequests": 1,
+        "revision": 107,
+        "writeRequests": 2
+      }
+    ],
+    "passed": true,
+    "pending": 0,
+    "sameFieldLastAcceptedWriteWon": true,
+    "thirdProcessColdReadRequests": 1,
+    "unrelatedConfigurationUnchanged": true
+  },
+  "originalDevelopmentConfigurationRestored": true,
+  "d1ReadOnlyAudit": {
+    "revision": 108,
+    "operations": 108,
+    "encryptedSecrets": 0
+  },
+  "previousAttempt": {
+    "passed": false,
+    "stage": "initial bootstrap before any edit",
+    "childErrorCode": "PROBE_START_FAILED",
+    "parentErrorCode": "PROBE_CHILD_TIMEOUT",
+    "exactStartupCauseNotCaptured": true,
+    "pendingInBothDatabases": 0,
+    "credentialReferencesInBothDatabases": 0,
+    "cloudWrites": 0,
+    "retained": true
+  },
+  "acceptedScope": "Windows only as explicitly requested; this does not assert a three-platform matrix",
+  "cmsWrites": 0,
+  "aiRequests": 0
+}

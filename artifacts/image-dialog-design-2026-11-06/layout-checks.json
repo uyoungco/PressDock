@@ -1,0 +1,76 @@
+[
+  {
+    "viewport": [1008, 640],
+    "overflow": [
+      {
+        "selector": "body",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".dialog",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".workspace",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".preview",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".stage",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".settings",
+        "horizontal": false,
+        "vertical": false
+      }
+    ],
+    "noOverlappingSettings": true,
+    "allActionsVisible": true
+  },
+  {
+    "viewport": [1440, 900],
+    "overflow": [
+      {
+        "selector": "body",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".dialog",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".workspace",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".preview",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".stage",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".settings",
+        "horizontal": false,
+        "vertical": false
+      }
+    ],
+    "noOverlappingSettings": true,
+    "allActionsVisible": true
+  }
+]

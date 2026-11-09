@@ -1,0 +1,19 @@
+{
+  "android": "android",
+  "desktopAbsent": true,
+  "hasForegroundNote": true,
+  "cards": 8,
+  "pageOverflow": 0,
+  "inputHeight": 44,
+  "settingsHref": "#/settings?tab=harvest&returnTo=import",
+  "touch": {
+    "action": {
+      "command": "harvest_job_action",
+      "args": {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "action": "show"
+      }
+    },
+    "cardsRetained": 8
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "viewport": 1440,
+    "width": 560,
+    "saveBottom": 884,
+    "height": 900,
+    "overflow": false,
+    "groups": ["标题与摘要", "配图", "目标渠道", "来源信息"]
+  },
+  {
+    "viewport": 1024,
+    "width": 560,
+    "saveBottom": 884,
+    "height": 900,
+    "overflow": false,
+    "groups": ["标题与摘要", "配图", "目标渠道", "来源信息"]
+  },
+  {
+    "viewport": 768,
+    "width": 560,
+    "saveBottom": 884,
+    "height": 900,
+    "overflow": false,
+    "groups": ["标题与摘要", "配图", "目标渠道", "来源信息"]
+  }
+]

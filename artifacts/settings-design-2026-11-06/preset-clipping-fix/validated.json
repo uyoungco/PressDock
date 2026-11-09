@@ -1,0 +1,257 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "panelHeight": 89,
+      "clipped": [],
+      "footerBottom": 856,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "panelHeight": 89,
+      "clipped": [],
+      "footerBottom": 556,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "documentWidth": 1280,
+      "panelHeight": 89,
+      "clipped": [],
+      "footerBottom": 676,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 1024,
+      "height": 600,
+      "documentWidth": 1024,
+      "panelHeight": 89,
+      "clipped": [],
+      "footerBottom": 556,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 768,
+      "height": 600,
+      "documentWidth": 768,
+      "panelHeight": 156,
+      "clipped": [],
+      "footerBottom": 556,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "panelHeight": 148,
+      "clipped": [],
+      "footerBottom": 808,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 390,
+      "height": 600,
+      "documentWidth": 390,
+      "panelHeight": 148,
+      "clipped": [],
+      "footerBottom": 564,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    },
+    {
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "panelHeight": 89,
+      "clipped": [],
+      "footerBottom": 436,
+      "triggerGetsFocus": true,
+      "selectionChangesForm": true,
+      "editWorks": true,
+      "saveWorks": true,
+      "savedValueRetained": true
+    }
+  ],
+  "regressions": [
+    {
+      "module": "general",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "harvest",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "image-presets",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "services",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "ai-models",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "ai-templates",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "about",
+      "width": 1440,
+      "height": 900,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "general",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "harvest",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "image-presets",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "services",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "ai-models",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "ai-templates",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "about",
+      "width": 1440,
+      "height": 600,
+      "documentWidth": 1440,
+      "clipped": []
+    },
+    {
+      "module": "general",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "harvest",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "image-presets",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "services",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "ai-models",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "ai-templates",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    },
+    {
+      "module": "about",
+      "width": 1024,
+      "height": 480,
+      "documentWidth": 1024,
+      "clipped": []
+    }
+  ]
+}

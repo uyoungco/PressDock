@@ -1,0 +1,118 @@
+[
+  {
+    "name": "切换内置获取后隐藏 CDP 输入",
+    "pass": true
+  },
+  {
+    "name": "切回 CDP 保留地址",
+    "pass": true
+  },
+  {
+    "name": "AI 规则开关有明确状态",
+    "pass": true
+  },
+  {
+    "name": "自动保存天数校验",
+    "pass": true
+  },
+  {
+    "name": "自动保存反馈明确标记演示",
+    "pass": true
+  },
+  {
+    "name": "采集页直达分页模板",
+    "pass": true
+  },
+  {
+    "name": "分页范围错误保留输入",
+    "pass": true
+  },
+  {
+    "name": "模板保存仅演示",
+    "pass": true
+  },
+  {
+    "name": "变量插入最近聚焦的提示词",
+    "pass": true
+  },
+  {
+    "name": "切换用途保留未保存提示词",
+    "pass": true
+  },
+  {
+    "name": "提供商编辑焦点进入弹框",
+    "pass": true
+  },
+  {
+    "name": "协议切换显示对应兼容项",
+    "pass": true
+  },
+  {
+    "name": "不安全 API 地址校验且保留输入",
+    "pass": true
+  },
+  {
+    "name": "关闭有修改的弹框先确认",
+    "pass": true
+  },
+  {
+    "name": "返回编辑保留输入",
+    "pass": true
+  },
+  {
+    "name": "放弃修改后关闭并返回触发器焦点",
+    "pass": true
+  },
+  {
+    "name": "引用中的模型删除受限",
+    "pass": true
+  },
+  {
+    "name": "测试不伪造模型成功",
+    "pass": true
+  },
+  {
+    "name": "新增提供商后显示空模型状态",
+    "pass": true
+  },
+  {
+    "name": "目录只提供 ID，不虚构能力参数",
+    "pass": true
+  },
+  {
+    "name": "模型输出上限校验",
+    "pass": true
+  },
+  {
+    "name": "保存模型出现在目录中",
+    "pass": true
+  },
+  {
+    "name": "删除未引用的提供商及所属模型仅影响演示",
+    "pass": true
+  },
+  {
+    "name": "复制预设只替换表单，仍需保存",
+    "pass": true
+  },
+  {
+    "name": "尺寸必须成对填写",
+    "pass": true
+  },
+  {
+    "name": "留空尺寸明确可自由调整",
+    "pass": true
+  },
+  {
+    "name": "图片预设保存有演示状态",
+    "pass": true
+  },
+  {
+    "name": "模块导航支持方向键，切换后焦点保留在新标签",
+    "pass": true
+  },
+  {
+    "name": "未修改时 Esc 关闭并返回触发器焦点",
+    "pass": true
+  }
+]

@@ -1,0 +1,299 @@
+{
+  "date": "2026-11-07",
+  "passed": true,
+  "scope": "Android 正式应用；单台 OnePlus 5 / Android 10、现有真实 CMS 会话",
+  "rootCause": {
+    "stage": "Worker -> CMS CurrentUser 登录校验",
+    "captured": {
+      "attempt": 15,
+      "bodyWasJson": true,
+      "cloudWrites": 0,
+      "code": "CMS_TIMEOUT",
+      "elapsedMs": 12185,
+      "httpStatus": 503,
+      "transportSucceeded": true
+    },
+    "previousTimeoutMs": 10000,
+    "previousAttempts": 1
+  },
+  "fix": {
+    "cmsVerificationAttempts": 2,
+    "timeoutPerAttemptMs": 8000,
+    "onlyTransientFailuresRetried": true,
+    "authenticationFailsClosed": true,
+    "explicitCacheRetryButton": true,
+    "preservesMountedEditor": true,
+    "normalColdBootstrapRequests": 1
+  },
+  "deployment": {
+    "development": "9dc053c4-0e7f-43e5-8f2b-c43dd809dfc7",
+    "production": "66a8dc45-c730-4a78-ab8d-dd55aca80dcf"
+  },
+  "apk": {
+    "path": "artifacts/PressDock-0.1.0-android-release-arm64.apk",
+    "sha256": "117EBC699115097B4B263AE399589FE8AECFA5150A93FF7B3EDB683436BBB6E6",
+    "certificateSha256": "32b9c534237ed6e9a3c188bb0c8f4a86bb61d277f7bf2cbd0868e9627108265d",
+    "sameCertificateUpdate": true,
+    "uninstalled": false,
+    "dataCleared": false,
+    "uid": 10246,
+    "firstInstallTime": "2026-11-07 14:00:10"
+  },
+  "verification": {
+    "coldStarts": [
+      {
+        "round": 1,
+        "elapsedMs": 12156,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 2,
+        "elapsedMs": 10304,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 3,
+        "elapsedMs": 6987,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 4,
+        "elapsedMs": 8907,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 5,
+        "elapsedMs": 7009,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 6,
+        "elapsedMs": 7015,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 7,
+        "elapsedMs": 7405,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 8,
+        "elapsedMs": 8254,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 9,
+        "elapsedMs": 13834,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 10,
+        "elapsedMs": 5063,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 11,
+        "elapsedMs": 19947,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      },
+      {
+        "round": 12,
+        "elapsedMs": 8777,
+        "status": {
+          "ready": true,
+          "phase": "reported",
+          "usingCache": false,
+          "pending": 0,
+          "lastError": null,
+          "readRequests": 1,
+          "successfulReads": 1,
+          "writeRequests": 0
+        }
+      }
+    ],
+    "phoneHttp": {
+      "requests": 20,
+      "successful": 20,
+      "cloudWrites": 0
+    },
+    "realRetryButton": {
+      "trigger": "真实网络失败现场；adb 点击可见按钮",
+      "before": {
+        "ready": true,
+        "phase": "cache",
+        "usingCache": true,
+        "pending": 0,
+        "lastError": "SYNC_NETWORK",
+        "readRequests": 1,
+        "successfulReads": 0,
+        "writeRequests": 0
+      },
+      "after": {
+        "ready": true,
+        "phase": "reported",
+        "usingCache": false,
+        "pending": 0,
+        "lastError": null,
+        "readRequests": 2,
+        "successfulReads": 1,
+        "writeRequests": 0
+      }
+    },
+    "backgroundReturn": {
+      "ready": true,
+      "phase": "reported",
+      "usingCache": false,
+      "pending": 0,
+      "lastError": null,
+      "readRequests": 1,
+      "successfulReads": 1,
+      "writeRequests": 0
+    },
+    "inventory": {
+      "sha256": "79f704b9aa5cdadbf833662773abc4d99ae936f9b43c6c4fde4eb5a185dc4ea9",
+      "providers": 1,
+      "keysPresent": 1,
+      "unchanged": true
+    },
+    "d1": {
+      "revision": 17,
+      "initialized": 1,
+      "operation_count": 17,
+      "actor_count": 1,
+      "encrypted_secret_count": 1
+    },
+    "d1AuditRowsWritten": 0,
+    "aiRequests": 0,
+    "cmsWrites": 0
+  },
+  "checks": {
+    "frontend": {
+      "files": 37,
+      "passed": 297
+    },
+    "rust": {
+      "passed": 101,
+      "ignored": 12,
+      "failed": 0
+    },
+    "worker": {
+      "passed": 124
+    },
+    "androidJvm": {
+      "passed": 4
+    },
+    "scripts": {
+      "passed": 9
+    },
+    "lint": true,
+    "format": true,
+    "build": true,
+    "rustFmt": true,
+    "clippy": true,
+    "workerTypecheck": true,
+    "workerDeploymentDryRuns": true
+  },
+  "limitations": [
+    "持续网络故障或上游持续不可用仍使用缓存并允许显式重试",
+    "未扩展到 Mac 或第二个真实账号；本轮未请求 AI"
+  ]
+}

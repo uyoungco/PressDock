@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PressDock 文章管理 · 设计稿</title>
+    <link rel="stylesheet" href="design.css" />
+    <script src="prototype.js" defer></script>
+  </head>
+  <body>
+    <svg class="svg-defs" aria-hidden="true">
+      <defs>
+        <symbol id="demo-photo" viewBox="0 0 560 248">
+          <rect width="560" height="248" fill="#e8ece8" />
+          <path d="M0 175h560v73H0z" fill="#c3c9bd" />
+          <path
+            d="M40 160V66h78v94m32 0V30h65v130m28 0V80h96v80m29 0V47h65v113m24 0V91h70v69"
+            fill="#9da99b"
+          />
+          <path d="M0 202h560" stroke="#f6f6ed" stroke-width="12" />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="review-bar">
+      <span>设计稿 · 隔离演示</span><label for="scene">查看场景</label
+      ><select id="scene">
+        <option value="list">文章列表</option>
+        <option value="editor">文章编辑</option>
+        <option value="pagination">分页助手</option>
+        <option value="draft">分页初稿</option>
+        <option value="missing">分页缺少配置</option>
+        <option value="nested">嵌套分页</option>
+        <option value="protected">正文保护</option>
+        <option value="source">HTML 源码</option>
+        <option value="link">链接编辑</option>
+        <option value="promote">文章转素材</option>
+        <option value="leave">未保存确认</option>
+        <option value="empty">列表空状态</option>
+        <option value="error">列表加载失败</option></select
+      ><a href="../../docs/articles-ui-design-2026-11-06.md">设计说明</a
+      ><span class="review-credit">Unslop · @heydamir · CC BY 4.0</span>
+    </div>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <span data-icon="newspaper"></span>PressDock<span class="brand-dot"
+            >.</span
+          >
+        </div>
+        <nav aria-label="主导航">
+          <p class="nav-label">编辑工作空间</p>
+          <button data-nav="dashboard">
+            <span data-icon="grid"></span>工作台</button
+          ><button data-nav="channels">
+            <span data-icon="columns"></span>渠道素材管理</button
+          ><button data-nav="import">
+            <span data-icon="download"></span>素材导入</button
+          ><button class="nav-active" aria-expanded="true">
+            <span data-icon="files"></span>文章管理<span
+              data-icon="chevron-up"
+              class="push"
+            ></span>
+          </button>
+          <div class="subnav">
+            <button class="selected" data-view="quality">优质文章</button
+            ><button data-view="review-1">一级待审核文章</button
+            ><button data-view="review-2">二级待审核文章</button
+            ><button data-view="review-3">三级待审核文章</button>
+          </div>
+          <button data-nav="images">
+            <span data-icon="image"></span>图片处理</button
+          ><button data-nav="publish">
+            <span data-icon="send"></span>发布管理
+          </button>
+          <hr />
+          <button data-nav="settings">
+            <span data-icon="settings"></span>系统设置
+          </button>
+        </nav>
+        <div class="sidebar-note">
+          <span data-icon="folder"></span><span>本地优先</span>
+          <p>素材与草稿独立保存，专注每一次编辑。</p>
+          <button data-nav="settings">
+            工作区设置 <span data-icon="chevron-right"></span>
+          </button>
+        </div>
+      </aside>
+      <div class="app-main">
+        <header class="topbar">
+          <button class="icon-button" id="toggle-nav" aria-label="切换导航">
+            <span data-icon="panel"></span></button
+          ><span class="breadcrumb"
+            >工作空间 <i>/</i> <span id="breadcrumb-view">优质文章</span></span
+          >
+          <div class="topbar-search">
+            <span data-icon="search"></span>搜索文章，回车查看
+          </div>
+          <span data-icon="monitor"></span><span data-icon="settings"></span
+          ><span class="demo-account">文章设计 · 演示账号</span>
+        </header>
+        <main class="page">
+          <div class="page-heading">
+            <div>
+              <h1 id="page-title">优质文章</h1>
+              <p>核对标题、配图与分页，继续编辑文章</p>
+            </div>
+            <span class="quiet desktop-only">文章管理</span>
+          </div>
+          <section class="list-workspace" aria-label="文章管理工作区">
+            <form id="filters">
+              <div class="filter-primary">
+                <label class="search-field"
+                  ><span data-icon="search"></span
+                  ><input
+                    id="filter-title"
+                    aria-label="文章标题"
+                    placeholder="搜索文章标题" /></label
+                ><select id="filter-class" aria-label="分类">
+                  <option value="">全部分类</option>
+                  <option>社会</option>
+                  <option>文化</option>
+                  <option>生活</option></select
+                ><input
+                  id="filter-start"
+                  type="date"
+                  aria-label="开始日期"
+                /><span class="date-divider">至</span
+                ><input
+                  id="filter-end"
+                  type="date"
+                  aria-label="结束日期"
+                /><button type="submit" class="primary">搜索</button
+                ><button type="button" id="reset-filter">重置</button
+                ><button type="button" id="more-filter" aria-expanded="false">
+                  更多筛选<span data-icon="chevron-down"></span>
+                </button>
+              </div>
+              <div class="filter-extra" hidden>
+                <label
+                  >文章编号<input
+                    id="filter-id"
+                    type="number"
+                    min="1"
+                    placeholder="输入编号" /></label
+                ><label class="author-filter"
+                  >作者<input
+                    id="filter-author"
+                    placeholder="输入作者" /></label
+                ><label class="check author-filter"
+                  ><input type="checkbox" id="filter-editor" />editor<span
+                    class="quiet"
+                    >原筛选条件</span
+                  ></label
+                ><label class="check nubia-filter"
+                  ><input type="checkbox" id="filter-nubia" />努比亚</label
+                >
+              </div>
+              <p class="field-error" id="filter-error" hidden></p>
+            </form>
+            <div class="list-toolbar">
+              <span
+                ><span id="result-total">10</span> 篇文章<span
+                  id="filter-summary"
+                  class="quiet"
+                ></span
+              ></span>
+              <div>
+                <button
+                  id="refresh"
+                  class="icon-button"
+                  aria-label="刷新文章列表"
+                >
+                  <span data-icon="refresh"></span></button
+                ><button id="column-settings">
+                  <span data-icon="sliders"></span>列配置
+                </button>
+              </div>
+            </div>
+            <div
+              class="list-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="文章列表内容"
+            >
+              <table class="article-table">
+                <thead>
+                  <tr>
+                    <th>新闻内容</th>
+                    <th class="pic-cell">配图</th>
+                    <th class="distribution-cell">分发记录</th>
+                    <th class="action-cell">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="article-rows"></tbody>
+              </table>
+              <div class="article-cards" id="article-cards"></div>
+              <div id="list-empty" class="list-empty" hidden>
+                <span data-icon="files"></span>
+                <h2>暂无符合条件的文章</h2>
+                <p>调整标题、分类或日期后重新搜索</p>
+                <button id="empty-reset">重置筛选</button>
+              </div>
+              <div id="list-error" class="list-empty" hidden>
+                <h2>文章列表加载失败</h2>
+                <p>当前筛选已保留，请检查连接后重试</p>
+                <button id="retry-list">重试加载</button>
+              </div>
+            </div>
+            <footer class="pagination">
+              <span id="page-summary">第 1 / 1 页 · 共 10 条</span>
+              <div>
+                <label for="page-size">每页</label
+                ><select id="page-size">
+                  <option>10</option>
+                  <option>20</option>
+                  <option>30</option>
+                  <option selected>50</option>
+                  <option>100</option>
+                  <option>200</option>
+                  <option>500</option></select
+                ><button id="previous-list" disabled>上一页</button
+                ><button id="next-list" disabled>下一页</button>
+              </div>
+            </footer>
+          </section>
+        </main>
+        <footer class="app-footer">
+          <span><b></b>本地工作区 · SQLite</span
+          ><span>News Editorial Workspace <i>v0.1.0</i></span>
+        </footer>
+      </div>
+    </div>
+    <dialog id="editor" class="editor-dialog" aria-labelledby="editor-heading">
+      <header class="dialog-head">
+        <div>
+          <h2 id="editor-heading">
+            编辑文章 <span class="quiet" id="edit-id">· 8101</span>
+          </h2>
+          <p id="edit-status">当前编辑中的内容，保存后写入 CMS</p>
+        </div>
+        <button id="toggle-info" class="info-toggle" aria-expanded="true">
+          <span data-icon="panel"></span>文章信息</button
+        ><button
+          class="icon-button"
+          data-close="editor"
+          aria-label="关闭文章编辑"
+        >
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="editor-tabs">
+        <button class="selected" data-edit-tab="body">正文</button
+        ><button data-edit-tab="info">文章信息</button>
+      </div>
+      <div class="editor-grid">
+        <section class="writing-pane">
+          <div class="article-title-field">
+            <label for="edit-title"
+              >文章标题 <span class="required">*</span></label
+            ><input
+              id="edit-title"
+              value="【演示】城市更新，让老街区焕发新活力"
+            />
+          </div>
+          <div class="format-toolbar" role="toolbar" aria-label="正文工具栏">
+            <select id="block-style" aria-label="正文样式">
+              <option value="p">正文</option>
+              <option value="h1">标题 1</option>
+              <option value="h2">标题 2</option>
+              <option value="h3">标题 3</option>
+              <option value="h4">标题 4</option>
+              <option value="h5">标题 5</option></select
+            ><button
+              class="icon-button"
+              data-format="bold"
+              aria-label="加粗"
+              title="加粗"
+            >
+              <span data-icon="bold"></span></button
+            ><button
+              class="icon-button"
+              data-format="italic"
+              aria-label="斜体"
+              title="斜体"
+            >
+              <span data-icon="italic"></span></button
+            ><button
+              class="icon-button"
+              data-format="underline"
+              aria-label="下划线"
+              title="下划线"
+            >
+              <span data-icon="underline"></span></button
+            ><span class="tool-divider"></span
+            ><button
+              class="icon-button secondary-tool"
+              data-format="insertUnorderedList"
+              aria-label="无序列表"
+              title="无序列表"
+            >
+              <span data-icon="list"></span></button
+            ><button
+              class="icon-button secondary-tool"
+              data-format="insertOrderedList"
+              aria-label="有序列表"
+              title="有序列表"
+            >
+              <span data-icon="list-ordered"></span></button
+            ><button
+              class="icon-button secondary-tool"
+              data-format="justifyLeft"
+              aria-label="左对齐"
+              title="左对齐"
+            >
+              <span data-icon="align-left"></span></button
+            ><button
+              class="icon-button secondary-tool"
+              data-format="justifyCenter"
+              aria-label="居中"
+              title="居中"
+            >
+              <span data-icon="align-center"></span></button
+            ><span class="tool-divider secondary-tool"></span
+            ><button
+              class="icon-button"
+              id="open-link"
+              aria-label="编辑链接"
+              title="编辑链接"
+            >
+              <span data-icon="link"></span></button
+            ><button
+              class="icon-button"
+              id="body-upload"
+              aria-label="上传正文图片"
+              title="上传图片"
+            >
+              <span data-icon="image-plus"></span></button
+            ><button id="open-assistant">
+              <span data-icon="book"></span>分页助手</button
+            ><span class="push"></span
+            ><button
+              class="icon-button"
+              id="undo"
+              aria-label="撤销"
+              title="撤销"
+            >
+              <span data-icon="undo"></span></button
+            ><button
+              class="icon-button"
+              id="redo"
+              aria-label="重做"
+              title="重做"
+            >
+              <span data-icon="redo"></span></button
+            ><button id="open-source" aria-label="HTML 源码" title="HTML 源码">
+              <span data-icon="code"></span
+              ><span class="source-label">源码</span>
+            </button>
+            <details class="format-more">
+              <summary aria-label="更多正文操作">
+                <span data-icon="more"></span>
+              </summary>
+              <div class="menu">
+                <button data-tool="link">编辑链接</button>
+                <button data-tool="source">HTML 源码</button>
+                <button data-tool="undo">撤销</button>
+                <button data-tool="redo">重做</button>
+                <button data-format="italic">斜体</button>
+                <button data-format="underline">下划线</button>
+                <button data-format="removeFormat">清除格式</button
+                ><button id="manual-insert">当前段落后分页</button
+                ><button data-format="insertUnorderedList">无序列表</button
+                ><button data-format="insertOrderedList">有序列表</button
+                ><button data-format="justifyLeft">左对齐</button
+                ><button data-format="justifyCenter">居中</button>
+              </div>
+            </details>
+          </div>
+          <div id="body-protection" class="notice warning" hidden>
+            <strong>正文已保护，暂不可编辑</strong>
+            <p>
+              历史正文包含暂不支持的结构；仍可编辑文章信息，保存时保留原始正文。
+            </p>
+            <button id="protected-source">查看 HTML 源码</button>
+          </div>
+          <div class="body-scroll" id="body-scroll">
+            <div
+              class="editor-paper"
+              id="article-body"
+              role="textbox"
+              aria-label="文章正文"
+              aria-multiline="true"
+              contenteditable="true"
+              spellcheck="false"
+            ></div>
+          </div>
+          <div class="body-meta">
+            <span id="body-count">523 字 · 3 页</span
+            ><span id="selection-context">分页按正文中的光标位置插入</span>
+          </div>
+        </section>
+        <aside class="article-info">
+          <div class="info-scroll">
+            <h3>文章信息</h3>
+            <div class="two-fields">
+              <label
+                >分类 <span class="required">*</span
+                ><select id="edit-class">
+                  <option>社会</option>
+                  <option>文化</option>
+                  <option>生活</option>
+                </select></label
+              ><label>作者<input id="edit-writer" value="演示编辑" /></label>
+            </div>
+            <label
+              >摘要<textarea id="edit-summary" rows="3">
+保留街巷肌理，从出行、休憩与照明入手，让街坊共同参与老街更新。</textarea></label
+            ><label for="edit-tags">标签</label>
+            <div class="tags" id="edit-tags-list">
+              <span
+                >城市更新<button aria-label="移除标签 城市更新" data-remove-tag>
+                  ×
+                </button></span
+              ><span
+                >公共空间<button aria-label="移除标签 公共空间" data-remove-tag>
+                  ×
+                </button></span
+              >
+            </div>
+            <form id="add-tag">
+              <input id="edit-tags" placeholder="输入标签，回车添加" /><button
+                type="submit"
+                aria-label="添加标签"
+              >
+                <span data-icon="plus"></span>
+              </button>
+            </form>
+            <hr />
+            <div class="section-caption">
+              <h3>文章配图</h3>
+              <span class="quiet">3 张标题图</span>
+            </div>
+            <div class="edit-images" id="edit-images"></div>
+            <p class="help">支持粘贴或上传 JPG、PNG、WebP，单张不超过 20 MiB</p>
+            <hr />
+            <label
+              >来源链接<input
+                id="edit-source"
+                value="https://demo.invalid/news/8101"
+            /></label>
+            <p class="help">正文、图片和分页修改需保存文章后生效</p>
+          </div>
+        </aside>
+      </div>
+      <footer class="dialog-footer">
+        <p id="save-feedback" class="quiet" aria-live="polite">
+          仅修改当前文章，保存不执行审核或发布
+        </p>
+        <div>
+          <button data-close="editor">取消</button
+          ><button class="primary" id="save-article">保存修改</button>
+        </div>
+      </footer>
+    </dialog>
+    <dialog
+      id="assistant"
+      class="assistant-dialog"
+      aria-labelledby="assistant-heading"
+    >
+      <header class="dialog-head">
+        <div>
+          <h2 id="assistant-heading">
+            分页助手 <span id="assistant-mode" class="quiet">· 当前分页</span>
+          </h2>
+          <p class="truncate" id="assistant-title">
+            城市更新，让老街区焕发新活力
+          </p>
+        </div>
+        <button id="generate-pages">
+          <span data-icon="book"></span>AI 生成分页</button
+        ><button id="cancel-generation" hidden>取消生成</button
+        ><button
+          class="icon-button"
+          data-close="assistant"
+          aria-label="关闭分页助手"
+        >
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="assistant-notice" id="assistant-notice">
+        <span>共 3 页 · 523 字</span
+        ><span class="quiet">按页核对，应用初稿后仍需保存文章</span>
+      </div>
+      <div class="assistant-grid">
+        <aside class="page-directory">
+          <div class="directory-caption">
+            正文页码 <span id="page-total">3 页</span>
+          </div>
+          <nav id="page-directory" aria-label="正文页码"></nav>
+          <div class="directory-footer">
+            <button id="assistant-insert">
+              <span data-icon="separator"></span>当前段落后分页
+            </button>
+            <p>按正文中的光标位置插入</p>
+          </div>
+        </aside>
+        <section class="page-preview">
+          <div class="preview-toolbar">
+            <strong id="preview-label">第 1 / 3 页 · 193 字</strong>
+            <div>
+              <button class="icon-button" id="prev-page" aria-label="上一页">
+                <span data-icon="chevron-left"></span></button
+              ><button class="icon-button" id="next-page" aria-label="下一页">
+                <span data-icon="chevron-right"></span></button
+              ><button id="locate-page">定位正文</button>
+              <details class="page-more">
+                <summary aria-label="分页操作">
+                  <span data-icon="more"></span>
+                </summary>
+                <div class="menu">
+                  <button id="merge-page">与上一页合并</button
+                  ><button id="remove-break">删除本页后分页点</button>
+                </div>
+              </details>
+            </div>
+          </div>
+          <div class="preview-scroll">
+            <div
+              class="proof-sheet"
+              id="page-preview"
+              aria-label="逐页正文预览"
+            ></div>
+          </div>
+        </section>
+      </div>
+      <footer class="dialog-footer">
+        <p id="assistant-footnote">关闭会丢弃未应用的初稿</p>
+        <div>
+          <button id="discard-draft" hidden>取消初稿</button
+          ><button data-close="assistant">关闭助手</button
+          ><button class="primary" id="apply-draft" hidden>应用分页初稿</button>
+        </div>
+      </footer>
+    </dialog>
+    <dialog id="source" class="source-dialog" aria-labelledby="source-heading">
+      <header class="dialog-head">
+        <div>
+          <h2 id="source-heading">HTML 源码</h2>
+          <p id="source-description">应用到当前正文，保存文章后才写入 CMS</p>
+        </div>
+        <button class="icon-button" data-close="source" aria-label="关闭源码">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="source-bar">
+        <span>正文 HTML</span><span class="quiet">保留原有图片与分页标记</span>
+      </div>
+      <div class="source-editor">
+        <textarea
+          id="html-source"
+          aria-label="正文 HTML"
+          spellcheck="false"
+          wrap="off"
+        ></textarea>
+      </div>
+      <p class="source-error field-error" id="source-error" hidden></p>
+      <footer class="dialog-footer">
+        <p id="source-count" class="quiet"></p>
+        <div>
+          <button data-close="source">取消</button
+          ><button class="primary" id="apply-source">应用到正文</button>
+        </div>
+      </footer>
+    </dialog>
+    <dialog id="link" class="small-dialog" aria-labelledby="link-heading">
+      <header class="dialog-head">
+        <div>
+          <h2 id="link-heading">编辑链接</h2>
+          <p>为选中文字设置链接</p>
+        </div>
+        <button class="icon-button" data-close="link" aria-label="关闭链接编辑">
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <form id="link-form">
+        <label
+          >链接地址<input
+            id="link-url"
+            type="url"
+            placeholder="https://"
+            required /></label
+        ><label
+          >显示文字<input id="link-text" placeholder="留空时使用链接地址"
+        /></label>
+        <p id="link-error" class="field-error" hidden></p>
+        <footer class="dialog-footer">
+          <button class="text-button" id="unlink" type="button">
+            移除链接
+          </button>
+          <div>
+            <button type="button" data-close="link">取消</button
+            ><button class="primary" type="submit">应用链接</button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+    <dialog
+      id="promote"
+      class="promote-dialog"
+      aria-labelledby="promote-heading"
+    >
+      <header class="dialog-head">
+        <div>
+          <h2 id="promote-heading">添加到渠道素材</h2>
+          <p id="promote-article">来自文章 8101 · 优质文章</p>
+        </div>
+        <button
+          class="icon-button"
+          data-close="promote"
+          aria-label="关闭转素材"
+        >
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <form id="promote-form">
+        <div class="promote-scroll">
+          <h3>标题与摘要</h3>
+          <label
+            >标题 <span class="required">*</span>
+            <div class="inline-field">
+              <input id="promote-title" required /><button
+                id="promote-ai"
+                type="button"
+              >
+                AI 优化
+              </button>
+            </div></label
+          ><label
+            >摘要<textarea id="promote-summary" rows="2">
+保留街巷肌理，让居民参与老街更新。</textarea>
+          </label>
+          <h3>配图</h3>
+          <div class="promote-images" id="promote-images"></div>
+          <h3>目标渠道</h3>
+          <label
+            >渠道 <span class="required">*</span
+            ><select id="promote-channel" required>
+              <option value="">选择渠道</option>
+              <option>演示渠道</option>
+            </select></label
+          ><label
+            >子渠道 <span class="required">*</span
+            ><select id="promote-subchannel" required>
+              <option value="">选择子渠道</option>
+              <option>头条推荐</option>
+              <option>轮播推荐</option>
+            </select></label
+          >
+          <div class="two-fields">
+            <label>日期<input type="date" value="2026-11-06" /></label
+            ><label>作者<input value="演示编辑" /></label>
+          </div>
+          <label>素材链接<input placeholder="可选" /></label>
+          <p class="help">上传仅回填图片地址，保存后关联素材</p>
+        </div>
+        <footer class="dialog-footer">
+          <p id="promote-feedback" class="quiet"></p>
+          <div>
+            <button type="button" data-close="promote">取消</button
+            ><button class="primary" type="submit">保存渠道素材</button>
+          </div>
+        </footer>
+      </form>
+    </dialog>
+    <dialog id="leave" class="small-dialog" aria-labelledby="leave-heading">
+      <header class="dialog-head">
+        <div>
+          <h2 id="leave-heading">文章有未保存的修改</h2>
+          <p>放弃后将恢复为上次读取的内容，已上传文件不会自动删除。</p>
+        </div>
+      </header>
+      <footer class="dialog-footer leave-actions">
+        <button data-close="leave" class="primary">继续编辑</button
+        ><button id="keep-draft">保留草稿并返回</button
+        ><button id="discard-edit" class="danger">放弃修改</button>
+      </footer>
+    </dialog>
+    <dialog id="columns" class="small-dialog" aria-labelledby="columns-heading">
+      <header class="dialog-head">
+        <div>
+          <h2 id="columns-heading">列配置</h2>
+          <p>默认聚合常用信息，其他字段可按需显示</p>
+        </div>
+        <button
+          class="icon-button"
+          data-close="columns"
+          aria-label="关闭列配置"
+        >
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="column-choices" id="column-choices"></div>
+      <footer class="dialog-footer">
+        <button id="reset-columns">恢复默认</button
+        ><button data-close="columns">完成</button>
+      </footer>
+    </dialog>
+    <dialog
+      id="image-preview"
+      class="image-dialog"
+      aria-labelledby="image-heading"
+    >
+      <header class="dialog-head">
+        <div>
+          <h2 id="image-heading">文章配图</h2>
+          <p>560 × 248 px · 隔离演示配图</p>
+        </div>
+        <button
+          class="icon-button"
+          data-close="image-preview"
+          aria-label="关闭图片预览"
+        >
+          <span data-icon="x"></span>
+        </button>
+      </header>
+      <div class="image-stage">
+        <svg viewBox="0 0 560 248" role="img" aria-label="演示街区配图">
+          <use href="#demo-photo"></use>
+        </svg>
+      </div>
+      <footer class="dialog-footer">
+        <span class="quiet">仅预览，不修改图片</span
+        ><button data-close="image-preview">关闭</button>
+      </footer>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <input
+      type="file"
+      id="image-file"
+      accept="image/jpeg,image/png,image/webp"
+      hidden
+    />
+  </body>
+</html>

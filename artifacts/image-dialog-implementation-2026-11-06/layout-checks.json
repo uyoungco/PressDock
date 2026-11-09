@@ -1,0 +1,260 @@
+[
+  {
+    "viewport": [1440, 900],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 640,
+        "scrollHeight": 640,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 572,
+        "scrollHeight": 572,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 272,
+        "scrollWidth": 272
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 63,
+        "scrollHeight": 63,
+        "width": 1120,
+        "scrollWidth": 1120
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  },
+  {
+    "viewport": [1280, 800],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 640,
+        "scrollHeight": 640,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 572,
+        "scrollHeight": 572,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 1120,
+        "scrollWidth": 1120
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 272,
+        "scrollWidth": 272
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 63,
+        "scrollHeight": 63,
+        "width": 1120,
+        "scrollWidth": 1120
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  },
+  {
+    "viewport": [1024, 768],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 640,
+        "scrollHeight": 640,
+        "width": 976,
+        "scrollWidth": 976
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 572,
+        "scrollHeight": 572,
+        "width": 976,
+        "scrollWidth": 976
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 976,
+        "scrollWidth": 976
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 272,
+        "scrollWidth": 272
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 63,
+        "scrollHeight": 63,
+        "width": 976,
+        "scrollWidth": 976
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  },
+  {
+    "viewport": [1008, 796],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 640,
+        "scrollHeight": 640,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 572,
+        "scrollHeight": 572,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 468,
+        "scrollHeight": 468,
+        "width": 272,
+        "scrollWidth": 272
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 63,
+        "scrollHeight": 63,
+        "width": 960,
+        "scrollWidth": 960
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  },
+  {
+    "viewport": [1008, 640],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 603,
+        "scrollHeight": 603,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 543,
+        "scrollHeight": 543,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 451,
+        "scrollHeight": 451,
+        "width": 960,
+        "scrollWidth": 960
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 451,
+        "scrollHeight": 451,
+        "width": 272,
+        "scrollWidth": 272
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 55,
+        "scrollHeight": 55,
+        "width": 960,
+        "scrollWidth": 960
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  },
+  {
+    "viewport": [768, 640],
+    "pageOverflow": false,
+    "bounds": [
+      {
+        "selector": ".channel-image-dialog",
+        "height": 576,
+        "scrollHeight": 576,
+        "width": 736,
+        "scrollWidth": 736
+      },
+      {
+        "selector": ".image-processor-dialog",
+        "height": 516,
+        "scrollHeight": 516,
+        "width": 736,
+        "scrollWidth": 736
+      },
+      {
+        "selector": ".image-dialog-workspace",
+        "height": 424,
+        "scrollHeight": 424,
+        "width": 736,
+        "scrollWidth": 736
+      },
+      {
+        "selector": ".image-dialog-settings",
+        "height": 424,
+        "scrollHeight": 424,
+        "width": 248,
+        "scrollWidth": 248
+      },
+      {
+        "selector": ".image-dialog-actions",
+        "height": 55,
+        "scrollHeight": 55,
+        "width": 736,
+        "scrollWidth": 736
+      }
+    ],
+    "settingsDoNotOverlap": true,
+    "allToolsVisible": true
+  }
+]

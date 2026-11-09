@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PressDock 手机端 · 设计全览</title>
+    <link rel="stylesheet" href="./overview.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="wordmark" href="./index.html">PressDock <span>设计提案</span></a
+      ><span>2026 / 11 / 06</span>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">手机端工作区</p>
+          <h1>把标题、配图和正文放在眼前</h1>
+          <p class="lead">
+            纸白、墨黑、校样蓝。收紧固定区域，让列表易扫读，让编辑有完整的空间。
+          </p>
+        </div>
+        <div class="controls">
+          <button id="theme">查看深色</button
+          ><a class="primary" href="./index.html#channels" target="_blank"
+            >进入交互预览 <span>↗</span></a
+          >
+        </div>
+      </div>
+      <div class="scope">
+        <span><i></i>可评审设计稿</span
+        ><span>390 × 844 基准 · 360px 与短屏校验</span
+        ><span>全部为演示数据 · 未连接 CMS / AI</span>
+      </div>
+      <div class="grid">
+        <section>
+          <div class="caption">
+            <h2><span>1</span>渠道素材</h2>
+            <a href="./index.html#channels" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="渠道素材设计稿"
+              src="./index.html?screen=channels&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            标题、双图与位置优先；次要操作收进更多菜单，图片规格在详情核对。
+          </p>
+        </section>
+        <section>
+          <div class="caption">
+            <h2><span>2</span>文章管理</h2>
+            <a href="./index.html#articles" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="文章管理设计稿"
+              src="./index.html?screen=articles&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            保留四类文章。标题与来源形成阅读单元，编辑、转素材各有明确入口。
+          </p>
+        </section>
+        <section>
+          <div class="caption">
+            <h2><span>3</span>正文编辑</h2>
+            <a href="./index.html#editor" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="正文编辑设计稿"
+              src="./index.html?screen=editor&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            基本信息与正文分开；工具栏收纳低频操作，蓝色校样刻度标记分页位置。
+          </p>
+        </section>
+        <section>
+          <div class="caption">
+            <h2><span>4</span>素材导入</h2>
+            <a href="./index.html#import" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="素材导入设计稿"
+              src="./index.html?screen=import&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            输入与记录紧密相邻；等待验证和待确认提交各有下一步，不用成功色混淆。
+          </p>
+        </section>
+        <section>
+          <div class="caption">
+            <h2><span>5</span>图片处理</h2>
+            <a href="./index.html#image" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="图片处理设计稿"
+              src="./index.html?screen=image&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            裁剪画布、渠道锁定与输出要求分组；底部确认固定，不遮挡参数。
+          </p>
+        </section>
+        <section>
+          <div class="caption">
+            <h2><span>6</span>系统设置</h2>
+            <a href="./index.html#settings" target="_blank">打开预览 ↗</a>
+          </div>
+          <div class="frame">
+            <iframe
+              title="系统设置设计稿"
+              src="./index.html?screen=settings&embed=1"
+            ></iframe>
+          </div>
+          <p class="annotation">
+            保留七个分项与层级返回。设置以行列表组织，账号和外观集中到导航。
+          </p>
+        </section>
+      </div>
+      <footer>
+        <span>PressDock · 手机端设计提案，业务界面尚未应用</span
+        ><span
+          >Design method: unslop by
+          <a href="https://x.com/heydamir" target="_blank" rel="noreferrer"
+            >@heydamir</a
+          >
+          · CC BY 4.0</span
+        >
+      </footer>
+    </main>
+    <script>
+      let dark = false;
+      document.querySelector("#theme").addEventListener("click", () => {
+        dark = !dark;
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+        document.querySelector("#theme").textContent = dark
+          ? "查看浅色"
+          : "查看深色";
+        document
+          .querySelectorAll("iframe")
+          .forEach((frame) =>
+            frame.contentWindow.postMessage(
+              { type: "theme", value: dark ? "dark" : "light" },
+              location.origin,
+            ),
+          );
+      });
+    </script>
+  </body>
+</html>

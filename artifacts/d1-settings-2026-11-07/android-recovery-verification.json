@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-07",
+  "scope": "Installed Android release against the real settings Worker; only a dedicated demo model was created and deleted",
+  "nativeProvisioning": {
+    "aiRequests": 0,
+    "check": "android-recovery-demo-model-remote-delete",
+    "cloudRevision": 9,
+    "cmsWrites": 0,
+    "dedicatedNativeCredentialsCleaned": true,
+    "modelDisplayName": "【演示数据】恢复验收ffcc37cb",
+    "modelId": "demo-recovery-ffcc37cb-08a7-415e-8a1a-3203de99efbd",
+    "originalSharedConfigurationRestored": true,
+    "passed": true,
+    "phase": "remoteDemoDeleted"
+  },
+  "permanentFailure": {
+    "readRequests": 1,
+    "successfulReads": 1,
+    "writeRequests": 1,
+    "pending": 1,
+    "errorCode": "ENTITY_NOT_FOUND",
+    "recoveryEntryVisible": true
+  },
+  "cancelled": {
+    "cancelPreservedPending": true,
+    "pending": 1,
+    "writeRequests": 1,
+    "diagnostic": "读取 1 次，成功 1 次；上报 1 次，待传 1 项。 错误代码：ENTITY_NOT_FOUND"
+  },
+  "archived": {
+    "restartRequiredVisible": true,
+    "recoveryCopySaved": true,
+    "readRequests": 1,
+    "successfulReads": 1,
+    "writeRequests": 1,
+    "pending": 0,
+    "noAdditionalFetch": true
+  },
+  "afterColdRestart": {
+    "readRequests": 1,
+    "successfulReads": 1,
+    "writeRequests": 0,
+    "pending": 0,
+    "demoModelAbsent": true,
+    "originalModelPresent": true,
+    "normalSettingsRestored": true,
+    "archivedRequestNotReplayed": true,
+    "recoveryCopyIntentionallyRetained": true
+  },
+  "production": {
+    "revision": 9,
+    "operations": 9,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "models": 1
+  },
+  "phoneRecoveryCopyIntentionallyRetained": true,
+  "aiRequests": 0,
+  "cmsWrites": 0,
+  "screenshots": [
+    "android-rejected-model.png",
+    "android-recovery-confirmation.png",
+    "android-recovery-restart-required.png",
+    "android-recovery-completed.png"
+  ]
+}

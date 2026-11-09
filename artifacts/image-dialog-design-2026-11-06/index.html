@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PressDock · 图片处理弹框设计稿</title>
+    <style>
+      :root {
+        font-family:
+          "Geist Variable", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+        color: #202226;
+        font-size: 13px;
+        font-synthesis: none;
+        --line: #e5e7eb;
+        --secondary: #626872;
+        --blue: #2457d6;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        height: 100dvh;
+        overflow: hidden;
+        background: #e8eaee;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
+      }
+      button:disabled {
+        cursor: default;
+      }
+      svg {
+        width: 16px;
+        height: 16px;
+        flex: none;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .symbols {
+        display: none;
+      }
+      .design-label {
+        position: fixed;
+        top: 16px;
+        left: 24px;
+        color: #626872;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .design-label strong {
+        font-weight: 500;
+        color: #343941;
+      }
+      .design-label span {
+        border-left: 1px solid #cbd0d8;
+        padding-left: 12px;
+      }
+      .backdrop {
+        display: grid;
+        place-items: center;
+        height: 100%;
+        padding: 48px 24px 24px;
+      }
+      .dialog {
+        width: min(1120px, 100%);
+        height: min(640px, calc(100dvh - 96px));
+        display: grid;
+        grid-template-rows: 64px 40px minmax(0, 1fr) 64px;
+        background: #fff;
+        border: 1px solid #d2d6dc;
+        border-radius: 12px;
+        box-shadow: 0 16px 48px #1821321a;
+        overflow: hidden;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 20px;
+      }
+      h1 {
+        font-size: 18px;
+        line-height: 24px;
+        margin: 0;
+        font-weight: 500;
+      }
+      .context {
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: var(--secondary);
+        line-height: 16px;
+      }
+      .icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        color: #535a64;
+      }
+      .icon-button:hover {
+        background: #edf0f4;
+      }
+      .file-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-width: 0;
+        border-block: 1px solid var(--line);
+        background: #fbfbfc;
+        padding: 0 20px;
+      }
+      .file {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow: hidden;
+      }
+      .file span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .quiet {
+        font-size: 12px;
+        color: var(--secondary);
+      }
+      .file-row > .quiet {
+        white-space: nowrap;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 272px;
+        min-height: 0;
+      }
+      .preview {
+        display: grid;
+        grid-template-rows: 40px minmax(0, 1fr) 36px;
+        min-width: 0;
+        min-height: 0;
+        border-right: 1px solid var(--line);
+      }
+      .preview-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .tab {
+        border: 0;
+        background: transparent;
+        padding: 4px 10px;
+        border-radius: 5px;
+        height: 28px;
+        color: var(--secondary);
+        font-size: 12px;
+      }
+      .tab.active {
+        background: #edf2ff;
+        color: #224eb7;
+        font-weight: 500;
+      }
+      .tab:disabled {
+        color: #969ca5;
+      }
+      .crop-mode {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #6e7580;
+      }
+      .stage {
+        display: grid;
+        place-items: center;
+        background: #202226;
+        padding: 28px 24px;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .photo {
+        width: 100%;
+        max-width: 800px;
+        aspect-ratio: 428 / 152;
+        position: relative;
+        overflow: hidden;
+        background: #222a22;
+        box-shadow: 0 2px 12px #0003;
+      }
+      /* 直接展示提供截图中的图片区域，源文件保持原样。 */
+      .source {
+        position: absolute;
+        max-width: none;
+        width: 235.514%;
+        left: -39.72%;
+        top: -239.474%;
+        pointer-events: none;
+        user-select: none;
+      }
+      .crop {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 12.15%;
+        width: 80.14%;
+        border: 1px solid #fff;
+        box-shadow: 0 0 0 600px #0007;
+      }
+      .crop::before,
+      .crop::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .crop::before {
+        left: 33.333%;
+        width: 33.333%;
+        border-inline: 1px solid #ffffff40;
+      }
+      .crop::after {
+        top: 33.333%;
+        height: 33.333%;
+        border-block: 1px solid #ffffff40;
+      }
+      .handle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: white;
+        border: 1px solid #30343a;
+      }
+      .tl {
+        top: -4px;
+        left: -4px;
+      }
+      .tr {
+        top: -4px;
+        right: -4px;
+      }
+      .bl {
+        bottom: -4px;
+        left: -4px;
+      }
+      .br {
+        bottom: -4px;
+        right: -4px;
+      }
+      .viewer-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 0 12px;
+        border-top: 1px solid var(--line);
+        background: #fbfbfc;
+      }
+      .zoom-tools {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .zoom-tools .icon-button {
+        width: 28px;
+        height: 28px;
+      }
+      .text-button {
+        height: 28px;
+        padding: 0 8px;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: #535a64;
+        font-size: 12px;
+      }
+      .text-button.selected {
+        background: #e9edf3;
+        color: #262b33;
+      }
+      .viewer-footer .quiet {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .settings {
+        padding: 16px;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .settings-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        line-height: 20px;
+      }
+      h2 {
+        font-size: 13px;
+        font-weight: 500;
+        margin: 0;
+      }
+      .locked {
+        color: #737b87;
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+      .locked svg {
+        width: 12px;
+        height: 12px;
+      }
+      .free-parameters,
+      .free-heading,
+      .free-crop {
+        display: none;
+      }
+      .editable .locked-parameters,
+      .editable .locked,
+      .editable .locked-note,
+      .editable .locked-crop {
+        display: none;
+      }
+      .editable .free-parameters,
+      .editable .free-crop {
+        display: block;
+      }
+      .editable .free-heading {
+        display: inline;
+        font-size: 11px;
+        color: var(--secondary);
+      }
+      .editable .settings {
+        gap: 8px;
+        min-height: 0;
+      }
+      .editable .settings > * {
+        flex-shrink: 0;
+      }
+      .editable .section {
+        padding-top: 8px;
+      }
+      .parameter-rows {
+        display: grid;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .parameter-row {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr);
+        align-items: center;
+        gap: 4px;
+        min-height: 32px;
+      }
+      .parameter-row > label {
+        font-size: 12px;
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+      .parameter-row input[type="number"],
+      .parameter-row select {
+        width: 100%;
+        min-width: 0;
+        height: 32px;
+        padding: 0 8px;
+        border: 1px solid #d9dee7;
+        border-radius: 5px;
+        background: white;
+        color: #2b313b;
+        font: inherit;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      .parameter-row input[type="number"] {
+        appearance: textfield;
+      }
+      .parameter-row input::-webkit-inner-spin-button,
+      .parameter-row input::-webkit-outer-spin-button {
+        appearance: none;
+        margin: 0;
+      }
+      .parameter-row input:disabled {
+        color: #8a929e;
+        background: #f3f5f7;
+      }
+      .size-inputs {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 8px minmax(0, 1fr) 14px;
+        gap: 4px;
+        align-items: center;
+        font-size: 11px;
+        color: var(--secondary);
+      }
+      .limit-input {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 24px;
+        gap: 6px;
+        align-items: center;
+        font-size: 11px;
+        color: var(--secondary);
+      }
+      .parameter-row input[type="checkbox"],
+      .free-crop input {
+        margin: 0;
+        width: 12px;
+        height: 12px;
+        accent-color: #536173;
+      }
+      .free-crop label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .free-help {
+        font-size: 11px;
+        line-height: 16px;
+        color: var(--secondary);
+        margin: 6px 0 0;
+      }
+      dl {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        column-gap: 8px;
+        font-size: 12px;
+        line-height: 28px;
+      }
+      dt {
+        color: var(--secondary);
+      }
+      dd {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+      .format-note {
+        margin: 4px 0 0;
+        font-size: 11px;
+        color: #747c87;
+        line-height: 16px;
+      }
+      .section {
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+      .crop-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        line-height: 20px;
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .check svg {
+        width: 14px;
+        height: 14px;
+        color: #5c6471;
+      }
+      .help {
+        margin: 4px 0 0;
+        color: var(--secondary);
+        font-size: 11px;
+        line-height: 16px;
+      }
+      .warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        background: #fff8e9;
+        color: #936016;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        line-height: 16px;
+      }
+      .warning svg {
+        width: 14px;
+        height: 14px;
+        margin-top: 1px;
+      }
+      .quality-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        line-height: 20px;
+      }
+      output {
+        font-variant-numeric: tabular-nums;
+      }
+      .range {
+        margin: 6px 0 0;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 4px;
+        background: linear-gradient(to right, #4d5563 75%, #e2e5ea 75%);
+        vertical-align: middle;
+        cursor: pointer;
+      }
+      .range::-webkit-slider-thumb {
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #4d5563;
+        border-radius: 50%;
+      }
+      .result {
+        margin-top: auto;
+        padding: 8px 10px;
+        background: #f5f6f8;
+        border-radius: 6px;
+      }
+      .result dl {
+        font-size: 11px;
+        line-height: 22px;
+      }
+      .result .pending {
+        color: #747c87;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 20px;
+        border-top: 1px solid var(--line);
+        background: #fff;
+      }
+      .action-start,
+      .action-end {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .action-start {
+        min-width: 0;
+      }
+      .action-start .quiet {
+        font-size: 11px;
+      }
+      .button {
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: 1px solid #dfe3e9;
+        background: #fff;
+        color: #343a44;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+      }
+      .button:hover {
+        background: #f6f7f9;
+      }
+      .button.primary {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .button.primary:hover {
+        background: #204cc0;
+      }
+      .button.ghost {
+        border-color: transparent;
+        color: #616874;
+        background: transparent;
+        padding-inline: 0;
+      }
+      .button:disabled {
+        background: #eff1f4;
+        border-color: #eff1f4;
+        color: #9aa1ad;
+      }
+      .design-credit {
+        position: fixed;
+        bottom: 12px;
+        right: 24px;
+        color: #737b87;
+        font-size: 10px;
+      }
+      .design-credit a {
+        color: inherit;
+        text-decoration: none;
+      }
+      @media (max-height: 720px) {
+        .dialog {
+          height: calc(100dvh - 64px);
+          grid-template-rows: 56px 36px minmax(0, 1fr) 56px;
+        }
+        .backdrop {
+          padding: 40px 24px 24px;
+        }
+        .settings {
+          padding: 12px;
+          gap: 8px;
+        }
+        dl {
+          line-height: 24px;
+        }
+        .section {
+          padding-top: 8px;
+        }
+        .format-note,
+        .help {
+          margin-top: 2px;
+        }
+        .result {
+          padding-block: 4px;
+        }
+        .warning {
+          padding: 6px 8px;
+        }
+        .actions {
+          padding-block: 8px;
+        }
+        .stage {
+          padding-block: 16px;
+        }
+      }
+      @media (max-width: 900px) {
+        .backdrop {
+          padding-inline: 16px;
+        }
+        .workspace {
+          grid-template-columns: minmax(0, 1fr) 248px;
+        }
+        .header,
+        .file-row,
+        .actions {
+          padding-inline: 16px;
+        }
+        .settings {
+          padding-inline: 12px;
+        }
+        .stage {
+          padding-inline: 16px;
+        }
+        .action-start .quiet {
+          max-width: 168px;
+          line-height: 16px;
+        }
+        .viewer-footer {
+          padding-inline: 8px;
+        }
+        .viewer-footer .quiet {
+          font-size: 10px;
+        }
+        .zoom-tools {
+          gap: 0;
+        }
+        .text-button {
+          padding-inline: 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="symbols" aria-hidden="true">
+      <defs>
+        <symbol id="close" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M6 18 18 6" />
+        </symbol>
+        <symbol id="image" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="m21 15-5-5L5 21" />
+        </symbol>
+        <symbol id="lock" viewBox="0 0 24 24">
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+        </symbol>
+        <symbol id="crop" viewBox="0 0 24 24">
+          <path d="M6 3v12a3 3 0 0 0 3 3h12M3 6h12a3 3 0 0 1 3 3v12" />
+        </symbol>
+        <symbol id="minus" viewBox="0 0 24 24">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m16 16 5 5M7.5 10.5h6" />
+        </symbol>
+        <symbol id="plus" viewBox="0 0 24 24">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m16 16 5 5M7.5 10.5h6M10.5 7.5v6" />
+        </symbol>
+        <symbol id="reset" viewBox="0 0 24 24">
+          <path d="M3 10a9 9 0 1 1 2.5 8M3 4v6h6" />
+        </symbol>
+        <symbol id="check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="alert" viewBox="0 0 24 24">
+          <path
+            d="m10.3 3.9-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0ZM12 9v4M12 17h.01"
+          />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="design-label">
+      <strong>PressDock / 图片处理</strong
+      ><span>布局设计稿 · 内容取自提供截图</span>
+    </div>
+    <main class="backdrop">
+      <section
+        class="dialog"
+        role="dialog"
+        aria-labelledby="dialog-title"
+        aria-describedby="context"
+      >
+        <header class="header">
+          <div>
+            <h1 id="dialog-title">处理主图</h1>
+            <p id="context" class="context">2345 / 右侧轮播小图_头条_280x124</p>
+          </div>
+          <button class="icon-button" aria-label="关闭">
+            <svg><use href="#close" /></svg>
+          </button>
+        </header>
+        <div class="file-row">
+          <div class="file">
+            <svg><use href="#image" /></svg><span>2345大二-恢复的.jpg</span>
+          </div>
+          <span class="quiet">本地处理 · 原图保留</span>
+        </div>
+        <div class="workspace">
+          <section class="preview" aria-label="图片预览">
+            <div class="preview-top">
+              <div class="tabs">
+                <button class="tab active">原图 / 裁剪</button
+                ><button class="tab" disabled title="生成处理预览后查看">
+                  处理结果
+                </button>
+              </div>
+              <span class="crop-mode"
+                ><svg><use href="#crop" /></svg>按输出比例取景</span
+              >
+            </div>
+            <div class="stage">
+              <div
+                class="photo"
+                aria-label="使用提供截图的图片，裁剪框为设计示意"
+              >
+                <img
+                  class="source"
+                  src="source.png"
+                  alt="两位人物在户外，图片来自提供截图"
+                  draggable="false"
+                />
+                <div class="crop">
+                  <i class="handle tl"></i><i class="handle tr"></i
+                  ><i class="handle bl"></i><i class="handle br"></i>
+                </div>
+              </div>
+            </div>
+            <div class="viewer-footer">
+              <div class="zoom-tools">
+                <button class="icon-button" aria-label="缩小查看">
+                  <svg><use href="#minus" /></svg></button
+                ><button class="icon-button" aria-label="放大查看">
+                  <svg><use href="#plus" /></svg></button
+                ><button class="text-button selected">适应窗口</button
+                ><button class="text-button">100%</button>
+              </div>
+              <span class="quiet">原图 506 × 180 px</span>
+            </div>
+          </section>
+          <aside class="settings" aria-label="图片输出参数">
+            <div>
+              <div class="settings-heading">
+                <h2>输出设置</h2>
+                <span class="locked"
+                  ><svg><use href="#lock" /></svg>预设已锁定</span
+                >
+                <span class="free-heading">可自由调整</span>
+              </div>
+              <dl class="locked-parameters">
+                <dt>图片格式</dt>
+                <dd>JPG / JPEG</dd>
+                <dt>输出尺寸</dt>
+                <dd>560 × 248 px</dd>
+                <dt>体积上限</dt>
+                <dd>79 KiB</dd>
+              </dl>
+              <p class="format-note locked-note">JPEG 透明区域以白色填充</p>
+              <div class="free-parameters">
+                <div class="parameter-rows">
+                  <div class="parameter-row">
+                    <label for="format">图片格式</label
+                    ><select id="format" title="JPEG 透明区域以白色填充">
+                      <option value="jpeg">JPG / JPEG</option>
+                      <option value="png">PNG</option>
+                      <option value="webp">WebP</option>
+                    </select>
+                  </div>
+                  <div class="parameter-row">
+                    <label for="resize"
+                      ><input
+                        type="checkbox"
+                        id="resize"
+                        checked
+                      />输出尺寸</label
+                    >
+                    <div class="size-inputs">
+                      <input
+                        type="number"
+                        id="width"
+                        aria-label="输出宽度"
+                        value="560"
+                        min="1"
+                        max="16384"
+                      /><span>×</span
+                      ><input
+                        type="number"
+                        id="height"
+                        aria-label="输出高度"
+                        value="248"
+                        min="1"
+                        max="16384"
+                      /><span>px</span>
+                    </div>
+                  </div>
+                  <div class="parameter-row">
+                    <label for="limit">体积上限</label>
+                    <div class="limit-input">
+                      <input
+                        type="number"
+                        id="limit"
+                        aria-label="文件体积上限"
+                        value="79"
+                        min="0.001"
+                        max="20480"
+                        step="any"
+                        placeholder="不限"
+                      /><span>KiB</span>
+                    </div>
+                  </div>
+                </div>
+                <p class="free-help">
+                  取消尺寸：保留原图或选区像素<br />体积留空：不限制
+                </p>
+              </div>
+            </div>
+            <div class="section">
+              <div class="crop-label">
+                <span class="check locked-crop"
+                  ><svg><use href="#check" /></svg>启用裁剪</span
+                ><span class="free-crop"
+                  ><label
+                    ><input
+                      id="cropping"
+                      type="checkbox"
+                      checked
+                      disabled
+                    />启用裁剪</label
+                  ></span
+                ><span class="quiet">按输出比例</span>
+              </div>
+              <p class="help">拖动或缩放选区，调整取景</p>
+            </div>
+            <div class="warning">
+              <svg><use href="#alert" /></svg
+              ><span>选区小于输出尺寸，将放大图片<br />清晰度可能下降</span>
+            </div>
+            <div class="section">
+              <label class="quality-row" for="quality"
+                ><span>优先画质</span
+                ><output id="quality-value">90</output></label
+              >
+              <input
+                id="quality"
+                aria-label="优先画质"
+                class="range"
+                type="range"
+                min="60"
+                max="100"
+                value="90"
+              />
+              <p class="help">体积受限时自动降低质量，最低 60</p>
+            </div>
+            <div class="result">
+              <dl>
+                <dt>原图</dt>
+                <dd>506 × 180 · 38.3 KiB</dd>
+                <dt>处理结果</dt>
+                <dd class="pending">待生成预览</dd>
+              </dl>
+            </div>
+          </aside>
+        </div>
+        <footer class="actions">
+          <div class="action-start">
+            <button class="button ghost">
+              <svg><use href="#reset" /></svg>重置</button
+            ><span class="quiet">确认后上传，保存素材后关联</span>
+          </div>
+          <div class="action-end">
+            <button class="button">取消</button
+            ><button class="button primary" title="布局设计稿，不执行图片处理">
+              处理预览</button
+            ><button class="button" disabled>确认结果</button>
+          </div>
+        </footer>
+      </section>
+    </main>
+    <div class="design-credit">
+      设计方法：<a href="https://heydamir.design/unslop"
+        >Unslop · Damir Sokolovsky</a
+      >
+      / CC BY 4.0
+    </div>
+    <script>
+      if (new URLSearchParams(location.search).has("editable")) {
+        document.body.classList.add("editable");
+        document.querySelector(".design-label span").textContent =
+          "布局设计稿 · 参数可编辑";
+      }
+      document.querySelector("#resize").addEventListener("change", (event) => {
+        document.querySelector("#width").disabled = !event.target.checked;
+        document.querySelector("#height").disabled = !event.target.checked;
+        document.querySelector("#cropping").disabled = event.target.checked;
+      });
+      const quality = document.querySelector("#quality");
+      quality.addEventListener("input", () => {
+        document.querySelector("#quality-value").textContent = quality.value;
+        quality.style.background = `linear-gradient(to right, #4d5563 ${((quality.value - 60) / 40) * 100}%, #e2e5ea 0)`;
+      });
+    </script>
+  </body>
+</html>

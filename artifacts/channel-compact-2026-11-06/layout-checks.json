@@ -1,0 +1,61 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "pageWidth": 1440,
+      "overflow": false,
+      "rowHeight": 73,
+      "paginationVisible": true,
+      "selectedPanel": false,
+      "headers": ["位置", "新闻内容", "主图", "第二张图片", "操作"],
+      "toolbarHeight": 57
+    },
+    {
+      "width": 1280,
+      "pageWidth": 1280,
+      "overflow": false,
+      "rowHeight": 73,
+      "paginationVisible": true,
+      "selectedPanel": false,
+      "headers": ["位置", "新闻内容", "主图", "第二张图片", "操作"],
+      "toolbarHeight": 57
+    },
+    {
+      "width": 1024,
+      "pageWidth": 1024,
+      "overflow": false,
+      "rowHeight": 73,
+      "paginationVisible": true,
+      "selectedPanel": false,
+      "headers": ["位置", "新闻内容", "主图", "第二张图片", "操作"],
+      "toolbarHeight": 97
+    },
+    {
+      "width": 768,
+      "pageWidth": 768,
+      "overflow": false,
+      "rowHeight": 73,
+      "paginationVisible": true,
+      "selectedPanel": false,
+      "headers": ["位置", "新闻内容", "主图", "第二张图片", "操作"],
+      "toolbarHeight": 137
+    },
+    {
+      "width": 390,
+      "pageWidth": 390,
+      "overflow": false,
+      "paginationVisible": true,
+      "selectedPanel": false,
+      "headers": []
+    }
+  ],
+  "sticky": {
+    "regionLeft": 249,
+    "regionRight": 751,
+    "titleLeft": 293,
+    "actionsRight": 751,
+    "scrollLeft": 134,
+    "headTop": 254,
+    "regionTop": 254
+  }
+}

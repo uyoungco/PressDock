@@ -1,0 +1,126 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "container": 1150,
+      "layout": "wide",
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "tableTop": 283,
+      "rows": 8,
+      "rowHeights": [60, 60, 60, 60, 60, 60, 60, 60],
+      "lastRowBottom": 795,
+      "listBottom": 806,
+      "controls": {
+        "input": 36,
+        "actionMin": 28,
+        "footerBottom": 843,
+        "viewportHeight": 900
+      }
+    },
+    {
+      "width": 1280,
+      "container": 990,
+      "layout": "wide",
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "tableTop": 283,
+      "rows": 8,
+      "rowHeights": [60, 60, 60, 60, 60, 60, 60, 60],
+      "lastRowBottom": 795,
+      "listBottom": 806,
+      "controls": {
+        "input": 36,
+        "actionMin": 28,
+        "footerBottom": 843,
+        "viewportHeight": 900
+      }
+    },
+    {
+      "width": 1024,
+      "container": 734,
+      "layout": "compact",
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "tableTop": 283,
+      "rows": 8,
+      "rowHeights": [60, 79, 60, 60, 60, 73, 73, 60],
+      "lastRowBottom": 840,
+      "listBottom": 806,
+      "controls": {
+        "input": 36,
+        "actionMin": 28,
+        "footerBottom": 843,
+        "viewportHeight": 900
+      }
+    },
+    {
+      "width": 768,
+      "container": 478,
+      "layout": "cards",
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "rows": 8,
+      "rowHeights": [],
+      "listBottom": 806,
+      "controls": {
+        "input": 44,
+        "actionMin": 40,
+        "footerBottom": 843,
+        "viewportHeight": 900
+      }
+    },
+    {
+      "width": 390,
+      "container": 356,
+      "layout": "cards",
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "rows": 8,
+      "rowHeights": [],
+      "listBottom": 758,
+      "controls": {
+        "input": 44,
+        "actionMin": 40,
+        "footerBottom": 795,
+        "viewportHeight": 844
+      }
+    }
+  ],
+  "longErrors": {
+    "notes": [
+      {
+        "text": "请在来源窗口完成网页验证，然后继续采集。",
+        "clipped": false
+      },
+      {
+        "text": "来源页面暂时无法读取，请打开原文检查后重试。",
+        "clipped": false
+      },
+      {
+        "text": "提交后未收到确认，请先到 CMS 核对，避免重复添加。",
+        "clipped": false
+      }
+    ],
+    "heights": [60, 79, 60, 60, 60, 73, 73, 60]
+  },
+  "collapsed": {
+    "layout": "compact",
+    "width": 646
+  },
+  "fixed": {
+    "before": {
+      "head": 283,
+      "input": 161,
+      "toolbar": 234,
+      "footer": 806
+    },
+    "after": {
+      "head": 283,
+      "input": 161,
+      "toolbar": 234,
+      "footer": 806
+    },
+    "scrollTop": 360
+  }
+}

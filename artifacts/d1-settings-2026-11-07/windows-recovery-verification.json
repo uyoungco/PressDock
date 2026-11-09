@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-07",
+  "platform": "Windows",
+  "accepted": true,
+  "isolatedNativeReleaseInstallation": true,
+  "interaction": {
+    "tool": "computer-use / @oai/sky through official node_repl",
+    "performedBy": "agent",
+    "userClicksRequired": false,
+    "runtimeRestoredByRecreatingMissingOwnedTempDirectories": true,
+    "recoveryIpcCalledDirectly": false
+  },
+  "before": {
+    "cloudRevision": 17,
+    "cachedRevision": 16,
+    "errorCode": "ENTITY_NOT_FOUND",
+    "pending": 1,
+    "originalUploadAttempts": 1,
+    "resumedProcessReadRequests": 1,
+    "resumedProcessSuccessfulReads": 0,
+    "resumedProcessWriteRequests": 0
+  },
+  "cancellation": {
+    "dialogObservedClosed": true,
+    "passed": true,
+    "pending": 1,
+    "originalRequestAndCiphertextUnchanged": true,
+    "noAdditionalUploadAttempt": true
+  },
+  "confirmation": {
+    "restartRequiredMessageObserved": true,
+    "passed": true,
+    "pending": 0,
+    "recoveryBatches": 1,
+    "recoveryOperations": 1,
+    "originalOperationIdAndRequestAndCiphertextPreserved": true,
+    "businessDataUnchanged": true,
+    "noAdditionalUploadAttempt": true
+  },
+  "coldRestart": {
+    "passed": true,
+    "cloudRevision": 17,
+    "newGenerationInstalled": true,
+    "pending": 0,
+    "demoModelAbsent": true,
+    "recoveryBatches": 1,
+    "recoveryOperations": 1,
+    "originalOperationIdAndRequestAndCiphertextPreserved": true,
+    "businessDataUnchanged": true,
+    "archivedRequestNotReplayed": true,
+    "diagnostics": {
+      "readRequests": 1,
+      "successfulReads": 1,
+      "writeRequests": 0,
+      "pending": 0
+    }
+  },
+  "pageChangeDiagnostics": {
+    "readRequests": 1,
+    "successfulReads": 1,
+    "writeRequests": 0,
+    "pending": 0
+  },
+  "backgroundReturnDiagnostics": {
+    "readRequests": 1,
+    "successfulReads": 1,
+    "writeRequests": 0,
+    "pending": 0
+  },
+  "formalApplicationRestored": {
+    "passed": true,
+    "cloudRevision": 17,
+    "newGenerationInstalled": true,
+    "pending": 0,
+    "runnable": 0,
+    "counts": {
+      "originals": 321,
+      "drafts": 4,
+      "jobs": 318
+    },
+    "businessContentsAndJobStatesUnchanged": true,
+    "sharedConfigurationUnchanged": true,
+    "localHarvestSettingsUnchanged": true,
+    "originalModelNameRestored": true,
+    "credentialReferencesPresent": 1,
+    "diagnostics": {
+      "readRequests": 1,
+      "successfulReads": 1,
+      "writeRequests": 0,
+      "pending": 0
+    }
+  },
+  "isolation": {
+    "testProcessStopped": true,
+    "testDataArchived": true,
+    "originalTestDatabaseAndRecoveryCredentialsIntentionallyRetained": true,
+    "productionInstallationReplaced": false
+  },
+  "productionD1ReadOnlyAuditBeforeDialog": {
+    "revision": 17,
+    "operations": 17,
+    "realActors": 1,
+    "encryptedSecrets": 1
+  },
+  "optionalFinalWranglerReadOnlyAudit": {
+    "passed": false,
+    "attempts": 2,
+    "error": "Cloudflare OAuth refresh endpoint could not be reached; credentials unchanged",
+    "existingRevision17AuditRetained": true,
+    "subsequentNativeClientsBothReadRevision17": true,
+    "subsequentNativeWriteRequests": 0
+  },
+  "aiRequests": 0,
+  "cmsArticleWrites": 0,
+  "gitPushes": 0
+}

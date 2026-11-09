@@ -1,0 +1,13 @@
+{
+  "error": {
+    "viewport": [1008, 640],
+    "fullErrorLength": 307,
+    "settings": [428, 428],
+    "footerVisible": true
+  },
+  "mobile": {
+    "viewport": [390, 844],
+    "compact": false,
+    "legacyCanvas": true
+  }
+}

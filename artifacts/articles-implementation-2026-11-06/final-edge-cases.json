@@ -1,0 +1,26 @@
+[
+  {
+    "scene": "nested-pagination",
+    "notice": true,
+    "preview": true,
+    "insertDisabled": true
+  },
+  {
+    "scene": "source-mobile",
+    "textarea": 614,
+    "footer": 844,
+    "footerHeight": 72,
+    "outerOverflow": 0
+  },
+  {
+    "scene": "short-assistant",
+    "preview": 132,
+    "footer": 400,
+    "configCollapsed": true,
+    "overflow": 0
+  },
+  {
+    "scene": "configuration-disclosure",
+    "expanded": true
+  }
+]

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>系统设置实施前后对比 · 隔离演示</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f5f6f8;
+        color: #21242b;
+        font:
+          14px/1.6 "Microsoft YaHei",
+          sans-serif;
+      }
+      main {
+        max-width: 1600px;
+        margin: auto;
+        padding: 24px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      h2 {
+        margin-top: 32px;
+        font-size: 16px;
+      }
+      p,
+      figcaption {
+        color: #666d79;
+      }
+      a {
+        color: #3659d9;
+      }
+      section > div {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      figure {
+        margin: 0;
+        min-width: 0;
+      }
+      img {
+        display: block;
+        width: 100%;
+        border: 1px solid #dfe2e7;
+        border-radius: 6px;
+      }
+      figcaption {
+        margin-bottom: 8px;
+      }
+      @media (max-width: 800px) {
+        section > div {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>系统设置 · 实施前后对比</h1>
+      <p>
+        真实 React
+        页面，明确标注的隔离演示数据。全部写入、模型请求和外部操作被拦截。2026-11-06。
+      </p>
+      <p>
+        <a href="../../docs/settings-compact-ui-qa-2026-11-06.md"
+          >完整验收记录</a
+        >
+        · <a href="layout-final.json">64 个页面状态</a> ·
+        <a href="dialog-layout-final.json">16 个弹框状态</a>
+      </p>
+      <section>
+        <h2>常规设置</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-general-light-1440.png"
+              alt="常规设置改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-general-1440x900.png" alt="常规设置改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>采集与 AI 处理</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-harvest-light-1440.png"
+              alt="采集设置改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-harvest-1440x900.png" alt="采集设置改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>图片预设</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-presets-1440.png"
+              alt="图片预设改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-presets-1440x900.png" alt="图片预设改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>AI 模型</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-models-light-1440.png"
+              alt="模型设置改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-models-1440x900.png" alt="模型设置改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>提示词模板</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-template-title-1440.png"
+              alt="模板改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-template-title-1440x900.png" alt="模板改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>分页模板</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-template-page-1440.png"
+              alt="分页模板改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-template-page-1440x900.png" alt="分页模板改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>服务连接</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-services-light-1440.png"
+              alt="服务连接改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-services-1440x900.png" alt="服务连接改造后" />
+          </figure>
+        </div>
+      </section>
+      <section>
+        <h2>关于应用</h2>
+        <div>
+          <figure>
+            <figcaption>改造前</figcaption>
+            <img
+              src="../settings-design-2026-11-06/before-about-light-1440.png"
+              alt="关于应用改造前"
+            />
+          </figure>
+          <figure>
+            <figcaption>改造后</figcaption>
+            <img src="after-about-1440x900.png" alt="关于应用改造后" />
+          </figure>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

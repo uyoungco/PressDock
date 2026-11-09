@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "name": "Android 编辑打开先聚焦容器",
+      "pass": true
+    },
+    {
+      "name": "触摸输入框获得焦点",
+      "pass": true
+    },
+    {
+      "name": "Android 返回重开保留提供商输入",
+      "pass": true
+    },
+    {
+      "name": "Android 提供商失败保留输入",
+      "pass": true
+    },
+    {
+      "name": "触摸输入框获得焦点",
+      "pass": true
+    },
+    {
+      "name": "Android 模板返回恢复输入",
+      "pass": true
+    },
+    {
+      "name": "Android 模板失败保留输入",
+      "pass": true
+    },
+    {
+      "name": "Android 离开仍有未保存保护",
+      "pass": true
+    }
+  ],
+  "blocked": [
+    {
+      "command": "ai_save_provider"
+    },
+    {
+      "command": "ai_save_template"
+    },
+    {
+      "command": "cms_list_promote_data"
+    },
+    {
+      "command": "channel_draft_load"
+    },
+    {
+      "command": "channel_draft_load"
+    }
+  ]
+}

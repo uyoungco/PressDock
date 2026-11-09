@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-11-07T01:11:06.3249388+08:00",
+  "workerVersion": "90439914-a3f4-4d37-ba66-2d585b1354ee",
+  "results": [
+    {
+      "authenticated": true,
+      "check": "direct-cms-current-user",
+      "httpStatus": 200
+    },
+    {
+      "check": "worker-valid-session",
+      "cmsVerified": true,
+      "code": null,
+      "d1Connected": true,
+      "elapsedMs": 1056,
+      "httpStatus": 200
+    },
+    {
+      "check": "worker-missing-session",
+      "cmsVerified": false,
+      "code": "AUTH_REQUIRED",
+      "d1Connected": false,
+      "elapsedMs": 111,
+      "httpStatus": 401
+    },
+    {
+      "check": "worker-tampered-session",
+      "cmsVerified": false,
+      "code": "AUTH_EXPIRED",
+      "d1Connected": false,
+      "elapsedMs": 114,
+      "httpStatus": 401
+    }
+  ]
+}

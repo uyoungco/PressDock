@@ -1,0 +1,107 @@
+[
+  {
+    "width": 1440,
+    "view": "desk",
+    "scrollWidth": 1425,
+    "overflow": false,
+    "buttons": 9
+  },
+  {
+    "width": 1440,
+    "view": "editor",
+    "scrollWidth": 1425,
+    "overflow": false,
+    "buttons": 5
+  },
+  {
+    "width": 1440,
+    "view": "channels",
+    "scrollWidth": 1425,
+    "overflow": false,
+    "buttons": 14
+  },
+  {
+    "width": 1280,
+    "view": "desk",
+    "scrollWidth": 1265,
+    "overflow": false,
+    "buttons": 9
+  },
+  {
+    "width": 1280,
+    "view": "editor",
+    "scrollWidth": 1265,
+    "overflow": false,
+    "buttons": 5
+  },
+  {
+    "width": 1280,
+    "view": "channels",
+    "scrollWidth": 1265,
+    "overflow": false,
+    "buttons": 14
+  },
+  {
+    "width": 1024,
+    "view": "desk",
+    "scrollWidth": 1009,
+    "overflow": false,
+    "buttons": 8
+  },
+  {
+    "width": 1024,
+    "view": "editor",
+    "scrollWidth": 1009,
+    "overflow": false,
+    "buttons": 5
+  },
+  {
+    "width": 1024,
+    "view": "channels",
+    "scrollWidth": 1009,
+    "overflow": false,
+    "buttons": 14
+  },
+  {
+    "width": 390,
+    "view": "desk",
+    "scrollWidth": 375,
+    "overflow": false,
+    "buttons": 8
+  },
+  {
+    "width": 390,
+    "view": "editor",
+    "scrollWidth": 375,
+    "overflow": false,
+    "buttons": 3
+  },
+  {
+    "width": 390,
+    "view": "channels",
+    "scrollWidth": 375,
+    "overflow": false,
+    "buttons": 12
+  },
+  {
+    "width": 360,
+    "view": "desk",
+    "scrollWidth": 345,
+    "overflow": false,
+    "buttons": 8
+  },
+  {
+    "width": 360,
+    "view": "editor",
+    "scrollWidth": 345,
+    "overflow": false,
+    "buttons": 3
+  },
+  {
+    "width": 360,
+    "view": "channels",
+    "scrollWidth": 345,
+    "overflow": false,
+    "buttons": 12
+  }
+]

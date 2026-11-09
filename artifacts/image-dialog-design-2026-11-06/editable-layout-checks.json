@@ -1,0 +1,78 @@
+[
+  {
+    "viewport": [1008, 796],
+    "overflow": [
+      {
+        "selector": "body",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".dialog",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".workspace",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".preview",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".stage",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".settings",
+        "horizontal": false,
+        "vertical": false
+      }
+    ],
+    "noOverlap": true,
+    "viewerToolsVisible": true,
+    "allActionsVisible": true
+  },
+  {
+    "viewport": [1008, 640],
+    "overflow": [
+      {
+        "selector": "body",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".dialog",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".workspace",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".preview",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".stage",
+        "horizontal": false,
+        "vertical": false
+      },
+      {
+        "selector": ".settings",
+        "horizontal": false,
+        "vertical": false
+      }
+    ],
+    "noOverlap": true,
+    "viewerToolsVisible": true,
+    "allActionsVisible": true
+  }
+]

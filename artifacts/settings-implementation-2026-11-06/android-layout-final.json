@@ -1,0 +1,53 @@
+[
+  {
+    "name": "常规设置",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "采集与 AI 处理"
+  },
+  {
+    "name": "Android 保留前台执行说明",
+    "pass": true
+  },
+  {
+    "name": "图片预设",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "图片预设"
+  },
+  {
+    "name": "Android 图片预设保存始终可达",
+    "pass": true,
+    "height": 44
+  },
+  {
+    "name": "服务连接",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "desktopWorkspace": false,
+    "overflow": 0,
+    "heading": "关于应用"
+  }
+]

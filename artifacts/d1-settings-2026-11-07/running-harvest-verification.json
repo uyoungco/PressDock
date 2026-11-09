@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-07",
+  "accepted": false,
+  "case": "S8-04",
+  "sourceUrl": "https://baijiahao.baidu.com/s?id=1881087775499169707",
+  "environment": "Isolated Windows native release; real source WebView and real production configuration service",
+  "status": "source-verification-required",
+  "runningTaskWithOldSnapshotObserved": true,
+  "runningSnapshotAutoSummary": true,
+  "localSummaryRuleChangedWhileRunningObserved": true,
+  "finalTask": {
+    "status": "waitingUser",
+    "stage": "collecting",
+    "attempts": 1,
+    "processingOnly": true,
+    "metadataExecutionSnapshotPresent": true,
+    "formattedResultPresent": false,
+    "preparedResultPresent": false,
+    "submissionIntentRecorded": false,
+    "cmsArticleIdPresent": false
+  },
+  "sourceHttpObservation": {
+    "title": "百度安全验证",
+    "articleSelectorCount": 0,
+    "bytes": 1488
+  },
+  "explicitNativeAcceptanceTest": {
+    "passed": false,
+    "errorCode": "PROBE_HARVEST_STOPPED",
+    "reason": "Source body unavailable; native task requested source verification before formatting or AI"
+  },
+  "secondTaskEnqueued": false,
+  "aiRequests": 0,
+  "cmsArticleWrites": 0,
+  "originalSharedConfigurationRestored": true,
+  "production": {
+    "revision": 11,
+    "operations": 11,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "models": 1
+  },
+  "dedicatedNativeCredentialsCleaned": 2,
+  "testProcessStopped": true,
+  "testApplicationDataArchived": true,
+  "completeRunningTaskAndRestartedNewTaskAccepted": false
+}

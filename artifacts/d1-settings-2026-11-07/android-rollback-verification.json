@@ -1,0 +1,239 @@
+{
+  "case": "S8-05 Android isolated release upgrade and backup rollback",
+  "passed": true,
+  "attempt": 2,
+  "previousAttemptAccepted": false,
+  "previousAttemptIssue": "Test fixture was under files/pressdock.db while Tauri uses dataDir/pressdock.db; corrected and reran the complete chain. Prior private state retained.",
+  "device": {
+    "model": "ONEPLUS_A5000",
+    "androidApi": 29,
+    "architecture": "arm64-v8a"
+  },
+  "packageName": "com.example.pressdock.rollbackqa",
+  "uid": 10240,
+  "demoDataOnly": true,
+  "legacySource": "f1633d7",
+  "currentSource": "uncommitted-worktree",
+  "stages": [
+    {
+      "phase": "legacy",
+      "passed": true,
+      "migration": 9,
+      "actualApplicationDatabaseRelativePath": "pressdock.db",
+      "packageName": "com.example.pressdock.rollbackqa",
+      "uid": 10240,
+      "originals": 5,
+      "drafts": 5,
+      "jobs": 1,
+      "originalsSha256": "127bde27e42efab5ed1ad3b421071d4e5389a91cf9ba9212846228c95d5ceeca",
+      "draftsSha256": "2c45256dfb9cde3900ec27e9fb17679561bbebcd9a38bf82344636adc27ea95e",
+      "jobsSha256": "3f782ec143afbef0b702264506e692b24379e6e6479cf5cc0d2de3a98245a22d",
+      "providersSha256": "2c0d9089d736bb3b1a7ed49589143daedaca9930267fafa3e09ed8885527661a",
+      "modelsSha256": "bbc0ef75fdaeafb75973cf5a25a27ff0b34f9614515555dbabf526778c710cf0",
+      "templatesSha256": "0d981ea8eb0dc53f5c8ed4355d59d2d2ad9b0e89ae30ff2ec3ccfc2b78f21221",
+      "imagePresetsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "harvestSettingsSha256": "3385d81f746d3a6e9326cd8c5e4563adad0fae3732719d5c90ee2be0916b9053",
+      "sqliteIntegrityCheck": "pending-compatible-host-SQLite-check",
+      "credentialCiphertextSha256": "5f8575a2fb324258f865ce9e7d94434daae6d1548acd17d687f083b08dda8fe9",
+      "nativeKeystoreCredentialReadable": true,
+      "debuggable": false,
+      "networkPermission": false,
+      "aiRequests": 0,
+      "cmsWrites": 0,
+      "coldDatabaseFiles": {
+        "pressdock.db": "c0399ae4f6b89e502949236e623243009b057e7cd9f58c46baf98eeb98ec355f",
+        "pressdock.db-wal": "c7198558dc4c68416b854c519e7d35490ecbd622a90a5b4ec459dae8eae4103d",
+        "pressdock.db-shm": "c2bca1078f44e608f60aa507864152e7ebde937ac944a52790fe4e51f7102cee"
+      },
+      "integrity": {
+        "phase": "legacy",
+        "passed": true,
+        "scope": "Byte-identical cold database and WAL exported from the isolated Android UID; compatible host SQLite structural check",
+        "sqliteVersion": "3.50.2",
+        "integrityCheck": "ok",
+        "foreignKeyViolations": 0,
+        "databaseAndWalBytesVerified": true,
+        "deviceDataModified": false
+      },
+      "launch": {
+        "phase": "legacy",
+        "packageName": "com.example.pressdock.rollbackqa",
+        "versionCode": 102,
+        "uid": 10240,
+        "processId": 19417,
+        "nativeActivityStarted": true
+      }
+    },
+    {
+      "phase": "upgrade",
+      "passed": true,
+      "migration": 12,
+      "actualApplicationDatabaseRelativePath": "pressdock.db",
+      "packageName": "com.example.pressdock.rollbackqa",
+      "uid": 10240,
+      "originals": 5,
+      "drafts": 5,
+      "jobs": 1,
+      "originalsSha256": "127bde27e42efab5ed1ad3b421071d4e5389a91cf9ba9212846228c95d5ceeca",
+      "draftsSha256": "2c45256dfb9cde3900ec27e9fb17679561bbebcd9a38bf82344636adc27ea95e",
+      "jobsSha256": "3f782ec143afbef0b702264506e692b24379e6e6479cf5cc0d2de3a98245a22d",
+      "providersSha256": "2c0d9089d736bb3b1a7ed49589143daedaca9930267fafa3e09ed8885527661a",
+      "modelsSha256": "bbc0ef75fdaeafb75973cf5a25a27ff0b34f9614515555dbabf526778c710cf0",
+      "templatesSha256": "0d981ea8eb0dc53f5c8ed4355d59d2d2ad9b0e89ae30ff2ec3ccfc2b78f21221",
+      "imagePresetsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "harvestSettingsSha256": "3385d81f746d3a6e9326cd8c5e4563adad0fae3732719d5c90ee2be0916b9053",
+      "sqliteIntegrityCheck": "pending-compatible-host-SQLite-check",
+      "credentialCiphertextSha256": "5f8575a2fb324258f865ce9e7d94434daae6d1548acd17d687f083b08dda8fe9",
+      "nativeKeystoreCredentialReadable": true,
+      "debuggable": false,
+      "networkPermission": false,
+      "aiRequests": 0,
+      "cmsWrites": 0,
+      "pending": 0,
+      "coldDatabaseFiles": {
+        "pressdock.db": "c0399ae4f6b89e502949236e623243009b057e7cd9f58c46baf98eeb98ec355f",
+        "pressdock.db-wal": "524a98d3e7ad427b2449e53ab3da5cb8a4e70f15cc32ebd3a262d21446960a9e",
+        "pressdock.db-shm": "fde64b1c2a14f314c5f638d20a46255f1c948b9fc514b99e8c254a3eaf9064f3"
+      },
+      "integrity": {
+        "phase": "upgrade",
+        "passed": true,
+        "scope": "Byte-identical cold database and WAL exported from the isolated Android UID; compatible host SQLite structural check",
+        "sqliteVersion": "3.50.2",
+        "integrityCheck": "ok",
+        "foreignKeyViolations": 0,
+        "databaseAndWalBytesVerified": true,
+        "deviceDataModified": false
+      },
+      "launch": {
+        "phase": "upgrade",
+        "packageName": "com.example.pressdock.rollbackqa",
+        "versionCode": 103,
+        "uid": 10240,
+        "processId": 19420,
+        "nativeActivityStarted": true
+      }
+    },
+    {
+      "phase": "rollback",
+      "passed": true,
+      "migration": 9,
+      "actualApplicationDatabaseRelativePath": "pressdock.db",
+      "packageName": "com.example.pressdock.rollbackqa",
+      "uid": 10240,
+      "originals": 5,
+      "drafts": 5,
+      "jobs": 1,
+      "originalsSha256": "127bde27e42efab5ed1ad3b421071d4e5389a91cf9ba9212846228c95d5ceeca",
+      "draftsSha256": "2c45256dfb9cde3900ec27e9fb17679561bbebcd9a38bf82344636adc27ea95e",
+      "jobsSha256": "3f782ec143afbef0b702264506e692b24379e6e6479cf5cc0d2de3a98245a22d",
+      "providersSha256": "2c0d9089d736bb3b1a7ed49589143daedaca9930267fafa3e09ed8885527661a",
+      "modelsSha256": "bbc0ef75fdaeafb75973cf5a25a27ff0b34f9614515555dbabf526778c710cf0",
+      "templatesSha256": "0d981ea8eb0dc53f5c8ed4355d59d2d2ad9b0e89ae30ff2ec3ccfc2b78f21221",
+      "imagePresetsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "harvestSettingsSha256": "3385d81f746d3a6e9326cd8c5e4563adad0fae3732719d5c90ee2be0916b9053",
+      "sqliteIntegrityCheck": "pending-compatible-host-SQLite-check",
+      "credentialCiphertextSha256": "5f8575a2fb324258f865ce9e7d94434daae6d1548acd17d687f083b08dda8fe9",
+      "nativeKeystoreCredentialReadable": true,
+      "debuggable": false,
+      "networkPermission": false,
+      "aiRequests": 0,
+      "cmsWrites": 0,
+      "coldDatabaseFiles": {
+        "pressdock.db": "c0399ae4f6b89e502949236e623243009b057e7cd9f58c46baf98eeb98ec355f",
+        "pressdock.db-wal": "c7198558dc4c68416b854c519e7d35490ecbd622a90a5b4ec459dae8eae4103d",
+        "pressdock.db-shm": "c2bca1078f44e608f60aa507864152e7ebde937ac944a52790fe4e51f7102cee"
+      },
+      "integrity": {
+        "phase": "rollback",
+        "passed": true,
+        "scope": "Byte-identical cold database and WAL exported from the isolated Android UID; compatible host SQLite structural check",
+        "sqliteVersion": "3.50.2",
+        "integrityCheck": "ok",
+        "foreignKeyViolations": 0,
+        "databaseAndWalBytesVerified": true,
+        "deviceDataModified": false
+      },
+      "launch": {
+        "phase": "rollback",
+        "packageName": "com.example.pressdock.rollbackqa",
+        "versionCode": 104,
+        "uid": 10240,
+        "processId": 20074,
+        "nativeActivityStarted": true
+      }
+    }
+  ],
+  "artifacts": {
+    "legacy": {
+      "versionName": "0.1.0",
+      "versionCode": 102,
+      "apkSha256": "927ac0bdfce903230a701a7ad9d467ca451e13ddc1d948a253ee27e5a02afd61",
+      "nativeLibrarySha256": "9541e4805c83982a3de2e937a7e0a5a724e391c90df046aba676cf63a71ac1e3",
+      "certificateSha256": "ce01eb7205e8a0320888038ac6cc8c7ff4eae121ddc2adcbb2db23132941a3a4",
+      "debuggable": false,
+      "networkPermission": false
+    },
+    "current": {
+      "versionName": "0.1.1",
+      "versionCode": 103,
+      "apkSha256": "841f262f2496267406ff5cd154f643bb8d01b7e9d642829b1e3671b1de3bf2f6",
+      "nativeLibrarySha256": "7d008d0fe98c217150425c875c25a6f645f9ef0aded500f3a29d22536c0a84fd",
+      "certificateSha256": "ce01eb7205e8a0320888038ac6cc8c7ff4eae121ddc2adcbb2db23132941a3a4",
+      "debuggable": false,
+      "networkPermission": false
+    },
+    "rollback": {
+      "versionName": "0.1.0",
+      "versionCode": 104,
+      "apkSha256": "20f465aa292b5d3f81e9dc07a8c6126e05935842a23efe497302d9e968b3b779",
+      "nativeLibrarySha256": "9541e4805c83982a3de2e937a7e0a5a724e391c90df046aba676cf63a71ac1e3",
+      "certificateSha256": "ce01eb7205e8a0320888038ac6cc8c7ff4eae121ddc2adcbb2db23132941a3a4",
+      "debuggable": false,
+      "networkPermission": false
+    },
+    "instrumentation": {
+      "versionName": "",
+      "versionCode": 0,
+      "apkSha256": "528d703df784ed1afd7234bb7e906b0bddb6495c93def6100624bcf6f52ce328",
+      "nativeLibrarySha256": null,
+      "certificateSha256": "ce01eb7205e8a0320888038ac6cc8c7ff4eae121ddc2adcbb2db23132941a3a4",
+      "debuggable": false,
+      "networkPermission": false
+    }
+  },
+  "oldAndRollbackNativeLibrariesByteIdentical": true,
+  "privateBackupRestoredByteForByte": true,
+  "keystoreKeyExported": false,
+  "keystoreKeyRecreated": false,
+  "originalKeystoreCredentialReadableAfterRollback": true,
+  "uninstalled": false,
+  "dataCleared": false,
+  "adbDowngradeFlagUsed": false,
+  "rollbackPackaging": "Old code and frontend repackaged with a higher Android versionCode (104), installed with -r after restoring the pre-upgrade database; not an Android versionCode downgrade.",
+  "testHarness": "QA-only package/application label, no INTERNET permission, dedicated certificate, empty foreground instrumentation helper; main APKs remain non-debuggable release and retain real native SQLx and AiSecretEnvelope/Keystore implementation.",
+  "integrityScope": "Cold database and WAL bytes verified on device and host; structural and foreign-key checks use compatible host SQLite 3.50.2 because device system SQLite lacks JSON1.",
+  "productionInstallationBefore": {
+    "packageName": "com.example.pressdock",
+    "uid": 10245,
+    "versionCode": 1000,
+    "versionName": "0.1.0",
+    "apkSha256": "efb764e8ae9c12e20e46377a027b3796a626cbb54c68a56c3707b2886daa8b77"
+  },
+  "productionInstallationAfter": {
+    "packageName": "com.example.pressdock",
+    "uid": 10245,
+    "versionCode": 1000,
+    "versionName": "0.1.0",
+    "apkSha256": "efb764e8ae9c12e20e46377a027b3796a626cbb54c68a56c3707b2886daa8b77"
+  },
+  "productionPackageUnchanged": true,
+  "aiRequests": 0,
+  "cmsArticleWrites": 0,
+  "testInstallationAndBackupsRetained": true,
+  "excluded": [
+    "macOS native upgrade/rollback",
+    "three-platform matrix",
+    "network or CMS login validation in this isolated offline test"
+  ]
+}

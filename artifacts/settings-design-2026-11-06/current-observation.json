@@ -1,0 +1,109 @@
+{
+  "positions": [
+    {
+      "text": "保存提供商",
+      "y": 863.25
+    },
+    {
+      "text": "获取可用模型",
+      "y": 1005.25
+    }
+  ],
+  "calls": [
+    {
+      "command": "cms_restore_session",
+      "args": {}
+    },
+    {
+      "command": "plugin:event|listen",
+      "args": {
+        "event": "harvest-changed",
+        "target": {
+          "kind": "Any"
+        },
+        "handler": 1
+      }
+    },
+    {
+      "command": "plugin:event|listen",
+      "args": {
+        "event": "harvest-debug",
+        "target": {
+          "kind": "Any"
+        },
+        "handler": 3
+      }
+    },
+    {
+      "command": "plugin:event|listen",
+      "args": {
+        "event": "harvest-debug",
+        "target": {
+          "kind": "Any"
+        },
+        "handler": 5
+      }
+    },
+    {
+      "command": "plugin:event|unlisten",
+      "args": {
+        "event": "harvest-debug",
+        "eventId": 4
+      }
+    },
+    {
+      "command": "list_channel_image_presets",
+      "args": {}
+    },
+    {
+      "command": "get_app_info",
+      "args": {}
+    },
+    {
+      "command": "health_check",
+      "args": {}
+    },
+    {
+      "command": "list_channel_image_presets",
+      "args": {}
+    },
+    {
+      "command": "get_app_info",
+      "args": {}
+    },
+    {
+      "command": "health_check",
+      "args": {}
+    },
+    {
+      "command": "cms_list_promote_channels",
+      "args": {}
+    },
+    {
+      "command": "cms_list_promote_channels",
+      "args": {}
+    },
+    {
+      "command": "harvest_bridge_status",
+      "args": {}
+    },
+    {
+      "command": "ai_load_settings",
+      "args": {}
+    },
+    {
+      "command": "harvest_load_settings",
+      "args": {}
+    },
+    {
+      "command": "ai_load_settings",
+      "args": {}
+    }
+  ],
+  "blocked": [
+    {
+      "command": "ai_test_model"
+    }
+  ],
+  "error": "隔离演示：写入、模型请求和外部操作已拦截，不连接 CMS 或 AI重试读取"
+}

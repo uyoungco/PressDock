@@ -1,0 +1,64 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "headerY": 282.5,
+      "rowHeights": [60, 60, 60, 60, 60, 60, 60, 60],
+      "footerBottom": 843,
+      "viewportHeight": 900
+    },
+    {
+      "width": 1024,
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "headerY": 282.5,
+      "rowHeights": [60, 83, 60, 60, 60, 73, 73, 60],
+      "footerBottom": 843,
+      "viewportHeight": 900
+    },
+    {
+      "width": 768,
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "headerY": 278.5,
+      "rowHeights": [60, 83, 60, 60, 60, 73, 73, 60],
+      "footerBottom": 847,
+      "viewportHeight": 900
+    },
+    {
+      "width": 390,
+      "pageOverflow": 0,
+      "listOverflow": 0,
+      "headerY": 0,
+      "rowHeights": [141, 161, 141, 141, 141, 161, 161, 161],
+      "footerBottom": 795,
+      "viewportHeight": 844
+    }
+  ],
+  "validation": {
+    "text": "请输入有效的百家号或 mbd.baidu.com 文章链接",
+    "focused": "article-url"
+  },
+  "enqueue": {
+    "rows": 9,
+    "status": "排队中",
+    "notice": "设计预览：已展示入队状态，未创建真实采集任务"
+  },
+  "escape": {
+    "closed": true,
+    "focus": "青年创作者走进社区，更多操作"
+  },
+  "deleteConfirmation": {
+    "open": true,
+    "title": "删除这条采集记录？",
+    "copy": "将删除本地采集记录及未被草稿引用的采集数据，CMS 中已有文章保留。删除后，相同链接可重新采集并再次提交 CMS。"
+  },
+  "deleteCancelled": true,
+  "cmsConfirmation": "请先确认 CMS 确实没有该文章。本操作只将记录标为失败，之后可手动重试；不会立即重新提交。",
+  "emptyState": {
+    "shown": true,
+    "tableHidden": true
+  }
+}

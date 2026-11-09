@@ -1,0 +1,522 @@
+[
+  {
+    "scene": "list",
+    "width": 1440,
+    "overflow": 0,
+    "layout": "wide",
+    "region": {
+      "x": 248,
+      "y": 240,
+      "width": 1176,
+      "height": 567,
+      "top": 240,
+      "right": 1424,
+      "bottom": 807,
+      "left": 248
+    },
+    "row": {
+      "x": 248,
+      "y": 272,
+      "width": 1176,
+      "height": 72,
+      "top": 272,
+      "right": 1424,
+      "bottom": 344,
+      "left": 248
+    },
+    "pagination": {
+      "x": 248,
+      "y": 807,
+      "width": 1176,
+      "height": 45,
+      "top": 807,
+      "right": 1424,
+      "bottom": 852,
+      "left": 248
+    },
+    "columns": ["新闻内容", "配图", "分发记录", "操作"]
+  },
+  {
+    "scene": "list",
+    "width": 1280,
+    "overflow": 0,
+    "layout": "wide",
+    "region": {
+      "x": 248,
+      "y": 240,
+      "width": 1016,
+      "height": 567,
+      "top": 240,
+      "right": 1264,
+      "bottom": 807,
+      "left": 248
+    },
+    "row": {
+      "x": 248,
+      "y": 272,
+      "width": 1016,
+      "height": 72,
+      "top": 272,
+      "right": 1264,
+      "bottom": 344,
+      "left": 248
+    },
+    "pagination": {
+      "x": 248,
+      "y": 807,
+      "width": 1016,
+      "height": 45,
+      "top": 807,
+      "right": 1264,
+      "bottom": 852,
+      "left": 248
+    },
+    "columns": ["新闻内容", "配图", "分发记录", "操作"]
+  },
+  {
+    "scene": "list",
+    "width": 1024,
+    "overflow": 0,
+    "layout": "compact",
+    "region": {
+      "x": 248,
+      "y": 280,
+      "width": 760,
+      "height": 527,
+      "top": 280,
+      "right": 1008,
+      "bottom": 807,
+      "left": 248
+    },
+    "row": {
+      "x": 248,
+      "y": 312,
+      "width": 760,
+      "height": 131,
+      "top": 312,
+      "right": 1008,
+      "bottom": 443,
+      "left": 248
+    },
+    "pagination": {
+      "x": 248,
+      "y": 807,
+      "width": 760,
+      "height": 45,
+      "top": 807,
+      "right": 1008,
+      "bottom": 852,
+      "left": 248
+    },
+    "columns": ["新闻内容", "配图", "", "操作"]
+  },
+  {
+    "scene": "list",
+    "width": 768,
+    "overflow": 0,
+    "layout": "cards",
+    "region": {
+      "x": 248,
+      "y": 320,
+      "width": 504,
+      "height": 487,
+      "top": 320,
+      "right": 752,
+      "bottom": 807,
+      "left": 248
+    },
+    "pagination": {
+      "x": 248,
+      "y": 807,
+      "width": 504,
+      "height": 45,
+      "top": 807,
+      "right": 752,
+      "bottom": 852,
+      "left": 248
+    },
+    "columns": []
+  },
+  {
+    "scene": "list",
+    "width": 390,
+    "overflow": 0,
+    "layout": "cards",
+    "region": {
+      "x": 8,
+      "y": 328,
+      "width": 374,
+      "height": 387,
+      "top": 328,
+      "right": 382,
+      "bottom": 715,
+      "left": 8
+    },
+    "pagination": {
+      "x": 8,
+      "y": 715,
+      "width": 374,
+      "height": 89,
+      "top": 715,
+      "right": 382,
+      "bottom": 804,
+      "left": 8
+    },
+    "columns": []
+  },
+  {
+    "scene": "editor",
+    "width": 1440,
+    "overflow": 0,
+    "sheet": {
+      "x": 240,
+      "y": 16,
+      "width": 1184,
+      "height": 868,
+      "top": 16,
+      "right": 1424,
+      "bottom": 884,
+      "left": 240
+    },
+    "body": {
+      "x": 241,
+      "y": 233.25,
+      "width": 882,
+      "height": 557.75,
+      "top": 233.25,
+      "right": 1123,
+      "bottom": 791,
+      "left": 241
+    },
+    "save": {
+      "x": 1325,
+      "y": 837.5,
+      "width": 78,
+      "height": 32,
+      "top": 837.5,
+      "right": 1403,
+      "bottom": 869.5,
+      "left": 1325
+    }
+  },
+  {
+    "scene": "assistant",
+    "width": 1440,
+    "overflow": 0,
+    "dialog": {
+      "x": 200,
+      "y": 130,
+      "width": 1040,
+      "height": 640,
+      "top": 130,
+      "right": 1240,
+      "bottom": 770,
+      "left": 200
+    },
+    "preview": {
+      "x": 400,
+      "y": 405.140625,
+      "width": 840,
+      "height": 304.859375,
+      "top": 405.140625,
+      "right": 1240,
+      "bottom": 710,
+      "left": 400
+    },
+    "footer": {
+      "x": 200,
+      "y": 710,
+      "width": 1040,
+      "height": 60,
+      "top": 710,
+      "right": 1240,
+      "bottom": 770,
+      "left": 200
+    },
+    "activeColor": "oklch(0.955459 0.0182499 351.35)"
+  },
+  {
+    "scene": "editor",
+    "width": 1280,
+    "overflow": 0,
+    "sheet": {
+      "x": 80,
+      "y": 16,
+      "width": 1184,
+      "height": 868,
+      "top": 16,
+      "right": 1264,
+      "bottom": 884,
+      "left": 80
+    },
+    "body": {
+      "x": 81,
+      "y": 233.25,
+      "width": 882,
+      "height": 557.75,
+      "top": 233.25,
+      "right": 963,
+      "bottom": 791,
+      "left": 81
+    },
+    "save": {
+      "x": 1165,
+      "y": 837.5,
+      "width": 78,
+      "height": 32,
+      "top": 837.5,
+      "right": 1243,
+      "bottom": 869.5,
+      "left": 1165
+    }
+  },
+  {
+    "scene": "assistant",
+    "width": 1280,
+    "overflow": 0,
+    "dialog": {
+      "x": 120,
+      "y": 130,
+      "width": 1040,
+      "height": 640,
+      "top": 130,
+      "right": 1160,
+      "bottom": 770,
+      "left": 120
+    },
+    "preview": {
+      "x": 320,
+      "y": 405.140625,
+      "width": 840,
+      "height": 304.859375,
+      "top": 405.140625,
+      "right": 1160,
+      "bottom": 710,
+      "left": 320
+    },
+    "footer": {
+      "x": 120,
+      "y": 710,
+      "width": 1040,
+      "height": 60,
+      "top": 710,
+      "right": 1160,
+      "bottom": 770,
+      "left": 120
+    },
+    "activeColor": "oklch(0.955459 0.0182499 351.35)"
+  },
+  {
+    "scene": "editor",
+    "width": 1024,
+    "overflow": 0,
+    "sheet": {
+      "x": 16,
+      "y": 16,
+      "width": 992,
+      "height": 868,
+      "top": 16,
+      "right": 1008,
+      "bottom": 884,
+      "left": 16
+    },
+    "body": {
+      "x": 17,
+      "y": 282.25,
+      "width": 990,
+      "height": 508.75,
+      "top": 282.25,
+      "right": 1007,
+      "bottom": 791,
+      "left": 17
+    },
+    "save": {
+      "x": 909,
+      "y": 837.5,
+      "width": 78,
+      "height": 32,
+      "top": 837.5,
+      "right": 987,
+      "bottom": 869.5,
+      "left": 909
+    }
+  },
+  {
+    "scene": "assistant",
+    "width": 1024,
+    "overflow": 0,
+    "dialog": {
+      "x": 16,
+      "y": 130,
+      "width": 992,
+      "height": 640,
+      "top": 130,
+      "right": 1008,
+      "bottom": 770,
+      "left": 16
+    },
+    "preview": {
+      "x": 216,
+      "y": 405.140625,
+      "width": 792,
+      "height": 304.859375,
+      "top": 405.140625,
+      "right": 1008,
+      "bottom": 710,
+      "left": 216
+    },
+    "footer": {
+      "x": 16,
+      "y": 710,
+      "width": 992,
+      "height": 60,
+      "top": 710,
+      "right": 1008,
+      "bottom": 770,
+      "left": 16
+    },
+    "activeColor": "oklch(0.955459 0.0182499 351.35)"
+  },
+  {
+    "scene": "editor",
+    "width": 768,
+    "overflow": 0,
+    "sheet": {
+      "x": 16,
+      "y": 16,
+      "width": 736,
+      "height": 868,
+      "top": 16,
+      "right": 752,
+      "bottom": 884,
+      "left": 16
+    },
+    "body": {
+      "x": 17,
+      "y": 282.25,
+      "width": 734,
+      "height": 508.75,
+      "top": 282.25,
+      "right": 751,
+      "bottom": 791,
+      "left": 17
+    },
+    "save": {
+      "x": 653,
+      "y": 837.5,
+      "width": 78,
+      "height": 32,
+      "top": 837.5,
+      "right": 731,
+      "bottom": 869.5,
+      "left": 653
+    }
+  },
+  {
+    "scene": "assistant",
+    "width": 768,
+    "overflow": 0,
+    "dialog": {
+      "x": 16,
+      "y": 130,
+      "width": 736,
+      "height": 640,
+      "top": 130,
+      "right": 752,
+      "bottom": 770,
+      "left": 16
+    },
+    "preview": {
+      "x": 216,
+      "y": 405.140625,
+      "width": 536,
+      "height": 304.859375,
+      "top": 405.140625,
+      "right": 752,
+      "bottom": 710,
+      "left": 216
+    },
+    "footer": {
+      "x": 16,
+      "y": 710,
+      "width": 736,
+      "height": 60,
+      "top": 710,
+      "right": 752,
+      "bottom": 770,
+      "left": 16
+    },
+    "activeColor": "oklch(0.955459 0.0182499 351.35)"
+  },
+  {
+    "scene": "editor",
+    "width": 390,
+    "overflow": 0,
+    "sheet": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844,
+      "top": 0,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    },
+    "body": {
+      "x": 1,
+      "y": 290.25,
+      "width": 388,
+      "height": 459.75,
+      "top": 290.25,
+      "right": 389,
+      "bottom": 750,
+      "left": 1
+    },
+    "save": {
+      "x": 299,
+      "y": 793,
+      "width": 78,
+      "height": 40,
+      "top": 793,
+      "right": 377,
+      "bottom": 833,
+      "left": 299
+    }
+  },
+  {
+    "scene": "assistant",
+    "width": 390,
+    "overflow": 0,
+    "dialog": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844,
+      "top": 0,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    },
+    "preview": {
+      "x": 0,
+      "y": 423.140625,
+      "width": 390,
+      "height": 359.859375,
+      "top": 423.140625,
+      "right": 390,
+      "bottom": 783,
+      "left": 0
+    },
+    "footer": {
+      "x": 0,
+      "y": 783,
+      "width": 390,
+      "height": 61,
+      "top": 783,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    },
+    "activeColor": "oklch(0.955459 0.0182499 351.35)"
+  }
+]

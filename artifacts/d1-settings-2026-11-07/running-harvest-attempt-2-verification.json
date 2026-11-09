@@ -1,0 +1,36 @@
+{
+  "observedAt": "2026-11-07T00:48:54.265Z",
+  "case": "S8-04",
+  "attempt": 2,
+  "accepted": false,
+  "manualSourceVerificationAllowed": true,
+  "controllerWaitSeconds": 900,
+  "explicitNativeTestPassed": false,
+  "errorCode": "PROBE_HARVEST_TIMEOUT",
+  "firstTask": {
+    "status": "waitingUser",
+    "stage": "collecting",
+    "attempts": 1,
+    "processingOnly": 1,
+    "oldSummarySnapshot": 1,
+    "metadataSnapshotPresent": 1,
+    "formatted": 0,
+    "prepared": 0,
+    "submissionIntentRecorded": 0,
+    "cmsArticleIdPresent": 0
+  },
+  "secondTaskEnqueued": false,
+  "originalSharedConfigurationRestored": true,
+  "cloudRevision": 13,
+  "testProcessRetainedForManualVerification": true,
+  "dedicatedCredentialsRetainedForPendingTask": true,
+  "aiRequestsObservedBeforeFormatting": 0,
+  "cmsArticleWrites": 0,
+  "production": {
+    "revision": 13,
+    "operations": 13,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "autoSummary": 1
+  }
+}

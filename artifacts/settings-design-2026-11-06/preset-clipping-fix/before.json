@@ -1,0 +1,98 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "panel": {
+      "top": 280.375,
+      "bottom": 369.375,
+      "height": 89
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375,
+      "height": 32
+    },
+    "clipped": false,
+    "workspace": 632
+  },
+  {
+    "width": 1440,
+    "height": 600,
+    "panel": {
+      "top": 280.375,
+      "bottom": 282.375,
+      "height": 2
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375,
+      "height": 32
+    },
+    "clipped": true,
+    "workspace": 332
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "panel": {
+      "top": 280.375,
+      "bottom": 282.375,
+      "height": 2
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375,
+      "height": 32
+    },
+    "clipped": true,
+    "workspace": 452
+  },
+  {
+    "width": 1024,
+    "height": 600,
+    "panel": {
+      "top": 280.375,
+      "bottom": 282.375,
+      "height": 2
+    },
+    "control": {
+      "top": 320.375,
+      "bottom": 352.375,
+      "height": 32
+    },
+    "clipped": true,
+    "workspace": 332
+  },
+  {
+    "width": 768,
+    "height": 600,
+    "panel": {
+      "top": 320.375,
+      "bottom": 322.375,
+      "height": 2
+    },
+    "control": {
+      "top": 360.375,
+      "bottom": 392.375,
+      "height": 32
+    },
+    "clipped": true,
+    "workspace": 292
+  },
+  {
+    "width": 390,
+    "height": 600,
+    "panel": {
+      "top": 300.375,
+      "bottom": 302.375,
+      "height": 2
+    },
+    "control": {
+      "top": 336.375,
+      "bottom": 368.375,
+      "height": 32
+    },
+    "clipped": true,
+    "workspace": 320
+  }
+]

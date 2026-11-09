@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-07",
+  "environment": "isolated Windows databases and dedicated demo credentials in native OS store",
+  "initialization": {
+    "aiRequests": 0,
+    "check": "windows-native-initialization-faults",
+    "cloudRequests": 0,
+    "cmsWrites": 0,
+    "dedicatedCredentialsCleaned": true,
+    "frozenInitializationRecoveredAfterForcedProcessExit": true,
+    "missingSourceKeyRejected": true,
+    "passed": true
+  },
+  "crossProcess": {
+    "archivedRecoveryAcrossProcesses": true,
+    "check": "windows-native-cross-process",
+    "dedicatedCredentialsCleaned": true,
+    "largeRequestEncryptedInSqlite": true,
+    "passed": true,
+    "pendingOperations": 2,
+    "stableSecretVersions": true
+  },
+  "scope": "Initialization child was terminated after local request freeze, before any cloud upload; this does not verify termination after a remote commit."
+}

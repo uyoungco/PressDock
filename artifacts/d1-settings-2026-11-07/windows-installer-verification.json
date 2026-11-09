@@ -1,0 +1,121 @@
+{
+  "date": "2026-11-07",
+  "passed": true,
+  "scope": "Real Windows NSIS legacy install, current overwrite upgrade, legacy overwrite rollback after restoring the pre-upgrade database; isolated product name, binary, identifier and installation directory",
+  "legacySourceRevision": "f1633d7",
+  "stages": {
+    "legacy": {
+      "installation": {
+        "phase": "legacy",
+        "installerExitCode": 0,
+        "registryVersion": "0.1.0",
+        "nsisPayloadBytesVerified": true,
+        "installedBinarySha256": "25E997A27F2562549D590151384B51111CFD42752F79BC42F9D55EA85DBDAD9D",
+        "isolatedInstallDirectory": true,
+        "productionInstallerInvoked": false
+      },
+      "inventory": {
+        "phase": "legacy",
+        "passed": true,
+        "migration": 9,
+        "originals": 321,
+        "drafts": 4,
+        "jobs": 318,
+        "originalAndDraftContentsUnchanged": true,
+        "jobStatesUnchanged": true,
+        "applicationIdentifier": "com.example.pressdock.installercheck",
+        "productName": "PressDockInstallerCheck",
+        "installerVersion": "0.1.0",
+        "productionInstallationReplaced": false
+      },
+      "processReachedWebView": true
+    },
+    "upgrade": {
+      "installation": {
+        "phase": "upgrade",
+        "installerExitCode": 0,
+        "registryVersion": "0.1.1",
+        "nsisPayloadBytesVerified": true,
+        "installedBinarySha256": "606B99F45C68BA66E234D5168CCF604C0FD3DE3773DD43E2A10F28F3BA25B33B",
+        "isolatedInstallDirectory": true,
+        "productionInstallerInvoked": false
+      },
+      "inventory": {
+        "phase": "upgrade",
+        "passed": true,
+        "migration": 12,
+        "originals": 321,
+        "drafts": 4,
+        "jobs": 318,
+        "originalAndDraftContentsUnchanged": true,
+        "jobStatesUnchanged": true,
+        "applicationIdentifier": "com.example.pressdock.installercheck",
+        "productName": "PressDockInstallerCheck",
+        "installerVersion": "0.1.1",
+        "productionInstallationReplaced": false,
+        "cloudReadAfterUpgrade": {
+          "ready": true,
+          "revision": 9,
+          "pending": 0
+        }
+      },
+      "processReachedWebView": true
+    },
+    "rollback": {
+      "installation": {
+        "phase": "rollback",
+        "installerExitCode": 0,
+        "registryVersion": "0.1.0",
+        "nsisPayloadBytesVerified": true,
+        "installedBinarySha256": "25E997A27F2562549D590151384B51111CFD42752F79BC42F9D55EA85DBDAD9D",
+        "isolatedInstallDirectory": true,
+        "productionInstallerInvoked": false
+      },
+      "inventory": {
+        "phase": "rollback",
+        "passed": true,
+        "migration": 9,
+        "originals": 321,
+        "drafts": 4,
+        "jobs": 318,
+        "originalAndDraftContentsUnchanged": true,
+        "jobStatesUnchanged": true,
+        "applicationIdentifier": "com.example.pressdock.installercheck",
+        "productName": "PressDockInstallerCheck",
+        "installerVersion": "0.1.0",
+        "productionInstallationReplaced": false
+      },
+      "processReachedWebView": true
+    }
+  },
+  "legacyNativeCredentialReferencesReadable": 1,
+  "dedicatedDownloadedCredentialsCleaned": true,
+  "production": {
+    "revision": 9,
+    "operations": 9,
+    "realActors": 1,
+    "encryptedSecrets": 1,
+    "models": 1
+  },
+  "productionExecutableRestoredBySha256": true,
+  "productionInstallationReplaced": false,
+  "testProductRemovedAfterVerification": false,
+  "cleanup": {
+    "isolatedApplicationDataArchived": true,
+    "ownedProcessStopped": true,
+    "testInstallationRetained": true,
+    "testRegistryEntriesRetained": true,
+    "testReleaseArtifactsRetained": true,
+    "productionApplicationDataRemoved": false,
+    "productionInstallationRemoved": false,
+    "cleanupDeferredReason": "Automatic approval rejected the combined uninstall and artifact deletion command: blocked by policy"
+  },
+  "originalDataAndCredentialsDeleted": false,
+  "uiInteractionVerified": false,
+  "androidRollbackVerified": false,
+  "aiRequests": 0,
+  "cmsWrites": 0,
+  "legacyInstallerSha256": "F339A65ACE2C54F90B2465340CD8403C376F457535B94BA973F932E8A6C6BBE4",
+  "currentInstallerSha256": "5375467D0A95E788A9DFDBE04FB1028D12072B0A8A5D2242C0885C35260B0B62",
+  "installedPayloadByteComparison": "Only Tauri's unique __TAURI_BUNDLE_TYPE_VAR_UNK marker is normalized to NSS; all other bytes must match the compiled source"
+}

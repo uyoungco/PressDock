@@ -1,0 +1,29 @@
+[
+  {
+    "scene": "android-info",
+    "platform": "android",
+    "newDesktopSheet": false,
+    "saveHeight": 42,
+    "saveBottom": 828,
+    "overflow": 0,
+    "saveOuterHeight": 44
+  },
+  {
+    "scene": "android-tab",
+    "sameNode": true
+  },
+  {
+    "scene": "android-assistant",
+    "originalBranch": true,
+    "newDesktopDialog": false,
+    "footer": 844
+  },
+  {
+    "scene": "android-source",
+    "originalBranch": true,
+    "newDesktopDialog": false,
+    "focusedRole": "dialog",
+    "footer": 844,
+    "blocked": []
+  }
+]

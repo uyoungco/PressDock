@@ -1,0 +1,1314 @@
+[
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 794,
+      "bottom": 852,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 530,
+        "scrollHeight": 556
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 791,
+      "bottom": 836,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 425,
+        "scrollHeight": 425
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 171,
+        "scrollHeight": 171
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 791,
+      "bottom": 836,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 425,
+        "scrollHeight": 425
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 171,
+        "scrollHeight": 171
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 1440,
+    "h": 900,
+    "window": [1440, 900],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 614,
+      "bottom": 672,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 350,
+        "scrollHeight": 556
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 611,
+      "bottom": 656,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 245,
+        "scrollHeight": 390
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 611,
+      "bottom": 656,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 245,
+        "scrollHeight": 390
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 1280,
+    "h": 720,
+    "window": [1280, 720],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 494,
+      "bottom": 552,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 230,
+        "scrollHeight": 556
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 491,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 149,
+        "scrollHeight": 662
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 491,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 149,
+        "scrollHeight": 662
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 1024,
+    "h": 600,
+    "window": [1024, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 486,
+      "bottom": 552,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 170,
+        "scrollHeight": 989
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 483,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 60,
+        "scrollHeight": 670
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 483,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 60,
+        "scrollHeight": 670
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 768,
+    "h": 600,
+    "window": [768, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 738,
+      "bottom": 804,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 430,
+        "scrollHeight": 1041
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 703,
+      "bottom": 788,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 264,
+        "scrollHeight": 718
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 703,
+      "bottom": 788,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 245,
+        "scrollHeight": 670
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 390,
+    "h": 844,
+    "window": [390, 844],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 494,
+      "bottom": 552,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 230,
+        "scrollHeight": 556
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 491,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 149,
+        "scrollHeight": 392
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 491,
+      "bottom": 536,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 149,
+        "scrollHeight": 390
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 1440,
+    "h": 600,
+    "window": [1440, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 374,
+      "bottom": 432,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 110,
+        "scrollHeight": 556
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 371,
+      "bottom": 416,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 29,
+        "scrollHeight": 662
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 371,
+      "bottom": 416,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 104,
+        "scrollHeight": 104
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 29,
+        "scrollHeight": 662
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 1024,
+    "h": 480,
+    "window": [1024, 480],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  },
+  {
+    "name": "常规设置",
+    "id": "general",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "常规设置"
+  },
+  {
+    "name": "采集与 AI 处理",
+    "id": "harvest",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "采集与 AI 处理"
+  },
+  {
+    "name": "图片预设",
+    "id": "presets",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 494,
+      "bottom": 560,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "px-(--card-spacing) settings-preset-body",
+        "clientHeight": 186,
+        "scrollHeight": 1041
+      }
+    ],
+    "selected": "图片预设"
+  },
+  {
+    "name": "服务连接",
+    "id": "services",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "服务连接"
+  },
+  {
+    "name": "AI 模型",
+    "id": "models",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "AI 模型"
+  },
+  {
+    "name": "提示词模板",
+    "id": "template-title",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 459,
+      "bottom": 544,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 44,
+        "scrollHeight": 718
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "文章分页模板",
+    "id": "template-page",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": {
+      "top": 459,
+      "bottom": 544,
+      "visible": true
+    },
+    "scrollers": [
+      {
+        "className": "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl h-fit min-w-0 shadow-none",
+        "clientHeight": 53,
+        "scrollHeight": 53
+      },
+      {
+        "className": "settings-template-fields",
+        "clientHeight": 44,
+        "scrollHeight": 670
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-28",
+        "clientHeight": 110,
+        "scrollHeight": 110
+      },
+      {
+        "className": "flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-44",
+        "clientHeight": 138,
+        "scrollHeight": 138
+      }
+    ],
+    "selected": "提示词模板"
+  },
+  {
+    "name": "关于应用",
+    "id": "about",
+    "w": 390,
+    "h": 600,
+    "window": [390, 600],
+    "bodyOverflow": 0,
+    "rootOverflow": 0,
+    "clipped": [],
+    "footer": null,
+    "scrollers": [],
+    "selected": "关于应用"
+  }
+]

@@ -1,0 +1,683 @@
+{
+  "numTotalTestSuites": 8,
+  "numPassedTestSuites": 8,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 56,
+  "numPassedTests": 56,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1793929238142,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 未登录保护整个工作区并保留完整目标查询",
+          "status": "passed",
+          "title": "未登录保护整个工作区并保留完整目标查询",
+          "duration": 418.15210000000025,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 恢复完成前不渲染工作区，网络异常可重试且不退出",
+          "status": "passed",
+          "title": "恢复完成前不渲染工作区，网络异常可重试且不退出",
+          "duration": 434.45870000000014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 账号密码必填，密码显隐，Enter 提交不裁剪密码",
+          "status": "passed",
+          "title": "账号密码必填，密码显隐，Enter 提交不裁剪密码",
+          "duration": 1260.6603000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 错误密码展示服务提示，提交期间阻止重复",
+          "status": "passed",
+          "title": "错误密码展示服务提示，提交期间阻止重复",
+          "duration": 419.22289999999975,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 浏览器仅预览登录，不能进入工作区",
+          "status": "passed",
+          "title": "浏览器仅预览登录，不能进入工作区",
+          "duration": 32.99129999999968,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 取消退出无请求，远程退出失败仍离开工作区",
+          "status": "passed",
+          "title": "取消退出无请求，远程退出失败仍离开工作区",
+          "duration": 701.2806,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 退出后的旧恢复结果不重新登录，编辑缓冲按用户清理",
+          "status": "passed",
+          "title": "退出后的旧恢复结果不重新登录，编辑缓冲按用户清理",
+          "duration": 0.9169000000001688,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 回跳只允许完整站内业务路由",
+          "status": "passed",
+          "title": "回跳只允许完整站内业务路由",
+          "duration": 0.7923000000000684,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 素材排序在失效后取消，同账号登录重新查询服务端顺序",
+          "status": "passed",
+          "title": "素材排序在失效后取消，同账号登录重新查询服务端顺序",
+          "duration": 1223.8827,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 素材表单在失效后同账号恢复，显式退出清理",
+          "status": "passed",
+          "title": "素材表单在失效后同账号恢复，显式退出清理",
+          "duration": 1304.2808000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["登录和工作区认证"],
+          "fullName": "登录和工作区认证 筛选记忆跨失效后同账号登录保留，更换账号或显式退出清空",
+          "status": "passed",
+          "title": "筛选记忆跨失效后同账号登录保留，更换账号或显式退出清空",
+          "duration": 2.149699999999939,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793929241408,
+      "endTime": 1793929247207.1497,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/auth.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 旧列偏好的显式显隐与列宽优先，恢复默认采用紧凑列",
+          "status": "passed",
+          "title": "旧列偏好的显式显隐与列宽优先，恢复默认采用紧凑列",
+          "duration": 657.8415000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 列配置仅改变展示，排序期间锁定配置和列宽",
+          "status": "passed",
+          "title": "列配置仅改变展示，排序期间锁定配置和列宽",
+          "duration": 873.2329,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 默认聚合新闻内容，额外字段按需显示，链接仍通过服务打开",
+          "status": "passed",
+          "title": "默认聚合新闻内容，额外字段按需显示，链接仍通过服务打开",
+          "duration": 489.97680000000037,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：subchannel=轮播图&publishdate=2026-10-21",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：subchannel=轮播图&publishdate=2026-10-21",
+          "duration": 116.22009999999955,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：channel=KOOK&publishdate=2026-10-21",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：channel=KOOK&publishdate=2026-10-21",
+          "duration": 133.63850000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 缺少任一条件时不能排序：channel=KOOK&subchannel=轮播图",
+          "status": "passed",
+          "title": "缺少任一条件时不能排序：channel=KOOK&subchannel=轮播图",
+          "duration": 121.83059999999932,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 未提交条件禁止排序，当前页不足两条禁止排序",
+          "status": "passed",
+          "title": "未提交条件禁止排序，当前页不足两条禁止排序",
+          "duration": 534.3733000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 原生拖放只提交当前页，排序失败保留并可重试，期间锁定操作",
+          "status": "passed",
+          "title": "原生拖放只提交当前页，排序失败保留并可重试，期间锁定操作",
+          "duration": 727.6828999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 键盘移动后取消恢复原顺序，离开可取消或放弃排序",
+          "status": "passed",
+          "title": "键盘移动后取消恢复原顺序，离开可取消或放弃排序",
+          "duration": 663.2772000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 WebView 未启动 HTML5 拖放时，按指针落点移动，轻点不排序",
+          "status": "passed",
+          "title": "WebView 未启动 HTML5 拖放时，按指针落点移动，轻点不排序",
+          "duration": 232.75910000000022,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 新增独立初始化、必填校验、保存防重复及失败保留",
+          "status": "passed",
+          "title": "新增独立初始化、必填校验、保存防重复及失败保留",
+          "duration": 2306.6085999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 修改先获取详情，只覆盖表单字段，成功后刷新同一页",
+          "status": "passed",
+          "title": "修改先获取详情，只覆盖表单字段，成功后刷新同一页",
+          "duration": 720.2861999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 上传成功只回填对应地址，保存成功但刷新失败分别提示",
+          "status": "passed",
+          "title": "上传成功只回填对应地址，保存成功但刷新失败分别提示",
+          "duration": 1936.7388999999985,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 删除取消无请求，删除末页后回退并更新记忆",
+          "status": "passed",
+          "title": "删除取消无请求，删除末页后回退并更新记忆",
+          "duration": 700.2909,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 上传失败可重试，等待期间不能保存，取消后旧上传不回填",
+          "status": "passed",
+          "title": "上传失败可重试，等待期间不能保存，取消后旧上传不回填",
+          "duration": 2189.6017999999985,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材写操作"],
+          "fullName": "渠道素材写操作 同账号恢复表单缓冲，离开确认丢弃",
+          "status": "passed",
+          "title": "同账号恢复表单缓冲，离开确认丢弃",
+          "duration": 467.3616999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793929241889,
+      "endTime": 1793929254761.3618,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channel-writes.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 分页和提交新筛选后重置实际列表视口的纵向位置",
+          "status": "passed",
+          "title": "分页和提交新筛选后重置实际列表视口的纵向位置",
+          "duration": 1125.3609999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值",
+          "status": "passed",
+          "title": "两级下拉支持本地搜索，过滤不请求接口且保留历史筛选值",
+          "duration": 839.2061999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 初始并行取数，选择条件不查询，搜索才提交并回到第一页",
+          "status": "passed",
+          "title": "初始并行取数，选择条件不查询，搜索才提交并回到第一页",
+          "duration": 988.1207999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 重置清空日期和两级渠道，并保留每页条数",
+          "status": "passed",
+          "title": "重置清空日期和两级渠道，并保留每页条数",
+          "duration": 246.15099999999984,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 每页条数变化回到第一页，保留已提交条件",
+          "status": "passed",
+          "title": "每页条数变化回到第一页，保留已提交条件",
+          "duration": 344.48269999999957,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 单独日期查询隐藏失真总数，短页阻止继续翻页",
+          "status": "passed",
+          "title": "单独日期查询隐藏失真总数，短页阻止继续翻页",
+          "duration": 131.3798999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 下一页为空保留上一页，不按错误总数继续请求",
+          "status": "passed",
+          "title": "下一页为空保留上一页，不按错误总数继续请求",
+          "duration": 570.1982000000007,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 最新请求优先，旧响应无法覆盖新结果",
+          "status": "passed",
+          "title": "最新请求优先，旧响应无法覆盖新结果",
+          "duration": 425.69930000000113,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 渠道配置和列表可独立失败、重试",
+          "status": "passed",
+          "title": "渠道配置和列表可独立失败、重试",
+          "duration": 295.0578000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 详情显示摘要、空值和图片占位，正文按纯文本渲染",
+          "status": "passed",
+          "title": "详情显示摘要、空值和图片占位，正文按纯文本渲染",
+          "duration": 240.45499999999993,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 非法链接筛选恢复默认值",
+          "status": "passed",
+          "title": "非法链接筛选恢复默认值",
+          "duration": 0.7978999999995722,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 双图以紧凑元信息显示，点击图片打开共用详情",
+          "status": "passed",
+          "title": "双图以紧凑元信息显示，点击图片打开共用详情",
+          "duration": 240.4313000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 离开返回恢复已提交条件和页码，丢弃未搜索修改且不先请求默认页",
+          "status": "passed",
+          "title": "离开返回恢复已提交条件和页码，丢弃未搜索修改且不先请求默认页",
+          "duration": 424.2636999999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 显式 URL 优先，前进后退更新记忆，重置也可在返回时恢复",
+          "status": "passed",
+          "title": "显式 URL 优先，前进后退更新记忆，重置也可在返回时恢复",
+          "duration": 450.6728999999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材筛选、分页和详情"],
+          "fullName": "渠道素材筛选、分页和详情 首次默认查询也写入地址，后退可以恢复默认条件",
+          "status": "passed",
+          "title": "首次默认查询也写入地址，后退可以恢复默认条件",
+          "duration": 527.8367999999991,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793929241884,
+      "endTime": 1793929248734.837,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/channels.test.tsx"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 原生拖动影像使用整行及按下偏移，接管后不重复触发指针移动",
+          "status": "passed",
+          "title": "原生拖动影像使用整行及按下偏移，接管后不重复触发指针移动",
+          "duration": 90.5654999999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 轻点不移动，超过阈值整行跟随，松手命中时移动且恢复样式和捕获",
+          "status": "passed",
+          "title": "轻点不移动，超过阈值整行跟随，松手命中时移动且恢复样式和捕获",
+          "duration": 30.147699999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 pointercancel 清理整行预览且不调整顺序",
+          "status": "passed",
+          "title": "pointercancel 清理整行预览且不调整顺序",
+          "duration": 22.13670000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 lostpointercapture 清理整行预览且不调整顺序",
+          "status": "passed",
+          "title": "lostpointercapture 清理整行预览且不调整顺序",
+          "duration": 30.24449999999979,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 其他指针不能移动或结束当前手势",
+          "status": "passed",
+          "title": "其他指针不能移动或结束当前手势",
+          "duration": 21.506399999999758,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 outside 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 outside 时恢复原行且不排序",
+          "duration": 17.858999999999924,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 foreign 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 foreign 时恢复原行且不排序",
+          "duration": 20.129799999999705,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 落在无效位置 self 时恢复原行且不排序",
+          "status": "passed",
+          "title": "落在无效位置 self 时恢复原行且不排序",
+          "duration": 19.758100000000013,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 busy 变化时清理拖动状态",
+          "status": "passed",
+          "title": "busy 变化时清理拖动状态",
+          "duration": 33.80699999999979,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 sorting 变化时清理拖动状态",
+          "status": "passed",
+          "title": "sorting 变化时清理拖动状态",
+          "duration": 36.860699999999724,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 records 变化时清理拖动状态",
+          "status": "passed",
+          "title": "records 变化时清理拖动状态",
+          "duration": 30.22550000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 unmount 变化时清理拖动状态",
+          "status": "passed",
+          "title": "unmount 变化时清理拖动状态",
+          "duration": 21.184700000000248,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 取消原生拖动后不接受迟到的放下事件",
+          "status": "passed",
+          "title": "取消原生拖动后不接受迟到的放下事件",
+          "duration": 20.38269999999966,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": ["渠道素材整行拖动"],
+          "fullName": "渠道素材整行拖动 进入保存状态后禁用手柄并拒绝尚未完成的原生放下事件",
+          "status": "passed",
+          "title": "进入保存状态后禁用手柄并拒绝尚未完成的原生放下事件",
+          "duration": 30.711099999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1793929241401,
+      "endTime": 1793929241826.7112,
+      "status": "passed",
+      "message": "",
+      "name": "src/test/material-drag.test.tsx"
+    }
+  ]
+}

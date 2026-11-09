@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-07",
+  "scope": "Windows legacy source rebuild with an isolated application identifier and a copy of the real pre-upgrade database backup; no production installation replacement",
+  "legacy": {
+    "check": "windows-isolated-legacy-backup-restore",
+    "passed": true,
+    "sourceRevision": "f1633d7",
+    "separateApplicationIdentifier": "com.example.pressdock.rollbackcheck",
+    "migrationVersion": 9,
+    "originals": 321,
+    "drafts": 4,
+    "jobs": 318,
+    "originalAndDraftContentsUnchanged": true,
+    "jobStatesUnchanged": true,
+    "productionInstallationReplaced": false,
+    "completeInstallerOrAndroidRollback": false
+  },
+  "reupgrade": {
+    "check": "windows-isolated-reupgrade-after-legacy-restore",
+    "passed": true,
+    "sourceRevision": "f1633d7",
+    "separateApplicationIdentifier": "com.example.pressdock.rollbackcheck",
+    "migrationVersion": 12,
+    "originals": 321,
+    "drafts": 4,
+    "jobs": 318,
+    "originalAndDraftContentsUnchanged": true,
+    "jobStatesUnchanged": true,
+    "productionInstallationReplaced": false,
+    "completeInstallerOrAndroidRollback": false,
+    "cloudReadAfterReupgrade": {
+      "ready": true,
+      "revision": 5,
+      "pending": 0
+    }
+  },
+  "legacyNativeCredentialReferences": 1,
+  "legacyNativeCredentialReferencesReadable": 1,
+  "dedicatedDownloadedCredentialsCleaned": true,
+  "legacyProcessReachedWebView": true,
+  "productionExecutableRestoredBySha256": true,
+  "productionCloud": {
+    "revision": 5,
+    "operations": 5,
+    "realActors": 1,
+    "encryptedSecrets": 1
+  },
+  "explicitAiRequests": 0,
+  "cmsWrites": 0,
+  "uiInteractionVerified": false,
+  "installerReplacementRollbackVerified": false,
+  "androidRollbackVerified": false,
+  "legacyExecutableSha256": "ECA5DB424357DFB1130AEA60853B51D6C0AEE6E2C0384325B2D38CC585D8007A",
+  "upgradedTestExecutableSha256": "8DE2D4257E2FD7CEDF54DBA5378F5D20014EF3AEA85B7C7CF54B95FDF7BA9CD2"
+}

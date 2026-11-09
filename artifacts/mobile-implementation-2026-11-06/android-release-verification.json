@@ -1,0 +1,22 @@
+{
+  "apk": "artifacts/PressDock-0.1.0-android-release-arm64.apk",
+  "sha256": "20c9c99b9165001d5f5d1195ad9ff2f1e87a766bb6749f028a52553dce847d97",
+  "installedHash": "20c9c99b9165001d5f5d1195ad9ff2f1e87a766bb6749f028a52553dce847d97",
+  "certificateSha256": "32b9c534237ed6e9a3c188bb0c8f4a86bb61d277f7bf2cbd0868e9627108265d",
+  "package": "com.example.pressdock",
+  "version": "0.1.0",
+  "versionCode": 1000,
+  "debuggable": false,
+  "demo": false,
+  "architecture": "arm64-v8a",
+  "alignment16KiB": "passed",
+  "device": "[redacted]",
+  "model": "ONEPLUS_A5000",
+  "installation": "adb install -r",
+  "dataPreserved": true,
+  "launch": "Activity resumed; launch intent delivered to existing top-most instance",
+  "processId": "32625",
+  "deviceDisplayState": "mWakefulness=Dozing",
+  "visualAcceptance": "Pending; device display is off",
+  "checkedAt": "2026-11-06T15:54:48.1578670Z"
+}

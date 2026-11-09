@@ -1,0 +1,362 @@
+{
+  "date": "2026-11-07",
+  "allEightStepsAcceptedWithinUserScope": true,
+  "caseCount": 48,
+  "scope": {
+    "requestedPlatforms": ["Windows"],
+    "userDecision": "没有 mac 不进行测试了，测试 Windows 就可以",
+    "macOSTesting": "out-of-scope-not-tested",
+    "additionalThreePlatformMatrix": "out-of-scope-not-tested",
+    "previousAndroidEvidenceRetained": true,
+    "s8_02": "two-independent-Windows-native-processes-and-third-process-cold-read",
+    "accountDecision": "本轮只测现有账号，跨账号不纳入验收",
+    "realAccountsRequired": 1,
+    "crossAccountTesting": "out-of-scope-not-tested",
+    "naturalExpiryDecision": "本轮采用已有鉴权证据，自然过期留作后续补验",
+    "naturalExpiryTesting": "deferred-not-tested"
+  },
+  "scopeExclusionsAndDeferralsAreNotPasses": true,
+  "cases": [
+    {
+      "id": "S1-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实会话经固定 CMS 接口验证",
+      "evidenceType": "deployed",
+      "evidence": "docs/cloudflare-d1-settings-step1-qa-2026-11-07.md"
+    },
+    {
+      "id": "S1-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实缺失/篡改凭据拒绝；失效响应故障注入",
+      "evidenceType": "deployed+automated",
+      "evidence": "docs/cloudflare-d1-settings-step1-qa-2026-11-07.md",
+      "limitation": "自然过期会话按用户决定后续补验，未计实测"
+    },
+    {
+      "id": "S1-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "CMS 超时/服务错误不授权",
+      "evidenceType": "automated",
+      "evidence": "workers/settings-sync/test"
+    },
+    {
+      "id": "S1-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "独立部署 Worker→D1 验证查询",
+      "evidenceType": "deployed",
+      "evidence": "docs/cloudflare-d1-settings-step1-qa-2026-11-07.md"
+    },
+    {
+      "id": "S1-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "鉴权输出脱敏，普通前端无凭据接口",
+      "evidenceType": "inspection+automated",
+      "evidence": "docs/cloudflare-d1-settings-step1-qa-2026-11-07.md"
+    },
+    {
+      "id": "S2-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "字段映射覆盖当前原生设置结构，共享与本机字段分离",
+      "evidenceType": "automated+inspection",
+      "evidence": "docs/settings-sync/field-map-v1.json"
+    },
+    {
+      "id": "S2-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "TypeScript/Rust 同组 80 个协议样例一致",
+      "evidenceType": "automated",
+      "evidence": "docs/settings-sync/fixtures-v1.json"
+    },
+    {
+      "id": "S2-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "明确未修改/置空/删除/清密钥及原字节幂等",
+      "evidenceType": "automated+protocol",
+      "evidence": "docs/settings-sync/protocol-v1.md"
+    },
+    {
+      "id": "S2-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "UTF-8 配置/传输/密钥及预设数边界，不截断",
+      "evidenceType": "automated",
+      "evidence": "docs/cloudflare-d1-settings-step2-qa-2026-11-07.md"
+    },
+    {
+      "id": "S3-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "现有真实账号可读写、未登录真实请求被拒绝",
+      "evidenceType": "deployed",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md",
+      "limitation": "第二真实账号按用户决定范围外，未计实测"
+    },
+    {
+      "id": "S3-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实开发 D1 重复初始化不覆盖，异内容拒绝",
+      "evidenceType": "deployed+automated",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S3-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "不同字段合并连续 20 轮真实开发 D1",
+      "evidenceType": "deployed",
+      "evidence": "artifacts/d1-settings-2026-11-07/verification.json"
+    },
+    {
+      "id": "S3-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "同字段按服务端有效提交顺序连续 20 轮",
+      "evidenceType": "deployed",
+      "evidence": "artifacts/d1-settings-2026-11-07/verification.json"
+    },
+    {
+      "id": "S3-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "旧操作延迟重试不覆盖新操作，连续 20 轮",
+      "evidenceType": "deployed",
+      "evidence": "artifacts/d1-settings-2026-11-07/verification.json"
+    },
+    {
+      "id": "S3-06",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实 D1 非法依赖原子拒绝；非法参数共享样例",
+      "evidenceType": "deployed+automated",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S3-07",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实专用密钥保存/下载/替换/清除；密文存储、脱敏及篡改验证",
+      "evidenceType": "deployed+automated+inspection",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md",
+      "limitation": "密文存储及事务由真实 SQL 适配器测试验证，不声称完整正式 D1 导出审计"
+    },
+    {
+      "id": "S3-08",
+      "acceptedWithinCurrentScope": true,
+      "result": "D1 SQL 适配器查询/写入故障注入，事务回滚",
+      "evidenceType": "automated-real-sql",
+      "evidence": "workers/settings-sync/test",
+      "limitation": "未故意停用线上 D1"
+    },
+    {
+      "id": "S4-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "Windows 隔离实际安装升级、重复迁移和旧备份回退",
+      "evidenceType": "native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-installer-verification.json"
+    },
+    {
+      "id": "S4-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实 Windows keyring 与密文队列跨子进程恢复",
+      "evidenceType": "native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/native-recovery-verification.json"
+    },
+    {
+      "id": "S4-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "SQLite 失败时配置修改及入队同时回滚",
+      "evidenceType": "automated-real-sql",
+      "evidence": "src-tauri/src/settings_sync/local_tests.rs"
+    },
+    {
+      "id": "S4-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "凭据准备/数据库切换故障保留旧代际与缓存",
+      "evidenceType": "automated-real-sql",
+      "evidence": "src-tauri/src/settings_sync/local_tests.rs"
+    },
+    {
+      "id": "S4-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "两个密钥版本及约 60KB 冻结请求跨进程保持",
+      "evidenceType": "native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/native-recovery-verification.json"
+    },
+    {
+      "id": "S4-06",
+      "acceptedWithinCurrentScope": true,
+      "result": "SQLite/WAL 演示密钥检测；普通 IPC 仅 hasApiKey；禁止明文回退",
+      "evidenceType": "automated+inspection",
+      "evidence": "src-tauri/src/settings_sync/local_tests.rs"
+    },
+    {
+      "id": "S5-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "打包 Windows 完全退出重开后读取一次最新有效代际",
+      "evidenceType": "native-windows-ui",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-recovery-verification.json"
+    },
+    {
+      "id": "S5-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "事件计数集成/原生运行时测试；真实 Windows 切页及后台返回读取不增加",
+      "evidenceType": "native-windows-ui+automated",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-recovery-verification.json",
+      "limitation": "运行中换号/网络事件组合由计数测试验证，未逐项宣称实机操作"
+    },
+    {
+      "id": "S5-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "缓存回退及失败提示；永久拒绝覆盖失败不破坏缓存",
+      "evidenceType": "automated+native-windows-ui",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-recovery-verification.json"
+    },
+    {
+      "id": "S5-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "首次无缓存失败阻塞，显式重试成功且不导入旧默认",
+      "evidenceType": "automated",
+      "evidence": "src-tauri/src/settings_sync/runtime.rs"
+    },
+    {
+      "id": "S5-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "待传模型 overlay 保留远端图片新字段与本机偏好",
+      "evidenceType": "automated-real-sql",
+      "evidence": "src-tauri/src/settings_sync/local_tests.rs"
+    },
+    {
+      "id": "S5-06",
+      "acceptedWithinCurrentScope": true,
+      "result": "下载中退出登录丢弃旧 session 响应",
+      "evidenceType": "automated",
+      "evidence": "src-tauri/src/settings_sync/runtime.rs"
+    },
+    {
+      "id": "S6-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实开发 D1 全共享类型 CRUD、密钥与默认关联",
+      "evidenceType": "native-windows+deployed",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S6-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "表单基线仅提交本次编辑字段，不覆盖旧值",
+      "evidenceType": "automated+deployed",
+      "evidence": "src-tauri/src/settings_sync/runtime.rs"
+    },
+    {
+      "id": "S6-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "未提交模板零保存，采集规则 500ms 防抖最终值",
+      "evidenceType": "frontend-integration",
+      "evidence": "src/test/harvest-settings.test.tsx"
+    },
+    {
+      "id": "S6-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "本机偏好不入同步队列；前端主题列宽保留本机",
+      "evidenceType": "native-windows+automated+inspection",
+      "evidence": "docs/settings-sync/field-map-v1.json"
+    },
+    {
+      "id": "S6-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "429/503 退避、数据库重开补传及断网重启恢复",
+      "evidenceType": "automated+native-windows+historical-android",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S6-06",
+      "acceptedWithinCurrentScope": true,
+      "result": "旧回执不确认新修改，原字节重试不重复应用",
+      "evidenceType": "automated+deployed",
+      "evidence": "src-tauri/src/settings_sync/runtime.rs"
+    },
+    {
+      "id": "S6-07",
+      "acceptedWithinCurrentScope": true,
+      "result": "401 暂停与永久错误不循环；真实 Windows 取消/确认/冷重启",
+      "evidenceType": "automated+native-windows-ui",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-recovery-verification.json"
+    },
+    {
+      "id": "S6-08",
+      "acceptedWithinCurrentScope": true,
+      "result": "保存不整份拉取；第三原生进程冷启动读取最终修改",
+      "evidenceType": "native-windows+automated",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-concurrency-verification.json"
+    },
+    {
+      "id": "S7-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "指定电脑原配置及密钥完整初始化、字段比对",
+      "evidenceType": "deployed+native-windows",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S7-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "专用源密钥读取失败阻止半份初始化",
+      "evidenceType": "native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/native-recovery-verification.json"
+    },
+    {
+      "id": "S7-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "独立专项 D1 提交后强杀，原 UUID/字节重试只应用一次",
+      "evidenceType": "deployed+native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/initialization-post-commit-verification.json"
+    },
+    {
+      "id": "S7-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "客户端旧配置不自动导入或覆盖已有云端",
+      "evidenceType": "automated+native-windows",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S7-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "隔离新 Windows 下载密钥后明确触发一次真实 AI 成功",
+      "evidenceType": "native-windows+real-ai",
+      "evidence": "docs/cloudflare-d1-settings-step3-8-qa-2026-11-07.md"
+    },
+    {
+      "id": "S8-01",
+      "acceptedWithinCurrentScope": true,
+      "result": "Windows 原生共享设置、凭据及恢复 UI 冷启动/聚焦闭环",
+      "evidenceType": "native-windows-ui+native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-recovery-verification.json"
+    },
+    {
+      "id": "S8-02",
+      "acceptedWithinCurrentScope": true,
+      "result": "两个原生进程同时改不同字段、依次改同字段、第三进程冷读",
+      "evidenceType": "native-windows+deployed",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-concurrency-verification.json"
+    },
+    {
+      "id": "S8-03",
+      "acceptedWithinCurrentScope": true,
+      "result": "保留既有 Android WebView 与 Windows CDP 偏好隔离证据",
+      "evidenceType": "historical-native-android+windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/transport-settings-verification.json"
+    },
+    {
+      "id": "S8-04",
+      "acceptedWithinCurrentScope": true,
+      "result": "真实旧任务原快照、冷重启新任务新规则，仅处理无 CMS 提交",
+      "evidenceType": "native-windows+real-source",
+      "evidence": "artifacts/d1-settings-2026-11-07/running-harvest-continuation-verification.json"
+    },
+    {
+      "id": "S8-05",
+      "acceptedWithinCurrentScope": true,
+      "result": "Windows NSIS 升级/旧备份回退实测；旧 schema 自动化拒绝",
+      "evidenceType": "native-windows+automated",
+      "evidence": "artifacts/d1-settings-2026-11-07/windows-installer-verification.json"
+    },
+    {
+      "id": "S8-06",
+      "acceptedWithinCurrentScope": true,
+      "result": "README 检查、Worker 检查、打包与真实启动均完成",
+      "evidenceType": "automated+native-windows",
+      "evidence": "artifacts/d1-settings-2026-11-07/verification.json"
+    }
+  ]
+}

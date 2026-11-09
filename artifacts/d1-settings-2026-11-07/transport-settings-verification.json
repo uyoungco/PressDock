@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-07",
+  "testCase": "S8-03",
+  "scope": "Windows native isolated settings client on the real OS credential store and the installed Android release app; no CDP browser launch or collection task",
+  "native": {
+    "aiRequests": 0,
+    "androidObservationAcknowledged": true,
+    "check": "windows-cdp-android-webview-shared-rule",
+    "cloudRevision": 7,
+    "cmsWrites": 0,
+    "desktopColdReads": 1,
+    "desktopLocalPreferenceUploads": 0,
+    "desktopSourceModePreserved": true,
+    "desktopWriteRequests": 2,
+    "originalSharedRuleRestored": true,
+    "passed": true,
+    "pending": 0
+  },
+  "androidChanged": {
+    "sourceMode": "webview",
+    "autoSummary": false,
+    "coldReadSuccesses": 1,
+    "readRequests": 1,
+    "writeRequests": 0,
+    "pending": 0,
+    "source": "fresh Android uiautomator snapshot"
+  },
+  "androidRestored": {
+    "sourceMode": "webview",
+    "autoSummary": true,
+    "coldReadSuccesses": 1,
+    "readRequests": 1,
+    "writeRequests": 0,
+    "pending": 0,
+    "originalSharedRuleRestored": true
+  },
+  "dedicatedNativeCredentialsCleaned": true,
+  "production": {
+    "revision": 7,
+    "operations": 7,
+    "realActors": 1,
+    "encryptedSecrets": 1
+  },
+  "androidScreenshots": [
+    "android-shared-summary-off.png",
+    "android-shared-webview-restored.png",
+    "android-shared-summary-restored.png"
+  ]
+}

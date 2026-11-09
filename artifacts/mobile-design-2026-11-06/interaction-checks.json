@@ -1,0 +1,74 @@
+[
+  {
+    "name": "35 个尺寸与主题组合无页面或固定区域横向溢出",
+    "passed": true
+  },
+  {
+    "name": "主要控件触控高度不少于 44px",
+    "passed": true
+  },
+  {
+    "name": "底部操作未超出视口",
+    "passed": true
+  },
+  {
+    "name": "中文字体加载完成",
+    "passed": true
+  },
+  {
+    "name": "切换渠道清空子渠道",
+    "passed": true
+  },
+  {
+    "name": "取消筛选不改变已应用条件",
+    "passed": true
+  },
+  {
+    "name": "应用后才更新筛选摘要",
+    "passed": true
+  },
+  {
+    "name": "排序预览可移动行",
+    "passed": true
+  },
+  {
+    "name": "导航保留五个 Android 工作入口",
+    "passed": true
+  },
+  {
+    "name": "返回键可关闭顶部面板",
+    "passed": true
+  },
+  {
+    "name": "保留四种 CMS 文章类别",
+    "passed": true
+  },
+  {
+    "name": "类别切换可达",
+    "passed": true
+  },
+  {
+    "name": "正文切换页签保留输入",
+    "passed": true
+  },
+  {
+    "name": "分页面板完整展示应用入口",
+    "passed": true
+  },
+  {
+    "name": "设置保留七个分项",
+    "passed": true
+  },
+  {
+    "name": "设置开关可操作",
+    "passed": true
+  },
+  {
+    "name": "开关触控高度为 44px",
+    "passed": true
+  },
+  {
+    "name": "密钥输入不预填真实密钥",
+    "passed": true
+  }
+]

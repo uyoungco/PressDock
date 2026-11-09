@@ -1,0 +1,61 @@
+[
+  {
+    "command": "cms_update_article",
+    "args": {
+      "request": {
+        "id": 8101,
+        "title": "【演示】城市更新，让老街区焕发新活力（演示修改）",
+        "classId": 1,
+        "className": "社会",
+        "titlePic": "https://demo.invalid/city.svg",
+        "titlePic2": "",
+        "titlePic3": "",
+        "tags": ["城市更新", "公共空间"],
+        "smallText": "这是一篇用于界面调研的演示文章，不连接线上 CMS。",
+        "writer": "演示编辑",
+        "sourceUrl": "https://demo.invalid/news/8101",
+        "newsText": "<p>【隔离演示正文】以下内容仅用于文章编辑与分页设计调研。</p><h2>把日常生活放在更新之前</h2><p>清晨的老街，早餐铺陆续开门，街坊沿着新修的人行步道穿行。这条承载着几代人记忆的街巷，正在通过小规模、渐进式改造，让熟悉的生活与新的公共空间相互连接。</p><p>此次更新保留原有街道肌理，把居民经常反映的出行、休憩和照明问题放在前面。修补后的路面衔接了社区书屋与口袋公园，沿街增设的座椅为老人和带孩子的家庭提供了歇脚的地方。</p><p>[!--empirenews.page--]</p><h2>让街坊一起参与</h2><p>居民参与了方案讨论。从绿化品种到夜间照明，设计团队把意见逐项整理，再带着调整后的方案回到社区。改造完成后，临街店铺的招牌保留各自特色，整体尺度也更适合步行者观看。</p><p>午后，社区书屋里传来翻书声。新的空间没有追求统一的装饰，而是尽量利用现有房屋，增加通风和采光。靠窗的阅读桌与门前树荫相连，让原本匆忙经过的人愿意多停留一会儿。</p><p>[!--empirenews.page--]</p><h2>保留烟火气，延续街区记忆</h2><p>街区更新也为小店留下了经营空间。原有的修理铺、杂货店和理发店继续营业，施工期间通过分段围挡保持通行。居民熟悉的日常服务与新增的便民设施共同构成街道的生活底色。</p><p>傍晚，路灯依次亮起。社区工作人员说，后续维护将由街道、居民与沿街商户共同参与，定期检查无障碍通道和公共设施，让更新后的街区在日常使用中持续完善。</p>"
+      }
+    }
+  },
+  {
+    "command": "cms_add_article_to_promote",
+    "args": {
+      "request": {
+        "article": {
+          "snapshot": {
+            "Id": 8101,
+            "Title": "【演示】城市更新，让老街区焕发新活力"
+          },
+          "id": 8101,
+          "classId": 1,
+          "className": "社会",
+          "title": "【演示】城市更新，让老街区焕发新活力",
+          "titlePic": "https://demo.invalid/city.svg",
+          "titlePic2": null,
+          "titlePic3": null,
+          "writer": "演示编辑",
+          "smallText": "这是一篇用于界面调研的演示文章，不连接线上 CMS。",
+          "sourceUrl": "https://demo.invalid/news/8101",
+          "newsTime": "2026-11-06 09:42:00",
+          "pages": 3,
+          "tags": ["城市更新", "公共空间"],
+          "nTags": ["民生"],
+          "commentRecommand": "头条推荐",
+          "commentPromote": ["演示渠道 / 头条推荐", "演示渠道 / 轮播推荐"]
+        },
+        "input": {
+          "channel": "演示渠道",
+          "subChannel": "头条推荐",
+          "publishDate": "2026-11-06",
+          "url": "",
+          "title": "【演示】城市更新，让老街区焕发新活力",
+          "titlePic": "https://demo.invalid/city.svg",
+          "titlePic2": "",
+          "smallText": "这是一篇用于界面调研的演示文章，不连接线上 CMS。",
+          "writer": "演示编辑"
+        }
+      }
+    }
+  }
+]

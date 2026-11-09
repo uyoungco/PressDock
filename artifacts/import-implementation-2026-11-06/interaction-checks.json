@@ -1,0 +1,56 @@
+{
+  "blockedWrites": [
+    {
+      "command": "harvest_job_action",
+      "args": {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "action": "delete"
+      }
+    },
+    {
+      "command": "harvest_job_action",
+      "args": {
+        "id": "00000000-0000-4000-8000-000000000007",
+        "action": "confirmNotSubmitted"
+      }
+    },
+    {
+      "command": "harvest_enqueue",
+      "args": {
+        "request": {
+          "id": "475ea40f-98c2-4473-a8d5-b725889cff80",
+          "url": "https://baijiahao.baidu.com/s?id=isolated-demo-only"
+        }
+      }
+    }
+  ],
+  "rowsAfterRejectedDelete": 8,
+  "retriesAfterCmsCheck": 0,
+  "inputAfterRejectedEnqueue": {
+    "value": "https://baijiahao.baidu.com/s?id=isolated-demo-only",
+    "error": "设计调研演示：此操作未执行，不连接 CMS 或 AI"
+  },
+  "menuEscape": {
+    "closed": true,
+    "focused": "【演示】秋日田野里的丰收图景，更多操作"
+  },
+  "cmsConfirmationText": "确认已在 CMS 核对结果？请先确认 CMS 确实没有该文章。本操作只将记录标为失败，之后可手动重试；不会立即重新提交。取消确认核对结果Close",
+  "validation": "请输入有效的 HTTP 或 HTTPS 链接",
+  "empty": {
+    "value": "2025-11-06",
+    "tableGone": true,
+    "text": "该日期暂无采集记录选择其他日期，或在上方提交文章链接。"
+  },
+  "settings": {
+    "hash": "#/settings?tab=harvest&returnTo=import",
+    "heading": ["系统设置"],
+    "harvestTab": "采集与 AI 处理"
+  },
+  "finalNarrow": {
+    "width": 390,
+    "pageOverflow": 0,
+    "layout": "cards",
+    "inputHeight": 44,
+    "footerBottom": 795
+  }
+}

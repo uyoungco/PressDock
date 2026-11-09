@@ -1,0 +1,126 @@
+[
+  {
+    "name": "筛选输入不自动提交",
+    "pass": true
+  },
+  {
+    "name": "点击搜索提交",
+    "pass": true,
+    "title": "【演示】公共图书馆延长开放时间\n8102\n文化\n演示编辑\n3 页\n11-06 09:40\n\t\n\t\n暂无分发记录\n\t\n编辑\n转素材"
+  },
+  {
+    "name": "重置恢复记录",
+    "pass": true
+  },
+  {
+    "name": "更多菜单 Esc 与焦点返回",
+    "pass": true
+  },
+  {
+    "name": "二级文章权限",
+    "pass": true
+  },
+  {
+    "name": "列表独立滚动与固定操作",
+    "pass": true,
+    "before": {
+      "header": 254,
+      "footer": 798
+    },
+    "after": {
+      "header": 254,
+      "footer": 798,
+      "scroll": 200
+    },
+    "note": "固定对象为 th 单元格；原脚本测量了会随内容滚动的 thead，已更正测量对象。"
+  },
+  {
+    "name": "保存拦截且保留输入",
+    "pass": true,
+    "message": "演示保存已拦截，输入与正文均已保留"
+  },
+  {
+    "name": "未保存关闭确认",
+    "pass": true
+  },
+  {
+    "name": "继续编辑保留输入",
+    "pass": true
+  },
+  {
+    "name": "打开助手不自动生成",
+    "pass": true
+  },
+  {
+    "name": "取消生成后不出现迟到初稿",
+    "pass": true
+  },
+  {
+    "name": "生成只形成初稿",
+    "pass": true,
+    "pages": 3
+  },
+  {
+    "name": "应用只更新内存分页",
+    "pass": true,
+    "pages": 2
+  },
+  {
+    "name": "关闭内层保留编辑器和焦点",
+    "pass": true
+  },
+  {
+    "name": "分页应用可撤销",
+    "pass": true
+  },
+  {
+    "name": "源码校验失败保留输入",
+    "pass": true
+  },
+  {
+    "name": "关闭丢弃未应用初稿",
+    "pass": true
+  },
+  {
+    "name": "嵌套分页禁止冲突动作",
+    "pass": true,
+    "message": "存在嵌套分页，保留预览；请先在 HTML 源码中调整为顶层分页"
+  },
+  {
+    "name": "保护模式源码只读",
+    "pass": true
+  },
+  {
+    "name": "转素材渠道必填",
+    "pass": true
+  },
+  {
+    "name": "转素材独立动作且保存拦截",
+    "pass": true
+  },
+  {
+    "name": "窄屏文章信息切换",
+    "pass": true
+  },
+  {
+    "name": "窄屏源码入口可达",
+    "pass": true,
+    "footer": {
+      "x": 0,
+      "y": 780,
+      "width": 390,
+      "height": 64,
+      "top": 780,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    }
+  },
+  {
+    "name": "短视口助手预览及底栏可达",
+    "pass": true,
+    "previewHeight": 122,
+    "footerBottom": 400,
+    "overflow": 0
+  }
+]

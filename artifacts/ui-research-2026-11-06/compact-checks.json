@@ -1,0 +1,107 @@
+[
+  {
+    "width": 1440,
+    "view": "desk",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1440,
+    "view": "editor",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1440,
+    "view": "channels",
+    "overflow": false,
+    "selectedPanel": false,
+    "rowHeight": 72,
+    "fullWidth": true,
+    "rows": 8
+  },
+  {
+    "width": 1280,
+    "view": "desk",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1280,
+    "view": "editor",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1280,
+    "view": "channels",
+    "overflow": false,
+    "selectedPanel": false,
+    "rowHeight": 72,
+    "fullWidth": true,
+    "rows": 8
+  },
+  {
+    "width": 1024,
+    "view": "desk",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1024,
+    "view": "editor",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 1024,
+    "view": "channels",
+    "overflow": false,
+    "selectedPanel": false,
+    "rowHeight": 72,
+    "fullWidth": true,
+    "rows": 8
+  },
+  {
+    "width": 390,
+    "view": "desk",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 390,
+    "view": "editor",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 390,
+    "view": "channels",
+    "overflow": false,
+    "selectedPanel": false,
+    "rowHeight": 70,
+    "fullWidth": true,
+    "rows": 8
+  },
+  {
+    "width": 360,
+    "view": "desk",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 360,
+    "view": "editor",
+    "overflow": false,
+    "selectedPanel": false
+  },
+  {
+    "width": 360,
+    "view": "channels",
+    "overflow": false,
+    "selectedPanel": false,
+    "rowHeight": 70,
+    "fullWidth": true,
+    "rows": 8
+  }
+]

@@ -1,0 +1,1507 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>素材导入 · 紧凑版设计稿 · PressDock</title>
+    <!-- Design study using Unslop by Damir Sokolovsky (@heydamir), CC BY 4.0. -->
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #fff;
+        --line: #e5e5e7;
+        --ink: #202124;
+        --secondary: #555860;
+        --muted: #70737a;
+        --blue: #3658cf;
+        --blue-hover: #2947b2;
+        --blue-soft: #eef2fd;
+        --warning: #8c5e15;
+        --danger: #b53b37;
+        --success: #27744d;
+        font-family:
+          "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+        font-size: 14px;
+        color: var(--ink);
+        background: var(--bg);
+        font-synthesis: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a,
+      input {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: wait;
+        opacity: 0.55;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button,
+      a,
+      input {
+        outline-offset: 3px;
+      }
+      :focus-visible {
+        outline: 2px solid var(--blue);
+      }
+      .icon {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: 0 0 auto;
+      }
+      .symbols {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
+      .app {
+        height: 100dvh;
+        display: grid;
+        grid-template-columns: 232px minmax(0, 1fr);
+        grid-template-rows: 56px minmax(0, 1fr) 32px;
+      }
+      .sidebar {
+        grid-row: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--line);
+        background: #f9f9fa;
+      }
+      .brand {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        color: white;
+        background: #171717;
+      }
+      .brand-name span {
+        color: #348a6b;
+      }
+      .nav-label {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 24px 20px 16px;
+      }
+      .nav {
+        padding: 0 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        height: 40px;
+        border-radius: 8px;
+        color: #62646b;
+      }
+      .nav a.active {
+        color: #171717;
+        background: #f0f0f2;
+        font-weight: 500;
+      }
+      .nav a:hover {
+        background: #eeeef0;
+      }
+      .nav .settings {
+        border-top: 1px solid var(--line);
+        border-radius: 0;
+        margin-top: 12px;
+        padding-top: 12px;
+        height: 52px;
+      }
+      .local-note {
+        margin: auto 12px 12px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        font-size: 12px;
+        line-height: 20px;
+      }
+      .local-note strong {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+      }
+      .local-note p {
+        margin: 4px 0;
+        color: var(--muted);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--line);
+        background: white;
+      }
+      .icon-button {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--secondary);
+        background: white;
+      }
+      .icon-button:hover,
+      .button:hover {
+        background: #f4f4f5;
+      }
+      .plain-icon {
+        border-color: transparent;
+      }
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .breadcrumb b {
+        font-weight: 400;
+        color: var(--ink);
+      }
+      .breadcrumb i {
+        font-style: normal;
+        color: #d4d4d8;
+      }
+      .global-search {
+        margin-left: auto;
+        width: 240px;
+        height: 36px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        background: #fafafa;
+      }
+      .account {
+        white-space: nowrap;
+        padding: 4px 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 12px;
+      }
+      main {
+        min-width: 0;
+        min-height: 0;
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .page-heading {
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 500;
+      }
+      .subtitle {
+        color: var(--secondary);
+        margin: 4px 0 0;
+        font-size: 13px;
+        line-height: 20px;
+      }
+      .heading-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-top: 4px;
+      }
+      .demo {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .demo::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border: 1px solid #83858b;
+        border-radius: 50%;
+      }
+      .button {
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--ink);
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 8px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        font-size: 13px;
+        transition:
+          background-color 120ms,
+          border-color 120ms;
+      }
+      .button.primary {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+      }
+      .button.primary:hover {
+        background: var(--blue-hover);
+        border-color: var(--blue-hover);
+      }
+      .button.danger {
+        background: var(--danger);
+        border-color: var(--danger);
+        color: white;
+      }
+      .button.soft {
+        color: var(--blue);
+        border-color: #d7dff7;
+        background: #f6f8ff;
+      }
+      .workspace {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        overflow: clip;
+      }
+      .composer {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .composer-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .composer-label {
+        font-size: 14px;
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+      .url-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid #d8d9dd;
+        border-radius: 8px;
+        color: var(--muted);
+        background: white;
+      }
+      .url-field:focus-within {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 2px #3658cf18;
+      }
+      .url-field input {
+        border: 0;
+        outline: none;
+        background: transparent;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        color: var(--ink);
+        font-size: 13px;
+      }
+      .url-field input::placeholder {
+        color: var(--muted);
+      }
+      kbd {
+        font-family: inherit;
+        font-size: 11px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: #fafafa;
+        border-radius: 4px;
+        padding: 0 4px;
+        line-height: 18px;
+        white-space: nowrap;
+      }
+      .composer .primary {
+        height: 36px;
+        padding: 0 16px;
+      }
+      .composer-note {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 16px;
+        margin: 8px 0 0 68px;
+      }
+      .input-error {
+        margin: 8px 0 0 68px;
+        color: var(--danger);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .input-error:empty {
+        display: none;
+      }
+      .records-toolbar {
+        flex-shrink: 0;
+        min-height: 48px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .records-title {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        min-width: 0;
+      }
+      h2 {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 500;
+        margin: 0;
+        white-space: nowrap;
+      }
+      .record-count {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .record-count .attention-count {
+        color: var(--warning);
+      }
+      .records-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .date-label {
+        font-size: 12px;
+        color: var(--secondary);
+      }
+      .date-input {
+        width: 144px;
+        height: 32px;
+        padding: 0 8px;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      .record-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #d2d3d8 transparent;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 13px;
+      }
+      .title-col {
+        width: auto;
+      }
+      .status-col {
+        width: 248px;
+      }
+      .actions-col {
+        width: 272px;
+      }
+      th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f7f7f8;
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 12px;
+        text-align: left;
+        padding: 0 16px;
+        height: 32px;
+        border-block: 1px solid var(--line);
+      }
+      th:last-child {
+        text-align: right;
+      }
+      td {
+        padding: 8px 16px;
+        border-bottom: 1px solid #eeeef0;
+        vertical-align: middle;
+        height: 60px;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      tbody tr:hover {
+        background: #fafafb;
+      }
+      .title-link {
+        display: block;
+        width: fit-content;
+        max-width: 100%;
+        font-weight: 500;
+        line-height: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border-radius: 2px;
+      }
+      .title-link:hover {
+        color: var(--blue);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 16px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .meta time {
+        font-variant-numeric: tabular-nums;
+      }
+      .meta .sep {
+        color: #d1d1d5;
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        line-height: 20px;
+      }
+      .status::before {
+        content: "";
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: #92949b;
+      }
+      .status.running {
+        color: var(--blue);
+      }
+      .status.running::before {
+        background: var(--blue);
+      }
+      .status.waiting {
+        color: var(--warning);
+      }
+      .status.waiting::before {
+        background: #aa7929;
+      }
+      .status.failed {
+        color: var(--danger);
+      }
+      .status.failed::before {
+        background: var(--danger);
+      }
+      .status.succeeded {
+        color: var(--success);
+      }
+      .status.succeeded::before {
+        background: var(--success);
+      }
+      .status-detail {
+        margin: 4px 0 0 12px;
+        color: var(--secondary);
+        line-height: 16px;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+      tr[data-needs-action="true"] td:first-child {
+        box-shadow: inset 3px 0 #bd9453;
+      }
+      tr[data-kind="failed"] td:first-child {
+        box-shadow: inset 3px 0 #c67c78;
+      }
+      .row-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        position: relative;
+      }
+      .text-button {
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        color: var(--secondary);
+        padding: 4px 6px;
+        font-size: 12px;
+        line-height: 20px;
+        white-space: nowrap;
+      }
+      .text-button:hover {
+        background: #f0f0f2;
+        color: var(--ink);
+      }
+      .text-button.blue {
+        color: var(--blue);
+      }
+      .row-actions .icon-button {
+        border-color: transparent;
+        width: 28px;
+        height: 28px;
+      }
+      .records-footer {
+        min-height: 36px;
+        padding: 8px 16px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        line-height: 20px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .records-footer .demo-note {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .records-footer .demo-note .icon {
+        width: 14px;
+        height: 14px;
+      }
+      .app-footer {
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--line);
+        font-size: 11px;
+        color: var(--muted);
+        background: white;
+      }
+      .app-footer .local-dot {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .local-dot::before {
+        content: "";
+        height: 6px;
+        width: 6px;
+        background: #32a880;
+        border-radius: 50%;
+      }
+      .empty {
+        padding: 64px 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .empty strong {
+        display: block;
+        color: var(--ink);
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      .empty .icon {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 12px;
+        color: #888a91;
+      }
+      .floating-menu {
+        position: fixed;
+        z-index: 20;
+        width: 184px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 4px 16px #20212414;
+      }
+      .floating-menu button {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: none;
+        text-align: left;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 20px;
+        padding: 6px 8px;
+        color: var(--secondary);
+      }
+      .floating-menu button:hover {
+        background: #f4f4f5;
+      }
+      .floating-menu button.destructive {
+        color: var(--danger);
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+        width: 460px;
+        max-width: calc(100vw - 32px);
+        color: var(--ink);
+        box-shadow: 0 16px 64px #20212420;
+      }
+      dialog::backdrop {
+        background: #2021244d;
+      }
+      dialog h3 {
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 24px;
+        margin: 0 0 12px;
+      }
+      dialog p {
+        color: var(--secondary);
+        font-size: 13px;
+        line-height: 24px;
+        margin: 0;
+      }
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 24px;
+      }
+      .toast {
+        position: fixed;
+        bottom: 52px;
+        left: calc(50% + 116px);
+        transform: translateX(-50%);
+        z-index: 30;
+        max-width: min(520px, calc(100vw - 32px));
+        padding: 12px 16px;
+        background: #25262a;
+        color: white;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 20px;
+        box-shadow: 0 4px 16px #0002;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 1200px) {
+        .status-col {
+          width: 208px;
+        }
+        .actions-col {
+          width: 232px;
+        }
+        .row-actions .button {
+          padding-inline: 8px;
+        }
+        .subtitle {
+          max-width: 520px;
+        }
+        .global-search {
+          width: 200px;
+        }
+        .demo {
+          display: none;
+        }
+      }
+      @media (max-width: 1000px) {
+        .app {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .sidebar {
+          display: none;
+        }
+        .toast {
+          left: 50%;
+        }
+        main {
+          padding: 20px 24px;
+        }
+      }
+      @media (max-width: 720px) {
+        .topbar {
+          padding-inline: 12px;
+          gap: 8px;
+        }
+        .global-search {
+          display: none;
+        }
+        .account {
+          margin-left: auto;
+        }
+        main {
+          padding: 16px;
+          gap: 12px;
+        }
+        .page-heading {
+          gap: 8px;
+        }
+        h1 {
+          font-size: 20px;
+        }
+        .subtitle {
+          font-size: 12px;
+        }
+        .heading-actions {
+          padding-top: 0;
+        }
+        .heading-actions .icon {
+          display: none;
+        }
+        .heading-actions .button {
+          height: 36px;
+        }
+        .composer {
+          padding: 12px;
+        }
+        .composer-row {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .composer-label {
+          width: 100%;
+          font-size: 13px;
+        }
+        .url-field {
+          height: 44px;
+        }
+        .composer .primary {
+          height: 44px;
+          padding: 0 12px;
+        }
+        .composer .primary .icon,
+        kbd {
+          display: none;
+        }
+        .composer-note {
+          margin-left: 0;
+          line-height: 20px;
+        }
+        .composer-note span:last-child {
+          display: none;
+        }
+        .input-error {
+          margin-left: 0;
+        }
+        .records-toolbar {
+          flex-wrap: wrap;
+          padding: 12px;
+          gap: 8px;
+        }
+        .records-title {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .records-tools {
+          width: 100%;
+        }
+        .date-input {
+          flex: 1;
+          width: 0;
+          height: 40px;
+        }
+        .records-tools .icon-button {
+          width: 40px;
+          height: 40px;
+        }
+        .table,
+        tbody,
+        tr,
+        td {
+          display: block;
+          width: 100%;
+        }
+        colgroup,
+        thead {
+          display: none;
+        }
+        tr {
+          position: relative;
+          padding: 12px;
+          border-bottom: 1px solid var(--line);
+        }
+        td {
+          height: auto;
+          padding: 0;
+          border: 0;
+        }
+        td + td {
+          margin-top: 8px;
+        }
+        tr[data-needs-action="true"] {
+          box-shadow: inset 3px 0 #bd9453;
+        }
+        tr[data-kind="failed"] {
+          box-shadow: inset 3px 0 #c67c78;
+        }
+        tr[data-needs-action="true"] td:first-child,
+        tr[data-kind="failed"] td:first-child {
+          box-shadow: none;
+        }
+        .title-link {
+          white-space: normal;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .row-actions {
+          justify-content: flex-start;
+        }
+        .row-actions .button,
+        .row-actions .text-button,
+        .row-actions .icon-button {
+          min-height: 40px;
+        }
+        .row-actions .icon-button {
+          width: 40px;
+        }
+        .records-footer {
+          padding: 8px 12px;
+        }
+        .records-footer > span:last-child,
+        .app-footer > span:last-child {
+          display: none;
+        }
+        .app-footer {
+          justify-content: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="symbols" aria-hidden="true">
+      <defs>
+        <symbol id="i-doc" viewBox="0 0 24 24">
+          <path
+            d="M8 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z M6 7H3v12a2 2 0 0 0 2 2 M10 7h6 M10 11h6 M10 15h4"
+          />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </symbol>
+        <symbol id="i-library" viewBox="0 0 24 24">
+          <path d="M4 6v14 M8 4v16 M12 8v12 M16 3l5 16" />
+        </symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+          <path
+            d="M12 3v12 m-5-5 5 5 5-5 M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"
+          />
+        </symbol>
+        <symbol id="i-files" viewBox="0 0 24 24">
+          <rect x="8" y="3" width="12" height="14" rx="2" />
+          <path d="M4 7v12a2 2 0 0 0 2 2h10 M12 7h4 M12 11h4" />
+        </symbol>
+        <symbol id="i-image" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="m21 15-5-5L5 21" />
+        </symbol>
+        <symbol id="i-send" viewBox="0 0 24 24">
+          <path d="m22 2-7 20-4-9-9-4 20-7Z M22 2 11 13" />
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24">
+          <path
+            d="m9 3-1 3-3 1 1 3-2 2 2 2-1 3 3 1 1 3h6l1-3 3-1-1-3 2-2-2-2 1-3-3-1-1-3Z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-panel" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M9 3v18" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m16 16 4 4" />
+        </symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="13" rx="2" />
+          <path d="M8 21h8 M12 17v4" />
+        </symbol>
+        <symbol id="i-chevron" viewBox="0 0 24 24">
+          <path d="m8 10 4 4 4-4" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </symbol>
+        <symbol id="i-link" viewBox="0 0 24 24">
+          <path
+            d="m10 13 4-4 M8 16H6a5 5 0 0 1 0-10h4 M14 6h4a5 5 0 0 1 0 10h-4"
+          />
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24">
+          <path
+            d="M20 7v5h-5 M4 17v-5h5 M6 6a8 8 0 0 1 13 2 M18 18a8 8 0 0 1-13-2"
+          />
+        </symbol>
+        <symbol id="i-more" viewBox="0 0 24 24">
+          <circle cx="5" cy="12" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="app">
+      <aside class="sidebar" aria-label="全局导航，沿用现有布局">
+        <a class="brand" href="#dashboard"
+          ><span class="brand-mark"
+            ><svg class="icon"><use href="#i-doc" /></svg></span
+          ><span class="brand-name">PressDock<span>.</span></span></a
+        >
+        <div class="nav-label">编辑工作空间</div>
+        <nav class="nav" aria-label="主导航">
+          <a href="#dashboard"
+            ><svg class="icon"><use href="#i-grid" /></svg>工作台</a
+          >
+          <a href="#channels"
+            ><svg class="icon"><use href="#i-library" /></svg>渠道素材管理</a
+          >
+          <a class="active" href="#import" aria-current="page"
+            ><svg class="icon"><use href="#i-download" /></svg>素材导入</a
+          >
+          <a href="#articles"
+            ><svg class="icon"><use href="#i-files" /></svg>文章管理<svg
+              class="icon"
+              style="margin-left: auto"
+            >
+              <use href="#i-chevron" /></svg
+          ></a>
+          <a href="#images"
+            ><svg class="icon"><use href="#i-image" /></svg>图片处理</a
+          >
+          <a href="#publish"
+            ><svg class="icon"><use href="#i-send" /></svg>发布管理</a
+          >
+          <a class="settings" href="#settings"
+            ><svg class="icon"><use href="#i-settings" /></svg>系统设置</a
+          >
+        </nav>
+        <div class="local-note">
+          <strong
+            ><svg class="icon"><use href="#i-lock" /></svg>本地优先</strong
+          >
+          <p>素材与草稿独立保存，专注每一次编辑。</p>
+          <a href="#settings">工作区设置 ›</a>
+        </div>
+      </aside>
+      <header class="topbar">
+        <button
+          class="icon-button plain-icon"
+          aria-label="切换导航"
+          data-preview="全局导航沿用现有版本"
+        >
+          <svg class="icon"><use href="#i-panel" /></svg>
+        </button>
+        <div class="breadcrumb">
+          <span>工作空间</span><i>/</i><b>素材导入</b>
+        </div>
+        <div class="global-search">
+          <svg class="icon"><use href="#i-search" /></svg>搜索文章，回车查看
+        </div>
+        <button
+          class="icon-button plain-icon"
+          aria-label="切换主题"
+          data-preview="本稿展示浅色主题"
+        >
+          <svg class="icon"><use href="#i-monitor" /></svg>
+        </button>
+        <button
+          class="icon-button plain-icon"
+          aria-label="打开设置"
+          data-preview="前往系统设置"
+        >
+          <svg class="icon"><use href="#i-settings" /></svg>
+        </button>
+        <span class="account">隔离演示账号</span>
+      </header>
+      <main>
+        <div class="page-heading">
+          <div>
+            <h1>素材导入</h1>
+            <p class="subtitle">
+              提交文章链接，后台采集并处理，完成后添加到 CMS。
+            </p>
+          </div>
+          <div class="heading-actions">
+            <span class="demo">设计预览 · 演示数据</span
+            ><button class="button" data-preview="前往系统设置中的采集配置">
+              <svg class="icon"><use href="#i-settings" /></svg>采集设置
+            </button>
+          </div>
+        </div>
+        <section class="workspace" aria-label="链接采集与采集记录">
+          <form class="composer" id="collect-form" novalidate>
+            <div class="composer-row">
+              <label class="composer-label" for="article-url">文章链接</label>
+              <div class="url-field">
+                <svg class="icon" aria-hidden="true"><use href="#i-link" /></svg
+                ><input
+                  id="article-url"
+                  name="url"
+                  type="url"
+                  inputmode="url"
+                  autocomplete="off"
+                  placeholder="粘贴百家号或 mbd.baidu.com 文章链接"
+                  aria-describedby="input-error composer-help"
+                  required
+                /><kbd aria-hidden="true">Enter ↵</kbd>
+              </div>
+              <button class="button primary" type="submit">
+                <svg class="icon"><use href="#i-download" /></svg
+                ><span>开始采集</span>
+              </button>
+            </div>
+            <p class="composer-note" id="composer-help">
+              <span>入队后可继续输入，离开页面仍会执行。</span
+              ><span>调试任务仅保存本地，不提交 CMS</span>
+            </p>
+            <p class="input-error" id="input-error" role="alert"></p>
+          </form>
+          <div class="records-toolbar">
+            <div class="records-title">
+              <h2>采集记录</h2>
+              <span class="record-count" id="record-count"></span>
+            </div>
+            <div class="records-tools">
+              <label class="date-label" for="harvest-date">采集日期</label
+              ><input
+                class="date-input"
+                id="harvest-date"
+                type="date"
+                value="2026-11-06"
+              /><button
+                class="icon-button"
+                id="refresh"
+                aria-label="刷新采集记录"
+              >
+                <svg class="icon"><use href="#i-refresh" /></svg>
+              </button>
+            </div>
+          </div>
+          <div
+            class="record-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="采集记录滚动区域"
+          >
+            <table class="table" aria-label="采集记录">
+              <colgroup>
+                <col class="title-col" />
+                <col class="status-col" />
+                <col class="actions-col" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col">新闻内容</th>
+                  <th scope="col">状态</th>
+                  <th scope="col">操作</th>
+                </tr>
+              </thead>
+              <tbody id="records"></tbody>
+            </table>
+            <div class="empty" id="empty" hidden>
+              <svg class="icon"><use href="#i-download" /></svg
+              ><strong>该日期暂无采集记录</strong
+              >选择其他日期，或在上方提交文章链接。
+            </div>
+          </div>
+          <div class="records-footer">
+            <span class="demo-note"
+              ><svg class="icon"><use href="#i-lock" /></svg
+              >设计预览：所有记录与操作均为演示，不连接 CMS / AI</span
+            ><span>标题可打开原文</span>
+          </div>
+        </section>
+      </main>
+      <footer class="app-footer">
+        <span class="local-dot">本地工作区 · SQLite</span
+        ><span>News Editorial Workspace　 v0.1.0</span>
+      </footer>
+    </div>
+    <div class="floating-menu" id="row-menu" role="menu" hidden></div>
+    <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+      <h3 id="confirm-title"></h3>
+      <p id="confirm-copy"></p>
+      <div class="dialog-actions">
+        <button class="button" id="cancel-confirm">取消</button
+        ><button class="button" id="accept-confirm">确认</button>
+      </div>
+    </dialog>
+    <div class="toast" role="status" id="toast" hidden></div>
+    <script>
+      const records = [
+        {
+          title: "城市更新，让老街区焕发新活力",
+          status: "running",
+          label: "格式化中",
+          time: "09:42",
+        },
+        {
+          title: "公共图书馆延长开放时间",
+          status: "waiting",
+          label: "等待网页验证",
+          detail: "在来源窗口完成验证后继续",
+          time: "09:40",
+        },
+        {
+          title: "周末去哪里？秋日城市漫步指南",
+          status: "queued",
+          label: "排队中",
+          time: "09:38",
+        },
+        {
+          title: "秋日田野里的丰收图景",
+          status: "succeeded",
+          label: "已添加到 CMS",
+          time: "09:36",
+        },
+        {
+          title: "青年创作者走进社区",
+          status: "succeeded",
+          label: "已添加到 CMS",
+          time: "09:34",
+        },
+        {
+          title: "社区食堂里的烟火气",
+          status: "failed",
+          label: "采集失败",
+          detail: "来源页面暂时无法读取，请检查原文",
+          time: "09:32",
+        },
+        {
+          title: "城市绿道串起家门口的风景",
+          status: "unknown",
+          label: "提交结果待确认",
+          detail: "请先到 CMS 核对，避免重复添加",
+          time: "09:30",
+        },
+        {
+          title: "老厂房的新故事",
+          status: "debug",
+          label: "调试完成",
+          detail: "仅保存本地，未提交 CMS",
+          time: "09:28",
+        },
+      ].map((row, index) => ({
+        ...row,
+        id: index,
+        url: `https://baijiahao.baidu.com/s?id=demo${index + 1}`,
+      }));
+      const $ = (selector) => document.querySelector(selector);
+      const escapeHtml = (value) =>
+        String(value).replace(
+          /[&<>"']/g,
+          (character) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[character],
+        );
+      let toastTimer;
+      let menuOpener;
+      let confirmAction;
+      function toast(text) {
+        clearTimeout(toastTimer);
+        $("#toast").textContent = text;
+        $("#toast").hidden = false;
+        toastTimer = setTimeout(() => {
+          $("#toast").hidden = true;
+        }, 4200);
+      }
+      function actionButton(row, action, label, className = "text-button") {
+        return `<button class="${className}" data-id="${row.id}" data-action="${action}">${label}</button>`;
+      }
+      function actions(row) {
+        if (row.status === "waiting")
+          return (
+            actionButton(row, "show", "打开来源", "text-button blue") +
+            actionButton(row, "resume", "验证完成，继续", "button soft") +
+            more(row)
+          );
+        if (row.status === "unknown")
+          return (
+            actionButton(row, "confirmSubmitted", "CMS 已添加", "button") +
+            actionButton(row, "confirmNotSubmitted", "CMS 未添加", "button")
+          );
+        if (["running", "queued"].includes(row.status))
+          return actionButton(row, "cancel", "取消");
+        if (row.status === "failed")
+          return (
+            actionButton(row, "retry", "重试", "text-button blue") + more(row)
+          );
+        return more(row);
+      }
+      function more(row) {
+        return `<button class="icon-button" data-id="${row.id}" data-action="more" aria-label="${escapeHtml(row.title)}，更多操作" aria-haspopup="menu" aria-expanded="false"><svg class="icon"><use href="#i-more"/></svg></button>`;
+      }
+      function render() {
+        const data = $("#harvest-date").value === "2026-11-06" ? records : [];
+        const attention = data.filter((row) =>
+          ["waiting", "failed", "unknown"].includes(row.status),
+        ).length;
+        $("#record-count").innerHTML =
+          `${data.length} 条${attention ? ` · <span class="attention-count">${attention} 条需处理</span>` : ""}`;
+        $("#records").innerHTML = data
+          .map(
+            (row) =>
+              `<tr data-kind="${row.status}" data-needs-action="${["waiting", "failed", "unknown"].includes(row.status)}"><td><a class="title-link" href="${escapeHtml(row.url)}" data-source="true" title="${escapeHtml(row.title)}">${escapeHtml(row.title)}</a><div class="meta"><span>百家号</span><span class="sep">·</span><time>${row.time}</time>${row.status === "debug" ? '<span class="sep">·</span><span>开发调试</span>' : ""}</div></td><td><div class="status ${row.status === "unknown" ? "waiting" : row.status}">${row.label}</div>${row.detail ? `<p class="status-detail">${escapeHtml(row.detail)}</p>` : ""}</td><td><div class="row-actions">${actions(row)}</div></td></tr>`,
+          )
+          .join("");
+        $(".table").hidden = !data.length;
+        $("#empty").hidden = !!data.length;
+      }
+      function closeMenu(restore = false) {
+        $("#row-menu").hidden = true;
+        if (menuOpener?.isConnected) {
+          menuOpener.setAttribute("aria-expanded", "false");
+          if (restore) menuOpener.focus({ preventScroll: true });
+        }
+      }
+      function confirm(row, action) {
+        const deleting = action === "delete";
+        $("#confirm-title").textContent = deleting
+          ? "删除这条采集记录？"
+          : "确认已在 CMS 核对结果？";
+        $("#confirm-copy").textContent = deleting
+          ? "将删除本地采集记录及未被草稿引用的采集数据，CMS 中已有文章保留。删除后，相同链接可重新采集并再次提交 CMS。"
+          : action === "confirmSubmitted"
+            ? "请先确认 CMS 已存在该文章。本操作只将本地记录标为已添加，不再次提交。"
+            : "请先确认 CMS 确实没有该文章。本操作只将记录标为失败，之后可手动重试；不会立即重新提交。";
+        $("#accept-confirm").textContent = deleting
+          ? "确认删除"
+          : "确认核对结果";
+        $("#accept-confirm").className =
+          `button ${deleting ? "danger" : "primary"}`;
+        confirmAction = () => {
+          if (deleting) records.splice(records.indexOf(row), 1);
+          else {
+            row.status = action === "confirmSubmitted" ? "succeeded" : "failed";
+            row.label =
+              action === "confirmSubmitted" ? "已添加到 CMS" : "未添加，可重试";
+            row.detail = "";
+          }
+          render();
+          toast("设计预览：仅更新演示记录，未执行真实操作");
+        };
+        $("#confirm-dialog").showModal();
+      }
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-action]");
+        if (button) {
+          const row = records.find(
+            (item) => item.id === Number(button.dataset.id),
+          );
+          const action = button.dataset.action;
+          if (!row) return;
+          if (action === "more") {
+            const rect = button.getBoundingClientRect();
+            const menu = $("#row-menu");
+            const wasOpen = menuOpener === button && !menu.hidden;
+            closeMenu();
+            if (wasOpen) return;
+            menuOpener = button;
+            const terminal = [
+              "succeeded",
+              "debug",
+              "failed",
+              "cancelled",
+            ].includes(row.status);
+            menu.innerHTML =
+              actionButton(row, "show", "打开原文") +
+              (terminal
+                ? actionButton(row, "delete", "删除记录", "destructive")
+                : actionButton(row, "cancel", "取消任务"));
+            menu
+              .querySelectorAll("button")
+              .forEach((item) => item.setAttribute("role", "menuitem"));
+            menu.hidden = false;
+            menu.style.left = `${Math.max(8, Math.min(innerWidth - 192, rect.right - 184))}px`;
+            menu.style.top = `${Math.min(innerHeight - menu.offsetHeight - 8, rect.bottom + 4)}px`;
+            button.setAttribute("aria-expanded", "true");
+            menu.querySelector("button").focus({ preventScroll: true });
+            return;
+          }
+          closeMenu();
+          if (
+            ["delete", "confirmSubmitted", "confirmNotSubmitted"].includes(
+              action,
+            )
+          )
+            confirm(row, action);
+          else if (action === "show")
+            toast("设计预览：此处打开来源页面，本稿不打开外部网站");
+          else {
+            row.status = action === "cancel" ? "cancelled" : "queued";
+            row.label = action === "cancel" ? "已取消" : "排队中";
+            row.detail = "";
+            render();
+            toast("设计预览：仅展示任务状态变化，未执行采集");
+          }
+          return;
+        }
+        if (!event.target.closest("#row-menu")) closeMenu();
+        const preview = event.target.closest("[data-preview]");
+        if (preview) toast(`设计预览：${preview.dataset.preview}`);
+        const link = event.target.closest("a");
+        if (link) {
+          event.preventDefault();
+          toast(
+            link.dataset.source
+              ? "设计预览：此处打开原文，本稿不打开外部网站"
+              : "本稿仅预览素材导入，全局导航沿用现有版本",
+          );
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if ($("#row-menu").hidden) return;
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeMenu(true);
+        }
+        if (["ArrowDown", "ArrowUp"].includes(event.key)) {
+          event.preventDefault();
+          const items = [...$("#row-menu").querySelectorAll("button")];
+          const next =
+            (items.indexOf(document.activeElement) +
+              (event.key === "ArrowDown" ? 1 : -1) +
+              items.length) %
+            items.length;
+          items[next].focus({ preventScroll: true });
+        }
+        if (event.key === "Tab") closeMenu();
+      });
+      $(".record-scroll").addEventListener("scroll", () => closeMenu(), {
+        passive: true,
+      });
+      window.addEventListener("resize", () => closeMenu());
+      $("#cancel-confirm").onclick = () => $("#confirm-dialog").close();
+      $("#accept-confirm").onclick = () => {
+        $("#confirm-dialog").close();
+        confirmAction?.();
+      };
+      $("#harvest-date").addEventListener("change", render);
+      $("#refresh").onclick = () => {
+        render();
+        toast("设计预览：已重新显示演示记录");
+      };
+      $("#collect-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = $("#article-url");
+        let valid = false;
+        try {
+          const parsed = new URL(input.value.trim());
+          valid =
+            ["http:", "https:"].includes(parsed.protocol) &&
+            ["baijiahao.baidu.com", "mbd.baidu.com"].includes(parsed.hostname);
+        } catch {}
+        $("#input-error").textContent = valid
+          ? ""
+          : "请输入有效的百家号或 mbd.baidu.com 文章链接";
+        input.setAttribute("aria-invalid", String(!valid));
+        if (!valid) {
+          input.focus({ preventScroll: true });
+          return;
+        }
+        records.unshift({
+          id: Date.now(),
+          title: "新链接，等待采集标题",
+          url: input.value.trim(),
+          status: "queued",
+          label: "排队中",
+          time: "09:44",
+        });
+        input.value = "";
+        $("#harvest-date").value = "2026-11-06";
+        render();
+        $(".record-scroll").scrollTop = 0;
+        input.focus({ preventScroll: true });
+        toast("设计预览：已展示入队状态，未创建真实采集任务");
+      });
+      render();
+    </script>
+  </body>
+</html>
