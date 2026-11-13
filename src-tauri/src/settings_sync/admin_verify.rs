@@ -17,7 +17,10 @@ pub(super) async fn run(
     let mut db = Database::open(&path).await?;
     let ai = crate::ai::AiService::new().map_err(|_| SyncError::new("SYNC_NETWORK", true))?;
     let result:SyncResult<()>=async {
-        let status=sync.start(&db,&ai,cms,false).await?;if !status.ready||status.successful_reads!=1{return Err(SyncError::new("PROBE_START_FAILED",false));}
+        let status=sync.start(&db,&ai,cms,false).await?;if !status.ready||status.successful_reads!=1{
+            eprintln!("{}",json!({"check":"native-probe-start","phase":status.phase,"code":status.last_error}));
+            return Err(SyncError::new("PROBE_START_FAILED",false));
+        }
         let repeated=sync.start(&db,&ai,cms,true).await?;if repeated.read_requests!=1{return Err(SyncError::new("PROBE_REPEATED_READ",false));}
         let config=local::export(&db).await?;
         if development {

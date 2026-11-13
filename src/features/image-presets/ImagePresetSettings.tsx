@@ -38,6 +38,7 @@ import {
   type MaterialImageField,
 } from "./model";
 import { imagePresetsService } from "./service";
+import { useSettingsActivity } from "@/features/settings-sync/activity";
 
 type Draft = {
   width: string;
@@ -83,6 +84,8 @@ const formats = [
 ];
 
 export function ImagePresetSettings() {
+  const { revision, synchronizing } = useSettingsActivity();
+  const loadedRevision = useRef(revision);
   const android = isAndroid();
   const compact = !!useDesktopSettings();
   const labels = compact
@@ -122,6 +125,11 @@ export function ImagePresetSettings() {
       if (channels.status === "fulfilled") setGroups(channels.value);
       else setGroupsError("渠道列表加载失败，可重试；仍可编辑已保存的预设。");
       if (presets.status === "fulfilled") {
+        if (loadedRevision.current !== revision) {
+          loadedRevision.current = revision;
+          baselines.current = {};
+          setDrafts({});
+        }
         setConfigs(presets.value);
         setCopySourceKey("");
         setReady(true);
@@ -134,7 +142,7 @@ export function ImagePresetSettings() {
     return () => {
       active = false;
     };
-  }, [retry]);
+  }, [retry, revision]);
   // 设置分项切换保留 drafts；仅真实改动触发离页提醒，保存成功仍由原逻辑清理。
   const dirty = Object.entries(drafts).some(([entryKey, value]) => {
     const [savedChannel, savedSubChannel] = JSON.parse(entryKey) as [
@@ -155,7 +163,7 @@ export function ImagePresetSettings() {
       })
     );
   });
-  useSettingsDraft("image-presets", dirty, saving);
+  useSettingsDraft("image-presets", dirty, saving || loading);
   const key = JSON.stringify([channel, subChannel]);
   const config =
     configs.find(
@@ -179,7 +187,7 @@ export function ImagePresetSettings() {
         .map((entry) => entry.subChannel),
     ]),
   ].filter(Boolean);
-  const disabled = loading || saving || !ready;
+  const disabled = loading || saving || !ready || synchronizing;
   const copySources = configs.filter(
     (entry) =>
       (entry.channel !== channel || entry.subChannel !== subChannel) &&

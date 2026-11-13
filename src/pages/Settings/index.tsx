@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DesktopSettingsProvider } from "@/features/settings/DesktopSettingsProvider";
 import { ConfigSyncStatus } from "@/features/settings-sync/ConfigBoundary";
+import { useSettingsActivity } from "@/features/settings-sync/activity";
 import "./settings.css";
 import { themeAtom } from "@/atoms/theme";
 import { systemService, type AppInfo } from "@/services/tauri/system";
@@ -23,6 +24,7 @@ import {
 } from "./sections";
 
 export default function Settings() {
+  const { synchronizing } = useSettingsActivity();
   const android = isAndroid();
   const [params, setParams] = useSearchParams();
   const pendingSearch = useRef<string | null>(null);
@@ -100,7 +102,12 @@ export default function Settings() {
           <p>模型与编辑规则在各设备共用，本机偏好独立保存。</p>
         </header>
         <ConfigSyncStatus />
-        <Tabs value={tab} onValueChange={go} className="settings-tabs">
+        <Tabs
+          value={tab}
+          onValueChange={go}
+          className="settings-tabs"
+          inert={synchronizing}
+        >
           <TabsList aria-label="设置模块" className="settings-tab-list">
             <TabsTrigger value="general" className="px-4">
               常规设置
@@ -139,6 +146,9 @@ export default function Settings() {
                 onConfigurePagination={() => {
                   go("ai-templates", "pagination");
                 }}
+                onConfigureOrganization={() =>
+                  go("ai-templates", "bodyOrganization")
+                }
               />
             </TabsContent>
             <TabsContent
@@ -181,7 +191,9 @@ export default function Settings() {
                 initialPurpose={
                   params.get("purpose") === "pagination"
                     ? "pagination"
-                    : "title"
+                    : params.get("purpose") === "bodyOrganization"
+                      ? "bodyOrganization"
+                      : "title"
                 }
               />
             </TabsContent>

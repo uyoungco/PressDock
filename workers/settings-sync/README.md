@@ -9,7 +9,7 @@
 | 开发 | `wrangler.jsonc`            | `pressdock-settings-dev` | `https://pressdock-settings-dev.i9543.workers.dev` |
 | 正式 | `wrangler.production.jsonc` | `pressdock-settings`     | `https://pressdock-settings.uyoung.co`             |
 
-两套 D1、主密钥及幂等密钥相互独立。迁移为 `migrations/0001_settings.sql`；正式库已初始化，不能删除重建或再次用本机设置覆盖。
+两套 D1、主密钥及幂等密钥相互独立。迁移按 `0001_settings.sql`、`0002_body_organization.sql` 执行；当前开发和正式环境均已升级为协议 v2。正式库已初始化，不能删除重建或再次用本机设置覆盖。
 
 正式自定义子域名已通过 Cloudflare 控制台绑定，DNS 与证书由 Cloudflare 管理；保留 workers.dev 作为运维入口。Android 实测其当前网络无法连接原 workers.dev，自定义域名的 IPv4 HTTPS 健康检查通过；客户端使用自定义域名，不写死边缘 IP。
 
@@ -43,7 +43,7 @@ build 只执行部署预演。Cloudflare 授权使用 Wrangler OAuth 系统凭�
 | `POST /api/v1/settings/operations` | 原子应用字段差量、记录永久幂等回执                     |
 | `POST /api/v1/settings/check`      | 以冻结操作原文查已提交回执；未知操作返回 404，不写配置 |
 
-完整请求类型、约束及错误码见[协议 v1](../../docs/settings-sync/protocol-v1.md)。D1 batch 内比较 revision/设备序号，再一并更新配置、密文、墓碑和回执。不同字段合并，同字段按服务端有效提交顺序决定；旧请求重试不能覆盖较新的修改。
+完整请求类型、约束及错误码见[协议 v2 增量说明](../../docs/settings-sync/protocol-v2.md)及其引用的 v1 基线。HTTP 路径仍为 `/api/v1/settings`，wire `schemaVersion` 为 2；旧客户端需升级。D1 batch 内比较 revision/设备序号，再一并更新配置、密文、墓碑和回执。不同字段合并，同字段按服务端有效提交顺序决定；旧请求重试不能覆盖较新的修改。
 
 CMS 固定为 `https://newsadmin.nccontrol.com.cn/api/Account/CurrentUser`。AI 密钥不回传给普通前端 IPC，不写日志。Workers Logs、invocation logs、Traces 均关闭；没有线上故障注入或任意管理员写入口。
 
@@ -64,6 +64,8 @@ cargo run --locked --manifest-path src-tauri/Cargo.toml --example settings_sync_
 # 新的隔离本机库下载正式设置和密钥，并明确发起一次真实 AI 连接测试（可能计费）：
 cargo run --locked --manifest-path src-tauri/Cargo.toml --example settings_sync_admin -- verify-fresh
 ```
+
+显式维护命令 `repair-protocol` 要求先退出目标客户端并设置 `PRESSDOCK_SETTINGS_SYNC_DB` 为实际安装数据库。它拒绝旧版队列及可运行采集任务，先备份，再调用原生手动同步恢复当前 v2 请求，最后检查队列及完整云端回读；不改写冻结请求或密钥，不调用 AI 或 CMS 写接口。常规用户直接使用新版客户端的“手动同步”。
 
 inspect 只输出数量。导入先备份原 SQLite，读取密钥失败则整体停止；请求先持久化为密文，以同一 operationId/原字节重试，确认后删除请求密文及解密密钥，保留回执。其他客户端只读取云端，不自动导入旧配置。
 

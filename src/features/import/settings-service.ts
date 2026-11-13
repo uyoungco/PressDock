@@ -1,6 +1,7 @@
 import { harvestIpc } from "@/services/tauri/harvest";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { harvestSettingsSchema, type HarvestSettings } from "./contracts";
+import { settingsActivity } from "@/features/settings-sync/activity";
 
 type ProcessingSettings = Omit<HarvestSettings, "developerMode">;
 type SettingsSnapshot = {
@@ -27,6 +28,7 @@ const keys = [
   "autoTags",
   "autoSummary",
   "aiAutoPaginate",
+  "aiOrganizeBody",
   "modelConfigId",
   "retentionDays",
 ] as const;
@@ -209,9 +211,11 @@ export const harvestSettingsService = {
     });
   },
   update(patch: Partial<Omit<ProcessingSettings, "retentionDays">>) {
+    if (settingsActivity.getSnapshot().synchronizing) return;
     if (snapshot.form) schedule({ form: { ...snapshot.form, ...patch } });
   },
   updateDays(days: string) {
+    if (settingsActivity.getSnapshot().synchronizing) return;
     if (!snapshot.form) return;
     const retentionDays = days.trim() === "" ? null : Number(days);
     const valid =
@@ -225,6 +229,11 @@ export const harvestSettingsService = {
     });
   },
   async setDeveloperMode(enabled: boolean) {
+    if (settingsActivity.getSnapshot().synchronizing)
+      throw new ServiceError(
+        "SETTINGS_SYNC_BUSY",
+        "配置正在同步，请等待完成后再修改",
+      );
     const generation = epoch;
     publish({ modeSaving: true });
     try {

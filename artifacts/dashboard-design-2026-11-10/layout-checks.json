@@ -1,0 +1,69 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "documentWidth": 1440,
+    "documentHeight": 900,
+    "contentWidth": 1176,
+    "columns": "285px 285px 285px 285px",
+    "recordMode": "table",
+    "quickBottom": 666,
+    "overflow": []
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "documentWidth": 1280,
+    "documentHeight": 720,
+    "contentWidth": 1016,
+    "columns": "245px 245px 245px 245px",
+    "recordMode": "table",
+    "quickBottom": 666,
+    "overflow": []
+  },
+  {
+    "width": 960,
+    "height": 720,
+    "documentWidth": 945,
+    "documentHeight": 850,
+    "contentWidth": 673,
+    "columns": "330.5px 330.5px",
+    "recordMode": "table",
+    "quickBottom": 798,
+    "overflow": []
+  },
+  {
+    "width": 900,
+    "height": 720,
+    "documentWidth": 885,
+    "documentHeight": 1028,
+    "contentWidth": 613,
+    "columns": "300.5px 300.5px",
+    "recordMode": "cards",
+    "quickBottom": 976,
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "documentWidth": 375,
+    "documentHeight": 1130,
+    "contentWidth": 343,
+    "columns": "165.5px 165.5px",
+    "recordMode": "cards",
+    "quickBottom": 1078,
+    "overflow": []
+  },
+  {
+    "interaction": "column-toggle",
+    "passed": true
+  },
+  {
+    "interaction": "theme-toggle",
+    "passed": true
+  },
+  {
+    "interaction": "refresh-preview",
+    "message": "设计预览：刷新采集和三级审核概览"
+  }
+]

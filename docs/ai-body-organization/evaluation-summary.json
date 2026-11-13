@@ -1,0 +1,1324 @@
+{
+  "generatedAt": "2026-11-10T09:02:40.316Z",
+  "model": "deepseek-flash",
+  "protocol": "responses",
+  "promptVersion": 6,
+  "promptSha256": "c096ed9a00b155861d83be7e5b9ddeb86dbd1757da250daf9fff10a3ce04d9ee",
+  "contractVersion": 2,
+  "counts": {
+    "realSamples": 20,
+    "development": 16,
+    "holdout": 4,
+    "inputImages": 96
+  },
+  "samples": [
+    {
+      "id": 11665073,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881205132833883553",
+      "inputSha256": "5e486fe760d84e507766da3e2d941468e849ed02055ad999f2829358ebec0d05",
+      "outputSha256": "5e486fe760d84e507766da3e2d941468e849ed02055ad999f2829358ebec0d05",
+      "original": {
+        "chars": 3175,
+        "images": 2,
+        "paragraphs": 38,
+        "maxParagraph": 132,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "formatted": {
+        "chars": 3175,
+        "images": 2,
+        "paragraphs": 40,
+        "maxParagraph": 132,
+        "longParagraphs": 0,
+        "shortParagraphs": 6
+      },
+      "cms": {
+        "chars": 3175,
+        "images": 2,
+        "paragraphs": 51,
+        "maxParagraph": 132,
+        "longParagraphs": 0,
+        "shortParagraphs": 10
+      },
+      "organized": {
+        "chars": 3175,
+        "images": 2,
+        "paragraphs": 40,
+        "maxParagraph": 132,
+        "longParagraphs": 0,
+        "shortParagraphs": 6
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    },
+    {
+      "id": 11665072,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881207577883948370",
+      "inputSha256": "a16031bea7a7c50848af878e387e2c25e48d7130c0c904d19970065894e52915",
+      "outputSha256": "f0ea579e1998170789a90c5d9fe55470d92a1587d095bcfe0ec0e541e17fa9e8",
+      "original": {
+        "chars": 1496,
+        "images": 8,
+        "paragraphs": 8,
+        "maxParagraph": 857,
+        "longParagraphs": 3,
+        "shortParagraphs": 2
+      },
+      "formatted": {
+        "chars": 1496,
+        "images": 8,
+        "paragraphs": 10,
+        "maxParagraph": 857,
+        "longParagraphs": 3,
+        "shortParagraphs": 4
+      },
+      "cms": {
+        "chars": 1496,
+        "images": 6,
+        "paragraphs": 23,
+        "maxParagraph": 132,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "organized": {
+        "chars": 1496,
+        "images": 8,
+        "paragraphs": 18,
+        "maxParagraph": 150,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 3,
+      "selected": ["A1", "A2", "A3"],
+      "splitCandidates": 3,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11665088,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881124168880962290",
+      "inputSha256": "cc27e42d118c7899a8adc819ca08b9e558ccd64fe1451db4714170254eb257e7",
+      "outputSha256": "4dfe9d11c8a33a356e3df440dc9f3c5b531ccdd282d54537666de2e466353ef8",
+      "original": {
+        "chars": 3117,
+        "images": 7,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 3117,
+        "images": 7,
+        "paragraphs": 44,
+        "maxParagraph": 228,
+        "longParagraphs": 2,
+        "shortParagraphs": 20
+      },
+      "cms": {
+        "chars": 3117,
+        "images": 7,
+        "paragraphs": 59,
+        "maxParagraph": 151,
+        "longParagraphs": 0,
+        "shortParagraphs": 24
+      },
+      "organized": {
+        "chars": 3117,
+        "images": 7,
+        "paragraphs": 46,
+        "maxParagraph": 160,
+        "longParagraphs": 0,
+        "shortParagraphs": 20
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 2,
+      "selected": ["A1", "A2"],
+      "splitCandidates": 2,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11665061,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881278563430782996",
+      "inputSha256": "f2a7933b8bf7e470fb89e6a264e76784148391ed5f9e393f3835a39f5e94f8e2",
+      "outputSha256": "f2a7933b8bf7e470fb89e6a264e76784148391ed5f9e393f3835a39f5e94f8e2",
+      "original": {
+        "chars": 1217,
+        "images": 4,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 1217,
+        "images": 4,
+        "paragraphs": 20,
+        "maxParagraph": 136,
+        "longParagraphs": 0,
+        "shortParagraphs": 9
+      },
+      "cms": {
+        "chars": 1217,
+        "images": 4,
+        "paragraphs": 28,
+        "maxParagraph": 98,
+        "longParagraphs": 0,
+        "shortParagraphs": 10
+      },
+      "organized": {
+        "chars": 1217,
+        "images": 4,
+        "paragraphs": 20,
+        "maxParagraph": 136,
+        "longParagraphs": 0,
+        "shortParagraphs": 9
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    },
+    {
+      "id": 11663830,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881074839995587925",
+      "inputSha256": "6c901280188ba7b94c87b50035d9ec9f244f0ba541022dcc22983e25bffdfb39",
+      "outputSha256": "6c901280188ba7b94c87b50035d9ec9f244f0ba541022dcc22983e25bffdfb39",
+      "original": {
+        "chars": 952,
+        "images": 2,
+        "paragraphs": 14,
+        "maxParagraph": 133,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "formatted": {
+        "chars": 952,
+        "images": 2,
+        "paragraphs": 15,
+        "maxParagraph": 133,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "cms": {
+        "chars": 952,
+        "images": 4,
+        "paragraphs": 17,
+        "maxParagraph": 119,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "organized": {
+        "chars": 952,
+        "images": 2,
+        "paragraphs": 15,
+        "maxParagraph": 133,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    },
+    {
+      "id": 11663855,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881078342229942668",
+      "inputSha256": "2917c08664709c35377d66833fc758dc8c0ab1a86ffb0a5a5c284a5f82f0ee78",
+      "outputSha256": "c62222e3820745f734e16c80f2aeec0a6b992716a86b768afa22c8e467869396",
+      "original": {
+        "chars": 1312,
+        "images": 2,
+        "paragraphs": 4,
+        "maxParagraph": 162,
+        "longParagraphs": 1,
+        "shortParagraphs": 2
+      },
+      "formatted": {
+        "chars": 1312,
+        "images": 2,
+        "paragraphs": 25,
+        "maxParagraph": 162,
+        "longParagraphs": 1,
+        "shortParagraphs": 14
+      },
+      "cms": {
+        "chars": 1300,
+        "images": 2,
+        "paragraphs": 24,
+        "maxParagraph": 110,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "organized": {
+        "chars": 1312,
+        "images": 2,
+        "paragraphs": 22,
+        "maxParagraph": 187,
+        "longParagraphs": 1,
+        "shortParagraphs": 9
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": false,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 5,
+      "selected": ["A1", "A3", "A4", "A5"],
+      "splitCandidates": 1,
+      "joinCandidates": 3,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11663841,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881021342171255264",
+      "inputSha256": "08fe3bd6617d59fe3c4e6152029aaa6ac252ac7dcbc8d4350c4f9f323120eae7",
+      "outputSha256": "d513919f41debd286f5ad7ce6bdf67f2c17d7fa7943839e7f88c118fad1f25b7",
+      "original": {
+        "chars": 2451,
+        "images": 4,
+        "paragraphs": 21,
+        "maxParagraph": 116,
+        "longParagraphs": 0,
+        "shortParagraphs": 9
+      },
+      "formatted": {
+        "chars": 2451,
+        "images": 4,
+        "paragraphs": 81,
+        "maxParagraph": 116,
+        "longParagraphs": 0,
+        "shortParagraphs": 56
+      },
+      "cms": {
+        "chars": 2352,
+        "images": 4,
+        "paragraphs": 65,
+        "maxParagraph": 135,
+        "longParagraphs": 0,
+        "shortParagraphs": 39
+      },
+      "organized": {
+        "chars": 2451,
+        "images": 4,
+        "paragraphs": 78,
+        "maxParagraph": 116,
+        "longParagraphs": 0,
+        "shortParagraphs": 51
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": false,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 2,
+      "selected": ["A1", "A2"],
+      "splitCandidates": 0,
+      "joinCandidates": 2,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11663829,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881079134506830426",
+      "inputSha256": "0d2661f67761f49274a12f19cccd7847a8b817b0f8cda0e1e59a38a1bd082b4d",
+      "outputSha256": "452745779f0b65c6623405ccabd11f8a9070047d3c7dbfe4f050d4e5abb064ca",
+      "original": {
+        "chars": 3676,
+        "images": 2,
+        "paragraphs": 28,
+        "maxParagraph": 306,
+        "longParagraphs": 6,
+        "shortParagraphs": 2
+      },
+      "formatted": {
+        "chars": 3676,
+        "images": 2,
+        "paragraphs": 37,
+        "maxParagraph": 306,
+        "longParagraphs": 6,
+        "shortParagraphs": 8
+      },
+      "cms": {
+        "chars": 3674,
+        "images": 2,
+        "paragraphs": 47,
+        "maxParagraph": 173,
+        "longParagraphs": 2,
+        "shortParagraphs": 8
+      },
+      "organized": {
+        "chars": 3676,
+        "images": 2,
+        "paragraphs": 42,
+        "maxParagraph": 206,
+        "longParagraphs": 2,
+        "shortParagraphs": 8
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": false,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 4,
+      "selected": ["A1", "A2", "A3", "A4"],
+      "splitCandidates": 4,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11663103,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881006314894804766",
+      "inputSha256": "e7a40fdc2936f7de43fdcb0a41a1d89eab5d8bcb33d7daf90abc02376371519c",
+      "outputSha256": "e7a40fdc2936f7de43fdcb0a41a1d89eab5d8bcb33d7daf90abc02376371519c",
+      "original": {
+        "chars": 928,
+        "images": 8,
+        "paragraphs": 13,
+        "maxParagraph": 120,
+        "longParagraphs": 0,
+        "shortParagraphs": 2
+      },
+      "formatted": {
+        "chars": 928,
+        "images": 8,
+        "paragraphs": 15,
+        "maxParagraph": 120,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "cms": {
+        "chars": 928,
+        "images": 8,
+        "paragraphs": 17,
+        "maxParagraph": 120,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "organized": {
+        "chars": 928,
+        "images": 8,
+        "paragraphs": 15,
+        "maxParagraph": 120,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    },
+    {
+      "id": 11663121,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881000507254437747",
+      "inputSha256": "f0bf7fde45b8b1d8986f274180f24798d80ac07bac3ee5d59a1cf6199eb1d451",
+      "outputSha256": "f0bf7fde45b8b1d8986f274180f24798d80ac07bac3ee5d59a1cf6199eb1d451",
+      "original": {
+        "chars": 779,
+        "images": 3,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 779,
+        "images": 3,
+        "paragraphs": 13,
+        "maxParagraph": 126,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "cms": {
+        "chars": 779,
+        "images": 3,
+        "paragraphs": 14,
+        "maxParagraph": 126,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "organized": {
+        "chars": 779,
+        "images": 3,
+        "paragraphs": 13,
+        "maxParagraph": 126,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    },
+    {
+      "id": 11663108,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1881013388439973968",
+      "inputSha256": "699915ad77277f7d206fc25a44bdf727f9973cca789ad8ed16e71107510bccc5",
+      "outputSha256": "3ded6525508830e703841522c55884c6b331a7e2f85a7b1c82da4ee44dbaa987",
+      "original": {
+        "chars": 4948,
+        "images": 11,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 4948,
+        "images": 11,
+        "paragraphs": 61,
+        "maxParagraph": 242,
+        "longParagraphs": 9,
+        "shortParagraphs": 23
+      },
+      "cms": {
+        "chars": 4948,
+        "images": 9,
+        "paragraphs": 88,
+        "maxParagraph": 141,
+        "longParagraphs": 0,
+        "shortParagraphs": 26
+      },
+      "organized": {
+        "chars": 4948,
+        "images": 11,
+        "paragraphs": 70,
+        "maxParagraph": 152,
+        "longParagraphs": 0,
+        "shortParagraphs": 23
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 9,
+      "selected": ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"],
+      "splitCandidates": 9,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11662870,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880935516505557730",
+      "inputSha256": "8fe9c88013ca0115fa2d485213dbf009665f139b7ca58870da21f63d7445648d",
+      "outputSha256": "141e20cfb0024c32440191e00dd5e709d6c68420671f8b4700db5c26006509ab",
+      "original": {
+        "chars": 1737,
+        "images": 10,
+        "paragraphs": 15,
+        "maxParagraph": 200,
+        "longParagraphs": 2,
+        "shortParagraphs": 1
+      },
+      "formatted": {
+        "chars": 1737,
+        "images": 10,
+        "paragraphs": 17,
+        "maxParagraph": 200,
+        "longParagraphs": 2,
+        "shortParagraphs": 3
+      },
+      "cms": {
+        "chars": 1737,
+        "images": 10,
+        "paragraphs": 26,
+        "maxParagraph": 123,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "organized": {
+        "chars": 1737,
+        "images": 10,
+        "paragraphs": 18,
+        "maxParagraph": 182,
+        "longParagraphs": 1,
+        "shortParagraphs": 3
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 1,
+      "selected": ["A1"],
+      "splitCandidates": 1,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11662237,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880918467363515087",
+      "inputSha256": "0ca1b1be996d4a4410a6c6936bc414b31fb3648ab33b85ed2b949d759af7a26a",
+      "outputSha256": "83e8dfa8fde4cc5f18b8724e92f78bdd9757fb107f185a8989a6943de012872a",
+      "original": {
+        "chars": 1060,
+        "images": 6,
+        "paragraphs": 7,
+        "maxParagraph": 167,
+        "longParagraphs": 1,
+        "shortParagraphs": 1
+      },
+      "formatted": {
+        "chars": 1060,
+        "images": 6,
+        "paragraphs": 15,
+        "maxParagraph": 167,
+        "longParagraphs": 1,
+        "shortParagraphs": 5
+      },
+      "cms": {
+        "chars": 1060,
+        "images": 6,
+        "paragraphs": 17,
+        "maxParagraph": 124,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "organized": {
+        "chars": 1060,
+        "images": 6,
+        "paragraphs": 16,
+        "maxParagraph": 133,
+        "longParagraphs": 0,
+        "shortParagraphs": 5
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 1,
+      "selected": ["A1"],
+      "splitCandidates": 1,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11662082,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880901094897196678",
+      "inputSha256": "3395f833a77fb7d68f4c47283c0b02950d1e756266ceb7450b86a6987bcdcd58",
+      "outputSha256": "d3b37fc851fd501d8838001be06fa5bfb466880a2b4144dc2c33da5361a5a6c3",
+      "original": {
+        "chars": 1958,
+        "images": 5,
+        "paragraphs": 18,
+        "maxParagraph": 188,
+        "longParagraphs": 1,
+        "shortParagraphs": 5
+      },
+      "formatted": {
+        "chars": 1958,
+        "images": 5,
+        "paragraphs": 30,
+        "maxParagraph": 188,
+        "longParagraphs": 1,
+        "shortParagraphs": 12
+      },
+      "cms": {
+        "chars": 1958,
+        "images": 5,
+        "paragraphs": 35,
+        "maxParagraph": 123,
+        "longParagraphs": 0,
+        "shortParagraphs": 12
+      },
+      "organized": {
+        "chars": 1958,
+        "images": 5,
+        "paragraphs": 31,
+        "maxParagraph": 145,
+        "longParagraphs": 0,
+        "shortParagraphs": 12
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 1,
+      "selected": ["A1"],
+      "splitCandidates": 1,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11662238,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880917445758276268",
+      "inputSha256": "1b9f0757887c6a9b28259a0a4f0381a49abdfb9064a914cac06d41fdda8473a9",
+      "outputSha256": "5085937e1527467619aebee32e16356ba115733e5ab5087d9682288d41054162",
+      "original": {
+        "chars": 2223,
+        "images": 3,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 2223,
+        "images": 3,
+        "paragraphs": 30,
+        "maxParagraph": 286,
+        "longParagraphs": 3,
+        "shortParagraphs": 13
+      },
+      "cms": {
+        "chars": 2223,
+        "images": 3,
+        "paragraphs": 39,
+        "maxParagraph": 178,
+        "longParagraphs": 1,
+        "shortParagraphs": 14
+      },
+      "organized": {
+        "chars": 2223,
+        "images": 3,
+        "paragraphs": 33,
+        "maxParagraph": 178,
+        "longParagraphs": 1,
+        "shortParagraphs": 13
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 2,
+      "selected": ["A1", "A2"],
+      "splitCandidates": 2,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11662067,
+      "split": "development",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880881341377647466",
+      "inputSha256": "970dfc3545e64a1faf1fc15286b81eb3689657de817ac1695950191b21240694",
+      "outputSha256": "f0c61d2767960e6503dc1ffaeb1fcafe67f354a13e69aea0b6ed3f276f7f5af6",
+      "original": {
+        "chars": 1570,
+        "images": 1,
+        "paragraphs": 11,
+        "maxParagraph": 124,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "formatted": {
+        "chars": 1570,
+        "images": 1,
+        "paragraphs": 39,
+        "maxParagraph": 124,
+        "longParagraphs": 0,
+        "shortParagraphs": 23
+      },
+      "cms": {
+        "chars": 1570,
+        "images": 1,
+        "paragraphs": 31,
+        "maxParagraph": 104,
+        "longParagraphs": 0,
+        "shortParagraphs": 11
+      },
+      "organized": {
+        "chars": 1570,
+        "images": 1,
+        "paragraphs": 29,
+        "maxParagraph": 158,
+        "longParagraphs": 0,
+        "shortParagraphs": 13
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 6,
+      "selected": ["A1", "A2", "A3", "A4", "A5", "A6"],
+      "splitCandidates": 0,
+      "joinCandidates": 6,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11661244,
+      "split": "holdout",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880815284825129050",
+      "inputSha256": "6df79678c4023e954c096dc862000feb2911e0d581279de61f8f78461eedba1d",
+      "outputSha256": "584771feb1525b38bc6a3ece066d583edf4a0173d96cea0e0bb62643da2a5229",
+      "original": {
+        "chars": 1037,
+        "images": 1,
+        "paragraphs": 12,
+        "maxParagraph": 195,
+        "longParagraphs": 1,
+        "shortParagraphs": 3
+      },
+      "formatted": {
+        "chars": 1037,
+        "images": 1,
+        "paragraphs": 12,
+        "maxParagraph": 195,
+        "longParagraphs": 1,
+        "shortParagraphs": 3
+      },
+      "cms": {
+        "chars": 1037,
+        "images": 1,
+        "paragraphs": 16,
+        "maxParagraph": 140,
+        "longParagraphs": 0,
+        "shortParagraphs": 3
+      },
+      "organized": {
+        "chars": 1037,
+        "images": 1,
+        "paragraphs": 13,
+        "maxParagraph": 140,
+        "longParagraphs": 0,
+        "shortParagraphs": 3
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": true,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 1,
+      "selected": ["A1"],
+      "splitCandidates": 1,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11661232,
+      "split": "holdout",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880830980841006700",
+      "inputSha256": "02a3823b50404e7597ed70602d30a973708bb104927de9eef65be2126d189d6d",
+      "outputSha256": "501f8b4a1a581187af2f9f3a315e7ca60e2d09412fefedbc2fa8d39bcffb6757",
+      "original": {
+        "chars": 5653,
+        "images": 7,
+        "paragraphs": 68,
+        "maxParagraph": 289,
+        "longParagraphs": 5,
+        "shortParagraphs": 14
+      },
+      "formatted": {
+        "chars": 5653,
+        "images": 7,
+        "paragraphs": 73,
+        "maxParagraph": 289,
+        "longParagraphs": 5,
+        "shortParagraphs": 19
+      },
+      "cms": {
+        "chars": 5653,
+        "images": 7,
+        "paragraphs": 97,
+        "maxParagraph": 151,
+        "longParagraphs": 0,
+        "shortParagraphs": 23
+      },
+      "organized": {
+        "chars": 5653,
+        "images": 7,
+        "paragraphs": 78,
+        "maxParagraph": 180,
+        "longParagraphs": 1,
+        "shortParagraphs": 19
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 4,
+      "selected": ["A1", "A2", "A3", "A4"],
+      "splitCandidates": 4,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11661239,
+      "split": "holdout",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880827768107179279",
+      "inputSha256": "b548e78721811a8b61005d571b67b5080bb1eac42c800dde1d76d778c6d4de8c",
+      "outputSha256": "3ba10dba95dfe47af73819e250f2136cc3478c79fac98def2ebc55cbdcfb51cd",
+      "original": {
+        "chars": 4849,
+        "images": 9,
+        "paragraphs": 0,
+        "maxParagraph": 0,
+        "longParagraphs": 0,
+        "shortParagraphs": 0
+      },
+      "formatted": {
+        "chars": 4849,
+        "images": 9,
+        "paragraphs": 50,
+        "maxParagraph": 532,
+        "longParagraphs": 8,
+        "shortParagraphs": 18
+      },
+      "cms": {
+        "chars": 4849,
+        "images": 9,
+        "paragraphs": 73,
+        "maxParagraph": 228,
+        "longParagraphs": 3,
+        "shortParagraphs": 19
+      },
+      "organized": {
+        "chars": 4849,
+        "images": 9,
+        "paragraphs": 49,
+        "maxParagraph": 532,
+        "longParagraphs": 8,
+        "shortParagraphs": 17
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": true,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 8,
+      "selected": ["A1"],
+      "splitCandidates": 0,
+      "joinCandidates": 1,
+      "valid": true,
+      "requestMade": true,
+      "changed": true
+    },
+    {
+      "id": 11661245,
+      "split": "holdout",
+      "sourceUrl": "https://baijiahao.baidu.com/s?id=1880831515479572087",
+      "inputSha256": "aa8a670336adb9ac470e9f72f92c7ffc4ddf6b5822a02ad6708bd120734a51ed",
+      "outputSha256": "aa8a670336adb9ac470e9f72f92c7ffc4ddf6b5822a02ad6708bd120734a51ed",
+      "original": {
+        "chars": 507,
+        "images": 1,
+        "paragraphs": 7,
+        "maxParagraph": 148,
+        "longParagraphs": 0,
+        "shortParagraphs": 2
+      },
+      "formatted": {
+        "chars": 507,
+        "images": 1,
+        "paragraphs": 10,
+        "maxParagraph": 148,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "cms": {
+        "chars": 451,
+        "images": 1,
+        "paragraphs": 10,
+        "maxParagraph": 86,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "organized": {
+        "chars": 507,
+        "images": 1,
+        "paragraphs": 10,
+        "maxParagraph": 148,
+        "longParagraphs": 0,
+        "shortParagraphs": 4
+      },
+      "sourceToFormattedTextEqual": true,
+      "cmsTextEqual": false,
+      "cmsTextBagEqual": false,
+      "textEqual": true,
+      "imagesEqual": true,
+      "candidateCount": 0,
+      "selected": [],
+      "splitCandidates": 0,
+      "joinCandidates": 0,
+      "valid": true,
+      "requestMade": false,
+      "changed": false
+    }
+  ],
+  "rounds": [
+    {
+      "name": "v1",
+      "workflows": 8,
+      "requests": 8,
+      "valid": 8,
+      "skipped": 0,
+      "changed": 5,
+      "failures": [],
+      "inputTokens": 40614,
+      "outputTokens": 783,
+      "medianMs": 1159,
+      "maxMs": 1705
+    },
+    {
+      "name": "v2",
+      "workflows": 8,
+      "requests": 8,
+      "valid": 5,
+      "skipped": 0,
+      "changed": 5,
+      "failures": [
+        {
+          "id": 11665073,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11665061,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11663855,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        }
+      ],
+      "inputTokens": 41929,
+      "outputTokens": 1493,
+      "medianMs": 1369,
+      "maxMs": 2696
+    },
+    {
+      "name": "v3",
+      "workflows": 8,
+      "requests": 8,
+      "valid": 2,
+      "skipped": 0,
+      "changed": 2,
+      "failures": [
+        {
+          "id": 11665073,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11665088,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11665061,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11663830,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11663855,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        },
+        {
+          "id": 11663841,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        }
+      ],
+      "inputTokens": 43567,
+      "outputTokens": 1117,
+      "medianMs": 1224,
+      "maxMs": 1925
+    },
+    {
+      "name": "v4",
+      "workflows": 8,
+      "requests": 8,
+      "valid": 8,
+      "skipped": 0,
+      "changed": 7,
+      "failures": [],
+      "inputTokens": 22838,
+      "outputTokens": 141,
+      "medianMs": 845,
+      "maxMs": 1037
+    },
+    {
+      "name": "v4-demo",
+      "workflows": 4,
+      "requests": 4,
+      "valid": 3,
+      "skipped": 0,
+      "changed": 2,
+      "failures": [
+        {
+          "id": "demo-quote",
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        }
+      ],
+      "inputTokens": 2246,
+      "outputTokens": 43,
+      "medianMs": 979,
+      "maxMs": 1004
+    },
+    {
+      "name": "v4-holdout",
+      "workflows": 4,
+      "requests": 4,
+      "valid": 3,
+      "skipped": 0,
+      "changed": 3,
+      "failures": [
+        {
+          "id": 11663121,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        }
+      ],
+      "inputTokens": 11412,
+      "outputTokens": 61,
+      "medianMs": 969,
+      "maxMs": 1192
+    },
+    {
+      "name": "v4-production-demo",
+      "workflows": 4,
+      "requests": 2,
+      "valid": 4,
+      "skipped": 2,
+      "changed": 2,
+      "failures": [],
+      "inputTokens": 1179,
+      "outputTokens": 24,
+      "medianMs": 816,
+      "maxMs": 816
+    },
+    {
+      "name": "v4-production-holdout",
+      "workflows": 4,
+      "requests": 3,
+      "valid": 3,
+      "skipped": 1,
+      "changed": 2,
+      "failures": [
+        {
+          "id": 11663108,
+          "repeat": 0,
+          "error": "LEGACY_VALIDATION_REJECTED"
+        }
+      ],
+      "inputTokens": 10346,
+      "outputTokens": 34,
+      "medianMs": 893,
+      "maxMs": 971
+    },
+    {
+      "name": "v4-stability",
+      "workflows": 12,
+      "requests": 12,
+      "valid": 12,
+      "skipped": 0,
+      "changed": 9,
+      "failures": [],
+      "inputTokens": 32199,
+      "outputTokens": 183,
+      "medianMs": 893,
+      "maxMs": 1693
+    },
+    {
+      "name": "v5",
+      "workflows": 12,
+      "requests": 10,
+      "valid": 12,
+      "skipped": 2,
+      "changed": 10,
+      "failures": [],
+      "inputTokens": 31839,
+      "outputTokens": 249,
+      "medianMs": 812,
+      "maxMs": 990
+    },
+    {
+      "name": "v5-demo",
+      "workflows": 4,
+      "requests": 2,
+      "valid": 4,
+      "skipped": 2,
+      "changed": 2,
+      "failures": [],
+      "inputTokens": 1217,
+      "outputTokens": 24,
+      "medianMs": 822,
+      "maxMs": 822
+    },
+    {
+      "name": "v5-holdout",
+      "workflows": 4,
+      "requests": 4,
+      "valid": 4,
+      "skipped": 0,
+      "changed": 4,
+      "failures": [],
+      "inputTokens": 10093,
+      "outputTokens": 81,
+      "medianMs": 985,
+      "maxMs": 1064
+    },
+    {
+      "name": "v5-stability",
+      "workflows": 12,
+      "requests": 9,
+      "valid": 12,
+      "skipped": 3,
+      "changed": 8,
+      "failures": [],
+      "inputTokens": 27765,
+      "outputTokens": 162,
+      "medianMs": 809,
+      "maxMs": 1470
+    },
+    {
+      "name": "v6",
+      "workflows": 16,
+      "requests": 11,
+      "valid": 16,
+      "skipped": 5,
+      "changed": 11,
+      "failures": [],
+      "inputTokens": 33108,
+      "outputTokens": 204,
+      "medianMs": 1023,
+      "maxMs": 1525
+    },
+    {
+      "name": "v6-demo",
+      "workflows": 4,
+      "requests": 2,
+      "valid": 4,
+      "skipped": 2,
+      "changed": 2,
+      "failures": [],
+      "inputTokens": 1249,
+      "outputTokens": 24,
+      "medianMs": 1172,
+      "maxMs": 1172
+    },
+    {
+      "name": "v6-holdout",
+      "workflows": 4,
+      "requests": 3,
+      "valid": 4,
+      "skipped": 1,
+      "changed": 3,
+      "failures": [],
+      "inputTokens": 13130,
+      "outputTokens": 45,
+      "medianMs": 1109,
+      "maxMs": 1237
+    },
+    {
+      "name": "v6-stability",
+      "workflows": 12,
+      "requests": 6,
+      "valid": 12,
+      "skipped": 6,
+      "changed": 6,
+      "failures": [],
+      "inputTokens": 17562,
+      "outputTokens": 99,
+      "medianMs": 886,
+      "maxMs": 1164
+    }
+  ]
+}

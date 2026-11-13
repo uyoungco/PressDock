@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-09",
+  "browser": "ego-browser",
+  "data": "明确标识的本机演示数据",
+  "liveCmsWrites": 0,
+  "mobile": {
+    "width": 390,
+    "overflow": false,
+    "checks": 3
+  },
+  "checks": [
+    "桌面宽屏固定选择列",
+    "桌面550px卡片无横向溢出",
+    "两端三级审核与editor隐藏入口",
+    "优质文章无审核选择入口",
+    "单条详情只读预览净化",
+    "原始正文与预览分离",
+    "同意二次确认",
+    "拒绝trim必填",
+    "批量逐篇混合结果",
+    "手机草稿阻挡与再次确认放弃",
+    "手机拒绝原因焦点",
+    "关闭确认后Esc返回列表",
+    "手机390px全屏预览及独立滚动"
+  ],
+  "preview": {
+    "width": 390,
+    "height": 844,
+    "scrollViewportHeight": 675,
+    "scrollContentHeight": 2304,
+    "unsafeNodes": false
+  },
+  "limitations": [
+    "未向线上CMS发送审核写请求",
+    "未进行Android真机安装与系统返回键/软键盘验收",
+    "二三级真实审核流转与发布效果未验证"
+  ],
+  "checkboxSizeFollowup": {
+    "visualAndroid": "20x20px",
+    "touchAndroid": "44x44px",
+    "visualDesktop": "16x16px",
+    "widths": [360, 390],
+    "evidence": "checkbox-size-evidence.json",
+    "originalScreenshotUpdated": "android-list.png"
+  }
+}

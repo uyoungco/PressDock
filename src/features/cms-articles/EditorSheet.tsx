@@ -360,6 +360,31 @@ export function EditorSheet({
         )}
         showCloseButton={false}
         onInteractOutside={(event) => event.preventDefault()}
+        onKeyDownCapture={(event) => {
+          if (
+            event.key.toLowerCase() !== "s" ||
+            !event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            event.metaKey ||
+            event.nativeEvent.isComposing ||
+            event.nativeEvent.keyCode === 229
+          )
+            return;
+          event.preventDefault();
+          // Portal 内的子弹框也会沿 React 树冒泡，只保存主编辑层。
+          if (
+            event.repeat ||
+            locked ||
+            gate.current ||
+            !(event.target instanceof Element) ||
+            event.target.closest('[role="dialog"]') !== event.currentTarget
+          )
+            return;
+          event.currentTarget
+            .querySelector<HTMLFormElement>("#cms-article-edit")
+            ?.requestSubmit();
+        }}
       >
         <SheetHeader
           className={cn(
@@ -558,7 +583,13 @@ export function EditorSheet({
           <Button variant="outline" disabled={locked} onClick={onClose}>
             取消
           </Button>
-          <Button type="submit" form="cms-article-edit" disabled={locked}>
+          <Button
+            type="submit"
+            form="cms-article-edit"
+            disabled={locked}
+            title="保存修改（Ctrl+S）"
+            aria-keyshortcuts="Control+s"
+          >
             {uploading ? "正在上传图片…" : busy ? "正在保存…" : "保存修改"}
           </Button>
         </SheetFooter>

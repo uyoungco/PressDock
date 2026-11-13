@@ -203,6 +203,10 @@ async fn harvest_upgrade_disables_paid_pagination_and_preserves_legacy_checkpoin
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!("../../migrations/0013_body_organization.sql"))
+        .execute(&pool)
+        .await
+        .unwrap();
     let db = Database { pool };
     let settings = db.harvest_settings().await.unwrap();
     assert!(!settings.options.ai_auto_paginate);

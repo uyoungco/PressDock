@@ -66,20 +66,7 @@ export function DesktopImportWorkspace({
       className="import-workspace flex h-full min-h-0 min-w-0 flex-1 flex-col gap-4 px-2 py-2 md:px-3"
       data-import-layout={layout}
     >
-      <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <div className="min-w-0">
-          <h1 className="text-[22px] leading-7 font-medium">素材导入</h1>
-          <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
-            提交文章链接，后台采集并处理，完成后添加到 CMS。
-          </p>
-        </div>
-        <Button asChild variant="outline" className="mt-1">
-          <Link to="/settings?tab=harvest&returnTo=import">
-            <Settings2 data-icon="inline-start" />
-            采集设置
-          </Link>
-        </Button>
-      </div>
+      <h1 className="sr-only">素材导入</h1>
       <div
         ref={workspaceRef}
         data-slot="import-container"
@@ -156,7 +143,7 @@ export function DesktopImportWorkspace({
               )}
             </span>
           </div>
-          <div className="import-tools flex items-center gap-2">
+          <div className="import-tools flex min-w-0 items-center gap-2">
             <label
               htmlFor="harvest-date"
               className="shrink-0 text-xs text-muted-foreground"
@@ -181,6 +168,12 @@ export function DesktopImportWorkspace({
               onClick={onRefresh}
             >
               <RefreshCw className={cn(fetching && "animate-spin")} />
+            </Button>
+            <Button asChild variant="outline" size="sm" className="shrink-0">
+              <Link to="/settings?tab=harvest&returnTo=import">
+                <Settings2 data-icon="inline-start" />
+                采集设置
+              </Link>
             </Button>
           </div>
         </div>

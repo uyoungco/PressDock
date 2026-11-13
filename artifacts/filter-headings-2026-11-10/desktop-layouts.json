@@ -1,0 +1,1308 @@
+[
+  {
+    "name": "channels-desktop-1440",
+    "route": "/channels?channel=KOOK&subchannel=%E8%BD%AE%E6%92%AD%E5%9B%BE&publishdate=2026-11-10",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 249,
+      "y": 73,
+      "width": 1174,
+      "height": 57,
+      "right": 1423,
+      "bottom": 130
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "渠道素材",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "渠道",
+        "x": 261,
+        "y": 85,
+        "width": 144,
+        "height": 32,
+        "right": 405,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "子渠道",
+        "x": 413,
+        "y": 85,
+        "width": 256,
+        "height": 32,
+        "right": 669,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 829,
+        "y": 85,
+        "width": 61.609375,
+        "height": 32,
+        "right": 890.609375,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 894.609375,
+        "y": 85,
+        "width": 61.609375,
+        "height": 32,
+        "right": 956.21875,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "刷新渠道素材",
+        "x": 1084.578125,
+        "y": 85,
+        "width": 61.609375,
+        "height": 32,
+        "right": 1146.1875,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "列配置",
+        "x": 1154.1875,
+        "y": 87,
+        "width": 80.40625,
+        "height": 28,
+        "right": 1234.59375,
+        "bottom": 115,
+        "disabled": false
+      },
+      {
+        "name": "开始排序",
+        "x": 1242.59375,
+        "y": 85,
+        "width": 73.203125,
+        "height": 32,
+        "right": 1315.796875,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "新增素材",
+        "x": 1323.796875,
+        "y": 85,
+        "width": 87.203125,
+        "height": 32,
+        "right": 1411,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "每页条数",
+        "x": 1202.1875,
+        "y": 811,
+        "width": 64,
+        "height": 32,
+        "right": 1266.1875,
+        "bottom": 843,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 1278.1875,
+        "y": 811,
+        "width": 60.40625,
+        "height": 32,
+        "right": 1338.59375,
+        "bottom": 843,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 1346.59375,
+        "y": 811,
+        "width": 60.40625,
+        "height": 32,
+        "right": 1407,
+        "bottom": 843,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "quality-desktop-1440",
+    "route": "/articles/quality",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 1176,
+      "height": 57,
+      "right": 1424,
+      "bottom": 129
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "优质文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 751.578125,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 871.578125,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 1195.578125,
+        "y": 84,
+        "width": 61.609375,
+        "height": 32,
+        "right": 1257.1875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 1265.1875,
+        "y": 84,
+        "width": 47.609375,
+        "height": 32,
+        "right": 1312.796875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 1320.796875,
+        "y": 84,
+        "width": 87.203125,
+        "height": 32,
+        "right": 1408,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 1211.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 1271.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 1279.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1339.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 1347.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1408,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-1-desktop-1440",
+    "route": "/articles/review-1",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 1176,
+      "height": 57,
+      "right": 1424,
+      "bottom": 129
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "一级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 751.578125,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 871.578125,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 1195.578125,
+        "y": 84,
+        "width": 61.609375,
+        "height": 32,
+        "right": 1257.1875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 1265.1875,
+        "y": 84,
+        "width": 47.609375,
+        "height": 32,
+        "right": 1312.796875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 1320.796875,
+        "y": 84,
+        "width": 87.203125,
+        "height": 32,
+        "right": 1408,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 1211.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 1271.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 1279.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1339.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 1347.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1408,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-2-desktop-1440",
+    "route": "/articles/review-2",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 1176,
+      "height": 57,
+      "right": 1424,
+      "bottom": 129
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "二级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 751.578125,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 871.578125,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 1195.578125,
+        "y": 84,
+        "width": 61.609375,
+        "height": 32,
+        "right": 1257.1875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 1265.1875,
+        "y": 84,
+        "width": 47.609375,
+        "height": 32,
+        "right": 1312.796875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 1320.796875,
+        "y": 84,
+        "width": 87.203125,
+        "height": 32,
+        "right": 1408,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 1211.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 1271.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 1279.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1339.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 1347.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1408,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-3-desktop-1440",
+    "route": "/articles/review-3",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 1176,
+      "height": 57,
+      "right": 1424,
+      "bottom": 129
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "三级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 751.578125,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 871.578125,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 1195.578125,
+        "y": 84,
+        "width": 61.609375,
+        "height": 32,
+        "right": 1257.1875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 1265.1875,
+        "y": 84,
+        "width": 47.609375,
+        "height": 32,
+        "right": 1312.796875,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 1320.796875,
+        "y": 84,
+        "width": 87.203125,
+        "height": 32,
+        "right": 1408,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 1211.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 1271.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 1279.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1339.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 1347.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 1408,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "import-desktop-1440",
+    "route": "/import",
+    "platform": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1440,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 1208,
+      "height": 812,
+      "right": 1440,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 261,
+      "y": 81,
+      "width": 1150,
+      "height": 85,
+      "right": 1411,
+      "bottom": 166
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "素材导入",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "开始采集",
+        "x": 1297,
+        "y": 93,
+        "width": 98,
+        "height": 36,
+        "right": 1395,
+        "bottom": 129,
+        "disabled": false
+      },
+      {
+        "name": "刷新采集记录",
+        "x": 1267.796875,
+        "y": 174,
+        "width": 32,
+        "height": 32,
+        "right": 1299.796875,
+        "bottom": 206,
+        "disabled": false
+      },
+      {
+        "name": "采集设置",
+        "x": 1307.796875,
+        "y": 176,
+        "width": 87.203125,
+        "height": 28,
+        "right": 1395,
+        "bottom": 204,
+        "disabled": false
+      }
+    ],
+    "settings": [
+      {
+        "name": "采集设置",
+        "href": "#/settings?tab=harvest&returnTo=import",
+        "x": 1307.796875,
+        "y": 176,
+        "width": 87.203125,
+        "height": 28,
+        "right": 1395,
+        "bottom": 204
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "channels-desktop-960",
+    "route": "/channels?channel=KOOK&subchannel=%E8%BD%AE%E6%92%AD%E5%9B%BE&publishdate=2026-11-10",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 249,
+      "y": 73,
+      "width": 694,
+      "height": 97,
+      "right": 943,
+      "bottom": 170
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "渠道素材",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "渠道",
+        "x": 261,
+        "y": 85,
+        "width": 144,
+        "height": 32,
+        "right": 405,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "子渠道",
+        "x": 413,
+        "y": 85,
+        "width": 256,
+        "height": 32,
+        "right": 669,
+        "bottom": 117,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 261,
+        "y": 125,
+        "width": 61.609375,
+        "height": 32,
+        "right": 322.609375,
+        "bottom": 157,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 326.609375,
+        "y": 125,
+        "width": 61.609375,
+        "height": 32,
+        "right": 388.21875,
+        "bottom": 157,
+        "disabled": false
+      },
+      {
+        "name": "刷新渠道素材",
+        "x": 604.578125,
+        "y": 125,
+        "width": 61.609375,
+        "height": 32,
+        "right": 666.1875,
+        "bottom": 157,
+        "disabled": false
+      },
+      {
+        "name": "列配置",
+        "x": 674.1875,
+        "y": 127,
+        "width": 80.40625,
+        "height": 28,
+        "right": 754.59375,
+        "bottom": 155,
+        "disabled": false
+      },
+      {
+        "name": "开始排序",
+        "x": 762.59375,
+        "y": 125,
+        "width": 73.203125,
+        "height": 32,
+        "right": 835.796875,
+        "bottom": 157,
+        "disabled": false
+      },
+      {
+        "name": "新增素材",
+        "x": 843.796875,
+        "y": 125,
+        "width": 87.203125,
+        "height": 32,
+        "right": 931,
+        "bottom": 157,
+        "disabled": false
+      },
+      {
+        "name": "每页条数",
+        "x": 722.1875,
+        "y": 811,
+        "width": 64,
+        "height": 32,
+        "right": 786.1875,
+        "bottom": 843,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 798.1875,
+        "y": 811,
+        "width": 60.40625,
+        "height": 32,
+        "right": 858.59375,
+        "bottom": 843,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 866.59375,
+        "y": 811,
+        "width": 60.40625,
+        "height": 32,
+        "right": 927,
+        "bottom": 843,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "quality-desktop-960",
+    "route": "/articles/quality",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 696,
+      "height": 97,
+      "right": 944,
+      "bottom": 169
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "优质文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 492,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 612,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 264,
+        "y": 124,
+        "width": 61.609375,
+        "height": 32,
+        "right": 325.609375,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 333.609375,
+        "y": 124,
+        "width": 47.609375,
+        "height": 32,
+        "right": 381.21875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 389.21875,
+        "y": 124,
+        "width": 87.203125,
+        "height": 32,
+        "right": 476.421875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 731.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 791.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 799.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 859.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 867.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 928,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-1-desktop-960",
+    "route": "/articles/review-1",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 696,
+      "height": 97,
+      "right": 944,
+      "bottom": 169
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "一级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 492,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 612,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 264,
+        "y": 124,
+        "width": 61.609375,
+        "height": 32,
+        "right": 325.609375,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 333.609375,
+        "y": 124,
+        "width": 47.609375,
+        "height": 32,
+        "right": 381.21875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 389.21875,
+        "y": 124,
+        "width": 87.203125,
+        "height": 32,
+        "right": 476.421875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 731.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 791.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 799.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 859.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 867.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 928,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-2-desktop-960",
+    "route": "/articles/review-2",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 696,
+      "height": 97,
+      "right": 944,
+      "bottom": 169
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "二级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 492,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 612,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 264,
+        "y": 124,
+        "width": 61.609375,
+        "height": 32,
+        "right": 325.609375,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 333.609375,
+        "y": 124,
+        "width": 47.609375,
+        "height": 32,
+        "right": 381.21875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 389.21875,
+        "y": 124,
+        "width": 87.203125,
+        "height": 32,
+        "right": 476.421875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 731.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 791.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 799.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 859.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 867.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 928,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "review-3-desktop-960",
+    "route": "/articles/review-3",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 248,
+      "y": 72,
+      "width": 696,
+      "height": 97,
+      "right": 944,
+      "bottom": 169
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "三级待审核文章",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "全部分类",
+        "x": 492,
+        "y": 84,
+        "width": 120,
+        "height": 32,
+        "right": 612,
+        "bottom": 116,
+        "disabled": false
+      },
+      {
+        "name": "搜索",
+        "x": 264,
+        "y": 124,
+        "width": 61.609375,
+        "height": 32,
+        "right": 325.609375,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "重置",
+        "x": 333.609375,
+        "y": 124,
+        "width": 47.609375,
+        "height": 32,
+        "right": 381.21875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "更多筛选",
+        "x": 389.21875,
+        "y": 124,
+        "width": 87.203125,
+        "height": 32,
+        "right": 476.421875,
+        "bottom": 156,
+        "disabled": false
+      },
+      {
+        "name": "50▼",
+        "x": 731.40625,
+        "y": 816,
+        "width": 59.78125,
+        "height": 28,
+        "right": 791.1875,
+        "bottom": 844,
+        "disabled": false
+      },
+      {
+        "name": "上一页",
+        "x": 799.1875,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 859.59375,
+        "bottom": 844,
+        "disabled": true
+      },
+      {
+        "name": "下一页",
+        "x": 867.59375,
+        "y": 816,
+        "width": 60.40625,
+        "height": 28,
+        "right": 928,
+        "bottom": 844,
+        "disabled": true
+      }
+    ],
+    "settings": [],
+    "blocked": []
+  },
+  {
+    "name": "import-desktop-960",
+    "route": "/import",
+    "platform": "desktop",
+    "viewport": {
+      "width": 960,
+      "height": 900
+    },
+    "documentWidth": 960,
+    "main": {
+      "x": 232,
+      "y": 56,
+      "width": 728,
+      "height": 812,
+      "right": 960,
+      "bottom": 868
+    },
+    "firstForm": {
+      "x": 261,
+      "y": 81,
+      "width": 670,
+      "height": 85,
+      "right": 931,
+      "bottom": 166
+    },
+    "visibleHeadings": [],
+    "srHeadings": [
+      {
+        "text": "素材导入",
+        "position": "absolute"
+      }
+    ],
+    "controls": [
+      {
+        "name": "开始采集",
+        "x": 817,
+        "y": 93,
+        "width": 98,
+        "height": 36,
+        "right": 915,
+        "bottom": 129,
+        "disabled": false
+      },
+      {
+        "name": "刷新采集记录",
+        "x": 787.796875,
+        "y": 174,
+        "width": 32,
+        "height": 32,
+        "right": 819.796875,
+        "bottom": 206,
+        "disabled": false
+      },
+      {
+        "name": "采集设置",
+        "x": 827.796875,
+        "y": 176,
+        "width": 87.203125,
+        "height": 28,
+        "right": 915,
+        "bottom": 204,
+        "disabled": false
+      }
+    ],
+    "settings": [
+      {
+        "name": "采集设置",
+        "href": "#/settings?tab=harvest&returnTo=import",
+        "x": 827.796875,
+        "y": 176,
+        "width": 87.203125,
+        "height": 28,
+        "right": 915,
+        "bottom": 204
+      }
+    ],
+    "blocked": []
+  }
+]

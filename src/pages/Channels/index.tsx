@@ -258,42 +258,7 @@ function ChannelResults() {
         data-channel-workspace
         className="channel-workspace flex h-full min-h-0 min-w-0 flex-1 flex-col gap-3"
       >
-        <header className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-          <h1 className="text-[22px] font-medium leading-8 tracking-tight">
-            渠道素材
-          </h1>
-          <div className="flex items-center gap-2">
-            {actions.sorting && (
-              <Button
-                variant="ghost"
-                disabled={actions.busy}
-                onClick={actions.cancelSort}
-              >
-                取消排序
-              </Button>
-            )}
-            <Button
-              variant={actions.sorting ? "default" : "outline"}
-              disabled={actions.busy || (!actions.sorting && !!sortReason)}
-              title={sortReason ?? undefined}
-              onClick={() =>
-                actions.sorting
-                  ? void actions.saveOrder()
-                  : matchingResult && actions.startSort(matchingResult.data)
-              }
-            >
-              {actions.busy && actions.sorting
-                ? "正在保存排序…"
-                : actions.sorting
-                  ? "保存排序"
-                  : "开始排序"}
-            </Button>
-            <Button disabled={locked} onClick={actions.create}>
-              <Plus data-icon="inline-start" />
-              新增素材
-            </Button>
-          </div>
-        </header>
+        <h1 className="sr-only">渠道素材</h1>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card">
           <form
             aria-label="渠道素材筛选"
@@ -393,7 +358,7 @@ function ChannelResults() {
                 </Button>
               </div>
             </fieldset>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex min-w-0 flex-wrap items-center gap-2">
               <span className="whitespace-nowrap text-xs text-muted-foreground">
                 当前页 {matchingResult?.data.length ?? 0} 条
               </span>
@@ -416,6 +381,44 @@ function ChannelResults() {
                 controller={columnPreferences}
                 disabled={locked}
               />
+              {actions.sorting && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={actions.busy}
+                  onClick={actions.cancelSort}
+                >
+                  取消排序
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant={actions.sorting ? "default" : "outline"}
+                size="sm"
+                disabled={actions.busy || (!actions.sorting && !!sortReason)}
+                title={sortReason ?? undefined}
+                onClick={() =>
+                  actions.sorting
+                    ? void actions.saveOrder()
+                    : matchingResult && actions.startSort(matchingResult.data)
+                }
+              >
+                {actions.busy && actions.sorting
+                  ? "正在保存排序…"
+                  : actions.sorting
+                    ? "保存排序"
+                    : "开始排序"}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={locked}
+                onClick={actions.create}
+              >
+                <Plus data-icon="inline-start" />
+                新增素材
+              </Button>
             </div>
           </form>
           {actions.sorting && (

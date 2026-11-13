@@ -10,7 +10,7 @@ const MARKER: &str = "[!--empirenews.page--]";
 const BREAK: &str = "<p>[!--empirenews.page--]</p>";
 
 #[derive(Clone)]
-enum LocalNode {
+pub(super) enum LocalNode {
     Text(String),
     Comment(String),
     Element {
@@ -20,7 +20,7 @@ enum LocalNode {
     },
 }
 impl LocalNode {
-    fn element(element: ElementRef<'_>, depth: usize) -> Result<Self, HarvestError> {
+    pub(super) fn element(element: ElementRef<'_>, depth: usize) -> Result<Self, HarvestError> {
         if depth > 128 {
             return Err(HarvestError::invalid("正文嵌套过深，保留原排版"));
         }
@@ -43,25 +43,25 @@ impl LocalNode {
             children,
         })
     }
-    fn name(&self) -> &str {
+    pub(super) fn name(&self) -> &str {
         if let Self::Element { name, .. } = self {
             name
         } else {
             ""
         }
     }
-    fn text(&self) -> String {
+    pub(super) fn text(&self) -> String {
         match self {
             Self::Text(text) => text.clone(),
             Self::Comment(_) => String::new(),
             Self::Element { children, .. } => children.iter().map(Self::text).collect(),
         }
     }
-    fn image(&self) -> bool {
+    pub(super) fn image(&self) -> bool {
         self.name() == "img"
             || matches!(self, Self::Element {children,..} if children.iter().any(Self::image))
     }
-    fn only_text(&self) -> bool {
+    pub(super) fn only_text(&self) -> bool {
         match self {
             Self::Text(_) | Self::Comment(_) => true,
             Self::Element { name, children, .. } => {
@@ -72,10 +72,10 @@ impl LocalNode {
             }
         }
     }
-    fn marker(&self) -> bool {
+    pub(super) fn marker(&self) -> bool {
         self.name() == "p" && self.text() == MARKER
     }
-    fn compatible(&self) -> bool {
+    pub(super) fn compatible(&self) -> bool {
         match self {
             Self::Text(_) | Self::Comment(_) => true,
             Self::Element { name, children, .. } => {
@@ -110,10 +110,10 @@ impl LocalNode {
             }
         }
     }
-    fn nested_marker(&self) -> bool {
+    pub(super) fn nested_marker(&self) -> bool {
         matches!(self, Self::Element {children,..} if children.iter().any(|c| c.marker() || c.nested_marker()))
     }
-    fn caption(&self) -> bool {
+    pub(super) fn caption(&self) -> bool {
         self.name() == "p"
             && matches!(self, Self::Element {attrs,..} if attrs.iter().any(|(k,v)| k == "class" && v.split_ascii_whitespace().any(|c| c == "img-caption")))
     }
@@ -129,7 +129,7 @@ impl LocalNode {
                 .collect::<String>()
         )
     }
-    fn render(&self) -> String {
+    pub(super) fn render(&self) -> String {
         match self {
             Self::Text(text) => content::escape(text),
             Self::Comment(text) => format!("<!--{text}-->"),
@@ -148,7 +148,7 @@ impl LocalNode {
             }
         }
     }
-    fn slice(&self, from: usize, to: usize) -> String {
+    pub(super) fn slice(&self, from: usize, to: usize) -> String {
         if from == 0 && to == self.text().len() {
             return self.render();
         }
@@ -171,6 +171,36 @@ impl LocalNode {
                 }
                 format!("{output}</{name}>")
             }
+        }
+    }
+    pub(super) fn joined(&self, next: &Self) -> Option<Self> {
+        match (self, next) {
+            (
+                Self::Element {
+                    name,
+                    attrs,
+                    children,
+                },
+                Self::Element {
+                    name: other,
+                    attrs: other_attrs,
+                    children: other_children,
+                },
+            ) if name == "p"
+                && other == name
+                && attrs == other_attrs
+                && self.only_text()
+                && next.only_text() =>
+            {
+                let mut combined = children.clone();
+                combined.extend(other_children.iter().cloned());
+                Some(Self::Element {
+                    name: name.clone(),
+                    attrs: attrs.clone(),
+                    children: combined,
+                })
+            }
+            _ => None,
         }
     }
 }

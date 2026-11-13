@@ -11,7 +11,7 @@ import {
 
 const fixture = JSON.parse(
   readFileSync(
-    new URL("../../../docs/settings-sync/fixtures-v1.json", import.meta.url),
+    new URL("../../../docs/settings-sync/fixtures-v2.json", import.meta.url),
     "utf8",
   ),
 ) as {
@@ -81,6 +81,7 @@ test("large Unicode templates and many presets honor config byte and count limit
   (base.config as unknown as Record<string, Json>).defaults = {
     titleTemplateId: null,
     paginationTemplateId: null,
+    bodyOrganizationTemplateId: null,
   };
   template.systemPrompt = "中".repeat(20000);
   template.userPrompt = "文".repeat(20000);
@@ -117,6 +118,7 @@ test("large Unicode templates and many presets honor config byte and count limit
   (base.config as unknown as Record<string, Json>).defaults = {
     titleTemplateId: null,
     paginationTemplateId: null,
+    bodyOrganizationTemplateId: null,
   };
   base.config.imagePresets = Array.from({ length: 2048 }, (_, i) => ({
     channel: `演示${i}`,

@@ -47,6 +47,17 @@ vi.mock("@/services/tauri/articles", () => ({
     })),
   },
 }));
+vi.mock("@/features/import/service", async (original) => {
+  const actual = await original<typeof import("@/features/import/service")>();
+  return {
+    ...actual,
+    importService: {
+      ...actual.importService,
+      subscribe: vi.fn(async () => () => undefined),
+      list: vi.fn(async () => ({ jobs: [], maintenanceWarning: null })),
+    },
+  };
+});
 vi.mock("@/services/tauri/cms", () => ({
   cmsIpc: {
     restore: vi.fn(),
@@ -136,9 +147,7 @@ describe("工作区", () => {
     expect(
       await screen.findByRole("heading", { name: "工作台" }),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByText("城市更新，让老街区焕发新活力"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("今天暂无正式采集记录")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("link", { name: "系统设置" }));
     expect(
       await screen.findByRole("heading", { name: "系统设置" }),

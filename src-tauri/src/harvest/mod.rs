@@ -1,7 +1,10 @@
 pub(crate) mod bridge;
 mod cdp;
-mod content;
+pub(crate) mod content;
 mod models;
+pub(crate) mod organization;
+#[cfg(test)]
+mod organization_tests;
 mod pagination;
 mod source;
 mod store;

@@ -1,4 +1,5 @@
 import { aiIpc } from "@/services/tauri/ai";
+import { guardSettingsWrite } from "@/features/settings-sync/activity";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import {
   suggestionRequestSchema,
@@ -63,11 +64,11 @@ export const aiService = {
       return result;
     }, signal),
   load: aiIpc.load,
-  saveProvider: aiIpc.saveProvider,
-  saveModel: aiIpc.saveModel,
-  saveTemplate: aiIpc.saveTemplate,
-  remove: aiIpc.remove,
-  clearSecret: aiIpc.clearSecret,
+  saveProvider: guardSettingsWrite(aiIpc.saveProvider),
+  saveModel: guardSettingsWrite(aiIpc.saveModel),
+  saveTemplate: guardSettingsWrite(aiIpc.saveTemplate),
+  remove: guardSettingsWrite(aiIpc.remove),
+  clearSecret: guardSettingsWrite(aiIpc.clearSecret),
   listModels: (providerId: string, signal?: AbortSignal) =>
     operation((id) => aiIpc.listModels(id, providerId), signal),
   testModel: (modelConfigId: string, signal?: AbortSignal) =>

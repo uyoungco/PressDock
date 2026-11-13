@@ -92,7 +92,7 @@ export const templateVariables = [
 export const paginationVariables = ["title", "blocks"] as const;
 export function validateVariables(value: string, purpose = "title"): boolean {
   const variables: readonly string[] =
-    purpose === "pagination" ? paginationVariables : templateVariables;
+    purpose === "title" ? templateVariables : paginationVariables;
   const pattern = /\{\{([\s\S]*?)\}\}/g;
   for (const match of value.matchAll(pattern)) {
     if (!variables.includes(match[1].trim())) return false;
@@ -121,7 +121,9 @@ export const defaultPaginationOptions = {
 };
 export const templateSchema = z
   .object({
-    purpose: z.enum(["title", "pagination"]).default("title"),
+    purpose: z
+      .enum(["title", "pagination", "bodyOrganization"])
+      .default("title"),
     paginationOptions: paginationOptionsSchema.nullable().default(null),
     id: text(100),
     name: text(100),
@@ -146,6 +148,12 @@ export const templateSchema = z
         code: "custom",
         path: ["paginationOptions"],
         message: "请配置分页页长",
+      });
+    if (v.purpose === "bodyOrganization" && v.paginationOptions)
+      ctx.addIssue({
+        code: "custom",
+        path: ["paginationOptions"],
+        message: "正文整理不使用分页参数",
       });
   });
 export const settingsSchema = z.object({

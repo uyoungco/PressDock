@@ -163,11 +163,11 @@ Bootstrap 只在 Rust 与 Worker 内处理，不成为普通 IPC 返回类型，
 
 ## 计划端点
 
-| 入口                               | 输入 / 输出                             | 调用时机                              |
-| ---------------------------------- | --------------------------------------- | ------------------------------------- |
-| `GET /api/v1/settings/bootstrap`   | Bootstrap；未初始化返回 NOT_INITIALIZED | Rust 冷启动成功读取一次；失败允许重试 |
-| `POST /api/v1/settings/initialize` | Initialize → Receipt                    | 指定电脑的一次性初始化                |
-| `POST /api/v1/settings/operations` | Operation → Receipt                     | 保存后上报、恢复网络或下次启动补传    |
+| 入口                               | 输入 / 输出                             | 调用时机                                              |
+| ---------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| `GET /api/v1/settings/bootstrap`   | Bootstrap；未初始化返回 NOT_INITIALIZED | Rust 冷启动成功读取一次；失败允许重试；用户可手动同步 |
+| `POST /api/v1/settings/initialize` | Initialize → Receipt                    | 指定电脑的一次性初始化                                |
+| `POST /api/v1/settings/operations` | Operation → Receipt                     | 保存后上报、恢复网络或下次启动补传                    |
 
 均经 Rust 发起、HTTPS Bearer 鉴权，POST 为 `application/json`，无查询参数，响应 `Cache-Control: no-store`。没有任意 SQL、任意上游地址或允许跳过鉴权的故障入口。运行中上报不额外 GET Bootstrap。
 
@@ -192,6 +192,8 @@ Bootstrap 在一条 SELECT 中取配置和密钥密文，避免查询间其他�
 `POST /api/v1/settings/check` 接收与 operations 相同的冻结原始请求字节。鉴权后核对永久账本和请求 HMAC，已提交返回原 Receipt，未知返回 `404 OPERATION_NOT_FOUND`，同 ID 不同原文仍返回 `409 OPERATION_ID_REUSED`。该入口不修改配置、不分配新 revision。
 
 冷启动先取得一致 bootstrap，再查询本机每个待传操作。只有回执 revision 不大于所取快照 revision 时才移除该项，其余在快照上重放；避免服务器已接受的 create/delete 因响应丢失被本机重复重放。正常上报只确认精确匹配的队列项，不把服务端回执当作新配置覆盖本机后续编辑，不额外 GET 快照。
+
+用户可通过 `settings_sync_manual` 主动同步：与后台上报串行，先补传可重试队列，再读取一次 bootstrap 并事务安装。临时补传失败仍尝试读取，未确认字段差量继续叠加并显示待传数量；鉴权失效、永久拒绝或要求重启时停止普通同步。快照版本不得低于本机已确认版本，失败保留有效配置、凭据与剩余队列。状态轮询、聚焦和网络恢复不触发读取。前端阻止未保存或处理中设置同步，先完成采集设置自动保存；同步时暂停设置编辑，安装成功后统一刷新设置及保存基线，不重建文章和草稿页面。该入口复用现有 API 和数据结构，无协议版本或数据库迁移。
 
 每个待传请求整体使用随机 AES-GCM 密钥加密存入 SQLite，解密密钥仅放系统凭据库；避免 Windows 单条凭据大小限制。字段计划删除 setSecret.value，普通 IPC 只返回 hasApiKey。初始化采用同样的冻结机制，成功后仅保留初始化回执。在写入每份原生凭据之前，sync_credential_gc 先持久记录候选引用；事务切换成功且没有配置、队列、恢复副本或任务引用时才清理，清理失败可稍后重试。准备、提交、确认与回收使用同一数据库旁的进程间文件锁，避免另一应用进程提前清理准备中的密钥；进程退出自动释放锁，启动时可清理未提交引用。
 

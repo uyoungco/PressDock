@@ -11,6 +11,7 @@ import { aiSettings, paginationSettings } from "./ai-fixtures";
 import { deferred } from "./cms-fixtures";
 import { toast } from "sonner";
 import { DesktopSettingsContext } from "@/features/settings/desktop-state";
+import { settingsActivity } from "@/features/settings-sync/activity";
 
 it("紧凑采集布局展示模板到模型及页长关系，保留 500ms 自动保存和配置入口", async () => {
   vi.mocked(aiService.load).mockResolvedValue(paginationSettings());
@@ -48,7 +49,48 @@ vi.mock("@/features/ai/service", () => ({ aiService: { load: vi.fn() } }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 const autosave = importService.settingsAutosave;
+
+it("配置同步期间停止编辑，更新后刷新采集表单及自动保存基线", async () => {
+  render(<HarvestSettings active />);
+  await tick(0);
+  act(() => settingsActivity.lock(true));
+  expect(screen.getByLabelText("AI 判断分类")).toBeDisabled();
+  persisted.autoClassify = true;
+  act(() => settingsActivity.applied());
+  await tick(0);
+  act(() => settingsActivity.lock(false));
+  expect(screen.getByLabelText("AI 判断分类")).toBeChecked();
+  expect(harvestIpc.saveSettings).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByLabelText("AI 生成标签"));
+  await tick(500);
+  expect(harvestIpc.saveSettings).toHaveBeenCalledWith(
+    expect.objectContaining({ autoClassify: true, autoTags: false }),
+    expect.objectContaining({ autoClassify: true, autoTags: true }),
+  );
+});
 let persisted: Settings;
+it("正文整理独立自动保存、离开补存并提供模板入口，同步期间锁定", async () => {
+  const configure = vi.fn();
+  const view = render(
+    <HarvestSettings active onConfigureOrganization={configure} />,
+  );
+  await tick(0);
+  expect(screen.getByLabelText("正文内容整理")).not.toBeChecked();
+  fireEvent.click(screen.getByLabelText("正文内容整理"));
+  await tick(499);
+  expect(harvestIpc.saveSettings).not.toHaveBeenCalled();
+  view.unmount();
+  await tick(0);
+  expect(persisted.aiOrganizeBody).toBe(true);
+  expect(persisted.aiAutoPaginate).toBe(false);
+  render(<HarvestSettings active onConfigureOrganization={configure} />);
+  await tick(0);
+  fireEvent.click(screen.getByRole("button", { name: "配置正文整理提示词" }));
+  expect(configure).toHaveBeenCalledOnce();
+  act(() => settingsActivity.lock(true));
+  expect(screen.getByLabelText("正文内容整理")).toBeDisabled();
+  act(() => settingsActivity.lock(false));
+});
 beforeEach(() => {
   vi.useFakeTimers();
   invalidateClientRequests();
@@ -62,6 +104,7 @@ beforeEach(() => {
     autoTags: true,
     autoSummary: true,
     aiAutoPaginate: false,
+    aiOrganizeBody: false,
     modelConfigId: null,
     retentionDays: null,
   };

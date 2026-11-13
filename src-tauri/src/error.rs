@@ -132,6 +132,7 @@ pub struct CommandError {
 impl From<crate::settings_sync::local::SyncError> for CommandError {
     fn from(error: crate::settings_sync::local::SyncError) -> Self {
         let message = match error.code {
+            "SESSION_CHANGED" => "登录状态已变化，请重试",
             "AUTH_EXPIRED" => "登录已失效，请重新登录",
             "SYNC_NOT_READY" => "全局配置尚未就绪，请先重试读取云端配置",
             "RECOVERY_NOT_AVAILABLE" => "当前没有可恢复的永久拒绝操作，请刷新同步状态",

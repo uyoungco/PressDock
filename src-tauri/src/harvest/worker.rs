@@ -410,7 +410,7 @@ async fn process(
         "start",
         "input",
         // 调试地址可能携带连接凭据，不随任务配置写入 Console 日志。
-        || json!({"job":stored.job,"options":{"sourceMode":options.source_mode,"cdpBrowser":options.cdp_browser,"developerMode":options.developer_mode,"autoClassify":options.auto_classify,"autoTags":options.auto_tags,"autoSummary":options.auto_summary,"aiAutoPaginate":options.ai_auto_paginate,"modelConfigId":options.model_config_id}}),
+        || json!({"job":stored.job,"options":{"sourceMode":options.source_mode,"cdpBrowser":options.cdp_browser,"developerMode":options.developer_mode,"autoClassify":options.auto_classify,"autoTags":options.auto_tags,"autoSummary":options.auto_summary,"aiOrganizeBody":options.ai_organize_body,"aiAutoPaginate":options.ai_auto_paginate,"modelConfigId":options.model_config_id}}),
     );
     let article = if let Some(prepared) = stored.prepared {
         context.trace(
@@ -419,7 +419,13 @@ async fn process(
             "output",
             || json!({"raw":stored.raw,"formatted":stored.formatted,"prepared":prepared}),
         );
-        for step in ["collecting", "formatting", "metadata", "paginating"] {
+        for step in [
+            "collecting",
+            "formatting",
+            "metadata",
+            "organizing",
+            "paginating",
+        ] {
             context.trace(
                 app,
                 step,
@@ -486,50 +492,151 @@ async fn process(
                 .await?;
             formatted
         };
-        let needs_ai = options.auto_classify || options.auto_summary || options.auto_tags;
-        let model = if needs_ai {
-            if let Some(snapshot) = &stored.options.metadata_snapshot {
-                Some(snapshot.clone())
-            } else if let Some(id) = &options.model_config_id {
-                db.ai_execution_snapshot(id).await?
+        // 检查点保存整篇处理状态和精确输入，用于重启后校验；原文及 formatted 保持独立。
+        let organization_input = article.news_text.clone();
+        let checkpoint = stored.organized.filter(|c| {
+            options.ai_organize_body
+                && stored
+                    .options
+                    .organization_snapshot
+                    .as_ref()
+                    .is_some_and(|s| s.contract_version == 2)
+                && c.input_html == organization_input
+                && c.contract_version == 2
+        });
+        if let Some(checkpoint) = checkpoint {
+            article = checkpoint.article;
+            if let Some(warning) = &checkpoint.warning
+                && !stored.job.warnings.contains(warning)
+            {
+                context.warning(app, warning).await?;
+            }
+            for step in ["metadata", "organizing"] {
+                context.trace(
+                    app,
+                    step,
+                    "skip",
+                    || json!({"reason":"复用正文整理检查点","warning":checkpoint.warning}),
+                );
+            }
+        } else {
+            let needs_ai = options.auto_classify || options.auto_summary || options.auto_tags;
+            let model = if needs_ai {
+                if let Some(snapshot) = &stored.options.metadata_snapshot {
+                    Some(snapshot.clone())
+                } else if let Some(id) = &options.model_config_id {
+                    db.ai_execution_snapshot(id).await?
+                } else {
+                    None
+                }
             } else {
                 None
-            }
-        } else {
-            None
-        };
-        if needs_ai && model.is_none() {
-            context
-                .warning(app, "未配置元数据处理模型，元数据步骤已跳过，保留后台结果")
-                .await?;
-        }
-        if let Some(model) = &model
-            && (options.auto_classify || options.auto_tags || options.auto_summary)
-        {
-            context
-                .progress(app, Status::Running, Stage::Metadata)
-                .await?;
-            if let Err(error) =
-                content::metadata(app, context, options, &raw, &mut article, model).await
-            {
-                if matches!(
-                    error.code,
-                    "AUTH_EXPIRED" | "SESSION_CHANGED" | "HARVEST_STORAGE"
-                ) {
-                    return Err(error);
-                }
-                context.error(
-                    app,
-                    "metadata.fallback",
-                    &error,
-                    || json!({"article":article}),
-                );
+            };
+            if needs_ai && model.is_none() {
                 context
-                    .warning(app, &format!("AI 元数据已回退：{}", error.message))
+                    .warning(app, "未配置元数据处理模型，元数据步骤已跳过，保留后台结果")
                     .await?;
             }
-        } else {
-            context.trace(app, "metadata", "skip", || json!({"reason":if model.is_none() && needs_ai {"未配置模型"} else {"元数据开关均关闭"},"article":article}));
+            if let Some(model) = &model
+                && (options.auto_classify || options.auto_tags || options.auto_summary)
+            {
+                context
+                    .progress(app, Status::Running, Stage::Metadata)
+                    .await?;
+                if let Err(error) =
+                    content::metadata(app, context, options, &raw, &mut article, model).await
+                {
+                    if matches!(
+                        error.code,
+                        "AUTH_EXPIRED" | "SESSION_CHANGED" | "HARVEST_STORAGE"
+                    ) {
+                        return Err(error);
+                    }
+                    context.error(
+                        app,
+                        "metadata.fallback",
+                        &error,
+                        || json!({"article":article}),
+                    );
+                    context
+                        .warning(app, &format!("AI 元数据已回退：{}", error.message))
+                        .await?;
+                }
+            } else {
+                context.trace(app, "metadata", "skip", || json!({"reason":if model.is_none() && needs_ai {"未配置模型"} else {"元数据开关均关闭"},"article":article}));
+            }
+            if options.ai_organize_body {
+                if let Some(snapshot) = &stored.options.organization_snapshot {
+                    context
+                        .progress(app, Status::Running, Stage::Organizing)
+                        .await?;
+                    context.trace(
+                        app,
+                        "organizing",
+                        "input",
+                        || json!({"html":article.news_text,"configuration":snapshot}),
+                    );
+                    let ai = app.state::<AiService>();
+                    let mut warning = None;
+                    match organization::organize(&ai, snapshot, &article.title, &article.news_text)
+                        .await
+                    {
+                        Ok(html) => {
+                            cms.ensure_generation(context.generation).await?;
+                            context.trace(app, "organizing", "output", || json!({"html":html}));
+                            article.news_text = html;
+                        }
+                        Err(error) => {
+                            if matches!(
+                                error.code,
+                                "AUTH_EXPIRED"
+                                    | "SESSION_CHANGED"
+                                    | "HARVEST_STORAGE"
+                                    | "AI_STORAGE"
+                                    | "AI_CREDENTIAL_STORE"
+                                    | "HARVEST_CANCELLED"
+                                    | "AI_CANCELLED"
+                            ) {
+                                return Err(error);
+                            }
+                            context.error(
+                                app,
+                                "organizing.fallback",
+                                &error,
+                                || json!({"article":article}),
+                            );
+                            let message = format!("正文整理已回退，保留原排版：{}", error.message);
+                            context.warning(app, &message).await?;
+                            warning = Some(message);
+                        }
+                    }
+                    cms.ensure_generation(context.generation).await?;
+                    db.harvest_save_organized(
+                        &context.id,
+                        &OrganizationCheckpoint {
+                            input_html: organization_input,
+                            contract_version: 2,
+                            article: article.clone(),
+                            warning,
+                        },
+                    )
+                    .await?;
+                } else {
+                    context
+                        .warning(
+                            app,
+                            "历史任务缺少正文整理快照，已跳过；新任务请检查正文整理模板配置",
+                        )
+                        .await?;
+                }
+            } else {
+                context.trace(
+                    app,
+                    "organizing",
+                    "skip",
+                    || json!({"reason":"正文内容整理开关关闭"}),
+                );
+            }
         }
         if options.ai_auto_paginate {
             context

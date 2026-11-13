@@ -441,18 +441,6 @@ export default function ImportPage() {
           data-slot="mobile-import"
           className="flex min-h-0 min-w-0 flex-1 flex-col gap-2"
         >
-          <div
-            data-slot="mobile-import-heading"
-            className="flex shrink-0 items-center justify-between gap-2"
-          >
-            <p className="text-sm text-muted-foreground">从来源文章开始</p>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/settings?tab=harvest&returnTo=import">
-                <Settings2 data-icon="inline-start" />
-                采集设置
-              </Link>
-            </Button>
-          </div>
           <form onSubmit={submit} className="shrink-0">
             <FieldGroup>
               <Field data-invalid={!!inputError}>
@@ -527,6 +515,19 @@ export default function ImportPage() {
               onClick={refresh}
             >
               <RefreshCw className={cn(list.isFetching && "animate-spin")} />
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              className="size-11 shrink-0"
+            >
+              <Link
+                to="/settings?tab=harvest&returnTo=import"
+                aria-label="采集设置"
+              >
+                <Settings2 />
+              </Link>
             </Button>
           </div>
           <div

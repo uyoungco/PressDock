@@ -17,6 +17,7 @@ export const harvestSettingsSchema = z.object({
   autoTags: z.boolean(),
   autoSummary: z.boolean(),
   aiAutoPaginate: z.boolean().default(false),
+  aiOrganizeBody: z.boolean().default(false),
   modelConfigId: z.string().min(1).max(100).nullable(),
   retentionDays: z.number().int().min(1).max(36500).nullable(),
 });

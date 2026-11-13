@@ -21,6 +21,7 @@ use tokio::sync::watch;
 pub(crate) enum GenerationTask<'a> {
     General,
     Pagination,
+    Organization(Option<&'a (dyn Fn(&Value) + Sync)>),
     Metadata(&'a (dyn Fn(&Value) + Sync)),
 }
 
@@ -76,11 +77,15 @@ pub(super) fn generation_request(
             }] = json!(match task {
                 // 输出额度也包含推理 token，元数据 JSON 较短也需要预留推理空间。
                 GenerationTask::Metadata(_) => 8192,
-                GenerationTask::Pagination => 4096,
+                GenerationTask::Pagination | GenerationTask::Organization(_) => 4096,
                 _ => 8192,
             });
         }
-        if matches!(task, GenerationTask::Pagination) && deepseek {
+        if matches!(
+            task,
+            GenerationTask::Pagination | GenerationTask::Organization(_)
+        ) && deepseek
+        {
             // 分页只返回语义编号；默认使用调研验证过的非推理模式，显式推理设置仍优先。
             match provider.protocol {
                 Protocol::ChatCompletions => {
@@ -538,7 +543,13 @@ impl AiService {
         // 在完成状态/截断校验之前交给采集日志观察器，保留失败时已收到的业务响应。
         // 不交出 provider、密钥或请求头，普通标题调用不注册观察器。
         match task {
-            GenerationTask::General | GenerationTask::Pagination => {}
+            GenerationTask::General
+            | GenerationTask::Pagination
+            | GenerationTask::Organization(None) => {}
+            GenerationTask::Organization(Some(observe)) => observe(&redact(
+                value.clone(),
+                &secret.as_deref().into_iter().collect::<Vec<_>>(),
+            )),
             GenerationTask::Metadata(observe) => observe(&redact(
                 value.clone(),
                 &secret.as_deref().into_iter().collect::<Vec<_>>(),
@@ -565,10 +576,14 @@ impl AiService {
                         "输出达到 token 上限（包含推理消耗），请检查模型的推理强度和输出上限后手动重试",
                     ));
                 }
-                if matches!(task, GenerationTask::Pagination) && finish_reason != Some("stop") {
+                if matches!(
+                    task,
+                    GenerationTask::Pagination | GenerationTask::Organization(_)
+                ) && finish_reason != Some("stop")
+                {
                     return Err(output_error(
                         "AI_OUTPUT_INCOMPLETE",
-                        "AI 分页响应未完整结束，请检查输出上限或重新生成",
+                        "AI 结构化响应未完整结束，请检查输出上限或重新生成",
                     ));
                 }
                 value
@@ -578,12 +593,14 @@ impl AiService {
                     .to_owned()
             }
             Protocol::Responses => {
-                if matches!(task, GenerationTask::Pagination)
-                    && value.get("status").and_then(Value::as_str).is_none()
+                if matches!(
+                    task,
+                    GenerationTask::Pagination | GenerationTask::Organization(_)
+                ) && value.get("status").and_then(Value::as_str).is_none()
                 {
                     return Err(output_error(
                         "AI_OUTPUT_INCOMPLETE",
-                        "AI 分页响应缺少完成状态，请检查服务商兼容设置",
+                        "AI 结构化响应缺少完成状态，请检查服务商兼容设置",
                     ));
                 }
                 if let Some(status) = value.get("status").and_then(Value::as_str)
@@ -641,3 +658,7 @@ impl AiService {
 #[cfg(test)]
 #[path = "pagination_live_test.rs"]
 mod pagination_live_test;
+
+#[cfg(test)]
+#[path = "organization_live_test.rs"]
+mod organization_live_test;

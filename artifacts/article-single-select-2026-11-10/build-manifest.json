@@ -1,0 +1,43 @@
+{
+  "createdUtc": "2026-11-10T02:16:05.560Z",
+  "buildOrder": ["npm run tauri build", "npm run android:build"],
+  "frontendTests": {
+    "files": 2,
+    "passed": 37
+  },
+  "egoLayouts": 17,
+  "checks": {
+    "lint": "passed",
+    "format": "passed",
+    "productionBuild": "passed"
+  },
+  "androidConfiguration": "正式业务配置，ARM64，调试签名",
+  "cmsWrites": 0,
+  "deviceInstallation": false,
+  "artifacts": [
+    {
+      "file": "src-tauri/target/release/pressdock.exe",
+      "size": 14371328,
+      "modifiedUtc": "2026-11-10T02:13:17.294Z",
+      "sha256": "d978a071363a8d10319d70dcddfba119e6a6d574e20b3881e4781f8e05bd9c4c"
+    },
+    {
+      "file": "src-tauri/target/release/bundle/nsis/PressDock_0.1.0_x64-setup.exe",
+      "size": 5165449,
+      "modifiedUtc": "2026-11-10T02:13:15.893Z",
+      "sha256": "c16408f716b0014448eec8c8eb4391fb4c622b877122b24515ef06f1b62d4199"
+    },
+    {
+      "file": "src-tauri/target/release/bundle/msi/PressDock_0.1.0_x64_en-US.msi",
+      "size": 6995968,
+      "modifiedUtc": "2026-11-10T02:13:04.607Z",
+      "sha256": "fff127f3d2d2443daab9bba498c0d9e6980567fb673f85defbdca251ec6c066f"
+    },
+    {
+      "file": "artifacts/PressDock-android-debug-arm64.apk",
+      "size": 46751357,
+      "modifiedUtc": "2026-11-10T02:15:15.070Z",
+      "sha256": "1f20ae06d505aa622d18e248febcb34547fff3643c3520ca834a21e97ee34c04"
+    }
+  ]
+}

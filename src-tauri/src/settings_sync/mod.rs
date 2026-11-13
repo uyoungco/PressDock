@@ -74,6 +74,8 @@ pub struct ImagePreset {
 pub struct Defaults {
     pub title_template_id: Option<String>,
     pub pagination_template_id: Option<String>,
+    #[serde(default)]
+    pub body_organization_template_id: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -82,6 +84,8 @@ pub struct HarvestRules {
     pub auto_tags: bool,
     pub auto_summary: bool,
     pub ai_auto_paginate: bool,
+    #[serde(default)]
+    pub ai_organize_body: bool,
     pub model_config_id: Option<String>,
 }
 // 不派生 Debug：网络请求可能含 API 密钥，只允许固定错误码进入日志。
@@ -185,7 +189,7 @@ fn integer(v: &Value, min: u64, max: u64) -> Result<()> {
     valid(v.as_u64().is_some_and(|n| n >= min && n <= max))
 }
 fn version(v: &Value) -> Result<()> {
-    ensure(v["schemaVersion"] == 1, "UNSUPPORTED_VERSION")
+    ensure(v["schemaVersion"] == 2, "UNSUPPORTED_VERSION")
 }
 fn size(v: &Value) -> usize {
     serde_json::to_vec(v).map_or(usize::MAX, |s| s.len())
@@ -226,12 +230,17 @@ fn fields(entity: &str) -> &'static [&'static str] {
             "paginationOptions",
         ],
         "imagePreset" => &["size", "maxBytes", "format"],
-        "defaults" => &["titleTemplateId", "paginationTemplateId"],
+        "defaults" => &[
+            "titleTemplateId",
+            "paginationTemplateId",
+            "bodyOrganizationTemplateId",
+        ],
         "harvest" => &[
             "autoClassify",
             "autoTags",
             "autoSummary",
             "aiAutoPaginate",
+            "aiOrganizeBody",
             "modelConfigId",
         ],
         _ => &[],
@@ -410,8 +419,15 @@ fn config(c: &Value) -> Result<()> {
             "REFERENCE_NOT_FOUND",
         )?;
     }
-    keys(&c["defaults"], &["titleTemplateId", "paginationTemplateId"])?;
-    for purpose in ["title", "pagination"] {
+    keys(
+        &c["defaults"],
+        &[
+            "titleTemplateId",
+            "paginationTemplateId",
+            "bodyOrganizationTemplateId",
+        ],
+    )?;
+    for purpose in ["title", "pagination", "bodyOrganization"] {
         let id = &c["defaults"][format!("{purpose}TemplateId")];
         if !id.is_null() {
             text(id, 100, false)?;
@@ -434,10 +450,17 @@ fn config(c: &Value) -> Result<()> {
             "autoTags",
             "autoSummary",
             "aiAutoPaginate",
+            "aiOrganizeBody",
             "modelConfigId",
         ],
     )?;
-    for k in ["autoClassify", "autoTags", "autoSummary", "aiAutoPaginate"] {
+    for k in [
+        "autoClassify",
+        "autoTags",
+        "autoSummary",
+        "aiAutoPaginate",
+        "aiOrganizeBody",
+    ] {
         valid(h[k].is_boolean())?;
     }
     if !h["modelConfigId"].is_null() {

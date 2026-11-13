@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-settings-sync-manual"
+description = "Enables the settings_sync_manual command without any pre-configured scope."
+commands.allow = ["settings_sync_manual"]
+
+[[permission]]
+identifier = "deny-settings-sync-manual"
+description = "Denies the settings_sync_manual command without any pre-configured scope."
+commands.deny = ["settings_sync_manual"]

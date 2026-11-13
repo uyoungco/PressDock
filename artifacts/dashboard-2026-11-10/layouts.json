@@ -1,0 +1,180 @@
+[
+  {
+    "name": "1440-light",
+    "width": 1440,
+    "height": 900,
+    "theme": "",
+    "documentWidth": 1440,
+    "rootWidth": 1176,
+    "rootScrollWidth": 1176,
+    "columns": 4,
+    "listLayout": "wide",
+    "navBottom": 662.5,
+    "mainBottom": 868,
+    "scrollAreas": [
+      {
+        "width": 1176,
+        "scrollWidth": 1176,
+        "height": 780,
+        "scrollHeight": 780
+      },
+      {
+        "width": 1174,
+        "scrollWidth": 1174,
+        "height": 289,
+        "scrollHeight": 289
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "1280-light",
+    "width": 1280,
+    "height": 720,
+    "theme": "",
+    "documentWidth": 1280,
+    "rootWidth": 1016,
+    "rootScrollWidth": 1016,
+    "columns": 4,
+    "listLayout": "wide",
+    "navBottom": 662.5,
+    "mainBottom": 688,
+    "scrollAreas": [
+      {
+        "width": 1016,
+        "scrollWidth": 1016,
+        "height": 600,
+        "scrollHeight": 600
+      },
+      {
+        "width": 1014,
+        "scrollWidth": 1014,
+        "height": 289,
+        "scrollHeight": 289
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "960-light",
+    "width": 960,
+    "height": 720,
+    "theme": "",
+    "documentWidth": 960,
+    "rootWidth": 696,
+    "rootScrollWidth": 696,
+    "columns": 2,
+    "listLayout": "compact",
+    "navBottom": 773.25,
+    "mainBottom": 688,
+    "scrollAreas": [
+      {
+        "width": 696,
+        "scrollWidth": 696,
+        "height": 600,
+        "scrollHeight": 702
+      },
+      {
+        "width": 694,
+        "scrollWidth": 694,
+        "height": 289,
+        "scrollHeight": 289
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "820-light",
+    "width": 820,
+    "height": 720,
+    "theme": "",
+    "documentWidth": 820,
+    "rootWidth": 556,
+    "rootScrollWidth": 556,
+    "columns": 2,
+    "listLayout": "cards",
+    "navBottom": 958.25,
+    "mainBottom": 688,
+    "scrollAreas": [
+      {
+        "width": 556,
+        "scrollWidth": 556,
+        "height": 600,
+        "scrollHeight": 887
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "390-light",
+    "width": 390,
+    "height": 844,
+    "theme": "",
+    "documentWidth": 390,
+    "rootWidth": 374,
+    "rootScrollWidth": 374,
+    "columns": 2,
+    "listLayout": "cards",
+    "navBottom": 1026,
+    "mainBottom": 812,
+    "scrollAreas": [
+      {
+        "width": 374,
+        "scrollWidth": 374,
+        "height": 740,
+        "scrollHeight": 963
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "1440-dark",
+    "width": 1440,
+    "height": 900,
+    "theme": "dark",
+    "documentWidth": 1440,
+    "rootWidth": 1176,
+    "rootScrollWidth": 1176,
+    "columns": 4,
+    "listLayout": "wide",
+    "navBottom": 662.5,
+    "mainBottom": 868,
+    "scrollAreas": [
+      {
+        "width": 1176,
+        "scrollWidth": 1176,
+        "height": 780,
+        "scrollHeight": 780
+      },
+      {
+        "width": 1174,
+        "scrollWidth": 1174,
+        "height": 289,
+        "scrollHeight": 289
+      }
+    ],
+    "blocked": []
+  },
+  {
+    "name": "390-dark",
+    "width": 390,
+    "height": 844,
+    "theme": "dark",
+    "documentWidth": 390,
+    "rootWidth": 374,
+    "rootScrollWidth": 374,
+    "columns": 2,
+    "listLayout": "cards",
+    "navBottom": 1026,
+    "mainBottom": 812,
+    "scrollAreas": [
+      {
+        "width": 374,
+        "scrollWidth": 374,
+        "height": 740,
+        "scrollHeight": 963
+      }
+    ],
+    "blocked": []
+  }
+]

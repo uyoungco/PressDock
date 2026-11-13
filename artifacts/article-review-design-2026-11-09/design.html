@@ -1,0 +1,4133 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PressDock 批量审核 · 视觉设计稿</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        --ink: #202630;
+        --secondary: #5e6673;
+        --muted: #707987;
+        --line: #e5e8ed;
+        --blue: #2457d6;
+        --blue-hover: #1948bc;
+        --blue-soft: #f2f6fe;
+        --surface: #f7f8fa;
+        --red: #b63c36;
+      }
+      body {
+        margin: 0;
+        background: #f1f2f4;
+        color: var(--ink);
+        font-family:
+          "Geist Variable", "Segoe UI", "Microsoft YaHei", sans-serif;
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      a,
+      input,
+      textarea {
+        font: inherit;
+      }
+      button {
+        border: 0;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0;
+        transition:
+          background-color 0.16s,
+          color 0.16s,
+          border-color 0.16s;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid #2457d650;
+        outline-offset: 3px;
+      }
+      button:disabled {
+        cursor: default;
+        color: #b6bdc8;
+      }
+      p,
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .icon {
+        flex-shrink: 0;
+        vertical-align: middle;
+      }
+      .secondary {
+        color: var(--secondary);
+      }
+      .number {
+        font-variant-numeric: tabular-nums;
+      }
+      b,
+      strong {
+        font-weight: 500;
+      }
+      .sep {
+        margin: 0 8px;
+        color: #b4bac4;
+      }
+      .icon-button {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+      .icon-button:hover:not(:disabled) {
+        background: #eff1f4;
+      }
+      .primary,
+      .secondary-button,
+      .reject-button,
+      .danger {
+        height: 44px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .primary {
+        background: var(--blue);
+        color: white;
+      }
+      .primary:hover {
+        background: var(--blue-hover);
+      }
+      .primary:disabled {
+        background: #e6e9ef;
+        color: #959eac;
+      }
+      .secondary-button {
+        background: #fff;
+        border: 1px solid #dce1e8;
+      }
+      .secondary-button:hover {
+        background: var(--surface);
+      }
+      .reject-button {
+        border: 1px solid #dce1e8;
+        color: var(--red);
+      }
+      .danger {
+        background: var(--red);
+        color: white;
+      }
+      .clear {
+        font-size: 13px;
+        color: var(--secondary);
+        height: 44px;
+        padding: 0 8px;
+        border-radius: 8px;
+      }
+      .clear:hover {
+        background: #e9edf3;
+      }
+      .checkbox {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #bfc8d6;
+        border-radius: 5px;
+        position: relative;
+        flex-shrink: 0;
+        background: #fff;
+        color: #fff;
+      }
+      .checkbox .icon {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2;
+        visibility: hidden;
+      }
+      .checkbox.checked {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+      .checkbox.checked .icon {
+        visibility: visible;
+      }
+      .checkbox:after {
+        content: "";
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .board {
+        width: 1440px;
+        margin: 0 auto;
+        padding: 56px 64px 32px;
+      }
+      .board-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 40px;
+      }
+      .board-eyebrow {
+        font-size: 14px;
+        color: var(--secondary);
+        margin-bottom: 12px;
+      }
+      .board-header h1 {
+        font-size: 32px;
+        line-height: 44px;
+        font-weight: 500;
+      }
+      .board-subtitle {
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--secondary);
+        margin-top: 8px;
+      }
+      .version {
+        color: var(--muted);
+        font-size: 12px;
+        padding-top: 6px;
+        text-align: right;
+        line-height: 24px;
+      }
+      .mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 390px);
+        justify-content: space-between;
+        gap: 40px;
+      }
+      .design-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .design-label span {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--muted);
+      }
+      .mobile-screen {
+        position: relative;
+        width: 390px;
+        height: 844px;
+        background: white;
+        border: 1px solid #d9dee5;
+        border-radius: 12px;
+        overflow: hidden;
+        isolation: isolate;
+        box-shadow: 0 2px 4px #20263005;
+      }
+      .mobile-list {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .appbar {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+        gap: 4px;
+      }
+      .category {
+        height: 44px;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 0 4px;
+        gap: 8px;
+      }
+      .category .icon {
+        width: 16px;
+        height: 16px;
+      }
+      .account {
+        margin-left: auto;
+      }
+      .filterbar {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .filter {
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+      .filterbar .secondary {
+        font-size: 13px;
+      }
+      .filterbar > .icon-button {
+        margin-left: auto;
+        margin-right: -8px;
+      }
+      .selection-strip {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        background: var(--surface);
+        border-block: 1px solid var(--line);
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+      .selection-strip label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+      }
+      .selection-strip .clear {
+        margin-right: -8px;
+      }
+      .article-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #ccd2dc transparent;
+      }
+      .article-row {
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        gap: 16px;
+        min-height: 164px;
+        padding: 20px 20px 12px 16px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+      .article-row.selected {
+        background: var(--blue-soft);
+      }
+      .article-row.selected:before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 2px;
+        background: var(--blue);
+      }
+      .check-column {
+        padding-top: 3px;
+      }
+      .article-copy h2 {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 24px;
+        max-width: 292px;
+        margin-bottom: 8px;
+      }
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 20px;
+        white-space: nowrap;
+      }
+      .article-copy > .meta + .meta {
+        margin-top: 2px;
+      }
+      .row-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 4px;
+        height: 36px;
+      }
+      .row-actions button {
+        height: 36px;
+        font-size: 13px;
+        color: var(--secondary);
+      }
+      .row-actions button:hover {
+        color: var(--blue);
+      }
+      .row-actions .more {
+        margin-left: auto;
+        width: 36px;
+        margin-right: -8px;
+      }
+      .mobile-pagination {
+        height: 52px;
+        flex-shrink: 0;
+        border-top: 1px solid var(--line);
+        padding: 0 12px 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 12px;
+        background: white;
+      }
+      .mobile-pagination > div,
+      .desktop-pagination > div {
+        display: flex;
+        align-items: center;
+        gap: 0;
+      }
+      .mobile-pagination .icon-button {
+        width: 32px;
+        height: 40px;
+      }
+      .page-size {
+        height: 36px;
+        font-size: 12px;
+        color: var(--secondary);
+        gap: 4px;
+        padding: 0 8px;
+      }
+      .page-size .icon {
+        width: 14px;
+        height: 14px;
+      }
+      .selection-dock {
+        height: 88px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-top: 1px solid var(--line);
+        flex-shrink: 0;
+        background: white;
+        box-shadow: 0 -4px 12px #20263003;
+      }
+      .selection-dock p {
+        font-size: 15px;
+        line-height: 24px;
+      }
+      .selection-dock strong {
+        font-size: 20px;
+        margin: 0 4px;
+        color: var(--blue);
+        font-variant-numeric: tabular-nums;
+      }
+      .selection-dock span {
+        font-size: 11px;
+        line-height: 16px;
+        color: var(--muted);
+      }
+      .selection-dock .primary {
+        height: 48px;
+        min-width: 144px;
+        justify-content: space-between;
+      }
+      .sheet-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: none;
+      }
+      .sheet-layer.is-open {
+        display: block;
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: #171e2a66;
+      }
+      .review-sheet {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        box-shadow: 0 -8px 32px #151b2910;
+      }
+      .sheet-header {
+        display: flex;
+        align-items: flex-start;
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid var(--line);
+        gap: 12px;
+      }
+      .sheet-header h2 {
+        font-size: 20px;
+        line-height: 28px;
+        font-weight: 500;
+      }
+      .sheet-header p {
+        margin-top: 8px;
+        color: var(--secondary);
+        font-size: 13px;
+        line-height: 20px;
+      }
+      .sheet-header .icon-button {
+        margin: -8px -8px 0 auto;
+      }
+      .dot {
+        margin: 0 6px;
+        color: var(--muted);
+      }
+      .sheet-body {
+        padding: 24px 20px;
+        overflow: auto;
+        min-height: 0;
+      }
+      .section-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--secondary);
+        margin-bottom: 8px;
+      }
+      .section-label > span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .review-list {
+        padding: 0;
+        list-style: none;
+        margin: 0;
+      }
+      .review-list li {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 12px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .ordinal {
+        padding-top: 2px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 24px;
+      }
+      .review-list h3 {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 24px;
+      }
+      .review-list .meta {
+        margin-top: 8px;
+        gap: 12px;
+      }
+      .review-note {
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 24px;
+        font-size: 13px;
+        line-height: 20px;
+        color: var(--secondary);
+      }
+      .review-note p {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .sheet-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        border-top: 1px solid var(--line);
+        padding: 16px 20px 24px;
+        background: #fff;
+        flex-shrink: 0;
+      }
+      .sheet-footer button {
+        height: 48px;
+      }
+      .compact li {
+        padding: 12px 0;
+      }
+      .compact h3 {
+        font-size: 14px;
+        line-height: 22px;
+      }
+      .compact .meta {
+        margin-top: 4px;
+      }
+      .reason-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 24px 0 8px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .reason-label span {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+      }
+      textarea {
+        width: 100%;
+        resize: none;
+        height: 112px;
+        border: 1px solid #cfd6e0;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--ink);
+        background: white;
+      }
+      .field-hint {
+        font-size: 12px;
+        line-height: 20px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .design-feedback {
+        font-size: 12px;
+        color: var(--secondary);
+        line-height: 20px;
+      }
+      .design-feedback:not(:empty) {
+        margin-top: 12px;
+      }
+      .accept-confirm {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        background: #171e2a66;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .accept-confirm[hidden] {
+        display: none;
+      }
+      .accept-confirm section {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        width: 100%;
+        box-shadow: 0 8px 24px #0001;
+      }
+      .accept-confirm h2 {
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+      .accept-confirm p {
+        font-size: 14px;
+        line-height: 24px;
+      }
+      .accept-confirm section > div {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .accept-confirm section > div > button {
+        flex: 1;
+      }
+      .design-notes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 48px;
+        margin: 24px 0 56px;
+      }
+      .design-notes p {
+        font-size: 13px;
+        line-height: 24px;
+        color: var(--secondary);
+      }
+      .design-notes strong {
+        display: block;
+        font-size: 14px;
+        color: var(--ink);
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      .desktop-section > .design-label {
+        margin-bottom: 16px;
+      }
+      .desktop-screen {
+        height: 696px;
+        width: 1312px;
+        border: 1px solid #d9dee5;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fafbfc;
+        display: flex;
+      }
+      .sidebar {
+        width: 224px;
+        flex-shrink: 0;
+        background: #f4f5f7;
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 16px 16px;
+      }
+      .brand {
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 0 12px;
+      }
+      .brand .icon {
+        width: 20px;
+        height: 20px;
+      }
+      .workspace-label {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 12px 12px 32px;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .sidebar a,
+      .nav-group,
+      .sidebar-bottom {
+        height: 36px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        color: var(--secondary);
+        font-size: 13px;
+        border-radius: 6px;
+      }
+      .sidebar .sub {
+        padding-left: 42px;
+      }
+      .sidebar .active {
+        background: #e7edfa;
+        color: #214db7;
+        font-weight: 500;
+      }
+      .nav-group .icon:last-child {
+        margin-left: auto;
+        width: 14px;
+      }
+      .sidebar-bottom {
+        margin-top: auto;
+      }
+      .desktop-main {
+        min-width: 0;
+        flex: 1;
+      }
+      .desktop-appbar {
+        height: 56px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 28px;
+        font-size: 12px;
+        color: var(--secondary);
+      }
+      .desktop-appbar b {
+        color: var(--ink);
+        font-weight: 400;
+      }
+      .demo-tag {
+        font-size: 11px;
+        margin-left: auto;
+        color: var(--muted);
+      }
+      .desktop-content {
+        padding: 28px;
+      }
+      .page-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .page-heading h1 {
+        font-size: 24px;
+        line-height: 32px;
+        font-weight: 500;
+      }
+      .page-heading p {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .page-heading > .secondary {
+        font-size: 12px;
+      }
+      .table-panel {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+      }
+      .desktop-filter {
+        padding: 16px;
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      .desktop-filter > button {
+        height: 36px;
+        font-size: 12px;
+        padding: 0 12px;
+        border-radius: 6px;
+      }
+      .searchbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        border: 1px solid #dce1e8;
+        border-radius: 6px;
+        height: 36px;
+        padding: 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .searchbox .icon {
+        width: 16px;
+        height: 16px;
+      }
+      .desktop-selection {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 16px;
+      }
+      .desktop-selection label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .desktop-selection .checkbox,
+      table .checkbox {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+      }
+      .desktop-selection p {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .desktop-selection p b {
+        color: var(--blue);
+        margin: 0 2px;
+      }
+      .vertical-rule {
+        height: 16px;
+        width: 1px;
+        background: var(--line);
+      }
+      .desktop-selection .clear {
+        font-size: 12px;
+        margin-left: -8px;
+      }
+      .desktop-selection .primary {
+        height: 32px;
+        font-size: 12px;
+        padding: 0 12px;
+        border-radius: 6px;
+        margin-left: auto;
+      }
+      .desktop-selection .primary .icon {
+        width: 14px;
+      }
+      .desktop-selection > .icon-button {
+        width: 32px;
+        height: 32px;
+        margin-left: -8px;
+      }
+      .desktop-screen table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .desktop-screen th {
+        height: 36px;
+        background: var(--surface);
+        text-align: left;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+        border-block: 1px solid var(--line);
+      }
+      .desktop-screen th:first-child {
+        width: 44px;
+      }
+      .desktop-screen th:nth-child(2) {
+        width: auto;
+      }
+      .desktop-screen th:nth-child(3) {
+        width: 68px;
+      }
+      .desktop-screen th:nth-child(4) {
+        width: 112px;
+      }
+      .desktop-screen th:nth-child(5) {
+        width: 152px;
+      }
+      .desktop-screen td {
+        height: 76px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--secondary);
+      }
+      .desktop-screen td:first-child {
+        padding-left: 16px;
+      }
+      .desktop-screen tr.selected {
+        background: var(--blue-soft);
+      }
+      .desktop-screen tr.selected td:first-child {
+        box-shadow: inset 2px 0 var(--blue);
+      }
+      .desktop-screen h3 {
+        font-size: 13px;
+        line-height: 22px;
+        font-weight: 500;
+        color: var(--ink);
+      }
+      .desktop-screen .meta {
+        font-size: 11px;
+        line-height: 20px;
+        gap: 12px;
+        margin-top: 2px;
+      }
+      .desktop-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .desktop-actions button {
+        height: 36px;
+        font-size: 12px;
+      }
+      .desktop-actions .more {
+        width: 28px;
+      }
+      .desktop-pagination {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .desktop-pagination .icon-button {
+        width: 28px;
+        height: 32px;
+      }
+      .current-page {
+        font-size: 12px;
+        color: var(--blue);
+        background: var(--blue-soft);
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: grid;
+        place-content: center;
+        margin: 0 4px;
+      }
+      .desktop-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin: 12px 4px;
+      }
+      .desktop-feedback {
+        font-size: 12px;
+        color: var(--secondary);
+        margin: 8px 4px;
+      }
+      .board-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        line-height: 20px;
+        color: var(--muted);
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #dce0e6;
+      }
+      .board-footer a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .sidebar {
+        width: 240px;
+      }
+      .article-thumbnail {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        width: 64px;
+        height: 52px;
+        background: #f8f9fb;
+        border: 1px solid #e2e6ed;
+        border-radius: 8px;
+        color: #919baa;
+      }
+      .article-copy h2 {
+        padding-right: 76px;
+      }
+      .article-row {
+        min-height: 176px;
+      }
+      .prototype .article-thumbnail {
+        right: 16px;
+      }
+      body.prototype {
+        background: #fff;
+      }
+      .prototype .board {
+        width: auto;
+        padding: 0;
+        margin: 0;
+      }
+      .prototype .board-header,
+      .prototype .design-notes,
+      .prototype .desktop-section,
+      .prototype .board-footer,
+      .prototype .design-label {
+        display: none;
+      }
+      .prototype .mobile-grid {
+        display: block;
+      }
+      .prototype figure {
+        margin: 0;
+      }
+      .prototype figure:not(:first-child) {
+        display: none;
+      }
+      .prototype .mobile-screen {
+        width: 100vw;
+        height: 100dvh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .prototype-banner {
+        display: none;
+      }
+      .prototype .prototype-banner {
+        display: block;
+        position: fixed;
+        top: 4px;
+        right: 48px;
+        z-index: 6;
+        font-size: 9px;
+        line-height: 12px;
+        color: var(--muted);
+        pointer-events: none;
+      }
+      .prototype .category {
+        font-size: 15px;
+      }
+      .prototype .article-row {
+        min-height: 176px;
+      }
+      .prototype .review-sheet {
+        max-height: calc(100% - 56px);
+      }
+      @page {
+        size: 1440px 2136px;
+        margin: 0;
+      }
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        body {
+          background: #f1f2f4;
+        }
+        .board-footer {
+          break-before: avoid;
+        }
+      }
+      .sidebar {
+        width: 240px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="prototype-banner">演示数据</div>
+    <main class="board">
+      <header class="board-header">
+        <div>
+          <p class="board-eyebrow">PressDock / 文章审核</p>
+          <h1>批量审核，先看清稿件</h1>
+          <p class="board-subtitle">
+            选择留在列表，操作固定在底部；用校样蓝标记本次稿件
+          </p>
+        </div>
+        <div class="version">
+          视觉设计稿 · 2026.11.09<br />所有内容均为演示数据
+        </div>
+      </header>
+      <section class="mobile-grid" aria-label="Android 批量审核设计稿">
+        <figure style="margin: 0">
+          <figcaption class="design-label">
+            01 · 选择稿件 <span>Android · 390 × 844</span>
+          </figcaption>
+          <div class="mobile-screen" data-screen="selection">
+            <div class="mobile-list" data-list="selection">
+              <header class="appbar">
+                <button class="icon-button" aria-label="切换导航">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-panel-left lucide-sidebar icon"
+                    aria-hidden="true"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                    <path d="M9 3v18"></path>
+                  </svg></button
+                ><button class="category">
+                  一级待审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-down icon"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg></button
+                ><button class="icon-button account" aria-label="账号">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-user-round lucide-user-2 icon"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="5"></circle>
+                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                  </svg>
+                </button>
+              </header>
+              <div class="filterbar">
+                <button class="filter">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-sliders-horizontal icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 5H3"></path>
+                    <path d="M12 19H3"></path>
+                    <path d="M14 3v4"></path>
+                    <path d="M16 17v4"></path>
+                    <path d="M21 12h-9"></path>
+                    <path d="M21 19h-5"></path>
+                    <path d="M21 5h-7"></path>
+                    <path d="M8 10v4"></path>
+                    <path d="M8 12H3"></path>
+                  </svg>
+                  筛选</button
+                ><span class="secondary">全部文章</span
+                ><button class="icon-button" aria-label="刷新列表">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-refresh-cw icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                    ></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path
+                      d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                    ></path>
+                    <path d="M8 16H3v5"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="selection-strip">
+                <label
+                  ><button
+                    type="button"
+                    role="checkbox"
+                    aria-label="全选当前页文章"
+                    aria-checked="mixed"
+                    class="checkbox checked"
+                    data-all
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                    </svg></button
+                  ><span>全选本页</span></label
+                ><button class="clear" data-clear>清空</button>
+              </div>
+              <div class="article-scroll">
+                <article class="article-row selected" data-row="8101">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8101"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8101"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8101 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>城市更新，让老街巷焕发新活力</h2>
+                    <p class="meta">
+                      <span class="number">#8101</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 10:24</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8101 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8102">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8102"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8102"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8102 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>从田间到餐桌，守好每一道质量关</h2>
+                    <p class="meta">
+                      <span class="number">#8102</span><span>民生观察</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">林悦<span>11-09 09:48</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8102 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row selected" data-row="8103">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8103"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8103"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8103 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>书香入社区，家门口有了阅读新空间</h2>
+                    <p class="meta">
+                      <span class="number">#8103</span><span>文化生活</span
+                      ><span>3 页</span>
+                    </p>
+                    <p class="meta">周文<span>11-09 09:16</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8103 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8104">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8104"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8104"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8104 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>秋日里的城市绿道，串起身边好风景</h2>
+                    <p class="meta">
+                      <span class="number">#8104</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 08:42</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8104 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="mobile-pagination">
+                <span
+                  >第 <b class="number">1</b> 页<span class="sep">/</span>共 4
+                  篇</span
+                >
+                <div>
+                  <button class="page-size">
+                    50 / 页
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-down icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="上一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-left icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m15 18-6-6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="下一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <footer class="selection-dock">
+                <div>
+                  <p>已选 <strong data-count>2</strong> 篇</p>
+                  <span>仅处理当前页稿件</span>
+                </div>
+                <button class="primary" data-open-review>
+                  批量审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-arrow-right icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </button>
+              </footer>
+            </div>
+            <div class="sheet-layer" data-sheet="review">
+              <div class="scrim"></div>
+              <section class="review-sheet" aria-label="批量审核设计稿">
+                <header class="sheet-header">
+                  <div>
+                    <h2>批量审核</h2>
+                    <p>一级审核 <span class="dot">·</span> 已选 2 篇</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <div class="review-note">
+                    按后台已保存内容审核
+                    <p>请核对本次稿件，再选择审核意见</p>
+                  </div>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="reject-button" data-open-reject>拒绝</button
+                  ><button class="primary" data-accept>同意</button>
+                </footer>
+              </section>
+            </div>
+            <div class="sheet-layer" data-sheet="reject">
+              <div class="scrim"></div>
+              <section
+                class="review-sheet reject-sheet"
+                aria-label="拒绝原因设计稿"
+              >
+                <header class="sheet-header">
+                  <div>
+                    <h2>拒绝 2 篇稿件</h2>
+                    <p>同一原因将用于本次全部稿件</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list compact">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <label class="reason-label" for="reason-reject"
+                    >拒绝原因<span>必填</span></label
+                  ><textarea
+                    id="reason-reject"
+                    aria-label="拒绝原因"
+                    placeholder="填写需要修改或补充的内容"
+                  >
+请补充信息来源，并核对稿件中的关键数据。</textarea>
+                  <p class="field-hint">请填写具体原因，便于继续修改稿件</p>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="secondary-button" data-back-review>返回</button
+                  ><button class="danger" data-confirm-reject>确认拒绝</button>
+                </footer>
+              </section>
+            </div>
+            <div class="accept-confirm" hidden>
+              <section>
+                <h2>确认通过审核？</h2>
+                <p>本次处理 <strong>2</strong> 篇稿件</p>
+                <p class="secondary">审核结果以后台确认为准</p>
+                <div>
+                  <button class="secondary-button" data-cancel-accept>
+                    取消</button
+                  ><button class="primary" data-confirm-accept>确认同意</button>
+                </div>
+                <p class="design-feedback" role="status"></p>
+              </section>
+            </div>
+          </div>
+        </figure>
+        <figure style="margin: 0">
+          <figcaption class="design-label">
+            02 · 核对本次稿件 <span>批量审核</span>
+          </figcaption>
+          <div class="mobile-screen" data-screen="review">
+            <div class="mobile-list" data-list="review">
+              <header class="appbar">
+                <button class="icon-button" aria-label="切换导航">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-panel-left lucide-sidebar icon"
+                    aria-hidden="true"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                    <path d="M9 3v18"></path>
+                  </svg></button
+                ><button class="category">
+                  一级待审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-down icon"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg></button
+                ><button class="icon-button account" aria-label="账号">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-user-round lucide-user-2 icon"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="5"></circle>
+                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                  </svg>
+                </button>
+              </header>
+              <div class="filterbar">
+                <button class="filter">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-sliders-horizontal icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 5H3"></path>
+                    <path d="M12 19H3"></path>
+                    <path d="M14 3v4"></path>
+                    <path d="M16 17v4"></path>
+                    <path d="M21 12h-9"></path>
+                    <path d="M21 19h-5"></path>
+                    <path d="M21 5h-7"></path>
+                    <path d="M8 10v4"></path>
+                    <path d="M8 12H3"></path>
+                  </svg>
+                  筛选</button
+                ><span class="secondary">全部文章</span
+                ><button class="icon-button" aria-label="刷新列表">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-refresh-cw icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                    ></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path
+                      d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                    ></path>
+                    <path d="M8 16H3v5"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="selection-strip">
+                <label
+                  ><button
+                    type="button"
+                    role="checkbox"
+                    aria-label="全选当前页文章"
+                    aria-checked="mixed"
+                    class="checkbox checked"
+                    data-all
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                    </svg></button
+                  ><span>全选本页</span></label
+                ><button class="clear" data-clear>清空</button>
+              </div>
+              <div class="article-scroll">
+                <article class="article-row selected" data-row="8101">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8101"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8101"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8101 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>城市更新，让老街巷焕发新活力</h2>
+                    <p class="meta">
+                      <span class="number">#8101</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 10:24</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8101 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8102">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8102"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8102"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8102 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>从田间到餐桌，守好每一道质量关</h2>
+                    <p class="meta">
+                      <span class="number">#8102</span><span>民生观察</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">林悦<span>11-09 09:48</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8102 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row selected" data-row="8103">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8103"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8103"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8103 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>书香入社区，家门口有了阅读新空间</h2>
+                    <p class="meta">
+                      <span class="number">#8103</span><span>文化生活</span
+                      ><span>3 页</span>
+                    </p>
+                    <p class="meta">周文<span>11-09 09:16</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8103 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8104">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8104"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8104"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8104 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>秋日里的城市绿道，串起身边好风景</h2>
+                    <p class="meta">
+                      <span class="number">#8104</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 08:42</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8104 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="mobile-pagination">
+                <span
+                  >第 <b class="number">1</b> 页<span class="sep">/</span>共 4
+                  篇</span
+                >
+                <div>
+                  <button class="page-size">
+                    50 / 页
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-down icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="上一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-left icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m15 18-6-6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="下一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <footer class="selection-dock">
+                <div>
+                  <p>已选 <strong data-count>2</strong> 篇</p>
+                  <span>仅处理当前页稿件</span>
+                </div>
+                <button class="primary" data-open-review>
+                  批量审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-arrow-right icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </button>
+              </footer>
+            </div>
+            <div class="sheet-layer is-open" data-sheet="review">
+              <div class="scrim"></div>
+              <section class="review-sheet" aria-label="批量审核设计稿">
+                <header class="sheet-header">
+                  <div>
+                    <h2>批量审核</h2>
+                    <p>一级审核 <span class="dot">·</span> 已选 2 篇</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <div class="review-note">
+                    按后台已保存内容审核
+                    <p>请核对本次稿件，再选择审核意见</p>
+                  </div>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="reject-button" data-open-reject>拒绝</button
+                  ><button class="primary" data-accept>同意</button>
+                </footer>
+              </section>
+            </div>
+            <div class="sheet-layer" data-sheet="reject">
+              <div class="scrim"></div>
+              <section
+                class="review-sheet reject-sheet"
+                aria-label="拒绝原因设计稿"
+              >
+                <header class="sheet-header">
+                  <div>
+                    <h2>拒绝 2 篇稿件</h2>
+                    <p>同一原因将用于本次全部稿件</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list compact">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <label class="reason-label" for="reason-reject"
+                    >拒绝原因<span>必填</span></label
+                  ><textarea
+                    id="reason-reject"
+                    aria-label="拒绝原因"
+                    placeholder="填写需要修改或补充的内容"
+                  >
+请补充信息来源，并核对稿件中的关键数据。</textarea>
+                  <p class="field-hint">请填写具体原因，便于继续修改稿件</p>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="secondary-button" data-back-review>返回</button
+                  ><button class="danger" data-confirm-reject>确认拒绝</button>
+                </footer>
+              </section>
+            </div>
+            <div class="accept-confirm" hidden>
+              <section>
+                <h2>确认通过审核？</h2>
+                <p>本次处理 <strong>2</strong> 篇稿件</p>
+                <p class="secondary">审核结果以后台确认为准</p>
+                <div>
+                  <button class="secondary-button" data-cancel-accept>
+                    取消</button
+                  ><button class="primary" data-confirm-accept>确认同意</button>
+                </div>
+                <p class="design-feedback" role="status"></p>
+              </section>
+            </div>
+          </div>
+        </figure>
+        <figure style="margin: 0">
+          <figcaption class="design-label">
+            03 · 填写拒绝原因 <span>同批共用原因</span>
+          </figcaption>
+          <div class="mobile-screen" data-screen="reject">
+            <div class="mobile-list" data-list="reject">
+              <header class="appbar">
+                <button class="icon-button" aria-label="切换导航">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-panel-left lucide-sidebar icon"
+                    aria-hidden="true"
+                  >
+                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                    <path d="M9 3v18"></path>
+                  </svg></button
+                ><button class="category">
+                  一级待审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-down icon"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg></button
+                ><button class="icon-button account" aria-label="账号">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-user-round lucide-user-2 icon"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="5"></circle>
+                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                  </svg>
+                </button>
+              </header>
+              <div class="filterbar">
+                <button class="filter">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-sliders-horizontal icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 5H3"></path>
+                    <path d="M12 19H3"></path>
+                    <path d="M14 3v4"></path>
+                    <path d="M16 17v4"></path>
+                    <path d="M21 12h-9"></path>
+                    <path d="M21 19h-5"></path>
+                    <path d="M21 5h-7"></path>
+                    <path d="M8 10v4"></path>
+                    <path d="M8 12H3"></path>
+                  </svg>
+                  筛选</button
+                ><span class="secondary">全部文章</span
+                ><button class="icon-button" aria-label="刷新列表">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-refresh-cw icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                    ></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path
+                      d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                    ></path>
+                    <path d="M8 16H3v5"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="selection-strip">
+                <label
+                  ><button
+                    type="button"
+                    role="checkbox"
+                    aria-label="全选当前页文章"
+                    aria-checked="mixed"
+                    class="checkbox checked"
+                    data-all
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                    </svg></button
+                  ><span>全选本页</span></label
+                ><button class="clear" data-clear>清空</button>
+              </div>
+              <div class="article-scroll">
+                <article class="article-row selected" data-row="8101">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8101"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8101"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8101 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>城市更新，让老街巷焕发新活力</h2>
+                    <p class="meta">
+                      <span class="number">#8101</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 10:24</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8101 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8102">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8102"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8102"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8102 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>从田间到餐桌，守好每一道质量关</h2>
+                    <p class="meta">
+                      <span class="number">#8102</span><span>民生观察</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">林悦<span>11-09 09:48</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8102 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row selected" data-row="8103">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8103"
+                      aria-checked="true"
+                      class="checkbox checked"
+                      data-check="8103"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8103 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>书香入社区，家门口有了阅读新空间</h2>
+                    <p class="meta">
+                      <span class="number">#8103</span><span>文化生活</span
+                      ><span>3 页</span>
+                    </p>
+                    <p class="meta">周文<span>11-09 09:16</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8103 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+                <article class="article-row" data-row="8104">
+                  <div class="check-column">
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-label="选择文章 8104"
+                      aria-checked="false"
+                      class="checkbox"
+                      data-check="8104"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-check icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="article-copy">
+                    <button
+                      class="article-thumbnail"
+                      aria-label="文章 8104 配图，暂无图片"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-image icon"
+                        aria-hidden="true"
+                      >
+                        <rect
+                          width="18"
+                          height="18"
+                          x="3"
+                          y="3"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="9" cy="9" r="2"></circle>
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        ></path>
+                      </svg>
+                    </button>
+                    <h2>秋日里的城市绿道，串起身边好风景</h2>
+                    <p class="meta">
+                      <span class="number">#8104</span><span>城市建设</span
+                      ><span>2 页</span>
+                    </p>
+                    <p class="meta">陈宁<span>11-09 08:42</span></p>
+                    <div class="row-actions">
+                      <button>编辑</button><button>审核</button
+                      ><button class="more" aria-label="文章 8104 更多操作">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="mobile-pagination">
+                <span
+                  >第 <b class="number">1</b> 页<span class="sep">/</span>共 4
+                  篇</span
+                >
+                <div>
+                  <button class="page-size">
+                    50 / 页
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-down icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="上一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-left icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m15 18-6-6 6-6"></path>
+                    </svg></button
+                  ><button class="icon-button" disabled aria-label="下一页">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-right icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <footer class="selection-dock">
+                <div>
+                  <p>已选 <strong data-count>2</strong> 篇</p>
+                  <span>仅处理当前页稿件</span>
+                </div>
+                <button class="primary" data-open-review>
+                  批量审核
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-arrow-right icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </button>
+              </footer>
+            </div>
+            <div class="sheet-layer" data-sheet="review">
+              <div class="scrim"></div>
+              <section class="review-sheet" aria-label="批量审核设计稿">
+                <header class="sheet-header">
+                  <div>
+                    <h2>批量审核</h2>
+                    <p>一级审核 <span class="dot">·</span> 已选 2 篇</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <div class="review-note">
+                    按后台已保存内容审核
+                    <p>请核对本次稿件，再选择审核意见</p>
+                  </div>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="reject-button" data-open-reject>拒绝</button
+                  ><button class="primary" data-accept>同意</button>
+                </footer>
+              </section>
+            </div>
+            <div class="sheet-layer is-open" data-sheet="reject">
+              <div class="scrim"></div>
+              <section
+                class="review-sheet reject-sheet"
+                aria-label="拒绝原因设计稿"
+              >
+                <header class="sheet-header">
+                  <div>
+                    <h2>拒绝 2 篇稿件</h2>
+                    <p>同一原因将用于本次全部稿件</p>
+                  </div>
+                  <button
+                    class="icon-button"
+                    data-close-sheet
+                    aria-label="关闭审核"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-x icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M18 6 6 18"></path>
+                      <path d="m6 6 12 12"></path>
+                    </svg>
+                  </button>
+                </header>
+                <div class="sheet-body">
+                  <div class="section-label">本次审核稿件<span>2 篇</span></div>
+                  <ol class="review-list compact">
+                    <li>
+                      <span class="ordinal number">01</span>
+                      <div>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="ordinal number">02</span>
+                      <div>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </div>
+                    </li>
+                  </ol>
+                  <label class="reason-label" for="reason-reject"
+                    >拒绝原因<span>必填</span></label
+                  ><textarea
+                    id="reason-reject"
+                    aria-label="拒绝原因"
+                    placeholder="填写需要修改或补充的内容"
+                  >
+请补充信息来源，并核对稿件中的关键数据。</textarea>
+                  <p class="field-hint">请填写具体原因，便于继续修改稿件</p>
+                  <p class="design-feedback" role="status"></p>
+                </div>
+                <footer class="sheet-footer">
+                  <button class="secondary-button" data-back-review>返回</button
+                  ><button class="danger" data-confirm-reject>确认拒绝</button>
+                </footer>
+              </section>
+            </div>
+            <div class="accept-confirm" hidden>
+              <section>
+                <h2>确认通过审核？</h2>
+                <p>本次处理 <strong>2</strong> 篇稿件</p>
+                <p class="secondary">审核结果以后台确认为准</p>
+                <div>
+                  <button class="secondary-button" data-cancel-accept>
+                    取消</button
+                  ><button class="primary" data-confirm-accept>确认同意</button>
+                </div>
+                <p class="design-feedback" role="status"></p>
+              </section>
+            </div>
+          </div>
+        </figure>
+      </section>
+      <section class="design-notes">
+        <p>
+          <strong>选择有反馈，标题有空间</strong>20px 方框、44px
+          触控区；浅蓝底与细线标记已选稿件，清空退为次要操作
+        </p>
+        <p>
+          <strong>让审核决定紧挨稿件清单</strong
+          >手机使用底部确认面板，保留列表上下文；同意后仍需再次确认
+        </p>
+        <p>
+          <strong>只在拒绝时使用语义红</strong
+          >原因单独成组，沿用具体标题与编号；不增加字数限制
+        </p>
+      </section>
+      <section class="desktop-section">
+        <h2 class="design-label">
+          04 · 桌面对应样式 <span>同一套选择状态与按钮层级</span>
+        </h2>
+        <div class="desktop-screen" data-screen="desktop">
+          <aside class="sidebar">
+            <div class="brand">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-newspaper icon"
+                aria-hidden="true"
+              >
+                <path d="M15 18h-5"></path>
+                <path d="M18 14h-8"></path>
+                <path
+                  d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"
+                ></path>
+                <rect width="8" height="4" x="10" y="6" rx="1"></rect></svg
+              ><span>PressDock</span>
+            </div>
+            <p class="workspace-label">新闻编辑工作空间</p>
+            <nav>
+              <a
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-layout-dashboard icon"
+                  aria-hidden="true"
+                >
+                  <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                  <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                  <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                  <rect width="7" height="5" x="3" y="16" rx="1"></rect></svg
+                >工作台</a
+              ><a
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-folder-open icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"
+                  ></path></svg
+                >渠道素材</a
+              >
+              <div class="nav-group">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-file-text icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                  ></path>
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+                  <path d="M10 9H8"></path>
+                  <path d="M16 13H8"></path>
+                  <path d="M16 17H8"></path></svg
+                >文章管理
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-chevron-down icon"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+              </div>
+              <a class="sub">优质文章</a><a class="sub active">一级待审核</a
+              ><a class="sub">二级待审核</a><a class="sub">三级待审核</a
+              ><a
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-image icon"
+                  aria-hidden="true"
+                >
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                  <circle cx="9" cy="9" r="2"></circle>
+                  <path
+                    d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                  ></path></svg
+                >图片处理</a
+              >
+            </nav>
+            <div class="sidebar-bottom">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-settings icon"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"
+                ></path>
+                <circle cx="12" cy="12" r="3"></circle></svg
+              >系统设置
+            </div>
+          </aside>
+          <div class="desktop-main">
+            <header class="desktop-appbar">
+              <span
+                >工作空间 <span class="sep">/</span> 文章管理
+                <span class="sep">/</span> <b>一级待审核</b></span
+              ><span class="demo-tag">演示数据</span
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-user-round lucide-user-2 icon"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="8" r="5"></circle>
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+              </svg>
+            </header>
+            <div class="desktop-content">
+              <header class="page-heading">
+                <div>
+                  <h1>一级待审核</h1>
+                  <p>核对稿件内容，继续当前审核流程</p>
+                </div>
+                <span class="secondary">共 4 篇文章</span>
+              </header>
+              <section class="table-panel">
+                <div class="desktop-filter">
+                  <div class="searchbox">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-search icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m21 21-4.34-4.34"></path>
+                      <circle cx="11" cy="11" r="8"></circle></svg
+                    ><span>搜索文章标题</span>
+                  </div>
+                  <button class="secondary-button">
+                    全部分类
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-down icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg></button
+                  ><button class="secondary-button">
+                    更多筛选
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-chevron-down icon"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg></button
+                  ><button class="primary">搜索</button>
+                </div>
+                <div class="desktop-selection">
+                  <label
+                    ><button
+                      type="button"
+                      role="checkbox"
+                      aria-label="全选表格当前页文章"
+                      aria-checked="mixed"
+                      class="checkbox checked"
+                      data-all
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-minus icon"
+                        aria-hidden="true"
+                      >
+                        <path d="M5 12h14"></path>
+                      </svg></button
+                    >全选本页</label
+                  >
+                  <div class="vertical-rule"></div>
+                  <p>已选 <b class="number" data-count>2</b> 篇</p>
+                  <button class="clear" data-clear>清空</button
+                  ><button class="primary" data-desktop-review>
+                    批量审核
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-arrow-right icon"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg></button
+                  ><button class="icon-button" aria-label="刷新">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-refresh-cw icon"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                      ></path>
+                      <path d="M21 3v5h-5"></path>
+                      <path
+                        d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                      ></path>
+                      <path d="M8 16H3v5"></path>
+                    </svg>
+                  </button>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>稿件</th>
+                      <th>作者</th>
+                      <th>时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="selected" data-row="8101">
+                      <td>
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-label="选择文章 8101"
+                          aria-checked="true"
+                          class="checkbox checked"
+                          data-check="8101"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-check icon"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6 9 17l-5-5"></path>
+                          </svg>
+                        </button>
+                      </td>
+                      <td>
+                        <h3>城市更新，让老街巷焕发新活力</h3>
+                        <p class="meta">
+                          <span class="number">#8101</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </td>
+                      <td>陈宁</td>
+                      <td class="number">11-09 10:24</td>
+                      <td>
+                        <div class="desktop-actions">
+                          <button>编辑</button><button>审核</button
+                          ><button class="more" aria-label="更多操作">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="19" cy="12" r="1"></circle>
+                              <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="" data-row="8102">
+                      <td>
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-label="选择文章 8102"
+                          aria-checked="false"
+                          class="checkbox"
+                          data-check="8102"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-check icon"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6 9 17l-5-5"></path>
+                          </svg>
+                        </button>
+                      </td>
+                      <td>
+                        <h3>从田间到餐桌，守好每一道质量关</h3>
+                        <p class="meta">
+                          <span class="number">#8102</span><span>民生观察</span
+                          ><span>2 页</span>
+                        </p>
+                      </td>
+                      <td>林悦</td>
+                      <td class="number">11-09 09:48</td>
+                      <td>
+                        <div class="desktop-actions">
+                          <button>编辑</button><button>审核</button
+                          ><button class="more" aria-label="更多操作">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="19" cy="12" r="1"></circle>
+                              <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="selected" data-row="8103">
+                      <td>
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-label="选择文章 8103"
+                          aria-checked="true"
+                          class="checkbox checked"
+                          data-check="8103"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-check icon"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6 9 17l-5-5"></path>
+                          </svg>
+                        </button>
+                      </td>
+                      <td>
+                        <h3>书香入社区，家门口有了阅读新空间</h3>
+                        <p class="meta">
+                          <span class="number">#8103</span><span>文化生活</span
+                          ><span>3 页</span>
+                        </p>
+                      </td>
+                      <td>周文</td>
+                      <td class="number">11-09 09:16</td>
+                      <td>
+                        <div class="desktop-actions">
+                          <button>编辑</button><button>审核</button
+                          ><button class="more" aria-label="更多操作">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="19" cy="12" r="1"></circle>
+                              <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="" data-row="8104">
+                      <td>
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-label="选择文章 8104"
+                          aria-checked="false"
+                          class="checkbox"
+                          data-check="8104"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-check icon"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6 9 17l-5-5"></path>
+                          </svg>
+                        </button>
+                      </td>
+                      <td>
+                        <h3>秋日里的城市绿道，串起身边好风景</h3>
+                        <p class="meta">
+                          <span class="number">#8104</span><span>城市建设</span
+                          ><span>2 页</span>
+                        </p>
+                      </td>
+                      <td>陈宁</td>
+                      <td class="number">11-09 08:42</td>
+                      <td>
+                        <div class="desktop-actions">
+                          <button>编辑</button><button>审核</button
+                          ><button class="more" aria-label="更多操作">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-ellipsis lucide-more-horizontal icon"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="1"></circle>
+                              <circle cx="19" cy="12" r="1"></circle>
+                              <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <footer class="desktop-pagination">
+                  <span>已显示当前页全部 4 篇文章</span>
+                  <div>
+                    <button class="page-size">
+                      50 条 / 页
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-chevron-down icon"
+                        aria-hidden="true"
+                      >
+                        <path d="m6 9 6 6 6-6"></path>
+                      </svg></button
+                    ><button class="icon-button" disabled aria-label="上一页">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-chevron-left icon"
+                        aria-hidden="true"
+                      >
+                        <path d="m15 18-6-6 6-6"></path>
+                      </svg></button
+                    ><b class="current-page number">1</b
+                    ><button class="icon-button" disabled aria-label="下一页">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-chevron-right icon"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 18 6-6-6-6"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </footer>
+              </section>
+              <p class="desktop-hint">
+                仅选择当前页稿件 · 换页或刷新后清空选择
+              </p>
+              <p class="desktop-feedback" role="status"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="board-footer">
+        <span
+          >PressDock · 设计演示，不连接 CMS · 20px 视觉方框 / 44px
+          手机触控区</span
+        ><span
+          >设计方法：<a href="https://heydamir.design/unslop"
+            >unslop by Damir Sokolovsky</a
+          >
+          · CC BY 4.0</span
+        >
+      </footer>
+    </main>
+    <script>
+      const selectedIds = new Set([8101, 8103]);
+      function sync(screen) {
+        const ids = [...screen.querySelectorAll("[data-check]")].map(
+          (b) => +b.dataset.check,
+        );
+        const unique = [...new Set(ids)];
+        screen.querySelectorAll("[data-check]").forEach((b) => {
+          const on = selectedIds.has(+b.dataset.check);
+          b.classList.toggle("checked", on);
+          b.setAttribute("aria-checked", String(on));
+        });
+        screen
+          .querySelectorAll("[data-row]")
+          .forEach((r) =>
+            r.classList.toggle("selected", selectedIds.has(+r.dataset.row)),
+          );
+        const count = unique.filter((id) => selectedIds.has(id)).length;
+        screen
+          .querySelectorAll("[data-count]")
+          .forEach((n) => (n.textContent = count));
+        screen.querySelectorAll("[data-all]").forEach((b) => {
+          const state =
+            count === unique.length ? "true" : count ? "mixed" : "false";
+          b.setAttribute("aria-checked", state);
+          b.classList.toggle("checked", !!count);
+          b.innerHTML =
+            count && count !== unique.length
+              ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus icon" aria-hidden="true"><path d="M5 12h14"></path></svg>'
+              : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check icon" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
+        });
+        screen
+          .querySelectorAll("[data-open-review],[data-desktop-review]")
+          .forEach((b) => (b.disabled = !count));
+        screen
+          .querySelectorAll("[data-clear]")
+          .forEach((b) => (b.style.visibility = count ? "visible" : "hidden"));
+      }
+      function selectedRows(screen) {
+        const list = [...screen.querySelectorAll(".article-row")].filter((r) =>
+          selectedIds.has(+r.dataset.row),
+        );
+        screen.querySelectorAll(".review-list").forEach((ol) => {
+          ol.innerHTML = list
+            .map(
+              (r, i) =>
+                '<li><span class="ordinal number">' +
+                String(i + 1).padStart(2, "0") +
+                "</span><div><h3>" +
+                r.querySelector("h2").textContent +
+                "</h3>" +
+                r.querySelector(".meta").outerHTML +
+                "</div></li>",
+            )
+            .join("");
+        });
+        const n = list.length;
+        screen.querySelector(
+          '[data-sheet="review"] .sheet-header p',
+        ).textContent = "一级审核 · 已选 " + n + " 篇";
+        screen.querySelector(
+          '[data-sheet="reject"] .sheet-header h2',
+        ).textContent = "拒绝 " + n + " 篇稿件";
+        screen
+          .querySelectorAll(".section-label>span")
+          .forEach((e) => (e.textContent = n + " 篇"));
+        screen.querySelector(".accept-confirm p strong").textContent = n;
+      }
+      document.addEventListener("click", (e) => {
+        const button = e.target.closest("button");
+        if (!button || button.disabled) return;
+        const screen = button.closest("[data-screen]");
+        if (!screen) return;
+        if (button.matches("[data-check]")) {
+          const id = +button.dataset.check;
+          selectedIds.has(id) ? selectedIds.delete(id) : selectedIds.add(id);
+          sync(screen);
+        }
+        if (button.matches("[data-all]")) {
+          const ids = [
+            ...new Set(
+              [...screen.querySelectorAll("[data-check]")].map(
+                (b) => +b.dataset.check,
+              ),
+            ),
+          ];
+          const all = ids.every((id) => selectedIds.has(id));
+          ids.forEach((id) =>
+            all ? selectedIds.delete(id) : selectedIds.add(id),
+          );
+          sync(screen);
+        }
+        if (button.matches("[data-clear]")) {
+          selectedIds.clear();
+          sync(screen);
+        }
+        if (button.matches("[data-open-review]")) {
+          selectedRows(screen);
+          screen
+            .querySelector('[data-sheet="review"]')
+            .classList.add("is-open");
+        }
+        if (button.matches("[data-close-sheet]")) {
+          screen
+            .querySelectorAll(".sheet-layer")
+            .forEach((s) => s.classList.remove("is-open"));
+        }
+        if (button.matches("[data-open-reject]")) {
+          screen
+            .querySelector('[data-sheet="review"]')
+            .classList.remove("is-open");
+          screen
+            .querySelector('[data-sheet="reject"]')
+            .classList.add("is-open");
+          screen.querySelector("textarea").focus();
+        }
+        if (button.matches("[data-back-review]")) {
+          screen
+            .querySelector('[data-sheet="reject"]')
+            .classList.remove("is-open");
+          screen
+            .querySelector('[data-sheet="review"]')
+            .classList.add("is-open");
+        }
+        if (button.matches("[data-accept]"))
+          screen.querySelector(".accept-confirm").hidden = false;
+        if (button.matches("[data-cancel-accept]"))
+          screen.querySelector(".accept-confirm").hidden = true;
+        if (button.matches("[data-confirm-reject]")) {
+          const t = screen.querySelector("textarea");
+          const p = screen.querySelector(
+            '[data-sheet="reject"] .design-feedback',
+          );
+          p.textContent = t.value.trim()
+            ? "设计演示：未执行审核"
+            : "请填写拒绝原因";
+          if (!t.value.trim()) t.focus();
+        }
+        if (button.matches("[data-confirm-accept]"))
+          screen.querySelector(".accept-confirm .design-feedback").textContent =
+            "设计演示：未执行审核";
+        if (button.matches("[data-desktop-review]"))
+          screen.querySelector(".desktop-feedback").textContent =
+            "设计演示：批量确认样式见上方手机稿件清单，未执行审核";
+      });
+      if (new URLSearchParams(location.search).get("view") === "prototype")
+        document.body.classList.add("prototype");
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document
+            .querySelectorAll(".accept-confirm")
+            .forEach((d) => (d.hidden = true));
+      });
+    </script>
+  </body>
+</html>

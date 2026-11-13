@@ -155,6 +155,22 @@ pub async fn cms_update_article(
     Err(unsupported())
 }
 #[tauri::command]
+pub async fn cms_review_article(
+    request: ArticleReviewInput,
+    cms: State<'_, CmsService>,
+) -> Result<ArticleReviewSummary, CommandError> {
+    let _ = (request, cms);
+    Err(unsupported())
+}
+#[tauri::command]
+pub async fn cms_review_articles(
+    request: ArticlesReviewInput,
+    cms: State<'_, CmsService>,
+) -> Result<ArticleReviewSummary, CommandError> {
+    let _ = (request, cms);
+    Err(unsupported())
+}
+#[tauri::command]
 pub async fn cms_add_article_to_promote(
     request: ArticlePromoteInput,
     cms: State<'_, CmsService>,

@@ -53,6 +53,7 @@ import {
   DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -70,6 +71,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { onClientInvalidated, ServiceError } from "@/services/tauri/client";
 import { articleService } from "./service";
 import { PaginationAssistant } from "./PaginationAssistant";
+import { EditorPageMenu } from "./EditorPageMenu";
 import { insertionBoundary, readPagination } from "./editor-pagination";
 import { deletePageBreakAt } from "./editor-page-break";
 import {
@@ -83,6 +85,8 @@ import {
 
 const imageTypes = ["image/jpeg", "image/png", "image/webp"];
 const imageSizeLimit = 20 * 1024 * 1024;
+const pageBreakShortcutLabel = "F8 / Ctrl+Shift+Enter";
+const pageBreakShortcutKeys = "F8 Control+Shift+Enter";
 
 function ToolHint({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -187,6 +191,30 @@ export default function RichTextEditor({
         role: "textbox",
         "aria-label": "文章正文",
         "aria-multiline": "true",
+      },
+      handleKeyDown(view, event) {
+        const pageShortcut =
+          !event.altKey &&
+          !event.metaKey &&
+          ((event.key === "F8" && !event.ctrlKey && !event.shiftKey) ||
+            (event.key === "Enter" && event.ctrlKey && event.shiftKey));
+        if (
+          !pageShortcut ||
+          event.isComposing ||
+          event.keyCode === 229 ||
+          view.composing
+        )
+          return false;
+        event.preventDefault();
+        if (
+          !event.repeat &&
+          view.hasFocus() &&
+          !source &&
+          !link &&
+          !paginationOpen
+        )
+          insertPageBreak();
+        return true;
       },
       handlePaste(_view, event) {
         const current = work.current;
@@ -657,12 +685,12 @@ export default function RichTextEditor({
     );
     if (!paginationOpen) editor!.view.focus();
   }
-  function insertPageBreak() {
+  function insertPageBreak(selectionEnd?: number) {
     if (!canEdit()) return;
     const target = editor!;
     const position = insertionBoundary(
       target.state.doc,
-      target.state.selection.to,
+      selectionEnd ?? target.state.selection.to,
     );
     if (position === null) return;
     const marker = target.schema.nodes.paragraph.create(
@@ -773,14 +801,16 @@ export default function RichTextEditor({
     icon: ReactNode,
     run: () => void,
     unavailable = false,
+    shortcut?: { label: string; keys: string },
   ) {
     return (
-      <ToolHint label={label}>
+      <ToolHint label={shortcut ? `${label}（${shortcut.label}）` : label}>
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
           aria-label={label}
+          aria-keyshortcuts={shortcut?.keys}
           disabled={locked || unavailable}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => {
@@ -955,6 +985,11 @@ export default function RichTextEditor({
                   ].map((item) => (
                     <DropdownMenuItem
                       key={item.label}
+                      aria-keyshortcuts={
+                        item.label === "插入分页符"
+                          ? pageBreakShortcutKeys
+                          : undefined
+                      }
                       disabled={
                         (item.label === "HTML 源码" ? sourceLocked : locked) ||
                         item.unavailable
@@ -964,6 +999,11 @@ export default function RichTextEditor({
                       }}
                     >
                       {item.label}
+                      {item.label === "插入分页符" && (
+                        <DropdownMenuShortcut aria-hidden="true">
+                          {pageBreakShortcutLabel}
+                        </DropdownMenuShortcut>
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuGroup>
@@ -1125,6 +1165,7 @@ export default function RichTextEditor({
               <SeparatorHorizontalIcon />,
               insertPageBreak,
               state?.paginationBoundary == null,
+              { label: pageBreakShortcutLabel, keys: pageBreakShortcutKeys },
             )}
             <Button
               type="button"
@@ -1216,6 +1257,16 @@ export default function RichTextEditor({
               }}
             />
           </div>
+        ) : editor && !isAndroid() ? (
+          <EditorPageMenu
+            editor={editor}
+            disabled={locked || !!source || !!link || paginationOpen}
+            onInsert={insertPageBreak}
+            shortcutLabel={pageBreakShortcutLabel}
+            shortcutKeys={pageBreakShortcutKeys}
+          >
+            <EditorContent editor={editor} />
+          </EditorPageMenu>
         ) : (
           <EditorContent editor={editor} />
         )}
@@ -1227,7 +1278,11 @@ export default function RichTextEditor({
             0,
           )}{" "}
           字 · {paginationSummary.pages.length} 页
-          <span>分页按正文中的光标位置插入</span>
+          <span>
+            {isAndroid()
+              ? "分页按正文中的光标位置插入"
+              : "工具栏按光标所在块分页；右键可在所点内容块后分页"}
+          </span>
         </div>
       )}
       {/* 每次打开持有独立初稿；关闭卸载时只清除未应用的临时状态。 */}

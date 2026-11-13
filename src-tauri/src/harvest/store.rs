@@ -126,6 +126,10 @@ impl Database {
                 .try_get::<Option<&str>, _>("prepared")?
                 .map(serde_json::from_str)
                 .transpose()?,
+            organized: row
+                .try_get::<Option<&str>, _>("organized")?
+                .map(serde_json::from_str)
+                .transpose()?,
         })
     }
     pub(crate) async fn harvest_enqueue(
@@ -138,6 +142,12 @@ impl Database {
         }
         let normalized = source_url(&request.url)?.to_string();
         let options = self.harvest_settings().await?.options;
+        // 定位已入队记录优先于检查当前 AI 配置；后来删除模板不能阻止复用旧任务。
+        if let Some(row)=sqlx::query("SELECT *,COALESCE(json_extract(options,'$.developerMode'),0) AS developer_mode,COALESCE(json_extract(options,'$.sourceMode'),'webview') AS source_mode FROM harvest_jobs WHERE id=? OR (user_id=? AND normalized_url=? AND COALESCE(json_extract(options,'$.developerMode'),0)=?) ORDER BY CASE WHEN id=? THEN 0 ELSE 1 END LIMIT 1")
+            .bind(&request.id).bind(user).bind(&normalized).bind(options.developer_mode).bind(&request.id).fetch_optional(&self.pool).await? {
+            if row.try_get::<i64,_>("user_id")?!=user || row.try_get::<String,_>("normalized_url")?!=normalized {return Err(HarvestError::invalid("采集请求 ID 已被使用"));}
+            return Ok((job_row(&row)?,serde_json::from_str(row.try_get("options")?)?));
+        }
         let mut pagination_snapshot = if options.ai_auto_paginate {
             // 快照只包含模板内容和绑定 ID；不读取或保存密钥。配置存储错误不能当作配置缺失。
             self.ai_settings()
@@ -164,10 +174,38 @@ impl Database {
             } else {
                 None
             };
+        let organization_snapshot = if options.ai_organize_body {
+            let settings = self.ai_settings().await?;
+            let template = settings
+                .templates
+                .iter()
+                .find(|t| t.purpose == crate::ai::TemplatePurpose::BodyOrganization && t.is_default)
+                .ok_or_else(|| {
+                    HarvestError::invalid("正文整理未设置默认模板，请到提示词模板 → 正文整理配置")
+                })?;
+            template.validate()?;
+            let model = template.model_config_id.as_ref().ok_or_else(|| {
+                HarvestError::invalid("正文整理模板未绑定模型，请到提示词模板 → 正文整理配置")
+            })?;
+            let execution = self
+                .ai_execution_snapshot(model)
+                .await?
+                .ok_or_else(|| HarvestError::invalid("正文整理绑定模型不存在，请重新配置"))?;
+            Some(crate::ai::OrganizationSnapshot {
+                execution,
+                template_id: template.id.clone(),
+                system_prompt: template.system_prompt.clone(),
+                user_prompt: template.user_prompt.clone(),
+                contract_version: 2,
+            })
+        } else {
+            None
+        };
         let job_options = JobOptions {
             metadata_snapshot,
             processing: options.clone(),
             pagination_snapshot,
+            organization_snapshot,
         };
         let local = Local::now();
         let time = now();
@@ -276,6 +314,24 @@ impl Database {
             .bind(id)
             .execute(&self.pool)
             .await?;
+        Ok(())
+    }
+    pub(crate) async fn harvest_save_organized(
+        &self,
+        id: &str,
+        checkpoint: &OrganizationCheckpoint,
+    ) -> Result<(), HarvestError> {
+        let result = sqlx::query(
+            "UPDATE harvest_jobs SET organized=?,updated_at=? WHERE id=? AND status='running'",
+        )
+        .bind(serde_json::to_string(checkpoint)?)
+        .bind(now())
+        .bind(id)
+        .execute(&self.pool)
+        .await?;
+        if result.rows_affected() != 1 {
+            return Err(HarvestError::new("HARVEST_CANCELLED", "任务已经停止"));
+        }
         Ok(())
     }
     pub(crate) async fn harvest_warning(

@@ -1,0 +1,48 @@
+{
+  "channelSorting": {
+    "filterLocked": true,
+    "saveEnabled": true,
+    "cancelEnabled": true,
+    "buttonsOutsideFieldset": true,
+    "type": "button",
+    "savedIds": [2, 1, 3, 4, 5, 6, 7, 8],
+    "scope": "仅演示内存；round-04/05"
+  },
+  "channelCreate": {
+    "dialogOpened": true,
+    "noSubmit": true
+  },
+  "import": {
+    "enqueue": "仅演示内存",
+    "focusReturnedToInput": true,
+    "settingsKeyboardEnter": true,
+    "settingsHref": "#/settings?tab=harvest&returnTo=import",
+    "nativeBackEvent": true,
+    "draftRestored": "https://baijiahao.baidu.com/s?id=demo-draft",
+    "scope": "round-09/12 已通过草稿恢复断言",
+    "scroll": {
+      "before": {
+        "top": 0,
+        "scrollHeight": 708,
+        "height": 675,
+        "x": 195,
+        "y": 506
+      },
+      "after": {
+        "scrollTop": 33,
+        "dateTop": 112,
+        "settingsTop": 112,
+        "documentWidth": 390
+      }
+    }
+  },
+  "review": {
+    "heading": "【演示数据】城市更新，让老街巷焕发新活力",
+    "unsafeScript": false,
+    "unsafeHandler": false,
+    "unsafeHref": false,
+    "scriptRan": false,
+    "blocked": [],
+    "returnFocus": "审核"
+  }
+}

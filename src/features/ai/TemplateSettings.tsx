@@ -36,6 +36,7 @@ import {
 } from "@/features/settings/mobile-state";
 import { isAndroid } from "@/lib/platform";
 import { useDesktopSettings } from "@/features/settings/desktop-state";
+import organizationPrompt from "../../../docs/ai-body-organization/prompts/v6.txt?raw";
 
 const blank = (purpose: PromptTemplate["purpose"]): PromptTemplate => ({
   purpose,
@@ -64,8 +65,6 @@ export function TemplateSettings({
   purposeOnly?: PromptTemplate["purpose"];
   onPurposeChange?: (purpose: PromptTemplate["purpose"]) => void;
 }) {
-  const { settings, loading, busy, error, run, refresh } =
-    useAiSettings(active);
   const mobile = useMobileSettings();
   const baselines = useRef<Record<string, PromptTemplate | undefined>>({});
   const compact = !!useDesktopSettings();
@@ -82,6 +81,16 @@ export function TemplateSettings({
   const [mobileDrafts, setMobileDrafts] = useState<
     Record<string, PromptTemplate>
   >({});
+  const { settings, loading, busy, synchronizing, error, run, refresh } =
+    useAiSettings(active, (next) => {
+      baselines.current = {};
+      drafts.current = {};
+      setMobileDrafts({});
+      setLocalDraft(
+        (previous) =>
+          next.templates.find((item) => item.id === previous?.id) ?? null,
+      );
+    });
   const editingId =
     mobile?.editor?.kind === "template" && active ? mobile.editor.id : null;
   const draft = mobile
@@ -132,14 +141,21 @@ export function TemplateSettings({
   }
   useSettingsDraft(
     "templates",
-    Object.values(mobileDrafts).some(
-      (value) =>
-        JSON.stringify(value) !==
+    (!mobile &&
+      !compact &&
+      localDraft !== null &&
+      JSON.stringify(localDraft) !==
         JSON.stringify(
-          settings.templates.find((saved) => saved.id === value.id),
-        ),
-    ),
-    busy,
+          settings.templates.find((item) => item.id === localDraft.id),
+        )) ||
+      Object.values(mobileDrafts).some(
+        (value) =>
+          JSON.stringify(value) !==
+          JSON.stringify(
+            settings.templates.find((saved) => saved.id === value.id),
+          ),
+      ),
+    busy || loading,
   );
   const drafts = useRef<
     Partial<Record<PromptTemplate["purpose"], PromptTemplate | null>>
@@ -150,7 +166,7 @@ export function TemplateSettings({
   );
   const systemRef = useRef<HTMLTextAreaElement>(null);
   const userRef = useRef<HTMLTextAreaElement>(null);
-  const disabled = busy || loading;
+  const disabled = busy || loading || synchronizing;
   // 新建和复制的模板在当前用途列表中显示，便于返回后继续编辑。
   const templates = [
     ...settings.templates,
@@ -277,7 +293,7 @@ export function TemplateSettings({
               />
             </AiField>
           </FieldGroup>
-        ) : (
+        ) : purpose === "pagination" ? (
           <FieldGroup className="grid sm:grid-cols-3">
             {(
               [
@@ -311,8 +327,8 @@ export function TemplateSettings({
               </Field>
             ))}
           </FieldGroup>
-        )}
-        <div className="flex flex-col gap-2">
+        ) : null}
+        <div className="settings-template-variables flex flex-col gap-2">
           <p className="text-sm font-medium">
             插入变量（插入最近聚焦的提示词）
           </p>
@@ -334,7 +350,9 @@ export function TemplateSettings({
           <p className="text-xs text-muted-foreground">
             {purpose === "title"
               ? "title：当前标题；content：正文或摘要；count：数量；max_length：最大字数；requirements：补充要求。"
-              : "title：当前标题；blocks：编号内容块。页长不受提示词中的字数要求控制，请修改上方参数。"}
+              : purpose === "pagination"
+                ? "title：当前标题；blocks：编号内容块。页长不受提示词中的字数要求控制，请修改上方参数。"
+                : "title：当前标题；blocks：编号内容块。整理段落，保留原文与图片位置；分页由独立开关控制。"}
           </p>
         </div>
         <AiField id="ai-template-system" label="系统指令">
@@ -436,6 +454,10 @@ export function TemplateSettings({
                 "判断相邻内容的语义绑定与自然边界。仅返回 bind_after、prefer_after 两个字符串数组。";
               next.userPrompt = "标题：{{title}}\n内容块：{{blocks}}";
             }
+            if (purpose === "bodyOrganization") {
+              next.systemPrompt = organizationPrompt;
+              next.userPrompt = "标题：{{title}}\n内容块：{{blocks}}";
+            }
             setDraft(next);
           }}
         >
@@ -450,7 +472,9 @@ export function TemplateSettings({
           disabled={disabled}
           onValueChange={(value) => {
             if (
-              (value === "title" || value === "pagination") &&
+              (value === "title" ||
+                value === "pagination" ||
+                value === "bodyOrganization") &&
               value !== purpose
             ) {
               drafts.current[purpose] = draft;
@@ -471,6 +495,7 @@ export function TemplateSettings({
         >
           <ToggleGroupItem value="title">标题优化</ToggleGroupItem>
           <ToggleGroupItem value="pagination">文章分页</ToggleGroupItem>
+          <ToggleGroupItem value="bodyOrganization">正文整理</ToggleGroupItem>
         </ToggleGroup>
       )}
       {error && !editingId && (
@@ -504,7 +529,11 @@ export function TemplateSettings({
         <Card className="h-fit min-w-0 shadow-none">
           <CardHeader>
             <CardTitle>
-              {purpose === "title" ? "标题模板" : "分页模板"}
+              {purpose === "title"
+                ? "标题模板"
+                : purpose === "pagination"
+                  ? "分页模板"
+                  : "正文整理模板"}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
@@ -540,7 +569,9 @@ export function TemplateSettings({
                 <CardDescription>
                   {purpose === "title"
                     ? "变量会替换为本次编辑内容。候选标题仍需核对事实。"
-                    : "AI 判断语义关系，本地按页长计算分页点；正文和图片不会由 AI 重写。"}
+                    : purpose === "pagination"
+                      ? "AI 判断语义关系，本地按页长计算分页点；正文和图片不会由 AI 重写。"
+                      : "AI 选择合适的分段候选，本地保留原文及图片位置。"}
                 </CardDescription>
               </CardHeader>
               <CardContent
@@ -584,14 +615,14 @@ export function TemplateSettings({
           <DialogFooter>
             <Button
               variant="outline"
-              disabled={busy}
+              disabled={disabled}
               onClick={() => setRemove(null)}
             >
               取消
             </Button>
             <Button
               variant="destructive"
-              disabled={busy}
+              disabled={disabled}
               onClick={() => {
                 if (remove)
                   void run(async () => {

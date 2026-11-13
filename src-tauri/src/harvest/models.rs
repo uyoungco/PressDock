@@ -34,6 +34,8 @@ pub struct Options {
     pub auto_summary: bool,
     #[serde(default)]
     pub ai_auto_paginate: bool,
+    #[serde(default)]
+    pub ai_organize_body: bool,
     pub model_config_id: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
@@ -45,6 +47,8 @@ pub(crate) struct JobOptions {
     pub processing: Options,
     #[serde(default)]
     pub pagination_snapshot: Option<crate::ai::PaginationSnapshot>,
+    #[serde(default)]
+    pub organization_snapshot: Option<crate::ai::OrganizationSnapshot>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -226,7 +230,17 @@ pub(crate) struct StoredJob {
     pub options: JobOptions,
     pub raw: Option<RawArticle>,
     pub formatted: Option<FormattedArticle>,
+    pub organized: Option<OrganizationCheckpoint>,
     pub prepared: Option<FormattedArticle>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub(crate) struct OrganizationCheckpoint {
+    pub input_html: String,
+    pub contract_version: u32,
+    pub article: FormattedArticle,
+    pub warning: Option<String>,
 }
 
 // 仅发送采集业务数据，不携带网络认证头或凭据；只投递给可信主窗口。

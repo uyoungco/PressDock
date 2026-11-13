@@ -47,8 +47,6 @@ const blankProvider = (): SaveProviderRequest => ({
 const numberValue = (value: string) => (value === "" ? null : Number(value));
 
 export function ModelSettings({ active }: { active: boolean }) {
-  const { settings, loading, busy, error, run, refresh } =
-    useAiSettings(active);
   const mobile = useMobileSettings();
   const providerBaselines = useRef<
     Record<string, AiProviderConfig | undefined>
@@ -66,6 +64,24 @@ export function ModelSettings({ active }: { active: boolean }) {
   const [modelDrafts, setModelDrafts] = useState<Record<string, AiModelConfig>>(
     {},
   );
+  const { settings, loading, busy, synchronizing, error, run, refresh } =
+    useAiSettings(active, (next) => {
+      providerBaselines.current = {};
+      modelBaselines.current = {};
+      setProviderDrafts({});
+      setModelDrafts({});
+      setCatalog([]);
+      setLocalProvider((previous) => {
+        const provider = next.providers.find(
+          (item) => item.id === previous?.id,
+        );
+        return provider ? { ...provider, apiKey: "" } : null;
+      });
+      setLocalModel(
+        (previous) =>
+          next.models.find((item) => item.id === previous?.id) ?? null,
+      );
+    });
   const editor = active ? mobile?.editor : null;
   const providerKey =
     editor?.kind === "provider" ? editor.id : mobile?.providerId;
@@ -130,29 +146,6 @@ export function ModelSettings({ active }: { active: boolean }) {
       setModel(modelDrafts[next.id] ?? next);
     mobile?.openEditor({ kind: "model", id: next.id });
   }
-  useSettingsDraft(
-    "models",
-    Object.values(providerDrafts).some((value) => {
-      const saved = settings.providers.find((p) => p.id === value.id);
-      return (
-        !!value.apiKey ||
-        !saved ||
-        (
-          ["id", "displayName", "baseUrl", "protocol", "compatibility"] as const
-        ).some(
-          (key) => JSON.stringify(value[key]) !== JSON.stringify(saved[key]),
-        )
-      );
-    }) ||
-      Object.values(modelDrafts).some(
-        (value) =>
-          JSON.stringify(value) !==
-          JSON.stringify(
-            settings.models.find((saved) => saved.id === value.id),
-          ),
-      ),
-    busy,
-  );
   const [catalog, setCatalog] = useState<string[]>([]);
   const [remove, setRemove] = useState<{
     kind: "provider" | "model";
@@ -183,6 +176,36 @@ export function ModelSettings({ active }: { active: boolean }) {
     !!model &&
     JSON.stringify(model) !==
       JSON.stringify(settings.models.find((saved) => saved.id === model.id));
+  useSettingsDraft(
+    "models",
+    (!mobile && !compact && (providerDirty || modelDirty)) ||
+      Object.values(providerDrafts).some((value) => {
+        const saved = settings.providers.find((p) => p.id === value.id);
+        return (
+          !!value.apiKey ||
+          !saved ||
+          (
+            [
+              "id",
+              "displayName",
+              "baseUrl",
+              "protocol",
+              "compatibility",
+            ] as const
+          ).some(
+            (key) => JSON.stringify(value[key]) !== JSON.stringify(saved[key]),
+          )
+        );
+      }) ||
+      Object.values(modelDrafts).some(
+        (value) =>
+          JSON.stringify(value) !==
+          JSON.stringify(
+            settings.models.find((saved) => saved.id === value.id),
+          ),
+      ),
+    busy || loading,
+  );
   // 新建但未保存的模型也留在列表，返回后可继续编辑同一份草稿。
   const models = [
     ...settings.models,
@@ -192,7 +215,7 @@ export function ModelSettings({ active }: { active: boolean }) {
         )
       : []),
   ].filter((m) => m.providerId === savedProvider?.id);
-  const disabled = busy || loading;
+  const disabled = busy || loading || synchronizing;
   const choose = (id: string) => {
     const next = settings.providers.find((p) => p.id === id);
     if (!next) return;
@@ -971,14 +994,14 @@ export function ModelSettings({ active }: { active: boolean }) {
           <DialogFooter>
             <Button
               variant="outline"
-              disabled={busy}
+              disabled={disabled}
               onClick={() => setRemove(null)}
             >
               取消
             </Button>
             <Button
               variant="destructive"
-              disabled={busy}
+              disabled={disabled}
               onClick={() => {
                 if (remove)
                   void run(async () => {

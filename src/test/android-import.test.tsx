@@ -42,6 +42,7 @@ const options: HarvestSettings = {
   autoTags: true,
   autoSummary: true,
   aiAutoPaginate: false,
+  aiOrganizeBody: false,
   modelConfigId: null,
   retentionDays: null,
 };

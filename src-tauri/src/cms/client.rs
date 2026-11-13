@@ -13,6 +13,8 @@ use tokio::sync::Mutex;
 mod article_management;
 #[path = "articles.rs"]
 mod articles;
+#[path = "review.rs"]
+mod review;
 #[path = "write.rs"]
 mod writes;
 
@@ -68,6 +70,7 @@ pub struct CmsService {
     state: Mutex<SessionState>,
     // 将认证和凭据操作串行化，避免旧操作删除或恢复新凭据。
     auth_operations: Mutex<()>,
+    review_operations: Mutex<()>,
     images: ImageLoader,
 }
 
@@ -125,6 +128,7 @@ impl CmsService {
             vault,
             state: Mutex::new(SessionState::default()),
             auth_operations: Mutex::new(()),
+            review_operations: Mutex::new(()),
             images: ImageLoader::new()?,
         })
     }

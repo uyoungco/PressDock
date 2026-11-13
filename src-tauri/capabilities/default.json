@@ -5,6 +5,7 @@
   "windows": ["main"],
   "permissions": [
     "allow-settings-sync-start",
+    "allow-settings-sync-manual",
     "allow-settings-sync-status",
     "allow-settings-sync-wake",
     "allow-settings-sync-resolve",
@@ -39,6 +40,8 @@
     "allow-cms-list-article-classes",
     "allow-cms-get-article",
     "allow-cms-update-article",
+    "allow-cms-review-article",
+    "allow-cms-review-articles",
     "allow-cms-add-article-to-promote",
     "allow-cms-login",
     "allow-cms-restore-session",

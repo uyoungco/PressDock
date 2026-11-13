@@ -1,0 +1,45 @@
+[
+  {
+    "check": "scope-dialog",
+    "title": "统计口径",
+    "text": "统计口径采集仅统计本机当前账号当天入队的正式任务，不含开发调试。已添加 CMS 仅统计实际成功的任务。进行中包括排队和正在处理；需处理包括等待验证、等待登录、失败、中断及提交结果待确认。CMS 待审核为当前账号可见的一级、二级、三级待审核总数，不限于今天。三级数据未完整读取时不展示合计。Close"
+  },
+  {
+    "check": "dialog-focus-return",
+    "passed": true
+  },
+  {
+    "check": "column-visibility",
+    "columns": ["标题及来源", "实际状态"]
+  },
+  {
+    "check": "source-open",
+    "call": {
+      "kind": "open-source",
+      "url": "https://baijiahao.baidu.com/s?id=demo0"
+    }
+  },
+  {
+    "check": "stale-data",
+    "total": "175篇",
+    "records": 5,
+    "overflow": false
+  },
+  {
+    "check": "review-navigation",
+    "hash": "#/articles/review-2?editor=0&nubia=0&current=1&pagesize=50"
+  },
+  {
+    "check": "empty-state",
+    "total": "0条",
+    "blocked": []
+  },
+  {
+    "check": "narrow-dark-long-error",
+    "horizontalOverflow": false,
+    "scrollTop": 292,
+    "quickBottom": 803,
+    "viewportBottom": 804,
+    "blocked": []
+  }
+]

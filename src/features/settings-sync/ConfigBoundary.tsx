@@ -15,11 +15,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { settingsSyncService, syncMessage } from "./service";
+import { useSettingsActivity } from "./activity";
 export function ConfigBoundary({ children }: { children: ReactNode }) {
   const state = useSyncExternalStore(
     settingsSyncService.subscribe,
     settingsSyncService.getSnapshot,
   );
+  const { synchronizing } = useSettingsActivity();
   useEffect(() => {
     void settingsSyncService.start();
     const timer = setInterval(() => void settingsSyncService.refresh(), 2000);
@@ -58,24 +60,18 @@ export function ConfigBoundary({ children }: { children: ReactNode }) {
     );
   return (
     <>
-      {state.status.usingCache && (
+      {(state.status.usingCache ||
+        state.status.phase === "protocolMismatch") && (
         <div
           role="status"
           className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted px-4 py-2 text-sm"
         >
           <span>
-            {state.loading
-              ? "正在重新读取全局配置…"
-              : syncMessage(state.status)}
+            {synchronizing
+              ? "同步中…"
+              : (state.error ?? syncMessage(state.status))}
           </span>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={state.loading}
-            onClick={() => void settingsSyncService.start(true)}
-          >
-            {state.loading ? "正在重试…" : "重试读取"}
-          </Button>
+          <ManualSyncButton />
         </div>
       )}
       {children}
@@ -87,28 +83,61 @@ export function ConfigSyncStatus() {
     settingsSyncService.subscribe,
     settingsSyncService.getSnapshot,
   );
+  const { synchronizing } = useSettingsActivity();
   return (
     <div
       className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3 text-sm"
       role="status"
     >
-      <span>{state.error ?? syncMessage(state.status)}</span>
+      <span>
+        {synchronizing
+          ? "同步中…"
+          : (state.error ?? state.notice ?? syncMessage(state.status))}
+      </span>
       <SyncDiagnostics status={state.status} />
+      <ManualSyncButton />
       {state.status?.phase === "failedValidation" && (
         <RejectedChangesRecovery count={state.status.pending} />
       )}
       {!!state.status?.pending &&
         state.status.phase !== "failedValidation" &&
+        state.status.phase !== "protocolMismatch" &&
         state.status.phase !== "waitingAuth" && (
           <Button
             size="sm"
             variant="outline"
+            disabled={synchronizing}
             onClick={() => void settingsSyncService.wake()}
           >
             立即补传
           </Button>
         )}
     </div>
+  );
+}
+
+function ManualSyncButton() {
+  const state = useSyncExternalStore(
+    settingsSyncService.subscribe,
+    settingsSyncService.getSnapshot,
+  );
+  const { synchronizing } = useSettingsActivity();
+  const disabled =
+    synchronizing ||
+    state.loading ||
+    !state.status?.ready ||
+    ["demo", "restartRequired", "waitingAuth", "failedValidation"].includes(
+      state.status.phase,
+    );
+  return (
+    <Button
+      size="sm"
+      variant="outline"
+      disabled={disabled}
+      onClick={() => void settingsSyncService.manual()}
+    >
+      {synchronizing ? "同步中…" : "手动同步"}
+    </Button>
   );
 }
 

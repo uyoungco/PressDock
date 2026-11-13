@@ -10,7 +10,7 @@ use std::sync::{
 #[derive(Default)]
 pub(super) struct Vault {
     values: Mutex<HashMap<String, String>>,
-    fail: AtomicBool,
+    pub(super) fail: AtomicBool,
 }
 impl AiVault for Vault {
     fn load(&self, r: &str) -> std::result::Result<String, AiError> {
@@ -38,7 +38,7 @@ impl AiVault for Vault {
 }
 pub(super) fn boot() -> Bootstrap {
     let fixture: Value =
-        serde_json::from_str(include_str!("../../../docs/settings-sync/fixtures-v1.json")).unwrap();
+        serde_json::from_str(include_str!("../../../docs/settings-sync/fixtures-v2.json")).unwrap();
     serde_json::from_value(json!({"snapshot":fixture["base"],"secrets":[{"providerId":"demo-provider","value":"DEMO-ONLY-native"}]})).unwrap()
 }
 fn change(value: &str) -> Change {
@@ -58,6 +58,95 @@ async fn setup() -> SyncResult<(tempfile::TempDir, Database, LocalStore, Arc<Vau
     LocalStore::ensure_device(&db).await?;
     store.install(&db, boot()).await?;
     Ok((dir, db, store, vault))
+}
+
+#[tokio::test]
+async fn old_cached_config_defaults_and_frozen_v1_queue_survive_upgrade() -> SyncResult<()> {
+    let (_dir, db, store, _vault) = setup().await?;
+    let mut old = serde_json::to_value(boot().snapshot.config)?;
+    old["defaults"]
+        .as_object_mut()
+        .unwrap()
+        .remove("bodyOrganizationTemplateId");
+    old["harvest"]
+        .as_object_mut()
+        .unwrap()
+        .remove("aiOrganizeBody");
+    let upgraded: Config = serde_json::from_value(old)?;
+    assert!(!upgraded.harvest.ai_organize_body);
+    assert!(upgraded.defaults.body_organization_template_id.is_none());
+    store
+        .enqueue(&db, vec![change("【演示数据】旧队列")], None)
+        .await?;
+    let raw = store.pending(&db).await?.remove(0).raw;
+    sqlx::query("UPDATE sync_outbox SET schema_version=1")
+        .execute(&db.pool)
+        .await?;
+    sqlx::raw_sql(include_str!("../../migrations/0014_sync_protocol_v2.sql"))
+        .execute(&db.pool)
+        .await?;
+    let pending = store.pending(&db).await?.remove(0);
+    assert_eq!(pending.raw, raw);
+    assert_eq!(pending.status, "failedValidation");
+    let code: String = sqlx::query_scalar("SELECT last_error_code FROM sync_outbox")
+        .fetch_one(&db.pool)
+        .await?;
+    assert_eq!(code, "UNSUPPORTED_VERSION");
+    Ok(())
+}
+
+#[tokio::test]
+async fn queued_organization_snapshot_keeps_rotated_credential_alive() -> SyncResult<()> {
+    let (_dir, db, store, vault) = setup().await?;
+    let reference = db.ai_credential_ref("demo-provider").await?.unwrap();
+    let mut template = db
+        .ai_settings()
+        .await?
+        .templates
+        .into_iter()
+        .next()
+        .unwrap();
+    template.id = "demo-body".into();
+    template.purpose = crate::ai::TemplatePurpose::BodyOrganization;
+    template.model_config_id = Some("demo-model".into());
+    template.system_prompt = "【演示数据】{{title}} {{blocks}}".into();
+    template.user_prompt = "{{blocks}}".into();
+    template.pagination_options = None;
+    template.is_default = true;
+    db.ai_save_template(&template).await?;
+    let mut settings = db.harvest_settings().await?;
+    settings.options.auto_classify = false;
+    settings.options.auto_tags = false;
+    settings.options.auto_summary = false;
+    settings.options.ai_auto_paginate = false;
+    settings.options.ai_organize_body = true;
+    db.harvest_save_settings(&settings).await?;
+    db.harvest_enqueue(
+        1,
+        &crate::harvest::EnqueueRequest {
+            id: uuid::Uuid::new_v4().to_string(),
+            url: "https://baijiahao.baidu.com/s?id=9".into(),
+        },
+    )
+    .await?;
+    sqlx::query("UPDATE ai_providers SET credential_ref=NULL")
+        .execute(&db.pool)
+        .await?;
+    sqlx::query("UPDATE sync_generation_secrets SET credential_ref=NULL")
+        .execute(&db.pool)
+        .await?;
+    sqlx::query("INSERT OR IGNORE INTO sync_credential_gc VALUES(?)")
+        .bind(&reference)
+        .execute(&db.pool)
+        .await?;
+    store.collect(&db).await?;
+    assert!(vault.load(&reference).is_ok());
+    sqlx::query("DELETE FROM harvest_jobs")
+        .execute(&db.pool)
+        .await?;
+    store.collect(&db).await?;
+    assert!(vault.load(&reference).is_err());
+    Ok(())
 }
 
 #[tokio::test]

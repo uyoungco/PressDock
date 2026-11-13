@@ -2,6 +2,8 @@ import { createContext, useContext, useState } from "react";
 import { toast } from "sonner";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { ArticleReviewController } from "./use-article-review";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -36,6 +38,7 @@ import {
 } from "./service";
 
 type Actions = {
+  review?: ArticleReviewController;
   view: ArticleView;
   busy: boolean;
   onEdit: (row: CmsArticleRow) => void;
@@ -99,6 +102,16 @@ function Cell({
         >
           编辑
         </Button>
+        {actions.review?.allowed && (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={actions.busy}
+            onClick={() => void actions.review?.begin([row], true)}
+          >
+            审核
+          </Button>
+        )}
         {actions.view === "quality" && (
           <Button
             variant="ghost"
@@ -255,6 +268,7 @@ const compactColumns = columns.map((column) => ({
           : column.size,
 }));
 const pinnedEnd = ["actions"];
+const pinnedSelect = ["reviewSelect"];
 const getRowId = (row: CmsArticleRow) => String(row.id);
 export function ArticleTable({
   rows,
@@ -278,14 +292,55 @@ export function ArticleTable({
   };
   const controller = {
     ...preferences,
-    visibility,
+    visibility: { ...visibility, reviewSelect: !!actions.review?.allowed },
   };
+  const review = actions.review;
+  const selectionColumns: DataTableColumnDef<CmsArticleRow>[] = review?.allowed
+    ? [
+        {
+          id: "reviewSelect",
+          size: 44,
+          minSize: 44,
+          maxSize: 44,
+          enableHiding: false,
+          meta: { label: "选择", resizable: false },
+          header: () => (
+            <Checkbox
+              className="article-review-checkbox"
+              aria-label="全选当前页文章"
+              disabled={actions.busy || !rows.length}
+              checked={
+                rows.length > 0 &&
+                rows.every((row) => review.selected.has(row.id))
+                  ? true
+                  : rows.some((row) => review.selected.has(row.id))
+                    ? "indeterminate"
+                    : false
+              }
+              onCheckedChange={(checked) =>
+                checked ? review.selectAll(rows) : review.clearSelection()
+              }
+            />
+          ),
+          cell: ({ row }) => (
+            <Checkbox
+              className="article-review-checkbox"
+              aria-label={`选择文章 ${row.original.id}`}
+              disabled={actions.busy}
+              checked={review.selected.has(row.original.id)}
+              onCheckedChange={() => review.toggle(row.original.id)}
+            />
+          ),
+        },
+      ]
+    : [];
   const table = useDataTable({
     data: rows,
-    columns: compact ? compactColumns : columns,
+    columns: [...selectionColumns, ...(compact ? compactColumns : columns)],
     preferences: controller,
     getRowId,
     pinnedEnd,
+    pinnedStart: review?.allowed ? pinnedSelect : undefined,
   });
   const extras = articleColumns.filter(
     (column) =>
@@ -309,8 +364,22 @@ export function ArticleTable({
             </p>
           )}
           {rows.map((row) => (
-            <Card key={row.id} className="gap-3 py-4 shadow-none">
+            <Card
+              key={row.id}
+              className="gap-3 py-4 shadow-none"
+              data-review-selected={
+                (review?.allowed && review.selected.has(row.id)) || undefined
+              }
+            >
               <CardHeader>
+                {review?.allowed && (
+                  <Checkbox
+                    aria-label={`选择文章 ${row.id}`}
+                    disabled={actions.busy}
+                    checked={review.selected.has(row.id)}
+                    onCheckedChange={() => review.toggle(row.id)}
+                  />
+                )}
                 <Cell row={row} field="title" />
               </CardHeader>
               <CardContent className="flex flex-col gap-2">
@@ -337,6 +406,14 @@ export function ArticleTable({
           externalScroll
           density="compact"
           stretchColumnId="title"
+          getRowProps={(row) => ({
+            "aria-selected": review?.allowed
+              ? review.selected.has(row.original.id)
+              : undefined,
+            className: review?.selected.has(row.original.id)
+              ? "article-review-selected"
+              : undefined,
+          })}
           resizeDisabled={actions.busy}
           emptyMessage="暂无符合条件的文章"
         />

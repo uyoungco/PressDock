@@ -163,6 +163,20 @@ pub async fn cms_update_article(
     Ok(cms.update_cms_article(request).await?)
 }
 #[tauri::command]
+pub async fn cms_review_article(
+    request: crate::cms::ArticleReviewInput,
+    cms: State<'_, CmsService>,
+) -> Result<crate::cms::ArticleReviewSummary, CommandError> {
+    Ok(cms.review_article(request).await?)
+}
+#[tauri::command]
+pub async fn cms_review_articles(
+    request: crate::cms::ArticlesReviewInput,
+    cms: State<'_, CmsService>,
+) -> Result<crate::cms::ArticleReviewSummary, CommandError> {
+    Ok(cms.review_articles(request).await?)
+}
+#[tauri::command]
 pub async fn cms_add_article_to_promote(
     request: crate::cms::ArticlePromoteInput,
     cms: State<'_, CmsService>,

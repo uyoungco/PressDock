@@ -6,6 +6,11 @@ import {
   articleClassesSchema,
   articleUpdateSchema,
   articlePromoteSchema,
+  articleReviewSchema,
+  articlesReviewSchema,
+  articleReviewSummarySchema,
+  type ArticleReviewInput,
+  type ArticlesReviewInput,
   type CmsArticleQuery,
   type ArticleUpdate,
   type ArticlePromoteInput,
@@ -15,6 +20,14 @@ import { invokeCommand } from "./client";
 
 // 后台 DTO 在 IPC 边界校验，业务组件不直接 invoke 或携带认证信息。
 export const articleIpc = {
+  review: (request: ArticleReviewInput) =>
+    invokeCommand("cms_review_article", articleReviewSummarySchema, {
+      request: articleReviewSchema.parse(request),
+    }),
+  reviewBatch: (request: ArticlesReviewInput) =>
+    invokeCommand("cms_review_articles", articleReviewSummarySchema, {
+      request: articlesReviewSchema.parse(request),
+    }),
   list: (query: CmsArticleQuery) =>
     invokeCommand("cms_list_articles", cmsArticlePageSchema, {
       query: cmsArticleQuerySchema.parse(query),

@@ -1,0 +1,205 @@
+{
+  "date": "2026-11-09",
+  "browser": "ego-browser",
+  "data": "明确标识的本机演示数据",
+  "liveCmsWrites": 0,
+  "before": {
+    "viewport": [390, 844],
+    "controls": [
+      {
+        "name": "全选当前页文章",
+        "width": 44,
+        "height": 44,
+        "minWidth": "44px",
+        "minHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "attrs": [
+          ["data-state", "indeterminate"],
+          ["data-slot", "checkbox"]
+        ]
+      },
+      {
+        "name": "选择文章 8101",
+        "width": 44,
+        "height": 44,
+        "minWidth": "44px",
+        "minHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "attrs": [
+          ["data-state", "checked"],
+          ["data-slot", "checkbox"]
+        ]
+      },
+      {
+        "name": "选择文章 8102",
+        "width": 44,
+        "height": 44,
+        "minWidth": "44px",
+        "minHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "attrs": [
+          ["data-state", "unchecked"],
+          ["data-slot", "checkbox"]
+        ]
+      },
+      {
+        "name": "选择文章 8103",
+        "width": 44,
+        "height": 44,
+        "minWidth": "44px",
+        "minHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "attrs": [
+          ["data-state", "unchecked"],
+          ["data-slot", "checkbox"]
+        ]
+      }
+    ]
+  },
+  "after390": {
+    "viewport": [390, 844],
+    "overflow": false,
+    "controls": [
+      {
+        "name": "全选当前页文章",
+        "state": "indeterminate",
+        "width": 20,
+        "height": 20,
+        "touchWidth": "44px",
+        "touchHeight": "44px",
+        "background": "rgba(36, 87, 214, 0.03)",
+        "color": "rgb(39, 43, 50)"
+      },
+      {
+        "name": "选择文章 8101",
+        "state": "checked",
+        "width": 20,
+        "height": 20,
+        "touchWidth": "44px",
+        "touchHeight": "44px",
+        "background": "rgba(36, 87, 214, 0.03)",
+        "color": "rgb(39, 43, 50)"
+      },
+      {
+        "name": "选择文章 8102",
+        "state": "unchecked",
+        "width": 20,
+        "height": 20,
+        "touchWidth": "44px",
+        "touchHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(32, 36, 43)"
+      },
+      {
+        "name": "选择文章 8103",
+        "state": "unchecked",
+        "width": 20,
+        "height": 20,
+        "touchWidth": "44px",
+        "touchHeight": "44px",
+        "background": "rgba(0, 0, 0, 0)",
+        "color": "rgb(32, 36, 43)"
+      }
+    ]
+  },
+  "interactions360": {
+    "currentPageSelectAll": true,
+    "clearSelection": true,
+    "enlargedAreaClick": {
+      "x": 56,
+      "y": 321,
+      "extendedHitArea": true
+    },
+    "mobile": {
+      "viewport": [360, 844],
+      "overflow": false,
+      "controls": [
+        {
+          "name": "全选当前页文章",
+          "state": "indeterminate",
+          "width": 20,
+          "height": 20,
+          "touchWidth": "44px",
+          "touchHeight": "44px",
+          "background": "rgba(36, 87, 214, 0.984)"
+        },
+        {
+          "name": "选择文章 8101",
+          "state": "checked",
+          "width": 20,
+          "height": 20,
+          "touchWidth": "44px",
+          "touchHeight": "44px",
+          "background": "rgba(36, 87, 214, 0.984)"
+        },
+        {
+          "name": "选择文章 8102",
+          "state": "unchecked",
+          "width": 20,
+          "height": 20,
+          "touchWidth": "44px",
+          "touchHeight": "44px",
+          "background": "rgba(36, 87, 214, 0.067)"
+        },
+        {
+          "name": "选择文章 8103",
+          "state": "unchecked",
+          "width": 20,
+          "height": 20,
+          "touchWidth": "44px",
+          "touchHeight": "44px",
+          "background": "rgba(36, 87, 214, 0.067)"
+        }
+      ],
+      "reviewRequests": 0
+    }
+  },
+  "desktop": {
+    "viewport": [1280, 900],
+    "controls": [
+      {
+        "name": "全选当前页文章",
+        "state": "indeterminate",
+        "width": 16,
+        "height": 16,
+        "background": "rgba(36, 87, 214, 0.03)"
+      },
+      {
+        "name": "全选表格当前页文章",
+        "state": "indeterminate",
+        "width": 16,
+        "height": 16,
+        "background": "rgb(36, 87, 214)"
+      },
+      {
+        "name": "选择文章 8101",
+        "state": "checked",
+        "width": 16,
+        "height": 16,
+        "background": "rgb(36, 87, 214)"
+      },
+      {
+        "name": "选择文章 8102",
+        "state": "unchecked",
+        "width": 16,
+        "height": 16,
+        "background": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "name": "选择文章 8103",
+        "state": "unchecked",
+        "width": 16,
+        "height": 16,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "reviewRequests": 0
+  },
+  "screenshots": [
+    "android-checkbox-before.png",
+    "android-checkbox-after.png",
+    "android-checkbox-360.png",
+    "desktop-checkbox-after.png"
+  ],
+  "note": "颜色取样可能发生于 transition-colors 过渡期间；最终颜色已通过截图目视确认。"
+}

@@ -11,7 +11,7 @@ use base64::{Engine, engine::general_purpose::STANDARD};
 use sqlx::{Row, SqliteConnection};
 use std::sync::Arc;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SyncError {
     pub code: &'static str,
     pub retryable: bool,
@@ -141,7 +141,7 @@ impl LocalStore {
         self.collect_locked(db).await
     }
     async fn collect_locked(&self, db: &Database) -> SyncResult<()> {
-        let refs:Vec<String>=sqlx::query_scalar("SELECT credential_ref FROM sync_credential_gc WHERE credential_ref NOT IN (SELECT credential_ref FROM ai_providers WHERE credential_ref IS NOT NULL UNION SELECT credential_ref FROM sync_generation_secrets WHERE credential_ref IS NOT NULL UNION SELECT credential_ref FROM sync_recovery_credentials UNION SELECT credential_key_ref FROM sync_secure_payloads UNION SELECT json_extract(options,'$.metadataSnapshot.credentialRef') FROM harvest_jobs WHERE json_extract(options,'$.metadataSnapshot.credentialRef') IS NOT NULL UNION SELECT json_extract(options,'$.paginationSnapshot.execution.credentialRef') FROM harvest_jobs WHERE json_extract(options,'$.paginationSnapshot.execution.credentialRef') IS NOT NULL)").fetch_all(&db.pool).await?;
+        let refs:Vec<String>=sqlx::query_scalar("SELECT credential_ref FROM sync_credential_gc WHERE credential_ref NOT IN (SELECT credential_ref FROM ai_providers WHERE credential_ref IS NOT NULL UNION SELECT credential_ref FROM sync_generation_secrets WHERE credential_ref IS NOT NULL UNION SELECT credential_ref FROM sync_recovery_credentials UNION SELECT credential_key_ref FROM sync_secure_payloads UNION SELECT json_extract(options,'$.metadataSnapshot.credentialRef') FROM harvest_jobs WHERE json_extract(options,'$.metadataSnapshot.credentialRef') IS NOT NULL UNION SELECT json_extract(options,'$.paginationSnapshot.execution.credentialRef') FROM harvest_jobs WHERE json_extract(options,'$.paginationSnapshot.execution.credentialRef') IS NOT NULL UNION SELECT json_extract(options,'$.organizationSnapshot.execution.credentialRef') FROM harvest_jobs WHERE json_extract(options,'$.organizationSnapshot.execution.credentialRef') IS NOT NULL)").fetch_all(&db.pool).await?;
         for reference in refs {
             if self.clear(&reference).await {
                 sqlx::query("DELETE FROM sync_credential_gc WHERE credential_ref=?")
@@ -218,7 +218,7 @@ impl LocalStore {
                 .await?;
         let sequence = row.try_get::<i64, _>("last_allocated_sequence")? + 1;
         let init = Initialize {
-            schema_version: 1,
+            schema_version: 2,
             operation_id: uuid::Uuid::new_v4().to_string(),
             device_id: row.try_get("device_id")?,
             sequence: sequence as u64,
@@ -399,14 +399,14 @@ impl LocalStore {
         }
         let sequence = state.try_get::<i64, _>("last_allocated_sequence")? + 1;
         let op = Operation {
-            schema_version: 1,
+            schema_version: 2,
             operation_id: uuid::Uuid::new_v4().to_string(),
             device_id: state.try_get("device_id")?,
             sequence: sequence as u64,
             changes,
         };
         let current = export(db).await?;
-        let base = json!({"schemaVersion":1,"revision":state.try_get::<i64,_>("last_observed_revision")?.max(1),"config":current});
+        let base = json!({"schemaVersion":2,"revision":state.try_get::<i64,_>("last_observed_revision")?.max(1),"config":current});
         let raw = serde_json::to_vec(&op)?;
         let next = validate_document(&raw, DocumentKind::Operation, Some(&base), &[])?;
         let config: Config = serde_json::from_value(next["config"].clone())?;
@@ -489,7 +489,7 @@ impl LocalStore {
                 c.as_object_mut().unwrap().remove("value");
             }
         }
-        sqlx::query("INSERT INTO sync_outbox(operation_id,device_id,sequence,schema_version,safe_plan_json,wire_body_payload_id,status) VALUES(?,?,?,1,?,?,'queued')").bind(&op.operation_id).bind(&op.device_id).bind(op.sequence as i64).bind(serde_json::to_string(&safe)?).bind(&sealed.id).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO sync_outbox(operation_id,device_id,sequence,schema_version,safe_plan_json,wire_body_payload_id,status) VALUES(?,?,?,2,?,?,'queued')").bind(&op.operation_id).bind(&op.device_id).bind(op.sequence as i64).bind(serde_json::to_string(&safe)?).bind(&sealed.id).execute(&mut *tx).await?;
         sqlx::query("UPDATE sync_state SET last_allocated_sequence=? WHERE id=1 AND last_allocated_sequence<?").bind(op.sequence as i64).bind(op.sequence as i64).execute(&mut *tx).await?;
         tx.commit().await?;
         let _ = self.collect_locked(db).await;
@@ -587,6 +587,7 @@ pub(crate) async fn export(db: &Database) -> SyncResult<Config> {
     let defaults = Defaults {
         title_template_id: default(crate::ai::TemplatePurpose::Title),
         pagination_template_id: default(crate::ai::TemplatePurpose::Pagination),
+        body_organization_template_id: default(crate::ai::TemplatePurpose::BodyOrganization),
     };
     let config = Config {
         providers: ai
@@ -623,10 +624,11 @@ pub(crate) async fn export(db: &Database) -> SyncResult<Config> {
             auto_tags: harvest.options.auto_tags,
             auto_summary: harvest.options.auto_summary,
             ai_auto_paginate: harvest.options.ai_auto_paginate,
+            ai_organize_body: harvest.options.ai_organize_body,
             model_config_id: harvest.options.model_config_id,
         },
     };
-    validate_snapshot(&json!({"schemaVersion":1,"revision":1,"config":config}))?;
+    validate_snapshot(&json!({"schemaVersion":2,"revision":1,"config":config}))?;
     Ok(config)
 }
 pub(crate) async fn apply_business(
@@ -671,10 +673,12 @@ pub(crate) async fn apply_business(
             .await?;
     }
     for t in &config.templates {
-        let default = if t.purpose == crate::ai::TemplatePurpose::Title {
-            &config.defaults.title_template_id
-        } else {
-            &config.defaults.pagination_template_id
+        let default = match t.purpose {
+            crate::ai::TemplatePurpose::Title => &config.defaults.title_template_id,
+            crate::ai::TemplatePurpose::Pagination => &config.defaults.pagination_template_id,
+            crate::ai::TemplatePurpose::BodyOrganization => {
+                &config.defaults.body_organization_template_id
+            }
         };
         sqlx::query("INSERT INTO ai_prompt_templates(id,name,system_prompt,user_prompt,model_config_id,candidate_count,max_length,is_default,purpose,pagination_options) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(&t.id).bind(&t.name).bind(&t.system_prompt).bind(&t.user_prompt).bind(&t.model_config_id).bind(t.candidate_count).bind(t.max_length).bind(default.as_deref()==Some(t.id.as_str())).bind(t.purpose.as_str()).bind(t.pagination_options.as_ref().map(serde_json::to_string).transpose()?).execute(&mut *conn).await?;
     }

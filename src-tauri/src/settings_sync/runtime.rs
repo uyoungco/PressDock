@@ -101,25 +101,38 @@ impl SettingsSync {
         let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM sync_outbox")
             .fetch_one(&db.pool)
             .await?;
-        let head: Option<String> =
-            sqlx::query_scalar("SELECT status FROM sync_outbox ORDER BY sequence LIMIT 1")
+        let head: Option<(String, i64, Option<String>)> =
+            sqlx::query_as("SELECT status,schema_version,last_error_code FROM sync_outbox ORDER BY sequence LIMIT 1")
                 .fetch_optional(&db.pool)
                 .await?;
         let ready = Self::cached(db).await?;
         let error = self.last_error.lock().await;
+        let head_status = head.as_ref().map(|h| h.0.as_str());
+        let last_error = error
+            .as_ref()
+            .map(|e| e.code)
+            .or_else(|| head.as_ref().and_then(|h| h.2.as_deref()));
+        let retry_protocol = head.as_ref().is_some_and(|h| {
+            h.0 == "failedValidation" && h.1 == 2 && h.2.as_deref() == Some("UNSUPPORTED_VERSION")
+        });
+        let protocol_mismatch = retry_protocol
+            || (head_status != Some("failedValidation")
+                && last_error == Some("UNSUPPORTED_VERSION"));
         let phase = if self.restart_required.load(Ordering::SeqCst)
             || (!ready && self.succeeded.load(Ordering::SeqCst))
         {
             "restartRequired"
-        } else if !self.attempted.load(Ordering::SeqCst) {
+        } else if !self.attempted.load(Ordering::SeqCst) && head.is_none() {
             "idle"
+        } else if head_status == Some("waitingAuth") || last_error == Some("AUTH_EXPIRED") {
+            "waitingAuth"
+        } else if protocol_mismatch {
+            "protocolMismatch"
         } else if !ready {
             "blocked"
-        } else if head.as_deref() == Some("waitingAuth") {
-            "waitingAuth"
-        } else if head.as_deref() == Some("failedValidation") {
+        } else if head_status == Some("failedValidation") {
             "failedValidation"
-        } else if head.as_deref() == Some("uploading") {
+        } else if head_status == Some("uploading") {
             "uploading"
         } else if count > 0 {
             "pending"
@@ -133,7 +146,7 @@ impl SettingsSync {
             phase,
             using_cache: self.using_cache.load(Ordering::SeqCst),
             pending: count as u64,
-            last_error: error.as_ref().map(|e| e.code.into()),
+            last_error: last_error.map(str::to_owned),
             read_requests: self.reads.load(Ordering::SeqCst),
             successful_reads: self.successes.load(Ordering::SeqCst),
             write_requests: self.writes.load(Ordering::SeqCst),
@@ -183,7 +196,10 @@ impl SettingsSync {
             .bearer_auth(token)
             .send()
             .await
-            .map_err(|_| SyncError::new("SYNC_NETWORK", true))?;
+            .map_err(|error| {
+                eprintln!("{}", json!({"check":"settings-sync-transport","timeout":error.is_timeout(),"connect":error.is_connect(),"request":error.is_request()}));
+                SyncError::new("SYNC_NETWORK", true)
+            })?;
         let status = response.status();
         let mut bytes = Vec::new();
         while let Some(chunk) = response
@@ -241,11 +257,21 @@ impl SettingsSync {
         retry: bool,
     ) -> SyncResult<SyncStatus> {
         let _startup = self.startup.lock().await;
+        let _upload = self.upload.lock().await;
         if self.restart_required.load(Ordering::SeqCst) {
             return self.status(db).await;
         }
         LocalStore::ensure_device(db).await?;
         sqlx::query("UPDATE sync_outbox SET status='queued',retry_at=NULL WHERE status IN ('waitingAuth','uploading')").execute(&db.pool).await?;
+        {
+            let mut error = self.last_error.lock().await;
+            if error
+                .as_ref()
+                .is_some_and(|error| error.code == "AUTH_EXPIRED")
+            {
+                *error = None;
+            }
+        }
         if self.succeeded.load(Ordering::SeqCst)
             || (self.attempted.load(Ordering::SeqCst) && !retry)
         {
@@ -259,7 +285,7 @@ impl SettingsSync {
             let _ = self.local.collect(db).await;
         }
         self.attempted.store(true, Ordering::SeqCst);
-        let result = self.fetch_install(db, ai, cms).await;
+        let result = self.fetch_install(db, ai, cms, None).await;
         if let Err(e) = result {
             *self.last_error.lock().await = Some(e);
             self.using_cache.store(true, Ordering::SeqCst);
@@ -272,16 +298,97 @@ impl SettingsSync {
         self.wake.notify_one();
         self.status(db).await
     }
+    pub async fn manual(
+        &self,
+        db: &Database,
+        ai: &AiService,
+        cms: &CmsService,
+    ) -> SyncResult<SyncStatus> {
+        let _startup = self.startup.lock().await;
+        let _upload = self.upload.lock().await;
+        let status = self.status(db).await?;
+        if matches!(
+            status.phase,
+            "demo" | "restartRequired" | "waitingAuth" | "failedValidation"
+        ) {
+            return Ok(status);
+        }
+        let (generation, _) = cms
+            .settings_authorization()
+            .await
+            .map_err(|_| SyncError::new("AUTH_EXPIRED", false))?;
+        LocalStore::ensure_device(db).await?;
+        self.attempted.store(true, Ordering::SeqCst);
+        if status.phase == "protocolMismatch" {
+            // 只有成功读取、校验和安装 v2 云端后才解锁；检查回执先于本机覆盖。
+            match self.fetch_install(db, ai, cms, Some(generation)).await {
+                Ok(()) => {
+                    let _gate = self.gate.lock().await;
+                    let _session = cms
+                        .settings_generation_guard(generation)
+                        .await
+                        .map_err(|_| SyncError::new("SESSION_CHANGED", false))?;
+                    sqlx::query("UPDATE sync_outbox SET status='queued',retry_at=NULL,last_error_code=NULL WHERE schema_version=2 AND status='failedValidation' AND last_error_code='UNSUPPORTED_VERSION'")
+                        .execute(&db.pool).await?;
+                    self.succeeded.store(true, Ordering::SeqCst);
+                    self.using_cache.store(false, Ordering::SeqCst);
+                    self.successes.fetch_add(1, Ordering::SeqCst);
+                    *self.last_error.lock().await = None;
+                }
+                Err(error) if error.code == "SESSION_CHANGED" => return Err(error),
+                Err(error) => {
+                    self.using_cache.store(true, Ordering::SeqCst);
+                    *self.last_error.lock().await = Some(error);
+                    return self.status(db).await;
+                }
+            }
+        }
+        sqlx::query("UPDATE sync_outbox SET retry_at=NULL WHERE status='queued'")
+            .execute(&db.pool)
+            .await?;
+        while self.upload_one_locked(db, cms, Some(generation)).await? {}
+        let status = self.status(db).await?;
+        if matches!(
+            status.phase,
+            "waitingAuth" | "failedValidation" | "protocolMismatch"
+        ) {
+            return Ok(status);
+        }
+        let upload_error = if status.pending > 0 {
+            self.last_error.lock().await.clone()
+        } else {
+            None
+        };
+        match self.fetch_install(db, ai, cms, Some(generation)).await {
+            Ok(()) => {
+                self.succeeded.store(true, Ordering::SeqCst);
+                self.using_cache.store(false, Ordering::SeqCst);
+                self.successes.fetch_add(1, Ordering::SeqCst);
+                *self.last_error.lock().await = upload_error;
+            }
+            Err(error) if error.code == "SESSION_CHANGED" => return Err(error),
+            Err(error) => {
+                self.using_cache.store(true, Ordering::SeqCst);
+                *self.last_error.lock().await = Some(error);
+            }
+        }
+        self.wake.notify_one();
+        self.status(db).await
+    }
     async fn fetch_install(
         &self,
         db: &Database,
         ai: &AiService,
         cms: &CmsService,
+        expected_generation: Option<u64>,
     ) -> SyncResult<()> {
         let (generation, token) = cms
             .settings_authorization()
             .await
             .map_err(|_| SyncError::new("AUTH_EXPIRED", false))?;
+        if expected_generation.is_some_and(|expected| expected != generation) {
+            return Err(SyncError::new("SESSION_CHANGED", false));
+        }
         self.reads.fetch_add(1, Ordering::SeqCst);
         let raw = self.request(&token, "bootstrap", None).await?;
         validate_document(&raw, DocumentKind::Bootstrap, None, &[])?;
@@ -289,12 +396,25 @@ impl SettingsSync {
         // 先识别在旧进程已经提交而响应丢失的操作，防止 create/delete 重放两次。
         let _ai = ai.operations.lock().await;
         let _gate = self.gate.lock().await;
+        let observed: i64 =
+            sqlx::query_scalar("SELECT last_observed_revision FROM sync_state WHERE id=1")
+                .fetch_one(&db.pool)
+                .await?;
+        if boot.snapshot.revision < observed as u64 {
+            return Err(SyncError::new("STALE_SNAPSHOT", true));
+        }
         for pending in self.local.pending(db).await? {
             match self.request(&token, "check", Some(&pending.raw)).await {
                 Ok(raw) => {
                     let receipt = Self::receipt(&raw, &pending)?;
                     if receipt.revision <= boot.snapshot.revision {
+                        let _session = cms
+                            .settings_generation_guard(generation)
+                            .await
+                            .map_err(|_| SyncError::new("SESSION_CHANGED", false))?;
                         self.ack(db, &pending, &receipt).await?;
+                    } else {
+                        return Err(SyncError::new("STALE_SNAPSHOT", true));
                     }
                 }
                 Err(e) if e.code == "OPERATION_NOT_FOUND" => {}
@@ -358,7 +478,24 @@ impl SettingsSync {
         let Ok(_upload) = self.upload.try_lock() else {
             return Ok(false);
         };
+        self.upload_one_locked(db, cms, None).await
+    }
+    async fn upload_one_locked(
+        &self,
+        db: &Database,
+        cms: &CmsService,
+        expected_generation: Option<u64>,
+    ) -> SyncResult<bool> {
         if !self.attempted.load(Ordering::SeqCst) || !Self::cached(db).await? {
+            return Ok(false);
+        }
+        if self
+            .last_error
+            .lock()
+            .await
+            .as_ref()
+            .is_some_and(|e| e.code == "UNSUPPORTED_VERSION")
+        {
             return Ok(false);
         }
         let pending = {
@@ -382,6 +519,9 @@ impl SettingsSync {
             Ok(v) => v,
             Err(_) => return Ok(false),
         };
+        if expected_generation.is_some_and(|expected| expected != generation) {
+            return Err(SyncError::new("SESSION_CHANGED", false));
+        }
         sqlx::query("UPDATE sync_outbox SET status='uploading' WHERE operation_id=?")
             .bind(&pending.operation_id)
             .execute(&db.pool)

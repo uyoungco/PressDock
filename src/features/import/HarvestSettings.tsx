@@ -38,6 +38,8 @@ import { isDesktop, ServiceError } from "@/services/tauri/client";
 import type { HarvestBridge } from "./contracts";
 import { isAndroid } from "@/lib/platform";
 import { useDesktopSettings } from "@/features/settings/desktop-state";
+import { useSettingsActivity } from "@/features/settings-sync/activity";
+import { useSettingsDraft } from "@/features/settings/mobile-state";
 
 const autosave = importService.settingsAutosave;
 function flushOnLeave() {
@@ -55,6 +57,11 @@ const switches = [
     "autoSummary",
     "AI 生成摘要",
     "生成不超过 130 字符的简介；关闭时保留后台简介。",
+  ],
+  [
+    "aiOrganizeBody",
+    "正文内容整理",
+    "合并碎段、拆分长段，保留原文及图片位置；失败保留原排版。",
   ],
   [
     "aiAutoPaginate",
@@ -142,10 +149,13 @@ function UserscriptConnection({ active }: { active: boolean }) {
 export function HarvestSettings({
   active,
   onConfigurePagination,
+  onConfigureOrganization,
 }: {
   active: boolean;
   onConfigurePagination?: () => void;
+  onConfigureOrganization?: () => void;
 }) {
+  const { revision, synchronizing } = useSettingsActivity();
   const compact = !!useDesktopSettings();
   const {
     form,
@@ -164,9 +174,16 @@ export function HarvestSettings({
     (m) => m.id === paginationTemplate?.modelConfigId,
   );
   const paginationOptions = paginationTemplate?.paginationOptions;
+  const organizationTemplate = aiSettings.templates.find(
+    (t) => t.purpose === "bodyOrganization" && t.isDefault,
+  );
+  const organizationModel = models.find(
+    (m) => m.id === organizationTemplate?.modelConfigId,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lock = useRef(false);
+  useSettingsDraft("harvest", false, loading || modeSaving);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -198,9 +215,9 @@ export function HarvestSettings({
       valid = false;
       flushOnLeave();
     };
-  }, [active]);
+  }, [active, revision]);
   async function setDeveloperMode(enabled: boolean) {
-    if (!form || lock.current) return;
+    if (!form || lock.current || synchronizing) return;
     lock.current = true;
     setError(null);
     try {
@@ -251,7 +268,7 @@ export function HarvestSettings({
                       variant="outline"
                       aria-label="素材获取方式"
                       value={form.sourceMode}
-                      disabled={loading}
+                      disabled={loading || synchronizing}
                       onValueChange={(value) => {
                         if (value === "webview" || value === "cdp")
                           autosave.update({ sourceMode: value });
@@ -286,7 +303,7 @@ export function HarvestSettings({
                           variant="outline"
                           aria-label="连接的浏览器"
                           value={form.cdpBrowser}
-                          disabled={loading}
+                          disabled={loading || synchronizing}
                           onValueChange={(value) => {
                             if (value === "chrome" || value === "edge")
                               autosave.update({ cdpBrowser: value });
@@ -308,7 +325,7 @@ export function HarvestSettings({
                           id="harvest-cdp-address"
                           value={form.cdpAddress ?? ""}
                           maxLength={4096}
-                          disabled={loading}
+                          disabled={loading || synchronizing}
                           placeholder="留空自动发现已运行的浏览器"
                           onChange={(event) =>
                             autosave.update({
@@ -353,7 +370,7 @@ export function HarvestSettings({
               </FieldSet>
               <Field
                 orientation="horizontal"
-                data-disabled={modeSaving || loading}
+                data-disabled={modeSaving || loading || synchronizing}
               >
                 <input
                   id="harvest-developer-mode"
@@ -361,7 +378,7 @@ export function HarvestSettings({
                   role="switch"
                   className="mt-1 size-4 accent-primary"
                   checked={form.developerMode}
-                  disabled={modeSaving || loading}
+                  disabled={modeSaving || loading || synchronizing}
                   onChange={(event) =>
                     void setDeveloperMode(event.target.checked)
                   }
@@ -410,6 +427,7 @@ export function HarvestSettings({
                         id={`harvest-${key}`}
                         type="checkbox"
                         role="switch"
+                        disabled={loading || synchronizing}
                         className="mt-1 size-4 accent-primary"
                         checked={form[key]}
                         onChange={(event) =>
@@ -425,6 +443,25 @@ export function HarvestSettings({
                     </Field>
                   ))}
                 </FieldGroup>
+              </FieldSet>
+              <FieldSet>
+                <FieldLegend variant="label">正文整理配置</FieldLegend>
+                <FieldContent>
+                  <FieldDescription>
+                    {organizationTemplate && organizationModel
+                      ? `${organizationTemplate.name} · ${organizationModel.displayName}`
+                      : "请先设置默认正文整理模板并绑定模型；配置完整后可开启整理。"}
+                  </FieldDescription>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={onConfigureOrganization}
+                    disabled={!onConfigureOrganization}
+                  >
+                    配置正文整理提示词
+                  </Button>
+                </FieldContent>
               </FieldSet>
               <FieldSet>
                 <FieldLegend variant="label">共用分页助手配置</FieldLegend>
@@ -480,7 +517,7 @@ export function HarvestSettings({
                       label: model.displayName,
                     })),
                   ]}
-                  disabled={loading}
+                  disabled={loading || synchronizing}
                   onValueChange={(value) => {
                     if (value !== null)
                       autosave.update({ modelConfigId: value || null });
@@ -503,9 +540,8 @@ export function HarvestSettings({
                   </SelectContent>
                 </Select>
                 <FieldDescription>
-                  用于分类、标签和摘要；AI
-                  自动分页使用默认分页模板绑定的模型。所有 AI 项关闭时不发送 AI
-                  请求。
+                  用于分类、标签和摘要；正文整理、自动分页各自使用默认模板绑定的模型。所有
+                  AI 项关闭时不发送 AI 请求。
                 </FieldDescription>
               </Field>
               <Field data-invalid={Boolean(retentionError)}>

@@ -1,0 +1,261 @@
+{
+  "environment": "ego-browser / localhost / 明确标识的内存演示 IPC / 无真实 CMS 写请求",
+  "rendering": "Page.printToPDF → Poppler PNG，浏览器打印渲染，非真机截图",
+  "checkedAt": "2026-11-10 Asia/Shanghai",
+  "checks": {
+    "android-list": {
+      "viewport": [390, 844],
+      "overflow": false,
+      "controls": [
+        {
+          "width": 20,
+          "height": 20,
+          "state": "indeterminate"
+        },
+        {
+          "width": 20,
+          "height": 20,
+          "state": "checked"
+        },
+        {
+          "width": 20,
+          "height": 20,
+          "state": "unchecked"
+        },
+        {
+          "width": 20,
+          "height": 20,
+          "state": "checked"
+        }
+      ],
+      "dock": {
+        "x": 0,
+        "y": 756,
+        "width": 390,
+        "height": 88,
+        "top": 756,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "button": {
+        "x": 230,
+        "y": 776.5,
+        "width": 144,
+        "height": 48,
+        "top": 776.5,
+        "right": 374,
+        "bottom": 824.5,
+        "left": 230
+      }
+    },
+    "android-batch": {
+      "viewport": [390, 844],
+      "overflow": false,
+      "sheet": {
+        "x": 0,
+        "y": 304.4375,
+        "width": 390,
+        "height": 539.5625,
+        "top": 304.4375,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "footer": {
+        "x": 0,
+        "y": 755,
+        "width": 390,
+        "height": 89,
+        "top": 755,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "closeDisabled": false,
+      "focused": "关闭审核"
+    },
+    "android-reject": {
+      "cancelWroteNothing": true,
+      "busy": {
+        "closeDisabled": true,
+        "confirming": [
+          {
+            "text": "取消",
+            "disabled": true
+          },
+          {
+            "text": "正在审核…",
+            "disabled": true
+          }
+        ]
+      },
+      "writes": [
+        {
+          "command": "cms_review_articles",
+          "comment": "",
+          "decision": "reject",
+          "ids": [8101, 8103]
+        }
+      ]
+    },
+    "desktop-list": {
+      "view": [1440, 900],
+      "overflow": false,
+      "toolbar": {
+        "x": 70.359375,
+        "y": 213,
+        "width": 357.28125,
+        "height": 32,
+        "top": 213,
+        "right": 427.640625,
+        "bottom": 245,
+        "left": 70.359375
+      },
+      "selected": [
+        {
+          "id": "8101",
+          "color": "color(srgb 0.948349 0.96052 0.990419)",
+          "shadow": "rgb(36, 87, 214) 2px 0px 0px 0px inset"
+        },
+        {
+          "id": "8103",
+          "color": "color(srgb 0.948349 0.96052 0.990419)",
+          "shadow": "rgb(36, 87, 214) 2px 0px 0px 0px inset"
+        }
+      ],
+      "checkbox": [16, 16, 16, 16, 16]
+    },
+    "desktop-accept": {
+      "color": "#2457d6",
+      "writes": [
+        {
+          "command": "cms_review_articles",
+          "comment": "",
+          "decision": "accept"
+        }
+      ]
+    },
+    "desktop-narrow": {
+      "view": [550, 850],
+      "overflow": false,
+      "selectedCards": 1,
+      "toolbar": {
+        "x": 70.4375,
+        "y": 253,
+        "width": 357.28125,
+        "height": 44,
+        "top": 253,
+        "right": 427.71875,
+        "bottom": 297,
+        "left": 70.4375
+      }
+    },
+    "android-scroll": {
+      "before": {
+        "sheet": {
+          "x": 0,
+          "y": 56,
+          "width": 360,
+          "height": 744,
+          "top": 56,
+          "right": 360,
+          "bottom": 800,
+          "left": 0
+        },
+        "viewport": {
+          "height": 557,
+          "scrollHeight": 2027,
+          "top": 0
+        },
+        "footer": {
+          "x": 0,
+          "y": 711,
+          "width": 360,
+          "height": 89,
+          "top": 711,
+          "right": 360,
+          "bottom": 800,
+          "left": 0
+        },
+        "focused": "关闭审核"
+      },
+      "after": {
+        "scrollTop": 1470,
+        "footer": {
+          "x": 0,
+          "y": 711,
+          "width": 360,
+          "height": 89,
+          "top": 711,
+          "right": 360,
+          "bottom": 800,
+          "left": 0
+        },
+        "pageScroll": 0
+      },
+      "back": {
+        "focused": "修复前焦点落在 body；最终焦点验证见 focus-single",
+        "selected": "已选 20 篇",
+        "writes": 0,
+        "overflow": false
+      }
+    },
+    "focus-single": {
+      "sheetReturn": "批量审核",
+      "decisionReturn": "拒绝",
+      "single": {
+        "dialog": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800,
+          "top": 0,
+          "right": 360,
+          "bottom": 800,
+          "left": 0
+        },
+        "scroll": {
+          "client": 611,
+          "total": 2344
+        },
+        "unsafe": 0
+      },
+      "writes": [
+        {
+          "command": "cms_review_article",
+          "decision": "reject",
+          "comment": ""
+        }
+      ]
+    },
+    "final-mobile": {
+      "hit": {
+        "x": 44,
+        "y": 208,
+        "size": [20, 20],
+        "touch": ["44px", "44px"]
+      },
+      "confirm": {
+        "rect": {
+          "x": 16,
+          "y": 238.5,
+          "width": 328,
+          "height": 323,
+          "top": 238.5,
+          "right": 344,
+          "bottom": 561.5,
+          "left": 16
+        },
+        "reasonInputs": 0,
+        "overflow": false
+      },
+      "dark": {
+        "rootClass": "dark",
+        "surface": "rgb(26, 29, 33)",
+        "button": "oklch(0.704 0.191 22.216)",
+        "foreground": "rgb(33, 20, 20)"
+      }
+    }
+  }
+}

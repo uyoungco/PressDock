@@ -39,7 +39,12 @@ test("public health never calls CMS or D1", async () => {
     db.env,
   );
   assert.equal(response.status, 200);
-  assert.equal(((await response.json()) as { stage: number }).stage, 3);
+  const health = (await response.json()) as {
+    stage: number;
+    schemaVersion: number;
+  };
+  assert.equal(health.stage, 3);
+  assert.equal(health.schemaVersion, 2);
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.deepEqual(db.queries, []);
 });

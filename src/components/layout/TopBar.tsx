@@ -65,7 +65,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
         <>
           <span
             className={cn(
-              pathname === "/channels"
+              pathname === "/channels" || pathname === "/dashboard"
                 ? "hidden min-w-0 truncate text-sm whitespace-nowrap text-muted-foreground lg:block"
                 : "hidden text-sm text-muted-foreground md:block",
             )}

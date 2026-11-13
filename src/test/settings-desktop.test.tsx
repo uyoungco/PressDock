@@ -14,6 +14,21 @@ import { aiService } from "@/features/ai/service";
 import { paginationSettings } from "./ai-fixtures";
 import { deferred } from "./cms-fixtures";
 import { chooseOption } from "./select-helpers";
+import { settingsSyncIpc } from "@/services/tauri/settings-sync";
+import { settingsSyncService } from "@/features/settings-sync/service";
+import { settingsActivity } from "@/features/settings-sync/activity";
+import { invalidateClientRequests } from "@/services/tauri/client";
+import { readySyncStatus } from "./settings-sync-fixtures";
+
+vi.mock("@/services/tauri/settings-sync", () => ({
+  settingsSyncIpc: {
+    start: vi.fn(),
+    manual: vi.fn(),
+    status: vi.fn(),
+    wake: vi.fn(),
+    resolve: vi.fn(),
+  },
+}));
 
 vi.mock("@/features/ai/service", () => ({
   aiService: {
@@ -27,9 +42,53 @@ vi.mock("@/features/ai/service", () => ({
   },
 }));
 let saved = paginationSettings();
+it("正文整理模板有独立用途和草稿，新建与复制不带标题或分页参数", async () => {
+  setup("ai-templates&purpose=bodyOrganization");
+  await userEvent.click(
+    await screen.findByRole("button", { name: "新增模板" }),
+  );
+  expect(
+    (screen.getByLabelText("系统指令") as HTMLTextAreaElement).value,
+  ).toContain("排版编辑");
+  expect(screen.getByLabelText("用户提示词")).toHaveValue(
+    "标题：{{title}}\n内容块：{{blocks}}",
+  );
+  expect(screen.queryByLabelText("候选数量")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("目标字数")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "{{content}}" }),
+  ).not.toBeInTheDocument();
+  change("模板名称", "演示正文整理");
+  await userEvent.click(screen.getByRole("button", { name: "保存模板" }));
+  await waitFor(() =>
+    expect(aiService.saveTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purpose: "bodyOrganization",
+        paginationOptions: null,
+        name: "演示正文整理",
+      }),
+      undefined,
+    ),
+  );
+  expect(saved.templates.find((t) => t.purpose === "title")?.isDefault).toBe(
+    true,
+  );
+  await userEvent.click(screen.getByRole("button", { name: "复制模板" }));
+  expect(screen.getByLabelText("模板名称")).toHaveValue("演示正文整理（副本）");
+  await userEvent.click(screen.getByRole("radio", { name: "文章分页" }));
+  await userEvent.click(screen.getByRole("radio", { name: "正文整理" }));
+  expect(screen.getByLabelText("模板名称")).toHaveValue("演示正文整理（副本）");
+});
 beforeEach(() => {
+  invalidateClientRequests();
   vi.clearAllMocks();
   saved = paginationSettings();
+  vi.mocked(settingsSyncIpc.start).mockResolvedValue(readySyncStatus);
+  vi.mocked(settingsSyncIpc.manual).mockResolvedValue({
+    ...readySyncStatus,
+    successfulReads: 2,
+    readRequests: 2,
+  });
   vi.mocked(aiService.load).mockImplementation(async () =>
     structuredClone(saved),
   );
@@ -47,6 +106,74 @@ beforeEach(() => {
       saved.templates = saved.templates.filter((t) => t.id !== id);
     return null;
   });
+});
+
+it("手动同步刷新模型摘要与保存基线，并在请求期间锁定编辑", async () => {
+  await settingsSyncService.start();
+  setup();
+  await screen.findByText("https://gateway.example/v1");
+  await waitFor(() => expect(settingsActivity.getSnapshot().busy).toBe(false));
+  const request = deferred<typeof readySyncStatus>();
+  vi.mocked(settingsSyncIpc.manual).mockReturnValueOnce(request.promise);
+  fireEvent.click(screen.getByRole("button", { name: "手动同步" }));
+  expect(screen.getByRole("button", { name: "编辑提供商" })).toBeDisabled();
+  saved.providers[0].displayName = "演示云端提供商";
+  await act(async () =>
+    request.resolve({
+      ...readySyncStatus,
+      successfulReads: 2,
+      readRequests: 2,
+    }),
+  );
+  await screen.findByRole("button", { name: /演示云端提供商/ });
+  const dialog = await providerEditor();
+  expect(screen.getByLabelText("显示名称")).toHaveValue("演示云端提供商");
+  change("显示名称", "同步后的本机修改");
+  await userEvent.click(
+    within(dialog).getByRole("button", { name: "保存提供商" }),
+  );
+  await waitFor(() =>
+    expect(aiService.saveProvider).toHaveBeenCalledWith(
+      expect.objectContaining({ displayName: "同步后的本机修改" }),
+      expect.objectContaining({ displayName: "演示云端提供商" }),
+    ),
+  );
+});
+
+it("未保存模板在切换模块后继续阻止同步，同步成功刷新所选模板", async () => {
+  await settingsSyncService.start();
+  const router = setup("ai-templates");
+  await screen.findByLabelText("模板名称");
+  const initial = (screen.getByLabelText("模板名称") as HTMLInputElement).value;
+  change("模板名称", "演示未保存模板");
+  await act(() => router.navigate("/settings?tab=ai-models"));
+  await waitFor(() => expect(settingsActivity.getSnapshot().busy).toBe(false));
+  fireEvent.click(screen.getByRole("button", { name: "手动同步" }));
+  expect(await screen.findByText("请先保存或取消编辑")).toBeVisible();
+  expect(settingsSyncIpc.manual).not.toHaveBeenCalled();
+  await act(() => router.navigate("/settings?tab=ai-templates"));
+  expect(screen.getByLabelText("模板名称")).toHaveValue("演示未保存模板");
+  change("模板名称", initial);
+  const selectedId = saved.templates.find(
+    (template) => template.name === initial,
+  )!.id;
+  vi.mocked(settingsSyncIpc.manual).mockImplementationOnce(async () => {
+    saved.templates.find((template) => template.id === selectedId)!.name =
+      "演示云端模板";
+    return { ...readySyncStatus, successfulReads: 2, readRequests: 2 };
+  });
+  fireEvent.click(screen.getByRole("button", { name: "手动同步" }));
+  await waitFor(() =>
+    expect(screen.getByLabelText("模板名称")).toHaveValue("演示云端模板"),
+  );
+  change("模板名称", "同步后的模板修改");
+  await userEvent.click(screen.getByRole("button", { name: "保存模板" }));
+  await waitFor(() =>
+    expect(aiService.saveTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "同步后的模板修改" }),
+      expect.objectContaining({ name: "演示云端模板" }),
+    ),
+  );
 });
 function setup(tab = "ai-models") {
   const router = createMemoryRouter(

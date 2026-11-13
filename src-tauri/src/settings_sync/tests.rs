@@ -1,7 +1,7 @@
 use super::*;
 
 fn fixtures() -> Value {
-    serde_json::from_str(include_str!("../../../docs/settings-sync/fixtures-v1.json")).unwrap()
+    serde_json::from_str(include_str!("../../../docs/settings-sync/fixtures-v2.json")).unwrap()
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn utf8_and_transport_size_boundaries_are_not_truncated() {
 fn large_unicode_templates_and_preset_counts_match_server_limits() {
     let mut s = fixtures()["base"].clone();
     let mut t = s["config"]["templates"][0].clone();
-    s["config"]["defaults"] = json!({"titleTemplateId":null,"paginationTemplateId":null});
+    s["config"]["defaults"] = json!({"titleTemplateId":null,"paginationTemplateId":null,"bodyOrganizationTemplateId":null});
     t["systemPrompt"] = json!("中".repeat(20_000));
     t["userPrompt"] = json!("文".repeat(20_000));
     let mut list: Vec<_> = (0..8)
@@ -85,7 +85,7 @@ fn large_unicode_templates_and_preset_counts_match_server_limits() {
     s["config"]["templates"][8]["userPrompt"] = json!(format!("{prompt}a"));
     assert_eq!(validate_snapshot(&s).unwrap_err().code, "PAYLOAD_TOO_LARGE");
     s["config"]["templates"] = json!([]);
-    s["config"]["defaults"] = json!({"titleTemplateId":null,"paginationTemplateId":null});
+    s["config"]["defaults"] = json!({"titleTemplateId":null,"paginationTemplateId":null,"bodyOrganizationTemplateId":null});
     let mut presets: Vec<_> = (0..2048).map(|i| json!({"channel":format!("演示{i}"),"subChannel":"子渠道","field":"titlePic","size":null,"maxBytes":null,"format":"webp"})).collect();
     s["config"]["imagePresets"] = json!(presets);
     assert!(validate_snapshot(&s).is_ok());
@@ -126,7 +126,7 @@ fn field_inventory_covers_existing_native_settings_structs() {
     let f = fixtures();
     let c = &f["base"]["config"];
     let catalog: Value = serde_json::from_str(include_str!(
-        "../../../docs/settings-sync/field-map-v1.json"
+        "../../../docs/settings-sync/field-map-v2.json"
     ))
     .unwrap();
     let mut p = c["providers"][0].clone();

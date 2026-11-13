@@ -7,6 +7,16 @@ use crate::{
 };
 use tauri::State;
 #[tauri::command]
+pub async fn settings_sync_manual(
+    database: State<'_, Database>,
+    ai: State<'_, AiService>,
+    cms: State<'_, CmsService>,
+    sync: State<'_, SettingsSync>,
+) -> Result<SyncStatus, CommandError> {
+    cms.authorize().await?;
+    Ok(sync.manual(&database, &ai, &cms).await?)
+}
+#[tauri::command]
 pub async fn settings_sync_start(
     retry: bool,
     database: State<'_, Database>,

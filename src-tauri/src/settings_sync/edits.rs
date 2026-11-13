@@ -117,11 +117,13 @@ impl SettingsSync {
         if current.is_some_and(|t| t.purpose != r.purpose) {
             return Err(SyncError::new("VALIDATION_FAILED", false));
         }
-        let was_default = if r.purpose == TemplatePurpose::Title {
-            before.defaults.title_template_id.as_deref() == Some(&r.id)
-        } else {
-            before.defaults.pagination_template_id.as_deref() == Some(&r.id)
-        };
+        let was_default = match r.purpose {
+            TemplatePurpose::Title => &before.defaults.title_template_id,
+            TemplatePurpose::Pagination => &before.defaults.pagination_template_id,
+            TemplatePurpose::BodyOrganization => &before.defaults.body_organization_template_id,
+        }
+        .as_deref()
+            == Some(&r.id);
         let default_changed = baseline
             .as_ref()
             .map(|b| b.is_default != r.is_default)
@@ -166,10 +168,12 @@ impl SettingsSync {
             after.templates.push(t);
         }
         if default_changed {
-            let default = if purpose == TemplatePurpose::Title {
-                &mut after.defaults.title_template_id
-            } else {
-                &mut after.defaults.pagination_template_id
+            let default = match purpose {
+                TemplatePurpose::Title => &mut after.defaults.title_template_id,
+                TemplatePurpose::Pagination => &mut after.defaults.pagination_template_id,
+                TemplatePurpose::BodyOrganization => {
+                    &mut after.defaults.body_organization_template_id
+                }
             };
             *default = if is_default { Some(id) } else { None };
         }
@@ -199,6 +203,9 @@ impl SettingsSync {
                 }
                 if after.defaults.pagination_template_id.as_deref() == Some(id) {
                     after.defaults.pagination_template_id = None;
+                }
+                if after.defaults.body_organization_template_id.as_deref() == Some(id) {
+                    after.defaults.body_organization_template_id = None;
                 }
             }
             _ => return Err(SyncError::new("VALIDATION_FAILED", false)),
@@ -272,6 +279,7 @@ impl SettingsSync {
             auto_tags: s.options.auto_tags,
             auto_summary: s.options.auto_summary,
             ai_auto_paginate: s.options.ai_auto_paginate,
+            ai_organize_body: s.options.ai_organize_body,
             model_config_id: s.options.model_config_id.clone(),
         };
         if let Some(base) = baseline {
@@ -282,12 +290,12 @@ impl SettingsSync {
         let changes = local::diff(&before, &after)?;
         // 即使只保存本机偏好，也合并当前有效的共享值，避免旧表单回写未编辑字段。
         let actual = local::export(db).await?;
-        let snapshot = json!({"schemaVersion":1,"revision":1,"config":actual});
+        let snapshot = json!({"schemaVersion":2,"revision":1,"config":actual});
         let merged = if changes.is_empty() {
             snapshot
         } else {
             validate_operation(
-                &json!({"schemaVersion":1,"operationId":uuid::Uuid::new_v4().to_string(),"deviceId":uuid::Uuid::new_v4().to_string(),"sequence":1,"changes":changes}),
+                &json!({"schemaVersion":2,"operationId":uuid::Uuid::new_v4().to_string(),"deviceId":uuid::Uuid::new_v4().to_string(),"sequence":1,"changes":changes}),
                 &snapshot,
                 &[],
             )?
@@ -298,6 +306,7 @@ impl SettingsSync {
         local.options.auto_tags = shared.auto_tags;
         local.options.auto_summary = shared.auto_summary;
         local.options.ai_auto_paginate = shared.ai_auto_paginate;
+        local.options.ai_organize_body = shared.ai_organize_body;
         local.options.model_config_id = shared.model_config_id;
         self.local.enqueue(db, changes, Some(&local)).await?;
         self.changed().await;

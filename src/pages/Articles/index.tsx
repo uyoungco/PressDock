@@ -40,6 +40,8 @@ import {
 import { ArticleFilters } from "@/features/cms-articles/ArticleFilters";
 import { useArticleLayout } from "@/features/cms-articles/use-article-layout";
 import { useArticleActions } from "@/features/cms-articles/use-article-actions";
+import { ReviewToolbar } from "@/features/cms-articles/ReviewToolbar";
+import { articleMemory } from "@/features/cms-articles/state";
 import {
   articlePageSizes,
   cmsArticleQuerySchema,
@@ -103,12 +105,19 @@ function ArticleResults({ view }: { view: ArticleView }) {
     articleColumns,
   );
   const refresh = () => {
-    void list.refetch();
+    actions.review.clearSelection();
+    void list.refetch().then((result) => {
+      if (!result.error) articleMemory.confirmReviewRefresh(view);
+    });
   };
   const actions = useArticleActions(view, classes, classesError, () => {
     void classQuery.refetch();
   });
   const key = articleQueryParams(applied).toString();
+  const clearSelection = actions.review.clearSelection;
+  useEffect(() => {
+    clearSelection();
+  }, [key, list.dataUpdatedAt, user, clearSelection]);
   useEffect(() => {
     setDraft(applied);
     remember((previous) => ({ ...previous, [view]: applied }));
@@ -123,6 +132,7 @@ function ArticleResults({ view }: { view: ArticleView }) {
       return;
     }
     setFilterError(null);
+    clearSelection();
     if (articleQueryParams(query).toString() === key) refresh();
     else setParams(articleQueryParams(query));
   }
@@ -130,21 +140,29 @@ function ArticleResults({ view }: { view: ArticleView }) {
   const totalPages = page
     ? Math.max(1, Math.ceil(page.total / applied.pagesize))
     : applied.current;
+  useEffect(() => {
+    if (
+      page &&
+      !list.isFetching &&
+      !actions.busy &&
+      applied.current > totalPages
+    )
+      setParams(articleQueryParams({ ...applied, current: totalPages }), {
+        replace: true,
+      });
+  }, [page, list.isFetching, actions.busy, applied, totalPages, setParams]);
   return (
     <>
-      <header className="article-page-heading">
-        <h1>
+      <h1 className="sr-only">
+        {
           {
-            {
-              quality: "优质文章",
-              "review-1": "一级待审核文章",
-              "review-2": "二级待审核文章",
-              "review-3": "三级待审核文章",
-            }[view]
-          }
-        </h1>
-        <p>核对标题、配图与分页，继续编辑文章</p>
-      </header>
+            quality: "优质文章",
+            "review-1": "一级待审核文章",
+            "review-2": "二级待审核文章",
+            "review-3": "三级待审核文章",
+          }[view]
+        }
+      </h1>
       <Card
         ref={workspace}
         data-layout={layout}
@@ -173,6 +191,12 @@ function ArticleResults({ view }: { view: ArticleView }) {
           <span className="mr-auto text-xs text-muted-foreground">
             {page ? `${page.total} 篇文章` : "文章记录"}
           </span>
+          <ReviewToolbar
+            review={actions.review}
+            rows={page?.data ?? []}
+            disabled={actions.busy || list.isFetching || !!error}
+            showSelectAll={layout === "cards"}
+          />
           <Button
             variant="outline"
             size="sm"
@@ -230,6 +254,7 @@ function ArticleResults({ view }: { view: ArticleView }) {
               onEdit={(row) => void actions.beginEdit(row)}
               onPromote={actions.beginPromote}
               onPreview={setPreview}
+              review={actions.review}
             />
           )}
         </ScrollArea>

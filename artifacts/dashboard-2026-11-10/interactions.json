@@ -1,0 +1,31 @@
+{
+  "stale": {
+    "total": "CMS 待审核175一级 125二级 42三级 8",
+    "rows": 5,
+    "overflow": false
+  },
+  "settings": [
+    {
+      "text": "标题及来源",
+      "checked": "true"
+    },
+    {
+      "text": "实际状态",
+      "checked": "true"
+    },
+    {
+      "text": "更新时间",
+      "checked": "true"
+    }
+  ],
+  "preferences": {
+    "stored": "{\"version\":1,\"visibility\":{\"updatedAt\":false},\"sizing\":{}}",
+    "sourceOpened": true,
+    "blocked": []
+  },
+  "scroll": {
+    "top": 223,
+    "navBottom": 803,
+    "mainBottom": 812
+  }
+}

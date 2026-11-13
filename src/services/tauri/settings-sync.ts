@@ -7,6 +7,7 @@ export const syncStatusSchema = z.object({
     "blocked",
     "waitingAuth",
     "failedValidation",
+    "protocolMismatch",
     "uploading",
     "pending",
     "cache",
@@ -23,6 +24,7 @@ export const syncStatusSchema = z.object({
 });
 export type SyncStatus = z.infer<typeof syncStatusSchema>;
 export const settingsSyncIpc = {
+  manual: () => invokeCommand("settings_sync_manual", syncStatusSchema),
   start: (retry = false) =>
     invokeCommand("settings_sync_start", syncStatusSchema, { retry }),
   status: () => invokeCommand("settings_sync_status", syncStatusSchema),

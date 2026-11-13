@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -7,8 +8,13 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import {
+  createMemoryRouter,
+  MemoryRouter,
+  RouterProvider,
+} from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ArticleTable } from "@/features/cms-articles/ArticleTable";
 import { ArticleFilters } from "@/features/cms-articles/ArticleFilters";
@@ -23,8 +29,13 @@ import {
   columnStorageKey,
   useColumnPreferences,
 } from "@/hooks/use-column-preferences";
-import type { CmsArticleDetail } from "@/types/cms-article";
+import type { ArticleUpdate, CmsArticleDetail } from "@/types/cms-article";
 import { EditorView } from "@tiptap/pm/view";
+import * as platform from "@/lib/platform";
+import { useArticleActions } from "@/features/cms-articles/use-article-actions";
+import { articleMemory } from "@/features/cms-articles/state";
+import { appQueryRuntime } from "@/lib/query-runtime";
+import { deferred } from "./cms-fixtures";
 
 const article: CmsArticleDetail = {
   id: 8101,
@@ -64,6 +75,7 @@ beforeEach(() => {
   });
   vi.spyOn(window, "scrollBy").mockImplementation(() => undefined);
 });
+afterEach(() => articleMemory.clear());
 function List({
   layout = "wide",
   view = "quality",
@@ -292,3 +304,220 @@ it("源码校验失败保留输入，取消不改正文，应用后一次撤销�
   await userEvent.click(screen.getByRole("button", { name: "保存修改" }));
   expect(save.mock.lastCall?.[0].newsText).toBe(article.newsText);
 });
+
+function ShortcutEditor({
+  onSave,
+  onClose = vi.fn(),
+  busy = false,
+  uploading = false,
+}: {
+  onSave: (input: ArticleUpdate) => void;
+  onClose?: () => void;
+  busy?: boolean;
+  uploading?: boolean;
+}) {
+  const [input, setInput] = useState(articleInput(article));
+  return (
+    <MemoryRouter>
+      <TooltipProvider>
+        <EditorSheet
+          input={input}
+          classes={[]}
+          classesError={null}
+          retryClasses={vi.fn()}
+          onChange={setInput}
+          onClose={onClose}
+          onSave={() => onSave(input)}
+          busy={busy}
+          uploading={uploading}
+          onUploading={vi.fn()}
+          error="【演示】保存失败，输入保留"
+          onError={vi.fn()}
+        />
+      </TooltipProvider>
+    </MemoryRouter>
+  );
+}
+
+it.each(["正文", "标题", "作者"])(
+  "%s 内 Ctrl+S 经表单提交最新输入，失败保持编辑状态",
+  async (field) => {
+    const save = vi.fn();
+    render(<ShortcutEditor onSave={save} />);
+    const body = await screen.findByRole("textbox", { name: "文章正文" });
+    fireEvent.change(screen.getByLabelText("标题 *"), {
+      target: { value: "【演示】快捷保存的标题" },
+    });
+    fireEvent.change(screen.getByLabelText("作者"), {
+      target: { value: "【演示】快捷保存的作者" },
+    });
+    const target =
+      field === "正文"
+        ? body
+        : screen.getByLabelText(`${field}${field === "标题" ? " *" : ""}`);
+    expect(fireEvent.keyDown(target, { key: "s", ctrlKey: true })).toBe(false);
+    expect(save).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        title: "【演示】快捷保存的标题",
+        writer: "【演示】快捷保存的作者",
+        newsText: article.newsText,
+      }),
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("保存失败");
+    expect(screen.getByLabelText("标题 *")).toHaveValue(
+      "【演示】快捷保存的标题",
+    );
+    expect(screen.getByRole("button", { name: "保存修改" })).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Control+s",
+    );
+  },
+);
+
+it("Ctrl+S 忽略输入法、长按和额外修饰键，保存或上传时仍阻止浏览器保存", async () => {
+  const save = vi.fn();
+  const { rerender, unmount } = render(<ShortcutEditor onSave={save} />);
+  const body = await screen.findByRole("textbox", { name: "文章正文" });
+  for (const extra of [
+    { repeat: true },
+    { isComposing: true },
+    { keyCode: 229 },
+    { shiftKey: true },
+    { altKey: true },
+    { metaKey: true },
+  ])
+    fireEvent.keyDown(body, { key: "s", ctrlKey: true, ...extra });
+  for (const state of [{ busy: true }, { uploading: true }]) {
+    rerender(<ShortcutEditor onSave={save} {...state} />);
+    expect(fireEvent.keyDown(body, { key: "s", ctrlKey: true })).toBe(false);
+  }
+  unmount();
+  expect(fireEvent.keyDown(document.body, { key: "s", ctrlKey: true })).toBe(
+    true,
+  );
+  expect(save).not.toHaveBeenCalled();
+});
+
+it.each(["HTML 源码", "编辑链接", "分页助手"])(
+  "%s 子弹框内的按键不保存文章或修改背景正文",
+  async (name) => {
+    const save = vi.fn();
+    render(<ShortcutEditor onSave={save} />);
+    const body = await screen.findByRole("textbox", { name: "文章正文" });
+    const before = body.innerHTML;
+    await userEvent.click(screen.getByRole("button", { name }));
+    const dialog = await screen.findByRole("dialog", { name });
+    const target = within(dialog).queryAllByRole("textbox")[0] ?? dialog;
+    expect(fireEvent.keyDown(target, { key: "s", ctrlKey: true })).toBe(false);
+    fireEvent.keyDown(target, { key: "F8" });
+    fireEvent.keyDown(target, { key: "Enter", ctrlKey: true, shiftKey: true });
+    expect(save).not.toHaveBeenCalled();
+    expect(body.innerHTML).toBe(before);
+    expect(dialog).toBeInTheDocument();
+  },
+);
+
+it("紧凑工具栏显示两种分页快捷键，正文外不触发分页", async () => {
+  vi.spyOn(platform, "isAndroid").mockReturnValue(true);
+  render(<ShortcutEditor onSave={vi.fn()} />);
+  const body = await screen.findByRole("textbox", {
+    name: "文章正文",
+    hidden: true,
+  });
+  const before = body.innerHTML;
+  const title = screen.getByLabelText("标题 *");
+  fireEvent.keyDown(title, { key: "F8" });
+  fireEvent.keyDown(title, { key: "Enter", ctrlKey: true, shiftKey: true });
+  expect(body.innerHTML).toBe(before);
+  await userEvent.click(screen.getByRole("tab", { name: "正文" }));
+  await userEvent.click(screen.getByRole("button", { name: "更多正文操作" }));
+  const item = screen.getByRole("menuitem", { name: "插入分页符" });
+  expect(item).toHaveTextContent("F8 / Ctrl+Shift+Enter");
+  expect(item).toHaveAttribute("aria-keyshortcuts", "F8 Control+Shift+Enter");
+});
+
+it("正文右键菜单 Escape 只关闭菜单，外部标题输入保留焦点", async () => {
+  const close = vi.fn();
+  render(<ShortcutEditor onSave={vi.fn()} onClose={close} />);
+  const body = await screen.findByRole("textbox", { name: "文章正文" });
+  const before = body.innerHTML;
+  fireEvent.contextMenu(body.querySelector("p")!);
+  const menu = await screen.findByRole("menu", { name: "正文右键菜单" });
+  fireEvent.keyDown(menu, { key: "Escape" });
+  await waitFor(() =>
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
+  );
+  expect(close).not.toHaveBeenCalled();
+  expect(body).toHaveFocus();
+  fireEvent.contextMenu(body.querySelector("p")!);
+  await screen.findByRole("menu");
+  const title = screen.getByLabelText("标题 *");
+  await userEvent.click(title);
+  await waitFor(() =>
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
+  );
+  expect(title).toHaveFocus();
+  expect(body.innerHTML).toBe(before);
+  expect(close).not.toHaveBeenCalled();
+});
+
+it.each(["成功", "失败"])(
+  "Ctrl+S 复用业务校验和请求锁，保存%s后遵守原有关闭规则",
+  async (result) => {
+    const pending = deferred<{ succeeded: true }>();
+    const update = vi
+      .spyOn(articleService, "update")
+      .mockReturnValue(pending.promise);
+    articleMemory.saveEdit("quality", {
+      kind: "edit",
+      base: article,
+      input: articleInput(article),
+    });
+    function Actions() {
+      return useArticleActions("quality", [], null, vi.fn()).dialogs;
+    }
+    const router = createMemoryRouter([
+      {
+        path: "/",
+        element: (
+          <QueryClientProvider client={appQueryRuntime.client}>
+            <TooltipProvider>
+              <Actions />
+            </TooltipProvider>
+          </QueryClientProvider>
+        ),
+      },
+    ]);
+    render(<RouterProvider router={router} />);
+    const body = await screen.findByRole("textbox", { name: "文章正文" });
+    fireEvent.keyDown(body, { key: "s", ctrlKey: true });
+    expect(update).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("TitlePic 必填");
+    fireEvent.change(screen.getByLabelText("主图 *"), {
+      target: { value: "/demo.jpg" },
+    });
+    fireEvent.change(screen.getByLabelText("标题 *"), {
+      target: { value: "【演示】快捷保存的最新标题" },
+    });
+    fireEvent.keyDown(body, { key: "s", ctrlKey: true });
+    fireEvent.keyDown(body, { key: "s", ctrlKey: true });
+    expect(update).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ title: "【演示】快捷保存的最新标题" }),
+    );
+    await act(async () => {
+      if (result === "成功") pending.resolve({ succeeded: true });
+      else pending.reject(new Error("【演示】保存请求失败"));
+      await pending.promise.catch(() => undefined);
+    });
+    if (result === "成功") {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(articleMemory.edit("quality")).toBeNull();
+    } else {
+      expect(screen.getByRole("alert")).toHaveTextContent("保存请求失败");
+      expect(screen.getByLabelText("标题 *")).toHaveValue(
+        "【演示】快捷保存的最新标题",
+      );
+      expect(body).toBeInTheDocument();
+    }
+  },
+);

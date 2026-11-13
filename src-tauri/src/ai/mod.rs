@@ -3,9 +3,11 @@ mod execution;
 pub(crate) use execution::ExecutionSnapshot;
 pub(crate) mod credentials;
 pub mod models;
+pub(crate) mod organization;
 mod pagination;
 pub(crate) mod pagination_plan;
 mod titles;
+pub(crate) use organization::{BodyPlan, OrganizationSnapshot};
 
 pub use client::AiService;
 pub use models::*;

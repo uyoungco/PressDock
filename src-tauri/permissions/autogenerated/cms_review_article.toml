@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-cms-review-article"
+description = "Enables the cms_review_article command without any pre-configured scope."
+commands.allow = ["cms_review_article"]
+
+[[permission]]
+identifier = "deny-cms-review-article"
+description = "Denies the cms_review_article command without any pre-configured scope."
+commands.deny = ["cms_review_article"]

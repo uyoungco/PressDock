@@ -532,7 +532,7 @@
 .settings-template-fields > :nth-child(2) {
   grid-area: model;
 }
-.settings-template-fields > :nth-child(3) {
+.settings-template-fields > [data-slot="field-group"] {
   grid-area: params;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -540,18 +540,18 @@
 }
 .settings-template-form[data-purpose="title"]
   .settings-template-fields
-  > :nth-child(3) {
+  > [data-slot="field-group"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.settings-template-fields > :nth-child(4) {
+.settings-template-fields > .settings-template-variables {
   grid-area: variables;
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
-.settings-template-fields > :nth-child(5) {
+.settings-template-fields > :has(#ai-template-system) {
   grid-area: system;
 }
-.settings-template-fields > :nth-child(6) {
+.settings-template-fields > :has(#ai-template-user) {
   grid-area: user;
   align-self: stretch;
 }
@@ -560,14 +560,14 @@
   line-height: 1.7;
   resize: vertical;
 }
-.settings-template-fields > :nth-child(6) textarea {
+.settings-template-fields > :has(#ai-template-user) textarea {
   flex: 1;
   min-height: 140px;
 }
-.settings-template-fields > :nth-child(4) > p:first-child {
+.settings-template-fields > .settings-template-variables > p:first-child {
   font-size: 12px;
 }
-.settings-template-fields > :nth-child(4) button {
+.settings-template-fields > .settings-template-variables button {
   padding: 0 8px;
   font-family: monospace;
   font-size: 11px;

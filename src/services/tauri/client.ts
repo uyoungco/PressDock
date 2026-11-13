@@ -34,6 +34,11 @@ export function onAuthenticationExpired(listener: () => void) {
   };
 }
 
+// 支持携带逐项结果的批次：先保留结果，再进入同一认证失效流程。
+export function reportAuthenticationExpired() {
+  authExpiredListeners.forEach((listener) => listener());
+}
+
 export async function invokeCommand<T>(
   command: string,
   schema: z.ZodType<T>,
@@ -50,8 +55,7 @@ export async function invokeCommand<T>(
       throw new ServiceError("SESSION_CHANGED", "登录状态已变化，请重试");
     const parsed = errorSchema.safeParse(error);
     if (parsed.success) {
-      if (parsed.data.code === "AUTH_EXPIRED")
-        authExpiredListeners.forEach((listener) => listener());
+      if (parsed.data.code === "AUTH_EXPIRED") reportAuthenticationExpired();
       throw new ServiceError(parsed.data.code, parsed.data.message);
     }
     if (error instanceof ServiceError) throw error;

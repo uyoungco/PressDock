@@ -14,6 +14,7 @@ fn main() {
             .windows_attributes(tauri_build::WindowsAttributes::new_without_app_manifest())
             .app_manifest(tauri_build::AppManifest::new().commands(&[
                 "settings_sync_start",
+                "settings_sync_manual",
                 "settings_sync_status",
                 "settings_sync_wake",
                 "settings_sync_resolve",
@@ -49,6 +50,8 @@ fn main() {
                 "cms_list_article_classes",
                 "cms_get_article",
                 "cms_update_article",
+                "cms_review_article",
+                "cms_review_articles",
                 "cms_add_article_to_promote",
                 "cms_login",
                 "cms_restore_session",

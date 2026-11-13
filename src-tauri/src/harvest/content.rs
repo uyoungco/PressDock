@@ -75,10 +75,10 @@ fn render(element: ElementRef<'_>, clean: bool, add_breaks: bool) -> String {
     }
     result
 }
-pub(super) fn clean_html(html: &str) -> String {
+pub(crate) fn clean_html(html: &str) -> String {
     render(Html::parse_fragment(html).root_element(), true, false)
 }
-pub(super) fn with_breaks(html: &str) -> String {
+pub(crate) fn with_breaks(html: &str) -> String {
     render(Html::parse_fragment(html).root_element(), false, true)
 }
 

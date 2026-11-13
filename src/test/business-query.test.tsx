@@ -133,7 +133,7 @@ function setup(path: string) {
 }
 
 describe("业务列表缓存", () => {
-  it("工作台和发布使用的本地文章查询在页面间复用，刷新失败保留数据", async () => {
+  it("历史本地文章查询在页面间复用，刷新失败保留数据", async () => {
     vi.mocked(localArticleService.getArticles).mockResolvedValueOnce([
       articleSchema.parse(demoArticles[0]),
     ]);

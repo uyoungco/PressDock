@@ -12,6 +12,8 @@ use sqlx::{
 use std::path::{Path, PathBuf};
 #[path = "admin_edits.rs"]
 mod edit_probe;
+#[path = "admin_protocol_repair.rs"]
+mod protocol_repair;
 #[cfg(all(test, target_os = "windows"))]
 #[path = "admin_tests.rs"]
 mod tests;
@@ -168,6 +170,12 @@ async fn inspect(path: &Path) -> SyncResult<()> {
 pub async fn run(action: &str) -> std::result::Result<(), &'static str> {
     let path = db_path()?;
     let result: SyncResult<()> = async {
+        if action == "repair-protocol" {
+            if std::env::var_os("PRESSDOCK_SETTINGS_SYNC_DB").is_none() {
+                return Err(SyncError::new("EXPLICIT_DATABASE_REQUIRED", false));
+            }
+            return protocol_repair::run(&path).await;
+        }
         if action == "inspect" {
             return inspect(&path).await;
         }

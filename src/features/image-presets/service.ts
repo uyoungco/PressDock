@@ -1,4 +1,5 @@
 import { imagePresetsIpc } from "@/services/tauri/image-presets";
+import { guardSettingsWrite } from "@/features/settings-sync/activity";
 import {
   channelImagePresetsSchema,
   type ChannelImagePresets,
@@ -15,8 +16,10 @@ import { channelService } from "@/features/channels/service";
 
 export const imagePresetsService = {
   list: () => imagePresetsIpc.list(),
-  save: (request: ChannelImagePresets, baseline?: ChannelImagePresets) =>
-    imagePresetsIpc.save(channelImagePresetsSchema.parse(request), baseline),
+  save: guardSettingsWrite(
+    (request: ChannelImagePresets, baseline?: ChannelImagePresets) =>
+      imagePresetsIpc.save(channelImagePresetsSchema.parse(request), baseline),
+  ),
   resolve: async (
     channel: string,
     subChannel: string,

@@ -54,6 +54,7 @@ impl Database {
                     purpose: match r.try_get::<&str, _>("purpose")? {
                         "title" => TemplatePurpose::Title,
                         "pagination" => TemplatePurpose::Pagination,
+                        "bodyOrganization" => TemplatePurpose::BodyOrganization,
                         _ => return Err(AiError::new("AI_STORAGE", "无效的模板用途")),
                     },
                     pagination_options: r

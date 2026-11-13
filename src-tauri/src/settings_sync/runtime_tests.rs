@@ -8,6 +8,7 @@ use wiremock::{
     Mock, MockServer, ResponseTemplate,
     matchers::{method, path},
 };
+include!("runtime_protocol_tests.rs");
 async fn setup() -> (
     tempfile::TempDir,
     Database,
@@ -40,7 +41,7 @@ async fn install(db: &Database, sync: &SettingsSync) {
 }
 fn receipt(request: &wiremock::Request) -> ResponseTemplate {
     let op: Operation = serde_json::from_slice(&request.body).unwrap();
-    ResponseTemplate::new(200).set_body_json(json!({"schemaVersion":1,"operationId":op.operation_id,"deviceId":op.device_id,"sequence":op.sequence,"revision":100+op.sequence}))
+    ResponseTemplate::new(200).set_body_json(json!({"schemaVersion":2,"operationId":op.operation_id,"deviceId":op.device_id,"sequence":op.sequence,"revision":100+op.sequence}))
 }
 fn name(value: &str) -> Change {
     Change::Set {
@@ -48,6 +49,279 @@ fn name(value: &str) -> Change {
         field: "displayName".into(),
         value: json!(value),
     }
+}
+
+#[tokio::test]
+async fn manual_credential_failure_preserves_active_configuration_and_secret() {
+    let (_dir, db, mut sync, ai, cms, server, _cms) = setup().await;
+    let vault = Arc::new(Vault::default());
+    sync.local.vault = vault.clone();
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    let reference = db.ai_credential_ref("demo-provider").await.unwrap();
+    let before = local::export(&db).await.unwrap().models[0]
+        .display_name
+        .clone();
+    server.reset().await;
+    let mut remote = boot();
+    remote.snapshot.revision += 1;
+    remote.snapshot.config.models[0].display_name = "演示不能落地的配置".into();
+    bootstrap(&server, &remote).await;
+    vault.fail.store(true, Ordering::SeqCst);
+    let result = sync.manual(&db, &ai, &cms).await.unwrap();
+    assert_eq!(result.successful_reads, 1);
+    assert_eq!(result.last_error.as_deref(), Some("SYNC_CREDENTIAL_STORE"));
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        before
+    );
+    assert_eq!(
+        db.ai_credential_ref("demo-provider").await.unwrap(),
+        reference
+    );
+    vault.fail.store(false, Ordering::SeqCst);
+    assert_eq!(
+        sync.local
+            .load(reference.as_deref().unwrap())
+            .await
+            .unwrap(),
+        "DEMO-ONLY-native"
+    );
+}
+
+#[tokio::test]
+async fn manual_refreshes_after_success_without_changing_automatic_start_behavior() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    server.reset().await;
+    let mut remote = boot();
+    remote.snapshot.revision += 1;
+    remote.snapshot.config.models[0].display_name = "演示远端更新".into();
+    bootstrap(&server, &remote).await;
+    let result = sync.manual(&db, &ai, &cms).await.unwrap();
+    assert_eq!(result.successful_reads, 2);
+    assert!(!result.using_cache);
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        "演示远端更新"
+    );
+    assert_eq!(
+        sync.start(&db, &ai, &cms, true)
+            .await
+            .unwrap()
+            .read_requests,
+        2
+    );
+    assert_eq!(server.received_requests().await.unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn manual_uploads_in_sequence_before_reading_the_latest_snapshot() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    sync.local
+        .enqueue(&db, vec![name("演示本机已上报")], None)
+        .await
+        .unwrap();
+    server.reset().await;
+    Mock::given(path("/operations"))
+        .respond_with(receipt)
+        .mount(&server)
+        .await;
+    let mut remote = boot();
+    remote.snapshot.revision = 102;
+    remote.snapshot.config.models[0].display_name = "演示本机已上报".into();
+    bootstrap(&server, &remote).await;
+    let result = sync.manual(&db, &ai, &cms).await.unwrap();
+    assert_eq!(result.pending, 0);
+    assert_eq!(result.successful_reads, 2);
+    let requests = server.received_requests().await.unwrap();
+    assert_eq!(
+        requests
+            .iter()
+            .map(|request| request.url.path())
+            .collect::<Vec<_>>(),
+        vec!["/operations", "/bootstrap"]
+    );
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        "演示本机已上报"
+    );
+}
+
+#[tokio::test]
+async fn manual_temporary_upload_failure_still_reads_and_overlays_pending_fields() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    sync.local
+        .enqueue(&db, vec![name("演示待传字段")], None)
+        .await
+        .unwrap();
+    let pending = sync.local.pending(&db).await.unwrap().remove(0);
+    server.reset().await;
+    Mock::given(path("/operations"))
+        .respond_with(ResponseTemplate::new(503))
+        .mount(&server)
+        .await;
+    Mock::given(path("/check"))
+        .respond_with(
+            ResponseTemplate::new(404)
+                .set_body_json(json!({"error":{"code":"OPERATION_NOT_FOUND"}})),
+        )
+        .mount(&server)
+        .await;
+    let mut remote = boot();
+    remote.snapshot.revision += 1;
+    remote.snapshot.config.models[0].model_id = "demo-remote-model".into();
+    bootstrap(&server, &remote).await;
+    let result = sync.manual(&db, &ai, &cms).await.unwrap();
+    assert_eq!(result.pending, 1);
+    assert_eq!(result.successful_reads, 2);
+    assert!(!result.using_cache);
+    assert_eq!(result.last_error.as_deref(), Some("SYNC_SERVER"));
+    let config = local::export(&db).await.unwrap();
+    assert_eq!(config.models[0].display_name, "演示待传字段");
+    assert_eq!(config.models[0].model_id, "demo-remote-model");
+    assert_eq!(sync.local.pending(&db).await.unwrap()[0].raw, pending.raw);
+}
+
+#[tokio::test]
+async fn manual_auth_or_permanent_rejection_stops_without_downloading_or_replaying() {
+    for (http, code, phase) in [
+        (401, "AUTH_EXPIRED", "waitingAuth"),
+        (409, "ENTITY_DELETED", "failedValidation"),
+    ] {
+        let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+        bootstrap(&server, &boot()).await;
+        sync.start(&db, &ai, &cms, false).await.unwrap();
+        sync.local
+            .enqueue(&db, vec![name("演示保留修改")], None)
+            .await
+            .unwrap();
+        server.reset().await;
+        Mock::given(path("/operations"))
+            .respond_with(ResponseTemplate::new(http).set_body_json(json!({"error":{"code":code}})))
+            .mount(&server)
+            .await;
+        let result = sync.manual(&db, &ai, &cms).await.unwrap();
+        assert_eq!(result.phase, phase);
+        assert_eq!(result.pending, 1);
+        assert_eq!(result.read_requests, 1);
+        assert_eq!(sync.manual(&db, &ai, &cms).await.unwrap().phase, phase);
+        assert_eq!(server.received_requests().await.unwrap().len(), 1);
+    }
+}
+
+#[tokio::test]
+async fn manual_rejects_snapshot_older_than_an_acknowledged_write() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    sync.local
+        .enqueue(&db, vec![name("演示已确认字段")], None)
+        .await
+        .unwrap();
+    Mock::given(path("/operations"))
+        .respond_with(receipt)
+        .mount(&server)
+        .await;
+    let reference = db.ai_credential_ref("demo-provider").await.unwrap();
+    let result = sync.manual(&db, &ai, &cms).await.unwrap();
+    assert!(result.ready && result.using_cache);
+    assert_eq!(result.last_error.as_deref(), Some("STALE_SNAPSHOT"));
+    assert_eq!(result.successful_reads, 1);
+    assert_eq!(result.pending, 0);
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        "演示已确认字段"
+    );
+    assert_eq!(
+        db.ai_credential_ref("demo-provider").await.unwrap(),
+        reference
+    );
+}
+
+#[tokio::test]
+async fn manual_download_excludes_background_upload_and_preserves_newly_queued_edits() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    server.reset().await;
+    Mock::given(path("/bootstrap"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(boot())
+                .set_delay(Duration::from_millis(100)),
+        )
+        .mount(&server)
+        .await;
+    Mock::given(path("/check"))
+        .respond_with(
+            ResponseTemplate::new(404)
+                .set_body_json(json!({"error":{"code":"OPERATION_NOT_FOUND"}})),
+        )
+        .mount(&server)
+        .await;
+    let (result, _) = tokio::join!(sync.manual(&db, &ai, &cms), async {
+        while server.received_requests().await.unwrap().is_empty() {
+            tokio::task::yield_now().await;
+        }
+        let _gate = sync.gate.lock().await;
+        sync.local
+            .enqueue(&db, vec![name("演示并发保留")], None)
+            .await
+            .unwrap();
+        drop(_gate);
+        assert!(!sync.upload_one(&db, &cms).await.unwrap());
+    });
+    assert_eq!(result.unwrap().pending, 1);
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        "演示并发保留"
+    );
+    assert!(
+        server
+            .received_requests()
+            .await
+            .unwrap()
+            .iter()
+            .all(|request| request.url.path() != "/operations")
+    );
+}
+
+#[tokio::test]
+async fn manual_logout_during_download_never_installs_old_response() {
+    let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
+    bootstrap(&server, &boot()).await;
+    sync.start(&db, &ai, &cms, false).await.unwrap();
+    server.reset().await;
+    let mut remote = boot();
+    remote.snapshot.config.models[0].display_name = "演示旧会话响应".into();
+    Mock::given(path("/bootstrap"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(remote)
+                .set_delay(Duration::from_millis(100)),
+        )
+        .mount(&server)
+        .await;
+    let before = local::export(&db).await.unwrap().models[0]
+        .display_name
+        .clone();
+    let (result, _) = tokio::join!(sync.manual(&db, &ai, &cms), async {
+        while server.received_requests().await.unwrap().is_empty() {
+            tokio::task::yield_now().await;
+        }
+        cms.logout().await;
+    });
+    assert_eq!(result.err().unwrap().code, "SESSION_CHANGED");
+    assert_eq!(
+        local::export(&db).await.unwrap().models[0].display_name,
+        before
+    );
 }
 #[tokio::test]
 async fn bootstrap_preserves_cms_failure_codes_without_installing_or_exposing_response_details() {
@@ -59,7 +333,7 @@ async fn bootstrap_preserves_cms_failure_codes_without_installing_or_exposing_re
     ] {
         let (_dir, db, sync, ai, cms, server, _cms) = setup().await;
         Mock::given(path("/bootstrap"))
-            .respond_with(ResponseTemplate::new(if code == "CMS_FORBIDDEN" { 403 } else { 503 }).set_body_json(json!({"schemaVersion":1,"error":{"code":code,"retryable":true,"detail":"demo-secret-must-not-escape"}})))
+            .respond_with(ResponseTemplate::new(if code == "CMS_FORBIDDEN" { 403 } else { 503 }).set_body_json(json!({"schemaVersion":2,"error":{"code":code,"retryable":true,"detail":"demo-secret-must-not-escape"}})))
             .mount(&server).await;
         let result = sync.start(&db, &ai, &cms, false).await.unwrap();
         assert!(!result.ready);
@@ -86,7 +360,7 @@ async fn rejected_changes_recovery_waits_for_cold_start_and_never_replays_archiv
         .enqueue(&db, vec![name("演示后续修改")], None)
         .await
         .unwrap();
-    Mock::given(path("/operations")).respond_with(ResponseTemplate::new(409).set_body_json(json!({"schemaVersion":1,"error":{"code":"ENTITY_DELETED","retryable":false,"operationId":null}}))).mount(&server).await;
+    Mock::given(path("/operations")).respond_with(ResponseTemplate::new(409).set_body_json(json!({"schemaVersion":2,"error":{"code":"ENTITY_DELETED","retryable":false,"operationId":null}}))).mount(&server).await;
     assert!(!sync.upload_one(&db, &cms).await.unwrap());
     let before = server.received_requests().await.unwrap().len();
     let result = sync.resolve_rejected(&db, &ai, &cms).await.unwrap();
@@ -199,12 +473,27 @@ async fn logout_during_download_discards_old_response() {
         .respond_with(
             ResponseTemplate::new(200)
                 .set_body_json(boot())
-                .set_delay(Duration::from_millis(70)),
+                .set_delay(Duration::from_millis(300)),
         )
         .mount(&server)
         .await;
     let (start, _) = tokio::join!(sync.start(&db, &ai, &cms, false), async {
-        tokio::time::sleep(Duration::from_millis(20)).await;
+        tokio::time::timeout(Duration::from_secs(5), async {
+            loop {
+                if server
+                    .received_requests()
+                    .await
+                    .unwrap()
+                    .iter()
+                    .any(|r| r.url.path() == "/bootstrap")
+                {
+                    break;
+                }
+                tokio::time::sleep(Duration::from_millis(2)).await;
+            }
+        })
+        .await
+        .expect("须先进入下载再退出账号");
         cms.logout().await
     });
     let status = start.unwrap();
@@ -235,7 +524,7 @@ async fn accepted_create_with_lost_response_is_removed_before_overlay() {
     remote.snapshot.revision = 9;
     remote.snapshot.config.models.push(model);
     bootstrap(&server, &remote).await;
-    Mock::given(path("/check")).respond_with(ResponseTemplate::new(200).set_body_json(json!({"schemaVersion":1,"operationId":pending.operation_id,"deviceId":pending.device_id,"sequence":pending.sequence,"revision":8}))).mount(&server).await;
+    Mock::given(path("/check")).respond_with(ResponseTemplate::new(200).set_body_json(json!({"schemaVersion":2,"operationId":pending.operation_id,"deviceId":pending.device_id,"sequence":pending.sequence,"revision":8}))).mount(&server).await;
     let status = sync.start(&db, &ai, &cms, false).await.unwrap();
     assert!(status.ready);
     assert_eq!(status.pending, 0);
@@ -300,7 +589,7 @@ async fn temporary_failures_persist_retry_and_auth_or_validation_errors_pause_wi
             .enqueue(&db, vec![name("演示错误")], None)
             .await
             .unwrap();
-        Mock::given(path("/operations")).respond_with(ResponseTemplate::new(status).set_body_json(json!({"schemaVersion":1,"error":{"code":code,"retryable":status>=500,"operationId":null}}))).mount(&server).await;
+        Mock::given(path("/operations")).respond_with(ResponseTemplate::new(status).set_body_json(json!({"schemaVersion":2,"error":{"code":code,"retryable":status>=500,"operationId":null}}))).mount(&server).await;
         assert!(!sync.upload_one(&db, &cms).await.unwrap());
         assert_eq!(sync.status(&db).await.unwrap().phase, expected);
         assert!(!sync.upload_one(&db, &cms).await.unwrap());

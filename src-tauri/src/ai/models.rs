@@ -183,12 +183,14 @@ pub enum TemplatePurpose {
     #[default]
     Title,
     Pagination,
+    BodyOrganization,
 }
 impl TemplatePurpose {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Title => "title",
             Self::Pagination => "pagination",
+            Self::BodyOrganization => "bodyOrganization",
         }
     }
 }
@@ -229,6 +231,13 @@ impl PromptTemplate {
                     .validate()?;
                 super::pagination::validate_variables(&self.system_prompt)?;
                 super::pagination::validate_variables(&self.user_prompt)
+            }
+            TemplatePurpose::BodyOrganization => {
+                if self.pagination_options.is_some() {
+                    return Err(AiError::invalid("正文整理不使用分页参数"));
+                }
+                super::organization::validate_variables(&self.system_prompt)?;
+                super::organization::validate_variables(&self.user_prompt)
             }
         }
     }

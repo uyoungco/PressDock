@@ -1,0 +1,172 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "contentWidth": 1176,
+    "columns": "284.5px 284.5px 284.5px 284.5px",
+    "recordLayout": "wide",
+    "scrollArea": {
+      "width": 1176,
+      "scrollWidth": 1176,
+      "height": 780,
+      "scrollHeight": 780
+    },
+    "quickBottom": 664,
+    "mainBottom": 868,
+    "stats": [
+      {
+        "text": "今日采集本机8条已添加 CMS 1 条",
+        "height": 114
+      },
+      {
+        "text": "进行中2条排队中与正在处理",
+        "height": 114
+      },
+      {
+        "text": "需处理4条验证、登录、中断或异常",
+        "height": 114
+      },
+      {
+        "text": "CMS 待审核全部175篇一级 125二级 42三级 8",
+        "height": 114
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 1280,
+    "height": 720,
+    "contentWidth": 1016,
+    "columns": "244.5px 244.5px 244.5px 244.5px",
+    "recordLayout": "wide",
+    "scrollArea": {
+      "width": 1016,
+      "scrollWidth": 1016,
+      "height": 600,
+      "scrollHeight": 600
+    },
+    "quickBottom": 664,
+    "mainBottom": 688,
+    "stats": [
+      {
+        "text": "今日采集本机8条已添加 CMS 1 条",
+        "height": 114
+      },
+      {
+        "text": "进行中2条排队中与正在处理",
+        "height": 114
+      },
+      {
+        "text": "需处理4条验证、登录、中断或异常",
+        "height": 114
+      },
+      {
+        "text": "CMS 待审核全部175篇一级 125二级 42三级 8",
+        "height": 114
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 960,
+    "height": 720,
+    "contentWidth": 696,
+    "columns": "341px 341px",
+    "recordLayout": "compact",
+    "scrollArea": {
+      "width": 696,
+      "scrollWidth": 696,
+      "height": 600,
+      "scrollHeight": 737
+    },
+    "quickBottom": 808,
+    "mainBottom": 688,
+    "stats": [
+      {
+        "text": "今日采集本机8条已添加 CMS 1 条",
+        "height": 114
+      },
+      {
+        "text": "进行中2条排队中与正在处理",
+        "height": 114
+      },
+      {
+        "text": "需处理4条验证、登录、中断或异常",
+        "height": 114
+      },
+      {
+        "text": "CMS 待审核全部175篇一级 125二级 42三级 8",
+        "height": 114
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 820,
+    "height": 720,
+    "contentWidth": 556,
+    "columns": "271px 271px",
+    "recordLayout": "cards",
+    "scrollArea": {
+      "width": 556,
+      "scrollWidth": 556,
+      "height": 600,
+      "scrollHeight": 1032
+    },
+    "quickBottom": 1103,
+    "mainBottom": 688,
+    "stats": [
+      {
+        "text": "今日采集本机8条已添加 CMS 1 条",
+        "height": 116
+      },
+      {
+        "text": "进行中2条排队中与正在处理",
+        "height": 116
+      },
+      {
+        "text": "需处理4条验证、登录、中断或异常",
+        "height": 116
+      },
+      {
+        "text": "CMS 待审核全部175篇一级 125二级 42三级 8",
+        "height": 116
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "contentWidth": 374,
+    "columns": "180px 180px",
+    "recordLayout": "cards",
+    "scrollArea": {
+      "width": 374,
+      "scrollWidth": 374,
+      "height": 740,
+      "scrollHeight": 1032
+    },
+    "quickBottom": 1095,
+    "mainBottom": 812,
+    "stats": [
+      {
+        "text": "今日采集本机8条已添加 CMS 1 条",
+        "height": 116
+      },
+      {
+        "text": "进行中2条排队中与正在处理",
+        "height": 116
+      },
+      {
+        "text": "需处理4条验证、登录、中断或异常",
+        "height": 116
+      },
+      {
+        "text": "CMS 待审核全部175篇一级 125二级 42三级 8",
+        "height": 116
+      }
+    ],
+    "overflow": []
+  }
+]

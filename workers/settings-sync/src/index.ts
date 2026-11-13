@@ -192,7 +192,7 @@ export function createWorker(dependencies: Dependencies = {}) {
           if (request.method !== method)
             return json(
               {
-                schemaVersion: 1,
+                schemaVersion: 2,
                 error: {
                   code: "METHOD_NOT_ALLOWED",
                   retryable: false,
@@ -245,6 +245,7 @@ export function createWorker(dependencies: Dependencies = {}) {
                 : "pressdock-settings-dev",
             environment: env.SETTINGS_ENVIRONMENT ?? "development",
             stage: 3,
+            schemaVersion: 2,
           });
 
         await verifyCms(
@@ -275,7 +276,7 @@ export function createWorker(dependencies: Dependencies = {}) {
               : serviceError(error);
           return json(
             {
-              schemaVersion: 1,
+              schemaVersion: 2,
               error: {
                 code: problem.code,
                 retryable: problem.retryable,

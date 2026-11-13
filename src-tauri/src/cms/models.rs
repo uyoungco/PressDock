@@ -309,3 +309,81 @@ pub struct ArticlePromoteInput {
     pub article: CmsArticleRow,
     pub input: PromoteInput,
 }
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+pub enum ReviewView {
+    #[serde(rename = "review-1")]
+    First,
+    #[serde(rename = "review-2")]
+    Second,
+    #[serde(rename = "review-3")]
+    Third,
+}
+
+impl ReviewView {
+    pub fn status(self) -> i32 {
+        match self {
+            Self::First => 0,
+            Self::Second => 1,
+            Self::Third => 2,
+        }
+    }
+    pub fn article_view(self) -> ArticleView {
+        match self {
+            Self::First => ArticleView::First,
+            Self::Second => ArticleView::Second,
+            Self::Third => ArticleView::Third,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ReviewDecision {
+    Accept,
+    Reject,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ArticleReviewInput {
+    pub view: ReviewView,
+    pub decision: ReviewDecision,
+    pub comment: String,
+    pub article: CmsArticleDetail,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ArticlesReviewInput {
+    pub view: ReviewView,
+    pub decision: ReviewDecision,
+    pub comment: String,
+    pub articles: Vec<CmsArticleRow>,
+}
+
+#[derive(Clone, Copy, Serialize, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub enum ReviewStatus {
+    Succeeded,
+    Failed,
+    Unconfirmed,
+    NotAttempted,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArticleReviewResult {
+    pub id: i64,
+    pub title: Option<String>,
+    pub status: ReviewStatus,
+    pub code: Option<String>,
+    pub message: String,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArticleReviewSummary {
+    pub items: Vec<ArticleReviewResult>,
+    pub auth_expired: bool,
+}

@@ -9,6 +9,8 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ReviewToolbar } from "@/features/cms-articles/ReviewToolbar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,15 +94,33 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
   const loading = list.isPending;
   const error = list.error?.message ?? null;
   const refresh = () => {
-    void list.refetch();
+    actions.review.clearSelection();
+    void list.refetch().then((result) => {
+      if (!result.error) articleMemory.confirmReviewRefresh(view);
+    });
   };
   const actions = useArticleActions(view, classes, classesError, () => {
     void classQuery.refetch();
   });
+  const clearSelection = actions.review.clearSelection;
+  useEffect(() => {
+    clearSelection();
+  }, [key, list.dataUpdatedAt, user, clearSelection]);
   const authorVisible = view === "quality" || view === "review-1";
   const totalPages = page
     ? Math.max(1, Math.ceil(page.total / applied.pagesize))
     : applied.current;
+  useEffect(() => {
+    if (
+      page &&
+      !list.isFetching &&
+      !actions.busy &&
+      applied.current > totalPages
+    )
+      setParams(articleQueryParams({ ...applied, current: totalPages }), {
+        replace: true,
+      });
+  }, [page, list.isFetching, actions.busy, applied, totalPages, setParams]);
   // 已提交查询、筛选输入与列表位置分别记忆；只有查询变化才重置位置。
   useEffect(() => {
     remember((previous) => ({ ...previous, [view]: applied }));
@@ -130,6 +150,7 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
       return;
     }
     setFilterError(null);
+    clearSelection();
     setFilterOpen(false);
     if (articleQueryParams(query).toString() === key) refresh();
     else setParams(articleQueryParams(query));
@@ -164,6 +185,12 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
           <RefreshCw data-icon="inline-start" />
         </Button>
       </header>
+      <ReviewToolbar
+        placement="selection"
+        review={actions.review}
+        rows={page?.data ?? []}
+        disabled={actions.busy || list.isFetching || !!error}
+      />
       {actions.savedDraft && (
         <Alert>
           <AlertTitle>
@@ -231,6 +258,17 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
               onEdit={() => void actions.beginEdit(row)}
               onPromote={() => actions.beginPromote(row)}
               onPreview={setPreview}
+              onReview={
+                actions.review.allowed
+                  ? () => actions.beginReview([row], true)
+                  : undefined
+              }
+              selected={
+                actions.review.allowed
+                  ? actions.review.selected.has(row.id)
+                  : undefined
+              }
+              onSelect={() => actions.review.toggle(row.id)}
             />
           ))}
           {page && !page.data.length && (
@@ -303,6 +341,13 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
           </Button>
         </div>
       </div>
+
+      <ReviewToolbar
+        placement="dock"
+        review={actions.review}
+        rows={page?.data ?? []}
+        disabled={actions.busy || list.isFetching || !!error}
+      />
 
       <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
         <DialogContent
@@ -523,6 +568,9 @@ export default function MobileArticles({ view }: { view: ArticleView }) {
 }
 
 function ArticleCard({
+  onReview,
+  selected,
+  onSelect,
   row,
   view,
   busy,
@@ -530,6 +578,9 @@ function ArticleCard({
   onPromote,
   onPreview,
 }: {
+  onReview?: () => void;
+  selected?: boolean;
+  onSelect?: () => void;
   row: CmsArticleRow;
   view: ArticleView;
   busy: boolean;
@@ -548,9 +599,18 @@ function ArticleCard({
   return (
     <article
       data-slot="mobile-article-item"
+      data-review-selected={selected || undefined}
       aria-label={row.title || "无标题文章"}
     >
       <div className="mobile-article-summary">
+        {selected !== undefined && (
+          <Checkbox
+            aria-label={`选择文章 ${row.id}`}
+            checked={selected}
+            disabled={busy}
+            onCheckedChange={onSelect}
+          />
+        )}
         <div className="min-w-0">
           <button
             className="mobile-article-title"
@@ -640,6 +700,11 @@ function ArticleCard({
         <Button variant="outline" disabled={busy} onClick={onEdit}>
           编辑
         </Button>
+        {onReview && (
+          <Button variant="outline" disabled={busy} onClick={onReview}>
+            审核
+          </Button>
+        )}
         {view === "quality" && (
           <Button variant="outline" disabled={busy} onClick={onPromote}>
             转渠道素材

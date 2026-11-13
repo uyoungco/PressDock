@@ -17,6 +17,7 @@ import {
 import { chooseOption } from "./select-helpers";
 import { deferred } from "./cms-fixtures";
 import { DesktopSettingsContext } from "@/features/settings/desktop-state";
+import { settingsActivity } from "@/features/settings-sync/activity";
 
 it("紧凑图片预设保留独立保存、中文字段、锁定提示和失败草稿恢复", async () => {
   const report = vi.fn();
@@ -76,6 +77,37 @@ async function select(channel = "A", subChannel = "轮播图") {
 }
 const change = (label: string, value: string) =>
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
+
+it("配置更新后保留所选渠道，替换干净预设副本及保存基线", async () => {
+  const original = {
+    ...emptyPresets("A", "轮播图"),
+    titlePic: { size: { width: 280, height: 124 } },
+  };
+  vi.mocked(imagePresetsService.list).mockResolvedValue([original]);
+  render(<ImagePresetSettings />);
+  await select();
+  change("TitlePic 宽（px）", "560");
+  await userEvent.click(screen.getByRole("button", { name: "保存图片预设" }));
+  await waitFor(() => expect(settingsActivity.getSnapshot().dirty).toBe(false));
+  const remote = {
+    ...original,
+    titlePic: { size: { width: 840, height: 372 } },
+  };
+  vi.mocked(imagePresetsService.list).mockResolvedValue([remote]);
+  act(() => settingsActivity.applied());
+  await waitFor(() =>
+    expect(screen.getByLabelText("TitlePic 宽（px）")).toHaveValue(840),
+  );
+  expect(screen.getByLabelText("预设渠道")).toHaveTextContent("A");
+  change("TitlePic 宽（px）", "841");
+  await userEvent.click(screen.getByRole("button", { name: "保存图片预设" }));
+  await waitFor(() =>
+    expect(imagePresetsService.save).toHaveBeenLastCalledWith(
+      expect.anything(),
+      remote,
+    ),
+  );
+});
 
 it("两个字段独立配置，KiB 转为字节并保留部分预设", async () => {
   render(<ImagePresetSettings />);

@@ -1,0 +1,74 @@
+{
+  "changes": [
+    {
+      "width": 1440,
+      "documentWidth": 1440,
+      "layout": "wide",
+      "allCount": 1,
+      "allInTable": true,
+      "allState": "mixed",
+      "separator": false,
+      "summary": "已选 1 篇",
+      "selectedRows": ["选择文章 8101"],
+      "focus": "BODY",
+      "blocked": []
+    },
+    {
+      "width": 960,
+      "documentWidth": 960,
+      "layout": "compact",
+      "allCount": 1,
+      "allInTable": true,
+      "allState": "mixed",
+      "separator": false,
+      "summary": "已选 1 篇",
+      "selectedRows": ["选择文章 8101"],
+      "focus": "BODY",
+      "blocked": []
+    },
+    {
+      "width": 900,
+      "documentWidth": 900,
+      "layout": "cards",
+      "allCount": 1,
+      "allInTable": false,
+      "allState": "mixed",
+      "separator": true,
+      "summary": "已选 1 篇",
+      "selectedRows": ["选择文章 8101"],
+      "focus": "BODY",
+      "blocked": []
+    },
+    {
+      "width": 1440,
+      "documentWidth": 1440,
+      "layout": "wide",
+      "allCount": 1,
+      "allInTable": true,
+      "allState": "mixed",
+      "separator": false,
+      "summary": "已选 1 篇",
+      "selectedRows": ["选择文章 8101"],
+      "focus": "BODY",
+      "blocked": []
+    }
+  ],
+  "batch": {
+    "articles": 3,
+    "focus": "批量审核"
+  },
+  "cleared": {
+    "width": 1440,
+    "documentWidth": 1440,
+    "layout": "wide",
+    "allCount": 1,
+    "allInTable": true,
+    "allState": "false",
+    "separator": false,
+    "summary": "已选 0 篇",
+    "selectedRows": [],
+    "focus": "清空选择",
+    "blocked": []
+  },
+  "fallbackFocus": "全选当前页文章"
+}

@@ -6,6 +6,7 @@ import { functionalUpdate, type Updater } from "@tanstack/react-table";
 export type TablePreferenceKey =
   | "channels"
   | "dashboard"
+  | "dashboard-harvest"
   | "articles"
   | "publish"
   | "import"

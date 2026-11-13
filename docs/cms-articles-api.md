@@ -2,6 +2,8 @@
 
 本次迁移以 Ego 对原站真实查询响应及被阻断的写请求为依据。原站入口：<https://newsadmin.nccontrol.com.cn/index.html#/article/article-review-quality>。线上写接口未实写验证；后续实写须另行授权测试数据。
 
+一、二、三级单条和批量审核的接口、请求体差异、原站批量处理问题及实施建议见 [2026-11-09 审核专项调研](cms-article-review-research-2026-11-09.md)。桌面与 Android 已实现审核，调研及实施验收均未向线上服务器发送审核写请求。验收范围见 [文章审核实施记录](cms-article-review-implementation-2026-11-09.md)。
+
 ## 查询与导航
 
 | 路由                 | 页面       | status | quality | 可选筛选                                              |
@@ -11,7 +13,7 @@
 | `/articles/review-2` | 二级待审核 | 1      | 0       | id、classid、title、start、end                        |
 | `/articles/review-3` | 三级待审核 | 2      | 0       | id、classid、title、start、end                        |
 
-`/articles` 跳转优质文章。四页共用 `GET /api/Article`，状态由 Rust 根据页面枚举固定映射，不能从 IPC 指定审核动作。公共参数 `priority=0`、`current`、`pagesize`；布尔参数为 0/1，日期为 YYYY-MM-DD，空可选条件省略。隐藏条件强制清空。分类来自 `GET /api/ArticleClass`。
+`/articles` 跳转优质文章。四页共用 `GET /api/Article`，查询状态由 Rust 根据页面枚举固定映射，查询 IPC 不接受审核动作或自定义状态。公共参数 `priority=0`、`current`、`pagesize`；布尔参数为 0/1，日期为 YYYY-MM-DD，空可选条件省略。隐藏条件强制清空。分类来自 `GET /api/ArticleClass`。
 
 默认每页 50 条，支持 10、20、30、50、100、200、500 条，使用服务端 total/current/pageSize。搜索回第一页；重置清除可选条件并保留条数。各页面分别在运行内存记住已提交条件及分页，显式 URL 优先；退出、换号或关闭应用清空，同账号认证恢复保留。
 
@@ -51,7 +53,11 @@
 
 协议相对图片仅在展示及图片许可登记时补 HTTPS，提交保留原始字段。文章三图扩展既有会话图片许可、懒加载、并发和缓存机制；无效地址显示占位。
 
-旧内容编辑菜单、路由、页面、缓冲和单篇本地草稿读写链路已移除，工作台/发布历史只读，不删除 SQLite 历史记录。未迁移新增文章、审核、优先审核、热点推荐、增删优质文章、日志、勾选和批量操作。
+旧内容编辑菜单、路由、页面、缓冲和单篇本地草稿读写链路已移除，发布历史只读，不删除 SQLite 历史记录。工作台改为真实采集与 CMS 待审核概览，复用三级查询第一页（每页 10 条）的服务端 total；分级入口显式清空筛选，不触发审核写操作。未迁移新增文章、优先审核、热点推荐、增删优质文章和日志。
+
+## 文章审核（2026-11-09）
+
+一、二、三级待审核页支持单条审核及当前页勾选批量审核，新增 `cms_review_article` 和 `cms_review_articles`。同意与拒绝都先确认；按用户要求不输入拒绝原因，两者均固定 `comment=""`。单条使用已保存详情构造 camelCase 请求，批量逐篇复查行快照并构造 PascalCase 请求，均 `PUT /api/Article/{id}`，不发送目标 status。沿用角色限制、草稿阻挡、串行请求、`msg="succ"` 确认及结果待确认保护；完整字段和校验见[审核实施记录](cms-article-review-implementation-2026-11-09.md)。没有线上实写验证空原因拒绝、审核流转或发布效果。
 
 ## 验收边界
 

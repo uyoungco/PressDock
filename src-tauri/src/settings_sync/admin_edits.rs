@@ -1,6 +1,6 @@
 //! 仅对独立开发环境的临时演示实体验收，不调用 AI 或 CMS 写接口。
 use super::*;
-use crate::ai::{AiService, PromptTemplate, SaveProviderRequest};
+use crate::ai::{AiService, PromptTemplate, SaveProviderRequest, TemplatePurpose};
 use crate::database::image_presets::ChannelImagePresets;
 
 async fn drain(sync: &SettingsSync, db: &Database, cms: &CmsService) -> SyncResult<()> {
@@ -116,6 +116,62 @@ pub(super) async fn run(
     sync.images(db, image(json!({}))?, None).await?;
     drain(sync, db, cms).await?;
     let harvest = db.harvest_settings().await?;
+    let original_body = db
+        .ai_settings()
+        .await?
+        .templates
+        .into_iter()
+        .find(|t| t.purpose == TemplatePurpose::BodyOrganization && t.is_default);
+    let mut body = db
+        .ai_settings()
+        .await?
+        .templates
+        .into_iter()
+        .find(|t| t.purpose == TemplatePurpose::BodyOrganization)
+        .ok_or(SyncError::new("PROBE_NO_BODY_TEMPLATE", false))?;
+    body.id = uuid::Uuid::new_v4().to_string();
+    body.name = "【演示数据】正文整理同步".into();
+    body.model_config_id = Some(suffix.clone());
+    body.is_default = true;
+    sync.template(db, body.clone(), None).await?;
+    drain(sync, db, cms).await?;
+    let mut organized = harvest.clone();
+    organized.options.ai_organize_body = !harvest.options.ai_organize_body;
+    sync.harvest(db, organized.clone(), Some(harvest.clone()))
+        .await?;
+    drain(sync, db, cms).await?;
+    let (_, token) = cms
+        .settings_authorization()
+        .await
+        .map_err(|_| SyncError::new("AUTH_EXPIRED", false))?;
+    let raw = sync.request(&token, "bootstrap", None).await?;
+    validate_document(&raw, DocumentKind::Bootstrap, None, &[])?;
+    let downloaded: Bootstrap = serde_json::from_slice(&raw)?;
+    if downloaded.snapshot.config.harvest.ai_organize_body != organized.options.ai_organize_body
+        || downloaded
+            .snapshot
+            .config
+            .defaults
+            .body_organization_template_id
+            .as_deref()
+            != Some(body.id.as_str())
+        || !downloaded
+            .snapshot
+            .config
+            .templates
+            .iter()
+            .any(|t| t.id == body.id && t.purpose == TemplatePurpose::BodyOrganization)
+    {
+        return Err(SyncError::new("PROBE_BODY_READBACK_FAILED", false));
+    }
+    sync.harvest(db, harvest.clone(), None).await?;
+    drain(sync, db, cms).await?;
+    if let Some(original) = original_body {
+        sync.template(db, original, None).await?;
+        drain(sync, db, cms).await?;
+    }
+    sync.remove(db, "template", &body.id).await?;
+    drain(sync, db, cms).await?;
     let mut changed = harvest.clone();
     changed.options.auto_summary = !harvest.options.auto_summary;
     changed.options.model_config_id = Some(suffix.clone());
@@ -154,7 +210,7 @@ pub(super) async fn run(
     }
     println!(
         "{}",
-        json!({"check":"windows-native-all-shared-edits-dev","passed":true,"providerModelTemplatePresetCrud":true,"defaultTemplateChangedAndRestored":true,"secretCreatedReplacedCleared":true,"harvestRulesChangedAndRestored":true,"localPreferencesUploads":0,"allOriginalDemoSettingsRestored":true,"aiRequests":0,"cmsWrites":0})
+        json!({"check":"windows-native-all-shared-edits-dev","passed":true,"providerModelTemplatePresetCrud":true,"defaultTemplateChangedAndRestored":true,"bodyOrganizationReadbackAndRestore":true,"secretCreatedReplacedCleared":true,"harvestRulesChangedAndRestored":true,"localPreferencesUploads":0,"allOriginalDemoSettingsRestored":true,"aiRequests":0,"cmsWrites":0})
     );
     Ok(())
 }

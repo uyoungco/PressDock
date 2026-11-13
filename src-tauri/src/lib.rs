@@ -67,7 +67,9 @@ pub fn run() {
                     .find(|window| window.label == "main")
                     .expect("主窗口配置");
                 tauri::WebviewWindowBuilder::from_config(app, config)?
-                    .initialization_script_for_all_frames(window_policy::script(developer_mode))
+                    .initialization_script_for_all_frames(window_policy::main_script(
+                        developer_mode,
+                    ))
                     .on_page_load(|window, _| window_policy::apply(&window))
                     .build()?;
             }
@@ -79,6 +81,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::settings_sync_start,
+            commands::settings_sync_manual,
             commands::settings_sync_status,
             commands::settings_sync_wake,
             commands::settings_sync_resolve,
@@ -114,6 +117,8 @@ pub fn run() {
             commands::cms_list_article_classes,
             commands::cms_get_article,
             commands::cms_update_article,
+            commands::cms_review_article,
+            commands::cms_review_articles,
             commands::cms_add_article_to_promote,
             commands::cms_login,
             commands::cms_restore_session,

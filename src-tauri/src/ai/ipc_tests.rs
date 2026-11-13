@@ -102,6 +102,7 @@ fn android_settings_permissions_only_cover_main_business_window() {
     assert!(capability.get("remote").is_none());
     let permissions = capability["permissions"].as_array().unwrap();
     for command in [
+        "settings-sync-manual",
         "harvest-load-settings",
         "harvest-save-settings",
         "harvest-set-developer-mode",
@@ -123,6 +124,8 @@ fn android_settings_permissions_only_cover_main_business_window() {
         "cms-list-article-classes",
         "cms-get-article",
         "cms-update-article",
+        "cms-review-article",
+        "cms-review-articles",
         "cms-add-article-to-promote",
         "ai-suggest-pagination",
         "ai-cancel",
@@ -178,7 +181,17 @@ async fn fixture(
     let calls = std::sync::atomic::AtomicUsize::new(0);
     Mock::given(method("POST"))
         .and(path(endpoint))
-        .respond_with(move |_: &wiremock::Request| {
+        .respond_with(move |request: &wiremock::Request| {
+            let body: Value = serde_json::from_slice(&request.body).unwrap();
+            if body["instructions"].as_str().is_some_and(|s| s.contains(organization::ORGANIZATION_CONTRACT)) {
+                let output = if body["input"].as_str().is_some_and(|s| s.contains("body-fallback")) {
+                    r#"{"type":"json_object","actions":[]}"#
+                } else { r#"{"version":2,"actions":["A1"]}"# };
+                return ResponseTemplate::new(200).set_body_json(json!({"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":output}]}]}));
+            }
+            if body["input"].as_str().is_some_and(|s| s.contains("body-both")) {
+                return ResponseTemplate::new(200).set_body_json(payload.clone());
+            }
             let wait = if calls.fetch_add(1, Ordering::SeqCst) == 0 {
                 delay.min(Duration::from_secs(2))
             } else {
@@ -213,6 +226,37 @@ async fn fixture(
 #[test]
 fn pagination_through_webview_ipc_checks_acl_generation_and_cancellation() {
     check_webview_ipc(Protocol::ChatCompletions);
+}
+
+#[test]
+fn article_review_commands_use_real_main_window_acl() {
+    let (cms, _server) = tauri::async_runtime::block_on(crate::cms::ipc_service());
+    let app = tauri::test::mock_builder()
+        .manage(cms)
+        .invoke_handler(tauri::generate_handler![
+            crate::commands::cms_review_article,
+            crate::commands::cms_review_articles
+        ])
+        .build(tauri::generate_context!())
+        .unwrap();
+    let main = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
+        .build()
+        .unwrap();
+    let blocked = tauri::WebviewWindowBuilder::new(&app, "source-review-test", Default::default())
+        .build()
+        .unwrap();
+    for command in ["cms_review_article", "cms_review_articles"] {
+        let denied = invoke(&blocked, command, json!({"request":{}})).unwrap_err();
+        assert!(denied.as_str().unwrap().contains("not allowed"));
+        // 合法授权后到达 Rust 类型边界；非法请求不能发网络。
+        let validation = invoke(
+            &main,
+            command,
+            json!({"request":{"view":"quality","decision":"accept","comment":"","articles":[]}}),
+        )
+        .unwrap_err();
+        assert!(!validation.as_str().unwrap().contains("not allowed"));
+    }
 }
 
 #[test]
@@ -401,12 +445,35 @@ fn harvest_native_desktop_fixture() {
             "第二段演示内容保持链接及段落格式。".repeat(18)
         );
         let mut jobs = Vec::new();
+        let mut body_template = db
+            .ai_settings()
+            .await
+            .unwrap()
+            .templates
+            .into_iter()
+            .find(|t| t.purpose == TemplatePurpose::BodyOrganization)
+            .unwrap();
+        body_template.model_config_id = Some("gateway".into());
+        db.ai_save_template(&body_template).await.unwrap();
         for (i, name) in [
-            "success", "nested", "missing", "images", "disabled", "prepared", "cancel",
+            "success",
+            "nested",
+            "missing",
+            "images",
+            "disabled",
+            "prepared",
+            "body-only",
+            "body-both",
+            "body-fallback",
+            "body-checkpoint",
+            "cancel",
         ]
         .iter()
         .enumerate()
         {
+            settings.options.ai_organize_body = name.starts_with("body-");
+            settings.options.ai_auto_paginate = !name.starts_with("body-") || *name == "body-both";
+            db.harvest_save_settings(&settings).await.unwrap();
             let id = uuid::Uuid::new_v4().to_string();
             let url = format!("https://baijiahao.baidu.com/s?id={}", i + 1000);
             db.harvest_enqueue(
@@ -446,22 +513,52 @@ fn harvest_native_desktop_fixture() {
             if *name == "disabled" {
                 sqlx::query("UPDATE harvest_jobs SET options=json_set(options,'$.aiAutoPaginate',json('false')) WHERE id=?").bind(&id).execute(&db.pool).await.unwrap();
             }
+            if *name == "body-checkpoint" {
+                let plan = organization::parse(r#"{"version":2,"actions":["A1"]}"#).unwrap();
+                let mut organized = article.clone();
+                organized.news_text = crate::harvest::organization::prepare(&html)
+                    .unwrap()
+                    .apply(&plan)
+                    .unwrap();
+                sqlx::query("UPDATE harvest_jobs SET organized=? WHERE id=?")
+                    .bind(
+                        serde_json::to_string(&crate::harvest::OrganizationCheckpoint {
+                            input_html: html.clone(),
+                            contract_version: 2,
+                            article: organized,
+                            warning: None,
+                        })
+                        .unwrap(),
+                    )
+                    .bind(&id)
+                    .execute(&db.pool)
+                    .await
+                    .unwrap();
+            }
             jobs.push((id, *name, article));
         }
         (user, jobs)
     });
+    let mut sync = crate::settings_sync::runtime::SettingsSync::new().unwrap();
+    sync.local.vault = Arc::new(TestVault::default());
+    tauri::async_runtime::block_on(async {
+        crate::settings_sync::local::LocalStore::ensure_device(&saved_db)
+            .await
+            .unwrap();
+        let config = crate::settings_sync::local::export(&saved_db)
+            .await
+            .unwrap();
+        sqlx::query("INSERT INTO sync_generations VALUES('demo-native',1,?,1)")
+            .bind(serde_json::to_string(&config).unwrap())
+            .execute(&saved_db.pool)
+            .await
+            .unwrap();
+        sqlx::query("UPDATE sync_state SET active_generation='demo-native',last_observed_revision=1 WHERE id=1").execute(&saved_db.pool).await.unwrap();
+    });
     let mut context = tauri::generate_context!();
     context.config_mut().identifier = "com.example.pressdock.harvest-pagination-demo".into();
-    let app = tauri::Builder::default()
-        .any_thread()
-        .manage(db)
-        .manage(ai)
-        .manage(cms)
-        .manage(HarvestService::new(None))
-        .manage(crate::window_policy::WindowPolicy(
-            std::sync::atomic::AtomicBool::new(true),
-        ))
-        .invoke_handler(tauri::generate_handler![
+    let handler: Box<dyn Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync> =
+        Box::new(tauri::generate_handler![
             crate::commands::cms_restore_session,
             crate::commands::ai_load_settings,
             crate::commands::harvest_load_settings,
@@ -470,7 +567,27 @@ fn harvest_native_desktop_fixture() {
             crate::commands::harvest_job_action,
             crate::commands::get_app_info,
             crate::commands::health_check,
-        ])
+            crate::commands::settings_sync_status,
+            crate::commands::settings_sync_wake,
+        ]);
+    let app = tauri::Builder::default()
+        .any_thread()
+        .manage(db)
+        .manage(ai)
+        .manage(cms)
+        .manage(HarvestService::new(None))
+        .manage(sync)
+        .manage(crate::window_policy::WindowPolicy(
+            std::sync::atomic::AtomicBool::new(true),
+        ))
+        .invoke_handler(move |invoke| {
+          if invoke.message.command()=="settings_sync_start" {
+            // 隔离验收只使用临时本机配置，不连接同步云服务。
+            invoke.resolver.resolve(json!({"ready":true,"phase":"demo","usingCache":false,"pending":0,"lastError":null,"readRequests":0,"successfulReads":0,"writeRequests":0}));
+            return true;
+          }
+            handler(invoke)
+        })
         .build(context)
         .unwrap();
     let window = tauri::WebviewWindowBuilder::new(
@@ -496,7 +613,7 @@ fn harvest_native_desktop_fixture() {
             native_eval(&window,r#"(() => { Array.from(document.querySelectorAll('a')).find(a=>a.getAttribute('href')==='#/settings').click(); return true; })()"#).await?;
             native_wait(&window,r#"Array.from(document.querySelectorAll('[role=tab]')).some(t=>t.textContent.trim()==='采集与 AI 处理')"#).await?;
             native_eval(&window,r#"(() => { const tab=Array.from(document.querySelectorAll('[role=tab]')).find(t=>t.textContent.trim()==='采集与 AI 处理'); tab.focus(); tab.dispatchEvent(new MouseEvent('mousedown',{bubbles:true,button:0})); tab.click(); return true; })()"#).await?;
-            native_wait(&window,r#"!!document.getElementById('harvest-aiAutoPaginate') && document.body.innerText.includes('目标 240')"#).await?;
+            native_wait(&window,r#"!!document.getElementById('harvest-aiAutoPaginate') && document.body.innerText.includes('100 / 240 / 400')"#).await?;
             let clean=native_eval(&window,r#"!document.getElementById('harvest-autoOrganize') && !document.getElementById('harvest-autoPaginate') && document.body.innerText.includes('元数据处理模型')"#).await?;
             if clean!=json!(true) {return Err("旧规则未移除或模型标签不符".into());}
             native_eval(&window,r#"(() => {document.getElementById('harvest-aiAutoPaginate').click();return true;})()"#).await?;
@@ -538,14 +655,27 @@ fn harvest_native_desktop_fixture() {
             match name {
                 "success" => assert!(html.contains("[!--empirenews.page--]")),
                 "images" => assert!(!html.contains("[!--empirenews.page--]")),
+                "body-only" | "body-both" | "body-checkpoint" => {
+                    assert_ne!(html, original.news_text);
+                    let text = |s: &str| {
+                        scraper::Html::parse_fragment(s)
+                            .root_element()
+                            .text()
+                            .collect::<String>()
+                            .replace("[!--empirenews.page--]", "")
+                    };
+                    assert_eq!(text(&html), text(&original.news_text));
+                    assert_eq!(html.contains("[!--empirenews.page--]"), name == "body-both");
+                    assert!(stored.organized.is_some());
+                }
                 _ => assert_eq!(html, original.news_text, "{name} 应完整保留排版"),
             }
             assert_eq!(stored.raw.unwrap().news_html, original.news_text);
-            if matches!(name, "nested" | "missing") {
+            if matches!(name, "nested" | "missing" | "body-fallback") {
                 assert!(stored.job.warnings.iter().any(|w| w.contains("保留原排版")));
             }
         }
-        assert_eq!(server.received_requests().await.unwrap().len(), 2);
+        assert_eq!(server.received_requests().await.unwrap().len(), 6);
         assert!(
             cms_server
                 .received_requests()
@@ -555,7 +685,7 @@ fn harvest_native_desktop_fixture() {
                 .all(|r| r.method.as_str() == "GET" || r.url.path() == "/api/Auth/Login")
         );
         println!(
-            "素材导入原生验收通过：共用分页、原排版回退、纯图片、关闭及检查点跳过、取消；CMS 无写入。"
+            "素材导入原生验收通过：正文整理、整理后分页、非法输出回退、整理检查点复用；共用分页、纯图片、关闭及取消；CMS 无写入。"
         );
     });
 }

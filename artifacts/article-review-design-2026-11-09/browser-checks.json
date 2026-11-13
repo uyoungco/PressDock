@@ -1,0 +1,39 @@
+{
+  "browser": "ego-browser",
+  "date": "2026-11-09",
+  "liveCmsRequests": 0,
+  "narrow": {
+    "width": 360,
+    "horizontalOverflow": false,
+    "box": {
+      "x": 16,
+      "y": 134,
+      "width": 20,
+      "height": 20,
+      "top": 134,
+      "right": 36,
+      "bottom": 154,
+      "left": 16
+    },
+    "button": {
+      "x": 200,
+      "y": 732.5,
+      "width": 144,
+      "height": 48,
+      "top": 732.5,
+      "right": 344,
+      "bottom": 780.5,
+      "left": 200
+    },
+    "scroll": {
+      "height": 492,
+      "content": 704
+    }
+  },
+  "clearSelection": true,
+  "currentPageSelectAll": 4,
+  "acceptConfirmation": true,
+  "rejectTrimRequired": true,
+  "designOnlyFeedback": true,
+  "imageExport": "Page.printToPDF → Poppler，Page.captureScreenshot 在最小空白页亦超时"
+}

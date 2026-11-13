@@ -2,14 +2,27 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 import { aiService } from "./service";
-import { emptySettings } from "./contracts";
+import { emptySettings, type AiSettings } from "./contracts";
+import {
+  settingsActivity,
+  useSettingsActivity,
+} from "@/features/settings-sync/activity";
 
 export function aiErrorMessage(error: unknown) {
   if (error instanceof ZodError)
     return error.issues.map((issue) => issue.message).join("；");
   return error instanceof Error ? error.message : "AI 操作失败，请重试";
 }
-export function useAiSettings(active: boolean) {
+export function useAiSettings(
+  active: boolean,
+  onReload?: (settings: AiSettings) => void,
+) {
+  const { revision, synchronizing } = useSettingsActivity();
+  const loadedRevision = useRef(revision);
+  const reload = useRef(onReload);
+  useEffect(() => {
+    reload.current = onReload;
+  }, [onReload]);
   const [settings, setSettings] = useState(emptySettings);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -37,7 +50,13 @@ export function useAiSettings(active: boolean) {
     aiService
       .load()
       .then((next) => {
-        if (valid) setSettings(next);
+        if (valid) {
+          if (loadedRevision.current !== revision) {
+            loadedRevision.current = revision;
+            reload.current?.(next);
+          }
+          setSettings(next);
+        }
       })
       .catch((reason) => {
         if (valid) setError(aiErrorMessage(reason));
@@ -48,12 +67,12 @@ export function useAiSettings(active: boolean) {
     return () => {
       valid = false;
     };
-  }, [active]);
+  }, [active, revision]);
   async function run(
     work: (signal: AbortSignal) => Promise<void>,
     success?: string,
   ) {
-    if (lock.current) return;
+    if (lock.current || settingsActivity.getSnapshot().synchronizing) return;
     lock.current = true;
     const current = new AbortController();
     controller.current = current;
@@ -75,5 +94,5 @@ export function useAiSettings(active: boolean) {
       controller.current = null;
     }
   }
-  return { settings, loading, busy, error, refresh, run };
+  return { settings, loading, busy, synchronizing, error, refresh, run };
 }

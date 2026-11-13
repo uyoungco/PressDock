@@ -36,6 +36,7 @@ function Workspace() {
   return (
     <Layout
       contentScroll={
+        pathname === "/dashboard" ||
         pathname === "/channels" ||
         pathname === "/import" ||
         pathname.startsWith("/articles") ||

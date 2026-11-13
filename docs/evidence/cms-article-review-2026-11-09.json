@@ -1,0 +1,328 @@
+{
+  "observedAt": "2026-11-09T06:48:01.009Z",
+  "origin": "https://newsadmin.nccontrol.com.cn",
+  "lists": [
+    {
+      "url": "/api/Article?status=2&current=1&pagesize=50&priority=0&editor=0&nubia=0&quality=0",
+      "httpStatus": 200,
+      "total": 0,
+      "current": 1,
+      "pageSize": 50,
+      "count": 0,
+      "msg": "succ",
+      "dataKeys": [],
+      "logKeys": []
+    },
+    {
+      "url": "/api/Article?status=1&current=1&pagesize=50&priority=0&editor=0&nubia=0&quality=0",
+      "httpStatus": 200,
+      "total": 0,
+      "current": 1,
+      "pageSize": 50,
+      "count": 0,
+      "msg": "succ",
+      "dataKeys": [],
+      "logKeys": []
+    },
+    {
+      "url": "/api/Article?status=0&current=1&pagesize=50&priority=0&editor=0&nubia=0&quality=0",
+      "httpStatus": 200,
+      "total": 47021,
+      "current": 1,
+      "pageSize": 50,
+      "count": 50,
+      "msg": "succ",
+      "dataKeys": [
+        "Id",
+        "Title",
+        "ClassId",
+        "ClassName",
+        "TitlePic",
+        "SourceUrl",
+        "NewsTime",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "Tags",
+        "Writer",
+        "Pages",
+        "NTags"
+      ],
+      "logKeys": []
+    }
+  ],
+  "detail": [
+    {
+      "httpStatus": 200,
+      "msg": "succ",
+      "dataKeys": [
+        "Id",
+        "OriginId",
+        "SourceUrl",
+        "ClassId",
+        "ClassName",
+        "Title",
+        "TitlePic",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "NewsTime",
+        "Tags",
+        "Writer",
+        "NewsText",
+        "Status",
+        "AccountId",
+        "AccountName",
+        "CreatedAt",
+        "UpdatedAt",
+        "DeletedAt",
+        "Quality",
+        "Pages",
+        "NTags"
+      ],
+      "articleStatus": 0,
+      "detailTagsType": "object",
+      "logKeys": [],
+      "url": "/api/Article/{id}"
+    }
+  ],
+  "blockedWrites": [
+    {
+      "index": 1,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "single",
+      "action": "accept",
+      "commentEmpty": true,
+      "keys": [
+        "id",
+        "newsText",
+        "title",
+        "classId",
+        "className",
+        "writer",
+        "titlePic",
+        "titlePic2",
+        "titlePic3",
+        "smallText",
+        "sourceUrl",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": true,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "undefined",
+        "NTags": "undefined"
+      },
+      "idMatchesPath": true
+    },
+    {
+      "index": 2,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "single",
+      "action": "reject",
+      "commentEmpty": false,
+      "keys": [
+        "id",
+        "newsText",
+        "title",
+        "classId",
+        "className",
+        "writer",
+        "titlePic",
+        "titlePic2",
+        "titlePic3",
+        "smallText",
+        "sourceUrl",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": true,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "undefined",
+        "NTags": "undefined"
+      },
+      "idMatchesPath": true
+    },
+    {
+      "index": 3,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "batch-item",
+      "action": "accept",
+      "commentEmpty": true,
+      "keys": [
+        "Id",
+        "Title",
+        "ClassId",
+        "ClassName",
+        "TitlePic",
+        "SourceUrl",
+        "NewsTime",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "Tags",
+        "Writer",
+        "Pages",
+        "NTags",
+        "commentRecommand",
+        "commentPromote",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": false,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "string",
+        "NTags": "string"
+      },
+      "idMatchesPath": true
+    },
+    {
+      "index": 4,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "batch-item",
+      "action": "accept",
+      "commentEmpty": true,
+      "keys": [
+        "Id",
+        "Title",
+        "ClassId",
+        "ClassName",
+        "TitlePic",
+        "SourceUrl",
+        "NewsTime",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "Tags",
+        "Writer",
+        "Pages",
+        "NTags",
+        "commentRecommand",
+        "commentPromote",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": false,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "string",
+        "NTags": "string"
+      },
+      "idMatchesPath": true
+    },
+    {
+      "index": 5,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "batch-item",
+      "action": "reject",
+      "commentEmpty": false,
+      "keys": [
+        "Id",
+        "Title",
+        "ClassId",
+        "ClassName",
+        "TitlePic",
+        "SourceUrl",
+        "NewsTime",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "Tags",
+        "Writer",
+        "Pages",
+        "NTags",
+        "commentRecommand",
+        "commentPromote",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": false,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "string",
+        "NTags": "string"
+      },
+      "idMatchesPath": true
+    },
+    {
+      "index": 6,
+      "method": "PUT",
+      "url": "/api/Article/{id}",
+      "scope": "batch-item",
+      "action": "reject",
+      "commentEmpty": false,
+      "keys": [
+        "Id",
+        "Title",
+        "ClassId",
+        "ClassName",
+        "TitlePic",
+        "SourceUrl",
+        "NewsTime",
+        "TitlePic2",
+        "TitlePic3",
+        "SmallText",
+        "Tags",
+        "Writer",
+        "Pages",
+        "NTags",
+        "commentRecommand",
+        "commentPromote",
+        "action",
+        "comment"
+      ],
+      "includesNewsText": false,
+      "includesStatus": false,
+      "tagTypes": {
+        "tags": "undefined",
+        "Tags": "string",
+        "NTags": "string"
+      },
+      "idMatchesPath": true
+    }
+  ],
+  "blockStrategy": "XMLHttpRequest.send aborted and threw before original send; non-read fetch rejected before native fetch. No review write was sent.",
+  "limitations": [
+    "Stage 2 and stage 3 lists were empty; no single or selected batch requests were executed there.",
+    "No server write response or actual state transition was tested."
+  ],
+  "loadedReviewAssets": [
+    "https://newsadmin.nccontrol.com.cn/assets/index-72ab49ce.js",
+    "https://newsadmin.nccontrol.com.cn/assets/index-72ab49ce.js"
+  ],
+  "assets": [
+    {
+      "url": "https://newsadmin.nccontrol.com.cn/assets/index-72ab49ce.js",
+      "sha256": "871ef86820e849d153a1bfe8803bfbe93b83858ae9f20b4539b415ae85f33592",
+      "bytes": 27106
+    },
+    {
+      "url": "https://newsadmin.nccontrol.com.cn/assets/index-d04968dd.js",
+      "sha256": "70108ffb26197178bd00d79301db95b16e3713c56637d30a5a9f07beff67c94f",
+      "bytes": 1981
+    },
+    {
+      "url": "https://newsadmin.nccontrol.com.cn/assets/index-4a801d9b.js",
+      "sha256": "95adfdbd5e7152bb4dd846734dd1924695d1d02afc9cfc4b679319f775d27162",
+      "bytes": 1309
+    },
+    {
+      "url": "https://newsadmin.nccontrol.com.cn/assets/index-c8317628.js",
+      "sha256": "239eae35e30482d11d403935295de0dd6ee248862bd5fba877e7a41d3c34c2c5",
+      "bytes": 974726
+    }
+  ]
+}

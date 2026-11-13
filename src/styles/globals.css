@@ -43,6 +43,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -86,6 +87,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: #fff;
   --success: oklch(0.95 0.052 163);
   --success-foreground: oklch(0.432 0.095 166);
   --warning: oklch(0.973 0.071 104);
@@ -113,6 +115,7 @@
 }
 
 .dark {
+  --destructive-foreground: #211414;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -841,6 +844,20 @@ html[data-platform="android"] [data-article-dialog] [role="toolbar"] {
   flex-wrap: nowrap;
   gap: 0;
 }
+
+/* 视觉方框独立于按钮的 44px 触控下限，扩大的伪元素继续接收点击。 */
+html[data-platform="android"] button[data-slot="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+}
+html[data-platform="android"] button[data-slot="checkbox"]::after {
+  inset: 50% auto auto 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
 html[data-platform="android"] [data-article-dialog] [role="toolbar"] button {
   flex-shrink: 0;
   min-width: 40px;
@@ -893,20 +910,6 @@ html[data-platform="android"]:has([data-mobile-articles])
   --ring: #2457d6;
   --accent: #edf2ff;
   --accent-foreground: #1d49b5;
-}
-.article-page-heading {
-  flex-shrink: 0;
-  margin-bottom: 16px;
-}
-.article-page-heading h1 {
-  font-size: 22px;
-  line-height: 30px;
-  font-weight: 500;
-}
-.article-page-heading p {
-  margin-top: 2px;
-  font-size: 12px;
-  color: var(--muted-foreground);
 }
 .articles-workspace {
   container-type: inline-size;
@@ -2112,6 +2115,299 @@ html[data-platform="android"]
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.article-review-sheet {
+  width: min(100vw, 1000px);
+  max-width: 100vw;
+}
+@media (min-width: 640px) {
+  .article-review-sheet {
+    max-width: 1000px;
+  }
+}
+.article-review-results {
+  width: min(640px, calc(100vw - 2rem));
+  max-width: 640px;
+}
+/* 文章审核沿用校样蓝；布局来自批量审核设计稿（unslop，署名见实施记录）。 */
+[data-article-dialog^="review"] {
+  --primary: #2457d6;
+  --primary-foreground: #fff;
+  --ring: #2457d6;
+}
+.dark [data-article-dialog^="review"] {
+  --primary: #9ab8ff;
+  --primary-foreground: #17213a;
+  --ring: #9ab8ff;
+}
+.article-review-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.article-review-select-all {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.article-review-toolbar > [data-slot="separator"] {
+  height: 16px;
+}
+.article-review-selection-summary p {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.article-review-selection-summary strong {
+  color: var(--primary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.article-review-toolbar .article-review-clear {
+  color: var(--muted-foreground);
+}
+.article-review-toolbar .article-review-clear:disabled {
+  visibility: hidden;
+}
+.article-review-toolbar [data-slot="button"] {
+  height: 32px;
+  border-radius: 8px;
+  transition-property: color, background-color, border-color, opacity;
+}
+.article-review-toolbar .article-review-batch-button {
+  gap: 12px;
+  padding-inline: 16px;
+}
+.article-review-selected > td,
+.article-review-selected:hover > td,
+.article-record-cards [data-review-selected="true"],
+html[data-platform="android"] [data-review-selected="true"] {
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+.articles-workspace :is(th, td):has(.article-review-checkbox) {
+  padding-inline: 14px;
+}
+.article-review-header {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.article-review-header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+.article-review-header > button {
+  margin: -8px -8px 0 0;
+}
+.article-review-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 20px;
+}
+.article-review-list-label {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.article-review-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.article-review-list li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+.article-review-ordinal {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.article-review-list h3 {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+.article-review-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.article-review-note {
+  margin-top: 8px;
+  background: var(--muted);
+  border-color: transparent;
+  border-radius: 8px;
+}
+.article-review-note [data-slot="alert-title"] {
+  font-weight: 400;
+}
+.article-review-batch-sheet {
+  width: min(560px, 100vw);
+  max-width: 560px;
+  gap: 0;
+}
+.article-review-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+}
+.article-review-footer > button {
+  min-width: 96px;
+  height: 44px;
+  border-radius: 8px;
+}
+.article-review-reject {
+  color: var(--destructive);
+}
+.article-review-confirm {
+  width: min(560px, calc(100vw - 32px));
+  max-width: 560px;
+  max-height: calc(100dvh - 32px);
+}
+.article-review-confirm .article-review-list li {
+  padding: 12px 0;
+}
+.article-review-confirm-footer {
+  flex-direction: row;
+  gap: 12px;
+  background: var(--background);
+}
+.article-review-confirm-footer > button {
+  flex: 1;
+  min-height: 44px;
+}
+html[data-platform="android"]
+  .article-review-toolbar[data-placement="selection"] {
+  justify-content: space-between;
+  min-height: 48px;
+  padding-inline: 16px 8px;
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+html[data-platform="android"] .article-review-toolbar[data-placement="dock"] {
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 88px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+}
+html[data-platform="android"] .article-review-selection-summary p {
+  font-size: 15px;
+  line-height: 24px;
+}
+html[data-platform="android"] .article-review-selection-summary strong {
+  margin-inline: 4px;
+  font-size: 20px;
+}
+html[data-platform="android"] .article-review-selection-summary > span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 20px;
+}
+html[data-platform="android"]
+  .article-review-toolbar[data-placement="dock"]
+  .article-review-batch-button {
+  justify-content: space-between;
+  min-width: 144px;
+  height: 48px;
+}
+html[data-platform="android"] [data-article-dialog="review-batch"] {
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 56px - env(safe-area-inset-top));
+  padding: 0;
+  translate: 0 0;
+  transform: none;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  gap: 0;
+}
+html[data-platform="android"]
+  [data-article-dialog="review-batch"]
+  .article-review-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+html[data-platform="android"] .article-review-footer > button {
+  min-height: 48px;
+}
+html[data-platform="android"]
+  .article-review-toolbar[data-placement="selection"]
+  > button {
+  min-height: 44px;
+}
+html[data-platform="android"] [data-review-selected] {
+  scroll-margin-block: 8px;
+}
+html[data-platform="android"]
+  .mobile-article-summary:has([data-slot="checkbox"])
+  [data-slot="material-image"],
+html[data-platform="android"]
+  .mobile-article-summary:has([data-slot="checkbox"])
+  [data-slot="material-image"]
+  > :first-child {
+  width: 64px;
+}
+html[data-platform="android"]
+  .mobile-article-summary:has([data-slot="checkbox"])
+  [data-slot="material-image"]
+  > :first-child {
+  height: 52px;
+}
+html[data-platform="android"]:has(
+    .article-review-toolbar[data-placement="dock"]
+  )
+  [data-sonner-toaster][data-y-position="bottom"] {
+  bottom: calc(12rem + env(safe-area-inset-bottom));
+}
+html[data-platform="android"] [data-article-dialog="review"] {
+  display: flex;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 100vw;
+  max-width: 100vw;
+  flex-direction: column;
+  border-radius: 0;
+}
+html[data-platform="android"]
+  .mobile-article-summary:has([data-slot="checkbox"]) {
+  grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
 html[data-platform="android"]

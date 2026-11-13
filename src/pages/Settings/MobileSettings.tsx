@@ -35,6 +35,7 @@ import {
 
 import { settingsModules as modules } from "@/features/settings/modules";
 import { ConfigSyncStatus } from "@/features/settings-sync/ConfigBoundary";
+import { useSettingsActivity } from "@/features/settings-sync/activity";
 type State = {
   settingsEditor?: NonNullable<
     ContextType<typeof MobileSettingsContext>
@@ -51,11 +52,16 @@ export default function MobileSettings({
 }: ComponentProps<typeof GeneralSettings> &
   ComponentProps<typeof ServiceConnections>) {
   const location = useLocation();
+  const { synchronizing } = useSettingsActivity();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const tab = modules.find(([id]) => id === params.get("tab"))?.[0] ?? null;
-  const purpose: "title" | "pagination" =
-    params.get("purpose") === "pagination" ? "pagination" : "title";
+  const purpose: "title" | "pagination" | "bodyOrganization" =
+    params.get("purpose") === "pagination"
+      ? "pagination"
+      : params.get("purpose") === "bodyOrganization"
+        ? "bodyOrganization"
+        : "title";
   const state: State = location.state ?? {};
   const [visited, setVisited] = useState<string[]>(tab ? [tab] : []);
   const [drafts, setDrafts] = useState<
@@ -143,7 +149,8 @@ export default function MobileSettings({
         state: { settingsProvider: id },
       });
     },
-    changePurpose: (next: "title" | "pagination") => go("ai-templates", next),
+    changePurpose: (next: "title" | "pagination" | "bodyOrganization") =>
+      go("ai-templates", next),
     report,
   };
   return (
@@ -195,6 +202,7 @@ export default function MobileSettings({
         {[...new Set([...visited, ...(tab ? [tab] : [])])].map((id) => (
           <div
             key={id}
+            inert={synchronizing}
             hidden={tab !== id}
             className="min-h-0 min-w-0 flex-1 flex-col data-[active=true]:flex"
             data-active={tab === id}
@@ -217,6 +225,9 @@ export default function MobileSettings({
                     active={tab === id}
                     onConfigurePagination={() =>
                       go("ai-templates", "pagination")
+                    }
+                    onConfigureOrganization={() =>
+                      go("ai-templates", "bodyOrganization")
                     }
                   />
                 )}

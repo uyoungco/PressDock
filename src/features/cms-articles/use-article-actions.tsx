@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useBeforeUnload, useBlocker } from "react-router-dom";
+import { useBeforeUnload, useBlocker, useNavigate } from "react-router-dom";
 import { useSetAtom } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBusinessQuery, useQueryUser } from "@/hooks/use-business-query";
@@ -30,6 +30,8 @@ import { articleInput, articleService } from "./service";
 import { articleEditIsDirty, articleMemory, type ArticleEdit } from "./state";
 import { EditorSheet } from "./EditorSheet";
 import { isAndroid } from "@/lib/platform";
+import { useArticleReview } from "./use-article-review";
+import { ReviewDialogs } from "./ReviewDialogs";
 
 const message = (error: unknown) =>
   error instanceof Error ? error.message : "请求失败，请重试";
@@ -41,6 +43,8 @@ export function useArticleActions(
 ) {
   const user = useQueryUser();
   const client = useQueryClient();
+  const navigate = useNavigate();
+  const review = useArticleReview(view);
   // 手机返回列表时仅显示恢复入口；桌面保留直接恢复编辑的原有行为。
   const [edit, setEdit] = useState(() =>
     isAndroid() ? null : articleMemory.edit(view),
@@ -54,7 +58,7 @@ export function useArticleActions(
   const alive = useRef(true),
     gate = useRef(false);
   const setDirty = useSetAtom(editorDirtyAtom);
-  const dirty = articleEditIsDirty(edit) || busy || uploading;
+  const dirty = articleEditIsDirty(edit) || busy || uploading || review.busy;
   const promoting = edit?.kind === "promote";
   const groupQuery = useBusinessQuery(
     businessKeys.groups(user),
@@ -107,7 +111,7 @@ export function useArticleActions(
     else close();
   }
   async function beginEdit(row: CmsArticleRow) {
-    if (gate.current || edit) return;
+    if (gate.current || edit || review.target || review.busy) return;
     if (isAndroid() && savedDraft) {
       setPendingOpen(() => () => void loadEdit(row));
       return;
@@ -131,7 +135,7 @@ export function useArticleActions(
     }
   }
   function beginPromote(article: CmsArticleRow) {
-    if (gate.current || edit) return;
+    if (gate.current || edit || review.target || review.busy) return;
     if (isAndroid() && savedDraft) {
       setPendingOpen(() => () => openPromote(article));
       return;
@@ -218,7 +222,17 @@ export function useArticleActions(
     }
   }
   return {
-    busy,
+    busy:
+      busy ||
+      uploading ||
+      review.busy ||
+      review.loading ||
+      !!review.target ||
+      !!edit,
+    review,
+    beginReview: (rows: CmsArticleRow[], single: boolean) => {
+      if (!busy && !uploading && !edit) void review.begin(rows, single);
+    },
     savedDraft,
     restoreDraft: () => setEdit(articleMemory.edit(view)),
     discardDraft: close,
@@ -226,6 +240,27 @@ export function useArticleActions(
     beginPromote,
     dialogs: (
       <>
+        <ReviewDialogs
+          review={review}
+          onResumeDraft={() => {
+            const draft = review.blockedDraft;
+            review.setBlockedDraft(undefined);
+            if (!draft) return;
+            if (draft[0] === view) setEdit(draft[1]);
+            else navigate(`/articles/${draft[0]}`);
+          }}
+          onDiscardDraft={() => {
+            const draft = review.blockedDraft;
+            if (draft) {
+              articleMemory.removeEdit(draft[0]);
+              if (draft[0] === view) {
+                setEdit(null);
+                setSavedDraft(null);
+              }
+            }
+            review.setBlockedDraft(undefined);
+          }}
+        />
         {edit?.kind === "edit" && (
           <EditorSheet
             dirty={articleEditIsDirty(edit)}
@@ -280,7 +315,7 @@ export function useArticleActions(
               {isAndroid() ? "离开文章编辑？" : "放弃未保存修改？"}
             </DialogTitle>
             <DialogDescription>
-              {busy || uploading
+              {busy || uploading || review.busy
                 ? "请求正在进行，请等待完成后再离开。"
                 : isAndroid()
                   ? "可保留到本次运行的内存草稿；退出、换号或重启会清除。已上传文件不会自动删除。"
@@ -294,12 +329,12 @@ export function useArticleActions(
                   if (blocker.state === "blocked") blocker.reset();
                 }}
               >
-                继续编辑
+                {review.busy ? "等待审核完成" : "继续编辑"}
               </Button>
               {isAndroid() && (
                 <Button
                   variant="outline"
-                  disabled={busy || uploading}
+                  disabled={busy || uploading || review.busy}
                   onClick={() => {
                     // 先保存最新输入，再解除浮层；保留的草稿必须由用户显式恢复。
                     if (edit) {
@@ -317,7 +352,7 @@ export function useArticleActions(
               )}
               <Button
                 variant="destructive"
-                disabled={busy || uploading}
+                disabled={busy || uploading || review.busy}
                 onClick={() => {
                   close();
                   if (blocker.state === "blocked") blocker.proceed();

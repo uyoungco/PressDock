@@ -11,7 +11,7 @@ import type { Config, Initialize, Operation, Change } from "../src/protocol.ts";
 const config = (
   JSON.parse(
     readFileSync(
-      new URL("../../../docs/settings-sync/fixtures-v1.json", import.meta.url),
+      new URL("../../../docs/settings-sync/fixtures-v2.json", import.meta.url),
       "utf8",
     ),
   ) as { base: { config: Config } }
@@ -31,6 +31,12 @@ function database() {
   db.exec(
     readFileSync(
       new URL("../migrations/0001_settings.sql", import.meta.url),
+      "utf8",
+    ),
+  );
+  db.exec(
+    readFileSync(
+      new URL("../migrations/0002_body_organization.sql", import.meta.url),
       "utf8",
     ),
   );
@@ -89,7 +95,7 @@ function database() {
   };
   const store = () => new SettingsStore(env);
   const init: Initialize = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     operationId: randomUUID(),
     deviceId: randomUUID(),
     sequence: 1,
@@ -115,7 +121,7 @@ const operation = (
   deviceId: string = randomUUID(),
   sequence = 1,
 ): Operation => ({
-  schemaVersion: 1,
+  schemaVersion: 2,
   operationId: randomUUID(),
   deviceId,
   sequence,

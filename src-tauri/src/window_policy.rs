@@ -5,6 +5,7 @@ use tauri::{AppHandle, Manager, WebviewWindow};
 pub(crate) struct WindowPolicy(pub AtomicBool);
 const SCRIPT: &str = r#"(() => {
   let enabled = __PRESSDOCK_MENU_ENABLED__;
+  const appMenus = __PRESSDOCK_APP_MENUS__;
   const channel = 'pressdock-context-menu';
   const notify = (target) => target.postMessage({channel, enabled}, '*');
   const update = (value) => {
@@ -13,6 +14,10 @@ const SCRIPT: &str = r#"(() => {
   };
   Object.defineProperty(window, '__pressdockSetContextMenu', {value: update});
   window.addEventListener('contextmenu', (event) => {
+    // 主窗口的业务菜单自行阻止原生菜单；不可在捕获阶段截断它的事件。
+    // 来源窗口及 iframe 即使含有同名 DOM 标记，也不获得此例外。
+    if (appMenus && window === window.top && event.target instanceof Element &&
+        event.target.closest('[data-pressdock-context-menu="article-body"]')) return;
     if (!enabled) { event.preventDefault(); event.stopImmediatePropagation(); }
   }, {capture: true});
   // 只同步无业务权限的菜单布尔值，跨域 iframe 不获得 invoke 或任何认证信息。
@@ -30,10 +35,22 @@ const SCRIPT: &str = r#"(() => {
 })()"#;
 
 pub(crate) fn script(enabled: bool) -> String {
-    SCRIPT.replace(
-        "__PRESSDOCK_MENU_ENABLED__",
-        if enabled { "true" } else { "false" },
-    )
+    window_script(enabled, false)
+}
+#[cfg(desktop)]
+pub(crate) fn main_script(enabled: bool) -> String {
+    window_script(enabled, true)
+}
+fn window_script(enabled: bool, app_menus: bool) -> String {
+    SCRIPT
+        .replace(
+            "__PRESSDOCK_MENU_ENABLED__",
+            if enabled { "true" } else { "false" },
+        )
+        .replace(
+            "__PRESSDOCK_APP_MENUS__",
+            if app_menus { "true" } else { "false" },
+        )
 }
 pub(crate) fn enabled(app: &AppHandle) -> bool {
     app.state::<WindowPolicy>().0.load(Ordering::SeqCst)

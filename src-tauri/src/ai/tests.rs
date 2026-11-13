@@ -354,6 +354,13 @@ async fn title_prompt_migration_updates_only_builtin_system_prompt_once() {
         .iter_mut()
         .find(|t| t["id"] == builtin.id)
         .unwrap()["systemPrompt"] = json!(upgraded.system_prompt);
+    expected["templates"].as_array_mut().unwrap().extend(
+        settings
+            .templates
+            .iter()
+            .filter(|t| t.purpose == TemplatePurpose::BodyOrganization)
+            .map(|t| serde_json::to_value(t).unwrap()),
+    );
     assert_eq!(serde_json::to_value(settings).unwrap(), expected);
 
     upgraded.system_prompt = "演示：升级后再次修改的指令".into();
@@ -414,9 +421,18 @@ async fn title_prompt_migration_initializes_fresh_databases_and_preserves_deleti
     db.ai_delete_config("template", "builtin-news-title")
         .await
         .unwrap();
-    let expected = serde_json::to_value(db.ai_settings().await.unwrap()).unwrap();
+    let mut expected = serde_json::to_value(db.ai_settings().await.unwrap()).unwrap();
     db.pool.close().await;
     let db = Database::open(&deleted_path).await.unwrap();
+    expected["templates"].as_array_mut().unwrap().extend(
+        db.ai_settings()
+            .await
+            .unwrap()
+            .templates
+            .iter()
+            .filter(|t| t.purpose == TemplatePurpose::BodyOrganization)
+            .map(|t| serde_json::to_value(t).unwrap()),
+    );
     assert_eq!(
         serde_json::to_value(db.ai_settings().await.unwrap()).unwrap(),
         expected
@@ -656,11 +672,11 @@ async fn settings_persist_default_is_unique_and_references_are_protected() {
     let mut invalid = copy.clone();
     invalid.user_prompt = "{{unknown}}".into();
     assert!(db.ai_save_template(&invalid).await.is_err());
-    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 3);
+    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 4);
     db.pool.close().await;
     let db = Database::open(&path).await.unwrap();
     assert_eq!(db.ai_settings().await.unwrap().providers.len(), 2);
-    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 3);
+    assert_eq!(db.ai_settings().await.unwrap().templates.len(), 4);
     template.model_config_id = None;
     template.is_default = false;
     db.ai_save_template(&template).await.unwrap();

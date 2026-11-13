@@ -1,5 +1,5 @@
-/** 协议 v1 的纯验证层；尚未接入部署入口，不访问网络、数据库或凭据库。 */
-export const SCHEMA_VERSION = 1;
+/** 协议 v2 的纯验证层，不访问网络、数据库或凭据库。 */
+export const SCHEMA_VERSION = 2;
 export const LIMITS = {
   documentBytes: 2 * 1024 * 1024,
   configBytes: 1024 * 1024,
@@ -34,7 +34,7 @@ export interface Model {
 }
 export interface Template {
   id: string;
-  purpose: "title" | "pagination";
+  purpose: "title" | "pagination" | "bodyOrganization";
   name: string;
   systemPrompt: string;
   userPrompt: string;
@@ -63,17 +63,19 @@ export interface Config {
   defaults: {
     titleTemplateId: string | null;
     paginationTemplateId: string | null;
+    bodyOrganizationTemplateId: string | null;
   };
   harvest: {
     autoClassify: boolean;
     autoTags: boolean;
     autoSummary: boolean;
     aiAutoPaginate: boolean;
+    aiOrganizeBody: boolean;
     modelConfigId: string | null;
   };
 }
 export interface Snapshot {
-  schemaVersion: 1;
+  schemaVersion: 2;
   revision: number;
   config: Config;
 }
@@ -100,7 +102,7 @@ export type Change =
   | { type: "setSecret"; providerId: string; value: string }
   | { type: "clearSecret"; providerId: string };
 export interface Operation {
-  schemaVersion: 1;
+  schemaVersion: 2;
   operationId: string;
   deviceId: string;
   sequence: number;
@@ -112,7 +114,7 @@ export interface SecretValue {
   value: string | null;
 }
 export interface Initialize {
-  schemaVersion: 1;
+  schemaVersion: 2;
   operationId: string;
   deviceId: string;
   sequence: number;
@@ -124,7 +126,7 @@ export interface Bootstrap {
   secrets: SecretValue[];
 }
 export interface Receipt {
-  schemaVersion: 1;
+  schemaVersion: 2;
   operationId: string;
   deviceId: string;
   sequence: number;
@@ -182,7 +184,7 @@ const nullable = (v: Json, validate: (v: Json) => void) => {
 const byteLength = (v: string) => new TextEncoder().encode(v).length;
 const bytes = (v: Json) => byteLength(JSON.stringify(v));
 const version = (v: ObjectValue) =>
-  ensure(v.schemaVersion === 1, "UNSUPPORTED_VERSION");
+  ensure(v.schemaVersion === 2, "UNSUPPORTED_VERSION");
 const collection: Record<Entity, string> = {
   provider: "providers",
   model: "models",
@@ -215,12 +217,17 @@ const fields: Record<string, string[]> = {
     "paginationOptions",
   ],
   imagePreset: ["size", "maxBytes", "format"],
-  defaults: ["titleTemplateId", "paginationTemplateId"],
+  defaults: [
+    "titleTemplateId",
+    "paginationTemplateId",
+    "bodyOrganizationTemplateId",
+  ],
   harvest: [
     "autoClassify",
     "autoTags",
     "autoSummary",
     "aiAutoPaginate",
+    "aiOrganizeBody",
     "modelConfigId",
   ],
 };
@@ -296,7 +303,7 @@ function validateEntity(entity: Entity, value: Json) {
     text(o.name, 100);
     text(o.systemPrompt, 20000, true);
     text(o.userPrompt, 20000);
-    oneOf(o.purpose, ["title", "pagination"]);
+    oneOf(o.purpose, ["title", "pagination", "bodyOrganization"]);
     nullable(o.modelConfigId, (v) => text(v, 100));
     integer(o.candidateCount, 1, 10);
     integer(o.maxLength, 1, 200);
@@ -323,6 +330,7 @@ function validateEntity(entity: Entity, value: Json) {
       );
     }
     ensure(o.purpose !== "pagination" || o.paginationOptions !== null);
+    ensure(o.purpose !== "bodyOrganization" || o.paginationOptions === null);
   } else {
     keys(o, ["channel", "subChannel", "field", "size", "maxBytes", "format"]);
     text(o.channel, 1024);
@@ -386,8 +394,9 @@ function validateConfig(value: Json) {
   const defaults = keys(c.defaults, [
     "titleTemplateId",
     "paginationTemplateId",
+    "bodyOrganizationTemplateId",
   ]);
-  for (const purpose of ["title", "pagination"]) {
+  for (const purpose of ["title", "pagination", "bodyOrganization"]) {
     const id = defaults[`${purpose}TemplateId`];
     nullable(id, (v) => text(v, 100));
     ensure(
@@ -403,9 +412,16 @@ function validateConfig(value: Json) {
     "autoTags",
     "autoSummary",
     "aiAutoPaginate",
+    "aiOrganizeBody",
     "modelConfigId",
   ]);
-  for (const k of ["autoClassify", "autoTags", "autoSummary", "aiAutoPaginate"])
+  for (const k of [
+    "autoClassify",
+    "autoTags",
+    "autoSummary",
+    "aiAutoPaginate",
+    "aiOrganizeBody",
+  ])
     boolean(h[k]);
   nullable(h.modelConfigId, (v) => {
     text(v, 100);

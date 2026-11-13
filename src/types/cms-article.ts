@@ -89,3 +89,43 @@ export const articlePromoteSchema = z.object({
   input: promoteInputSchema,
 });
 export type ArticlePromoteInput = z.infer<typeof articlePromoteSchema>;
+
+export const reviewViewSchema = z.enum(["review-1", "review-2", "review-3"]);
+export type ReviewView = z.infer<typeof reviewViewSchema>;
+export const reviewDecisionSchema = z.enum(["accept", "reject"]);
+export type ReviewDecision = z.infer<typeof reviewDecisionSchema>;
+const reviewFields = {
+  view: reviewViewSchema,
+  decision: reviewDecisionSchema,
+  comment: z.string(),
+};
+export const articleReviewSchema = z.object({
+  ...reviewFields,
+  article: cmsArticleDetailSchema,
+});
+export const articlesReviewSchema = z
+  .object({
+    ...reviewFields,
+    articles: z.array(cmsArticleRowSchema).min(1).max(500),
+  })
+  .refine(
+    (input) =>
+      new Set(input.articles.map((row) => row.id)).size ===
+      input.articles.length,
+    "文章不能重复",
+  );
+export type ArticleReviewInput = z.infer<typeof articleReviewSchema>;
+export type ArticlesReviewInput = z.infer<typeof articlesReviewSchema>;
+export const articleReviewSummarySchema = z.object({
+  authExpired: z.boolean(),
+  items: z.array(
+    z.object({
+      id: z.number().int().positive().safe(),
+      title: nullableText,
+      status: z.enum(["succeeded", "failed", "unconfirmed", "notAttempted"]),
+      code: nullableText,
+      message: z.string(),
+    }),
+  ),
+});
+export type ArticleReviewSummary = z.infer<typeof articleReviewSummarySchema>;

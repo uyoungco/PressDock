@@ -90,13 +90,13 @@ export class SettingsStore {
       .all<RawState>(`SELECT 'state' AS kind,schema_version,revision,initialized,config_json,NULL AS provider_id,NULL AS key_id,NULL AS nonce_hex,NULL AS ciphertext_hex,NULL AS secret_revision FROM settings_state WHERE id=1
 UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(ciphertext),secret_revision FROM settings_secrets`);
     const row = rows.find((r) => r.kind === "state");
-    if (!row || row.schema_version !== 1 || row.revision === null)
+    if (!row || row.schema_version !== 2 || row.revision === null)
       throw unavailable();
     let config: Config | null = null;
     if (row.initialized) {
       try {
         config = validateSnapshot({
-          schemaVersion: 1,
+          schemaVersion: 2,
           revision: row.revision,
           config: JSON.parse(row.config_json!) as Json,
         }).config;
@@ -140,7 +140,7 @@ UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(
     );
     const result: Bootstrap = {
       snapshot: {
-        schemaVersion: 1,
+        schemaVersion: 2,
         revision: state.revision,
         config: state.config,
       },
@@ -222,7 +222,7 @@ UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(
           raw,
           "initialize",
         ) as unknown as Initialize;
-        next = { schemaVersion: 1, revision: 1, config: init.config };
+        next = { schemaVersion: 2, revision: 1, config: init.config };
         for (const s of init.secrets)
           if (s.value !== null)
             puts.push(await encryptSecret(this.env, s.providerId, s.value, 1));
@@ -233,7 +233,7 @@ UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(
         next = validateOperation(
           input as unknown as Json,
           {
-            schemaVersion: 1,
+            schemaVersion: 2,
             revision: state.revision,
             config: state.config,
           } as unknown as Json,
@@ -283,7 +283,7 @@ UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(
         }
       }
       const receipt: Receipt = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         operationId: input.operationId,
         deviceId: input.deviceId,
         sequence: input.sequence,
@@ -291,7 +291,7 @@ UNION ALL SELECT 'secret',NULL,NULL,NULL,NULL,provider_id,key_id,hex(nonce),hex(
       };
       const statements = [
         this.stmt(
-          `INSERT INTO settings_commit_guard(id,ok) VALUES(1,CASE WHEN EXISTS(SELECT 1 FROM settings_state WHERE id=1 AND schema_version=1 AND revision=? AND initialized=?) AND NOT EXISTS(SELECT 1 FROM settings_devices WHERE device_id=? AND last_sequence>=?) THEN 1 ELSE 0 END)`,
+          `INSERT INTO settings_commit_guard(id,ok) VALUES(1,CASE WHEN EXISTS(SELECT 1 FROM settings_state WHERE id=1 AND schema_version=2 AND revision=? AND initialized=?) AND NOT EXISTS(SELECT 1 FROM settings_devices WHERE device_id=? AND last_sequence>=?) THEN 1 ELSE 0 END)`,
           state.revision,
           state.initialized ? 1 : 0,
           input.deviceId,
