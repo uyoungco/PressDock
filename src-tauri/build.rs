@@ -43,6 +43,8 @@ fn main() {
                 "channel_draft_save",
                 "channel_draft_clear",
                 "get_app_info",
+                // 为独立 PhotoCraft 启动入口生成权限，窗口本身不授予业务权限。
+                "open_photocraft",
                 "health_check",
                 "list_articles",
                 "create_demo_article",

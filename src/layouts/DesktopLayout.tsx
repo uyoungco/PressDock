@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavigationItems } from "@/components/layout/NavigationItems";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
+import { PhotoCraftLauncher } from "@/features/photocraft/PhotoCraftLauncher";
 import { cn } from "@/lib/utils";
 
 export function DesktopLayout({
@@ -41,6 +42,8 @@ export function DesktopLayout({
         <ScrollArea className="flex-1">
           <nav aria-label="主导航" className="flex flex-col gap-1 p-2 pt-3">
             <NavigationItems expanded={open} onExpand={() => setOpen(true)} />
+            {/* 独立工具只打开原生窗口，不进入业务路由或改变当前页面。 */}
+            <PhotoCraftLauncher expanded={open} />
           </nav>
         </ScrollArea>
         {open && (

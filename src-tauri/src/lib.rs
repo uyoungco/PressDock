@@ -5,6 +5,7 @@ mod database;
 mod error;
 mod harvest;
 mod imaging;
+mod photocraft;
 mod platform;
 pub mod settings_sync;
 mod system;
@@ -14,6 +15,9 @@ use tauri::Manager;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default();
+    // 独立协议直接提供内嵌资源，开发与安装包均不依赖额外 HTTP 服务。
+    #[cfg(desktop)]
+    let builder = builder.register_uri_scheme_protocol("photocraft", photocraft::resource);
     #[cfg(target_os = "android")]
     let builder = builder.plugin(platform::init());
     builder
@@ -110,6 +114,7 @@ pub fn run() {
             commands::channel_draft_save,
             commands::channel_draft_clear,
             commands::get_app_info,
+            commands::open_photocraft,
             commands::health_check,
             commands::list_articles,
             commands::create_demo_article,

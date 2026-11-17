@@ -33,6 +33,7 @@
     "allow-ai-suggest-pagination",
     "allow-ai-cancel",
     "allow-get-app-info",
+    "allow-open-photocraft",
     "allow-health-check",
     "allow-list-articles",
     "allow-create-demo-article",

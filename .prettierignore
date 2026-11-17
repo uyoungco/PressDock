@@ -6,3 +6,5 @@ src-tauri/target
 src-tauri/gen
 package-lock.json
 Cargo.lock
+# 保留 PhotoCraft 发布包原样，不格式化上游生成的脚本与文档。
+vendor/photocraft-web-0.23.1
